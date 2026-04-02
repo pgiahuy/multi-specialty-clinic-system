@@ -4,10 +4,15 @@
  */
 package com.hb.repository;
 
+import com.hb.pojo.User;
+import java.util.List;
+
 /**
  *
  * @author HUY
  */
-public class UserRepository {
-    
+public interface UserRepository{
+    List<User> getUsers();
+    User getUserByUsername(String username);
+    User addUser(User u);
 }

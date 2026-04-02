@@ -14,6 +14,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -26,14 +27,13 @@ import javax.persistence.TemporalType;
  * @author HUY
  */
 @Entity
-@Table(name = "inventory_logs")
+@Table(name = "notification")
 @NamedQueries({
-    @NamedQuery(name = "InventoryLogs.findAll", query = "SELECT i FROM InventoryLogs i"),
-    @NamedQuery(name = "InventoryLogs.findById", query = "SELECT i FROM InventoryLogs i WHERE i.id = :id"),
-    @NamedQuery(name = "InventoryLogs.findByChangeAmount", query = "SELECT i FROM InventoryLogs i WHERE i.changeAmount = :changeAmount"),
-    @NamedQuery(name = "InventoryLogs.findByReason", query = "SELECT i FROM InventoryLogs i WHERE i.reason = :reason"),
-    @NamedQuery(name = "InventoryLogs.findByCreatedAt", query = "SELECT i FROM InventoryLogs i WHERE i.createdAt = :createdAt")})
-public class InventoryLogs implements Serializable {
+    @NamedQuery(name = "Notification.findAll", query = "SELECT n FROM Notification n"),
+    @NamedQuery(name = "Notification.findById", query = "SELECT n FROM Notification n WHERE n.id = :id"),
+    @NamedQuery(name = "Notification.findByIsRead", query = "SELECT n FROM Notification n WHERE n.isRead = :isRead"),
+    @NamedQuery(name = "Notification.findByCreatedAt", query = "SELECT n FROM Notification n WHERE n.createdAt = :createdAt")})
+public class Notification implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -41,21 +41,22 @@ public class InventoryLogs implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
-    @Column(name = "change_amount")
-    private Integer changeAmount;
-    @Column(name = "reason")
-    private String reason;
+    @Lob
+    @Column(name = "content")
+    private String content;
+    @Column(name = "is_read")
+    private Boolean isRead;
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
-    @JoinColumn(name = "medicine_id", referencedColumnName = "id")
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     @ManyToOne(fetch = FetchType.LAZY)
-    private Medicines medicineId;
+    private User userId;
 
-    public InventoryLogs() {
+    public Notification() {
     }
 
-    public InventoryLogs(Long id) {
+    public Notification(Long id) {
         this.id = id;
     }
 
@@ -67,20 +68,20 @@ public class InventoryLogs implements Serializable {
         this.id = id;
     }
 
-    public Integer getChangeAmount() {
-        return changeAmount;
+    public String getContent() {
+        return content;
     }
 
-    public void setChangeAmount(Integer changeAmount) {
-        this.changeAmount = changeAmount;
+    public void setContent(String content) {
+        this.content = content;
     }
 
-    public String getReason() {
-        return reason;
+    public Boolean getIsRead() {
+        return isRead;
     }
 
-    public void setReason(String reason) {
-        this.reason = reason;
+    public void setIsRead(Boolean isRead) {
+        this.isRead = isRead;
     }
 
     public Date getCreatedAt() {
@@ -91,12 +92,12 @@ public class InventoryLogs implements Serializable {
         this.createdAt = createdAt;
     }
 
-    public Medicines getMedicineId() {
-        return medicineId;
+    public User getUserId() {
+        return userId;
     }
 
-    public void setMedicineId(Medicines medicineId) {
-        this.medicineId = medicineId;
+    public void setUserId(User userId) {
+        this.userId = userId;
     }
 
     @Override
@@ -109,10 +110,10 @@ public class InventoryLogs implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof InventoryLogs)) {
+        if (!(object instanceof Notification)) {
             return false;
         }
-        InventoryLogs other = (InventoryLogs) object;
+        Notification other = (Notification) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -121,7 +122,7 @@ public class InventoryLogs implements Serializable {
 
     @Override
     public String toString() {
-        return "com.hb.pojo.InventoryLogs[ id=" + id + " ]";
+        return "com.hb.pojo.Notification[ id=" + id + " ]";
     }
     
 }

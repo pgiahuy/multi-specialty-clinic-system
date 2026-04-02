@@ -5,6 +5,7 @@
 package com.hb.pojo;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -14,9 +15,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -27,12 +28,12 @@ import javax.persistence.TemporalType;
  * @author HUY
  */
 @Entity
-@Table(name = "medical_records")
+@Table(name = "prescription")
 @NamedQueries({
-    @NamedQuery(name = "MedicalRecords.findAll", query = "SELECT m FROM MedicalRecords m"),
-    @NamedQuery(name = "MedicalRecords.findById", query = "SELECT m FROM MedicalRecords m WHERE m.id = :id"),
-    @NamedQuery(name = "MedicalRecords.findByCreatedAt", query = "SELECT m FROM MedicalRecords m WHERE m.createdAt = :createdAt")})
-public class MedicalRecords implements Serializable {
+    @NamedQuery(name = "Prescription.findAll", query = "SELECT p FROM Prescription p"),
+    @NamedQuery(name = "Prescription.findById", query = "SELECT p FROM Prescription p WHERE p.id = :id"),
+    @NamedQuery(name = "Prescription.findByCreatedAt", query = "SELECT p FROM Prescription p WHERE p.createdAt = :createdAt")})
+public class Prescription implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -40,25 +41,19 @@ public class MedicalRecords implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
-    @Lob
-    @Column(name = "diagnosis")
-    private String diagnosis;
-    @Lob
-    @Column(name = "note")
-    private String note;
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
-    @JoinColumn(name = "appointment_id", referencedColumnName = "id")
+    @JoinColumn(name = "medical_record_id", referencedColumnName = "id")
     @OneToOne(fetch = FetchType.LAZY)
-    private Appointments appointmentId;
-    @OneToOne(mappedBy = "medicalRecordId", fetch = FetchType.LAZY)
-    private Prescriptions prescriptions;
+    private MedicalRecord medicalRecordId;
+    @OneToMany(mappedBy = "prescriptionId", fetch = FetchType.LAZY)
+    private Collection<PrescriptionItem> prescriptionItemCollection;
 
-    public MedicalRecords() {
+    public Prescription() {
     }
 
-    public MedicalRecords(Long id) {
+    public Prescription(Long id) {
         this.id = id;
     }
 
@@ -70,22 +65,6 @@ public class MedicalRecords implements Serializable {
         this.id = id;
     }
 
-    public String getDiagnosis() {
-        return diagnosis;
-    }
-
-    public void setDiagnosis(String diagnosis) {
-        this.diagnosis = diagnosis;
-    }
-
-    public String getNote() {
-        return note;
-    }
-
-    public void setNote(String note) {
-        this.note = note;
-    }
-
     public Date getCreatedAt() {
         return createdAt;
     }
@@ -94,20 +73,20 @@ public class MedicalRecords implements Serializable {
         this.createdAt = createdAt;
     }
 
-    public Appointments getAppointmentId() {
-        return appointmentId;
+    public MedicalRecord getMedicalRecordId() {
+        return medicalRecordId;
     }
 
-    public void setAppointmentId(Appointments appointmentId) {
-        this.appointmentId = appointmentId;
+    public void setMedicalRecordId(MedicalRecord medicalRecordId) {
+        this.medicalRecordId = medicalRecordId;
     }
 
-    public Prescriptions getPrescriptions() {
-        return prescriptions;
+    public Collection<PrescriptionItem> getPrescriptionItemCollection() {
+        return prescriptionItemCollection;
     }
 
-    public void setPrescriptions(Prescriptions prescriptions) {
-        this.prescriptions = prescriptions;
+    public void setPrescriptionItemCollection(Collection<PrescriptionItem> prescriptionItemCollection) {
+        this.prescriptionItemCollection = prescriptionItemCollection;
     }
 
     @Override
@@ -120,10 +99,10 @@ public class MedicalRecords implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof MedicalRecords)) {
+        if (!(object instanceof Prescription)) {
             return false;
         }
-        MedicalRecords other = (MedicalRecords) object;
+        Prescription other = (Prescription) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -132,7 +111,7 @@ public class MedicalRecords implements Serializable {
 
     @Override
     public String toString() {
-        return "com.hb.pojo.MedicalRecords[ id=" + id + " ]";
+        return "com.hb.pojo.Prescription[ id=" + id + " ]";
     }
     
 }

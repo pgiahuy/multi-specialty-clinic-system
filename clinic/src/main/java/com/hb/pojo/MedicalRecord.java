@@ -15,9 +15,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -27,13 +27,12 @@ import javax.persistence.TemporalType;
  * @author HUY
  */
 @Entity
-@Table(name = "notifications")
+@Table(name = "medical_record")
 @NamedQueries({
-    @NamedQuery(name = "Notifications.findAll", query = "SELECT n FROM Notifications n"),
-    @NamedQuery(name = "Notifications.findById", query = "SELECT n FROM Notifications n WHERE n.id = :id"),
-    @NamedQuery(name = "Notifications.findByIsRead", query = "SELECT n FROM Notifications n WHERE n.isRead = :isRead"),
-    @NamedQuery(name = "Notifications.findByCreatedAt", query = "SELECT n FROM Notifications n WHERE n.createdAt = :createdAt")})
-public class Notifications implements Serializable {
+    @NamedQuery(name = "MedicalRecord.findAll", query = "SELECT m FROM MedicalRecord m"),
+    @NamedQuery(name = "MedicalRecord.findById", query = "SELECT m FROM MedicalRecord m WHERE m.id = :id"),
+    @NamedQuery(name = "MedicalRecord.findByCreatedAt", query = "SELECT m FROM MedicalRecord m WHERE m.createdAt = :createdAt")})
+public class MedicalRecord implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -42,21 +41,24 @@ public class Notifications implements Serializable {
     @Column(name = "id")
     private Long id;
     @Lob
-    @Column(name = "content")
-    private String content;
-    @Column(name = "is_read")
-    private Boolean isRead;
+    @Column(name = "diagnosis")
+    private String diagnosis;
+    @Lob
+    @Column(name = "note")
+    private String note;
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Users userId;
+    @JoinColumn(name = "appointment_id", referencedColumnName = "id")
+    @OneToOne(fetch = FetchType.LAZY)
+    private Appointment appointmentId;
+    @OneToOne(mappedBy = "medicalRecordId", fetch = FetchType.LAZY)
+    private Prescription prescription;
 
-    public Notifications() {
+    public MedicalRecord() {
     }
 
-    public Notifications(Long id) {
+    public MedicalRecord(Long id) {
         this.id = id;
     }
 
@@ -68,20 +70,20 @@ public class Notifications implements Serializable {
         this.id = id;
     }
 
-    public String getContent() {
-        return content;
+    public String getDiagnosis() {
+        return diagnosis;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setDiagnosis(String diagnosis) {
+        this.diagnosis = diagnosis;
     }
 
-    public Boolean getIsRead() {
-        return isRead;
+    public String getNote() {
+        return note;
     }
 
-    public void setIsRead(Boolean isRead) {
-        this.isRead = isRead;
+    public void setNote(String note) {
+        this.note = note;
     }
 
     public Date getCreatedAt() {
@@ -92,12 +94,20 @@ public class Notifications implements Serializable {
         this.createdAt = createdAt;
     }
 
-    public Users getUserId() {
-        return userId;
+    public Appointment getAppointmentId() {
+        return appointmentId;
     }
 
-    public void setUserId(Users userId) {
-        this.userId = userId;
+    public void setAppointmentId(Appointment appointmentId) {
+        this.appointmentId = appointmentId;
+    }
+
+    public Prescription getPrescription() {
+        return prescription;
+    }
+
+    public void setPrescription(Prescription prescription) {
+        this.prescription = prescription;
     }
 
     @Override
@@ -110,10 +120,10 @@ public class Notifications implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Notifications)) {
+        if (!(object instanceof MedicalRecord)) {
             return false;
         }
-        Notifications other = (Notifications) object;
+        MedicalRecord other = (MedicalRecord) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -122,7 +132,7 @@ public class Notifications implements Serializable {
 
     @Override
     public String toString() {
-        return "com.hb.pojo.Notifications[ id=" + id + " ]";
+        return "com.hb.pojo.MedicalRecord[ id=" + id + " ]";
     }
     
 }

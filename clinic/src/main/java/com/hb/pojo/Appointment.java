@@ -27,15 +27,15 @@ import javax.persistence.TemporalType;
  * @author HUY
  */
 @Entity
-@Table(name = "appointments")
+@Table(name = "appointment")
 @NamedQueries({
-    @NamedQuery(name = "Appointments.findAll", query = "SELECT a FROM Appointments a"),
-    @NamedQuery(name = "Appointments.findById", query = "SELECT a FROM Appointments a WHERE a.id = :id"),
-    @NamedQuery(name = "Appointments.findByDate", query = "SELECT a FROM Appointments a WHERE a.date = :date"),
-    @NamedQuery(name = "Appointments.findByTimeSlot", query = "SELECT a FROM Appointments a WHERE a.timeSlot = :timeSlot"),
-    @NamedQuery(name = "Appointments.findByStatus", query = "SELECT a FROM Appointments a WHERE a.status = :status"),
-    @NamedQuery(name = "Appointments.findByCreatedAt", query = "SELECT a FROM Appointments a WHERE a.createdAt = :createdAt")})
-public class Appointments implements Serializable {
+    @NamedQuery(name = "Appointment.findAll", query = "SELECT a FROM Appointment a"),
+    @NamedQuery(name = "Appointment.findById", query = "SELECT a FROM Appointment a WHERE a.id = :id"),
+    @NamedQuery(name = "Appointment.findByDate", query = "SELECT a FROM Appointment a WHERE a.date = :date"),
+    @NamedQuery(name = "Appointment.findByTimeSlot", query = "SELECT a FROM Appointment a WHERE a.timeSlot = :timeSlot"),
+    @NamedQuery(name = "Appointment.findByStatus", query = "SELECT a FROM Appointment a WHERE a.status = :status"),
+    @NamedQuery(name = "Appointment.findByCreatedAt", query = "SELECT a FROM Appointment a WHERE a.createdAt = :createdAt")})
+public class Appointment implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -53,21 +53,21 @@ public class Appointments implements Serializable {
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
+    @OneToOne(mappedBy = "appointmentId", fetch = FetchType.LAZY)
+    private MedicalRecord medicalRecord;
     @JoinColumn(name = "doctor_id", referencedColumnName = "id")
     @ManyToOne(fetch = FetchType.LAZY)
-    private Doctors doctorId;
+    private Doctor doctorId;
     @JoinColumn(name = "patient_id", referencedColumnName = "id")
     @ManyToOne(fetch = FetchType.LAZY)
-    private Patients patientId;
+    private Patient patientId;
     @OneToOne(mappedBy = "appointmentId", fetch = FetchType.LAZY)
-    private MedicalRecords medicalRecords;
-    @OneToOne(mappedBy = "appointmentId", fetch = FetchType.LAZY)
-    private Payments payments;
+    private Payment payment;
 
-    public Appointments() {
+    public Appointment() {
     }
 
-    public Appointments(Long id) {
+    public Appointment(Long id) {
         this.id = id;
     }
 
@@ -111,36 +111,36 @@ public class Appointments implements Serializable {
         this.createdAt = createdAt;
     }
 
-    public Doctors getDoctorId() {
+    public MedicalRecord getMedicalRecord() {
+        return medicalRecord;
+    }
+
+    public void setMedicalRecord(MedicalRecord medicalRecord) {
+        this.medicalRecord = medicalRecord;
+    }
+
+    public Doctor getDoctorId() {
         return doctorId;
     }
 
-    public void setDoctorId(Doctors doctorId) {
+    public void setDoctorId(Doctor doctorId) {
         this.doctorId = doctorId;
     }
 
-    public Patients getPatientId() {
+    public Patient getPatientId() {
         return patientId;
     }
 
-    public void setPatientId(Patients patientId) {
+    public void setPatientId(Patient patientId) {
         this.patientId = patientId;
     }
 
-    public MedicalRecords getMedicalRecords() {
-        return medicalRecords;
+    public Payment getPayment() {
+        return payment;
     }
 
-    public void setMedicalRecords(MedicalRecords medicalRecords) {
-        this.medicalRecords = medicalRecords;
-    }
-
-    public Payments getPayments() {
-        return payments;
-    }
-
-    public void setPayments(Payments payments) {
-        this.payments = payments;
+    public void setPayment(Payment payment) {
+        this.payment = payment;
     }
 
     @Override
@@ -153,10 +153,10 @@ public class Appointments implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Appointments)) {
+        if (!(object instanceof Appointment)) {
             return false;
         }
-        Appointments other = (Appointments) object;
+        Appointment other = (Appointment) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -165,7 +165,7 @@ public class Appointments implements Serializable {
 
     @Override
     public String toString() {
-        return "com.hb.pojo.Appointments[ id=" + id + " ]";
+        return "com.hb.pojo.Appointment[ id=" + id + " ]";
     }
     
 }

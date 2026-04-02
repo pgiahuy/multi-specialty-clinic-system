@@ -30,7 +30,8 @@ public class CloudinaryService {
             Map uploadResult = cloudinary.uploader().upload(
                     file.getBytes(),
                     ObjectUtils.asMap(
-                        "folder", "clinic/" + folder
+                        "folder", "clinic/" + folder,
+                        "resource_type", "auto"
                     )
             );
             Map<String,String> res = new HashMap<>();

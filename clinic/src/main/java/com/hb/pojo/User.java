@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -27,16 +28,18 @@ import javax.persistence.TemporalType;
  * @author HUY
  */
 @Entity
-@Table(name = "users")
+@Table(name = "user")
 @NamedQueries({
-    @NamedQuery(name = "Users.findAll", query = "SELECT u FROM Users u"),
-    @NamedQuery(name = "Users.findById", query = "SELECT u FROM Users u WHERE u.id = :id"),
-    @NamedQuery(name = "Users.findByEmail", query = "SELECT u FROM Users u WHERE u.email = :email"),
-    @NamedQuery(name = "Users.findByPassword", query = "SELECT u FROM Users u WHERE u.password = :password"),
-    @NamedQuery(name = "Users.findByUsername", query = "SELECT u FROM Users u WHERE u.username = :username"),
-    @NamedQuery(name = "Users.findByRole", query = "SELECT u FROM Users u WHERE u.role = :role"),
-    @NamedQuery(name = "Users.findByCreatedAt", query = "SELECT u FROM Users u WHERE u.createdAt = :createdAt")})
-public class Users implements Serializable {
+    @NamedQuery(name = "User.findAll", query = "SELECT u FROM User u"),
+    @NamedQuery(name = "User.findById", query = "SELECT u FROM User u WHERE u.id = :id"),
+    @NamedQuery(name = "User.findByEmail", query = "SELECT u FROM User u WHERE u.email = :email"),
+    @NamedQuery(name = "User.findByPassword", query = "SELECT u FROM User u WHERE u.password = :password"),
+    @NamedQuery(name = "User.findByUsername", query = "SELECT u FROM User u WHERE u.username = :username"),
+    @NamedQuery(name = "User.findByRole", query = "SELECT u FROM User u WHERE u.role = :role"),
+    @NamedQuery(name = "User.findByCreatedAt", query = "SELECT u FROM User u WHERE u.createdAt = :createdAt"),
+    @NamedQuery(name = "User.findBySecureUrl", query = "SELECT u FROM User u WHERE u.secureUrl = :secureUrl"),
+    @NamedQuery(name = "User.findByPublicId", query = "SELECT u FROM User u WHERE u.publicId = :publicId")})
+public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -57,21 +60,25 @@ public class Users implements Serializable {
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
-    @OneToOne(mappedBy = "userId", fetch = FetchType.LAZY)
-    private Doctors doctors;
-    @OneToOne(mappedBy = "userId", fetch = FetchType.LAZY)
-    private Patients patients;
+    @Column(name = "secure_url")
+    private String secureUrl;
+    @Column(name = "public_id")
+    private String publicId;
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY)
+    private Doctor doctor;
     @OneToMany(mappedBy = "userId", fetch = FetchType.LAZY)
-    private Collection<Notifications> notificationsCollection;
+    private Collection<Notification> notificationCollection;
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY)
+    private Patient patient;
 
-    public Users() {
+    public User() {
     }
 
-    public Users(Long id) {
+    public User(Long id) {
         this.id = id;
     }
 
-    public Users(Long id, String password, String username) {
+    public User(Long id, String password, String username) {
         this.id = id;
         this.password = password;
         this.username = username;
@@ -125,28 +132,44 @@ public class Users implements Serializable {
         this.createdAt = createdAt;
     }
 
-    public Doctors getDoctors() {
-        return doctors;
+    public String getSecureUrl() {
+        return secureUrl;
     }
 
-    public void setDoctors(Doctors doctors) {
-        this.doctors = doctors;
+    public void setSecureUrl(String secureUrl) {
+        this.secureUrl = secureUrl;
     }
 
-    public Patients getPatients() {
-        return patients;
+    public String getPublicId() {
+        return publicId;
     }
 
-    public void setPatients(Patients patients) {
-        this.patients = patients;
+    public void setPublicId(String publicId) {
+        this.publicId = publicId;
     }
 
-    public Collection<Notifications> getNotificationsCollection() {
-        return notificationsCollection;
+    public Doctor getDoctor() {
+        return doctor;
     }
 
-    public void setNotificationsCollection(Collection<Notifications> notificationsCollection) {
-        this.notificationsCollection = notificationsCollection;
+    public void setDoctor(Doctor doctor) {
+        this.doctor = doctor;
+    }
+
+    public Collection<Notification> getNotificationCollection() {
+        return notificationCollection;
+    }
+
+    public void setNotificationCollection(Collection<Notification> notificationCollection) {
+        this.notificationCollection = notificationCollection;
+    }
+
+    public Patient getPatient() {
+        return patient;
+    }
+
+    public void setPatient(Patient patient) {
+        this.patient = patient;
     }
 
     @Override
@@ -159,10 +182,10 @@ public class Users implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Users)) {
+        if (!(object instanceof User)) {
             return false;
         }
-        Users other = (Users) object;
+        User other = (User) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -171,7 +194,7 @@ public class Users implements Serializable {
 
     @Override
     public String toString() {
-        return "com.hb.pojo.Users[ id=" + id + " ]";
+        return "com.hb.pojo.User[ id=" + id + " ]";
     }
     
 }
