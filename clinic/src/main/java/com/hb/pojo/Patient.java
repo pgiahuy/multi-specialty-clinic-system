@@ -28,14 +28,14 @@ import javax.persistence.TemporalType;
  * @author HUY
  */
 @Entity
-@Table(name = "patients")
+@Table(name = "patient")
 @NamedQueries({
-    @NamedQuery(name = "Patients.findAll", query = "SELECT p FROM Patients p"),
-    @NamedQuery(name = "Patients.findById", query = "SELECT p FROM Patients p WHERE p.id = :id"),
-    @NamedQuery(name = "Patients.findByDob", query = "SELECT p FROM Patients p WHERE p.dob = :dob"),
-    @NamedQuery(name = "Patients.findByGender", query = "SELECT p FROM Patients p WHERE p.gender = :gender"),
-    @NamedQuery(name = "Patients.findByPhone", query = "SELECT p FROM Patients p WHERE p.phone = :phone")})
-public class Patients implements Serializable {
+    @NamedQuery(name = "Patient.findAll", query = "SELECT p FROM Patient p"),
+    @NamedQuery(name = "Patient.findById", query = "SELECT p FROM Patient p WHERE p.id = :id"),
+    @NamedQuery(name = "Patient.findByDob", query = "SELECT p FROM Patient p WHERE p.dob = :dob"),
+    @NamedQuery(name = "Patient.findByGender", query = "SELECT p FROM Patient p WHERE p.gender = :gender"),
+    @NamedQuery(name = "Patient.findByPhone", query = "SELECT p FROM Patient p WHERE p.phone = :phone")})
+public class Patient implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -50,16 +50,16 @@ public class Patients implements Serializable {
     private String gender;
     @Column(name = "phone")
     private String phone;
+    @JoinColumn(name = "id", referencedColumnName = "id", insertable = false, updatable = false)
+    @OneToOne(optional = false, fetch = FetchType.LAZY)
+    private User user;
     @OneToMany(mappedBy = "patientId", fetch = FetchType.LAZY)
-    private Collection<Appointments> appointmentsCollection;
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    @OneToOne(fetch = FetchType.LAZY)
-    private Users userId;
+    private Collection<Appointment> appointmentCollection;
 
-    public Patients() {
+    public Patient() {
     }
 
-    public Patients(Long id) {
+    public Patient(Long id) {
         this.id = id;
     }
 
@@ -95,20 +95,20 @@ public class Patients implements Serializable {
         this.phone = phone;
     }
 
-    public Collection<Appointments> getAppointmentsCollection() {
-        return appointmentsCollection;
+    public User getUser() {
+        return user;
     }
 
-    public void setAppointmentsCollection(Collection<Appointments> appointmentsCollection) {
-        this.appointmentsCollection = appointmentsCollection;
+    public void setUser(User user) {
+        this.user = user;
     }
 
-    public Users getUserId() {
-        return userId;
+    public Collection<Appointment> getAppointmentCollection() {
+        return appointmentCollection;
     }
 
-    public void setUserId(Users userId) {
-        this.userId = userId;
+    public void setAppointmentCollection(Collection<Appointment> appointmentCollection) {
+        this.appointmentCollection = appointmentCollection;
     }
 
     @Override
@@ -121,10 +121,10 @@ public class Patients implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Patients)) {
+        if (!(object instanceof Patient)) {
             return false;
         }
-        Patients other = (Patients) object;
+        Patient other = (Patient) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -133,7 +133,7 @@ public class Patients implements Serializable {
 
     @Override
     public String toString() {
-        return "com.hb.pojo.Patients[ id=" + id + " ]";
+        return "com.hb.pojo.Patient[ id=" + id + " ]";
     }
     
 }

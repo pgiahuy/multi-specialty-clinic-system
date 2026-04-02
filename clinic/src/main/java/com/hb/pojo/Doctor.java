@@ -7,6 +7,7 @@ package com.hb.pojo;
 import java.io.Serializable;
 import java.util.Collection;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -15,6 +16,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -26,11 +28,11 @@ import javax.persistence.Table;
  * @author HUY
  */
 @Entity
-@Table(name = "doctors")
+@Table(name = "doctor")
 @NamedQueries({
-    @NamedQuery(name = "Doctors.findAll", query = "SELECT d FROM Doctors d"),
-    @NamedQuery(name = "Doctors.findById", query = "SELECT d FROM Doctors d WHERE d.id = :id")})
-public class Doctors implements Serializable {
+    @NamedQuery(name = "Doctor.findAll", query = "SELECT d FROM Doctor d"),
+    @NamedQuery(name = "Doctor.findById", query = "SELECT d FROM Doctor d WHERE d.id = :id")})
+public class Doctor implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -41,16 +43,21 @@ public class Doctors implements Serializable {
     @Lob
     @Column(name = "description")
     private String description;
+    @JoinColumn(name = "id_specailty", referencedColumnName = "id")
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    private Specialtie idSpecailty;
+    @JoinColumn(name = "id", referencedColumnName = "id", insertable = false, updatable = false)
+    @OneToOne(optional = false, fetch = FetchType.LAZY)
+    private User user;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idHod", fetch = FetchType.LAZY)
+    private Collection<Specialtie> specialtieCollection;
     @OneToMany(mappedBy = "doctorId", fetch = FetchType.LAZY)
-    private Collection<Appointments> appointmentsCollection;
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    @OneToOne(fetch = FetchType.LAZY)
-    private Users userId;
+    private Collection<Appointment> appointmentCollection;
 
-    public Doctors() {
+    public Doctor() {
     }
 
-    public Doctors(Long id) {
+    public Doctor(Long id) {
         this.id = id;
     }
 
@@ -70,20 +77,36 @@ public class Doctors implements Serializable {
         this.description = description;
     }
 
-    public Collection<Appointments> getAppointmentsCollection() {
-        return appointmentsCollection;
+    public Specialtie getIdSpecailty() {
+        return idSpecailty;
     }
 
-    public void setAppointmentsCollection(Collection<Appointments> appointmentsCollection) {
-        this.appointmentsCollection = appointmentsCollection;
+    public void setIdSpecailty(Specialtie idSpecailty) {
+        this.idSpecailty = idSpecailty;
     }
 
-    public Users getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(Users userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Collection<Specialtie> getSpecialtieCollection() {
+        return specialtieCollection;
+    }
+
+    public void setSpecialtieCollection(Collection<Specialtie> specialtieCollection) {
+        this.specialtieCollection = specialtieCollection;
+    }
+
+    public Collection<Appointment> getAppointmentCollection() {
+        return appointmentCollection;
+    }
+
+    public void setAppointmentCollection(Collection<Appointment> appointmentCollection) {
+        this.appointmentCollection = appointmentCollection;
     }
 
     @Override
@@ -96,10 +119,10 @@ public class Doctors implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Doctors)) {
+        if (!(object instanceof Doctor)) {
             return false;
         }
-        Doctors other = (Doctors) object;
+        Doctor other = (Doctor) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -108,7 +131,7 @@ public class Doctors implements Serializable {
 
     @Override
     public String toString() {
-        return "com.hb.pojo.Doctors[ id=" + id + " ]";
+        return "com.hb.pojo.Doctor[ id=" + id + " ]";
     }
     
 }

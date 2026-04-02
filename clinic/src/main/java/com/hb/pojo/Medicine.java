@@ -26,14 +26,16 @@ import javax.persistence.TemporalType;
  * @author HUY
  */
 @Entity
-@Table(name = "medicines")
+@Table(name = "medicine")
 @NamedQueries({
-    @NamedQuery(name = "Medicines.findAll", query = "SELECT m FROM Medicines m"),
-    @NamedQuery(name = "Medicines.findById", query = "SELECT m FROM Medicines m WHERE m.id = :id"),
-    @NamedQuery(name = "Medicines.findByName", query = "SELECT m FROM Medicines m WHERE m.name = :name"),
-    @NamedQuery(name = "Medicines.findByStock", query = "SELECT m FROM Medicines m WHERE m.stock = :stock"),
-    @NamedQuery(name = "Medicines.findByExpirationDate", query = "SELECT m FROM Medicines m WHERE m.expirationDate = :expirationDate")})
-public class Medicines implements Serializable {
+    @NamedQuery(name = "Medicine.findAll", query = "SELECT m FROM Medicine m"),
+    @NamedQuery(name = "Medicine.findById", query = "SELECT m FROM Medicine m WHERE m.id = :id"),
+    @NamedQuery(name = "Medicine.findByName", query = "SELECT m FROM Medicine m WHERE m.name = :name"),
+    @NamedQuery(name = "Medicine.findByStock", query = "SELECT m FROM Medicine m WHERE m.stock = :stock"),
+    @NamedQuery(name = "Medicine.findByExpirationDate", query = "SELECT m FROM Medicine m WHERE m.expirationDate = :expirationDate"),
+    @NamedQuery(name = "Medicine.findBySecureUrl", query = "SELECT m FROM Medicine m WHERE m.secureUrl = :secureUrl"),
+    @NamedQuery(name = "Medicine.findByPublicId", query = "SELECT m FROM Medicine m WHERE m.publicId = :publicId")})
+public class Medicine implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -48,15 +50,19 @@ public class Medicines implements Serializable {
     @Column(name = "expiration_date")
     @Temporal(TemporalType.DATE)
     private Date expirationDate;
+    @Column(name = "secure_url")
+    private String secureUrl;
+    @Column(name = "public_id")
+    private String publicId;
     @OneToMany(mappedBy = "medicineId", fetch = FetchType.LAZY)
-    private Collection<InventoryLogs> inventoryLogsCollection;
+    private Collection<InventoryLog> inventoryLogCollection;
     @OneToMany(mappedBy = "medicineId", fetch = FetchType.LAZY)
-    private Collection<PrescriptionItems> prescriptionItemsCollection;
+    private Collection<PrescriptionItem> prescriptionItemCollection;
 
-    public Medicines() {
+    public Medicine() {
     }
 
-    public Medicines(Long id) {
+    public Medicine(Long id) {
         this.id = id;
     }
 
@@ -92,20 +98,36 @@ public class Medicines implements Serializable {
         this.expirationDate = expirationDate;
     }
 
-    public Collection<InventoryLogs> getInventoryLogsCollection() {
-        return inventoryLogsCollection;
+    public String getSecureUrl() {
+        return secureUrl;
     }
 
-    public void setInventoryLogsCollection(Collection<InventoryLogs> inventoryLogsCollection) {
-        this.inventoryLogsCollection = inventoryLogsCollection;
+    public void setSecureUrl(String secureUrl) {
+        this.secureUrl = secureUrl;
     }
 
-    public Collection<PrescriptionItems> getPrescriptionItemsCollection() {
-        return prescriptionItemsCollection;
+    public String getPublicId() {
+        return publicId;
     }
 
-    public void setPrescriptionItemsCollection(Collection<PrescriptionItems> prescriptionItemsCollection) {
-        this.prescriptionItemsCollection = prescriptionItemsCollection;
+    public void setPublicId(String publicId) {
+        this.publicId = publicId;
+    }
+
+    public Collection<InventoryLog> getInventoryLogCollection() {
+        return inventoryLogCollection;
+    }
+
+    public void setInventoryLogCollection(Collection<InventoryLog> inventoryLogCollection) {
+        this.inventoryLogCollection = inventoryLogCollection;
+    }
+
+    public Collection<PrescriptionItem> getPrescriptionItemCollection() {
+        return prescriptionItemCollection;
+    }
+
+    public void setPrescriptionItemCollection(Collection<PrescriptionItem> prescriptionItemCollection) {
+        this.prescriptionItemCollection = prescriptionItemCollection;
     }
 
     @Override
@@ -118,10 +140,10 @@ public class Medicines implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Medicines)) {
+        if (!(object instanceof Medicine)) {
             return false;
         }
-        Medicines other = (Medicines) object;
+        Medicine other = (Medicine) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -130,7 +152,7 @@ public class Medicines implements Serializable {
 
     @Override
     public String toString() {
-        return "com.hb.pojo.Medicines[ id=" + id + " ]";
+        return "com.hb.pojo.Medicine[ id=" + id + " ]";
     }
     
 }
