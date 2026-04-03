@@ -56,7 +56,7 @@ public class Patient implements Serializable {
     private String phone;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @OneToOne(fetch = FetchType.LAZY)
-    private User user;
+    private User userId;
     @OneToMany(mappedBy = "patientId", fetch = FetchType.LAZY)
     private Collection<Appointment> appointmentCollection;
 
@@ -100,11 +100,11 @@ public class Patient implements Serializable {
     }
 
     public User getUserId() {
-        return user;
+        return userId;
     }
 
-    public void setUserId(User user) {
-        this.user = user;
+    public void setUserId(User userId) {
+        this.userId = userId;
     }
 
     public Collection<Appointment> getAppointmentCollection() {

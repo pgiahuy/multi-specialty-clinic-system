@@ -1,0 +1,76 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Quản lý người dùng</title>
+
+    <th:block th:replace="base :: css"></th:block>
+</head>
+
+<body>
+
+    <div th:replace="base :: header"></div>
+
+    <div th:replace="base :: sidebar"></div>
+
+    <div class="content">
+
+        <h2 class="mb-4">Quản lý người dùng</h2>
+
+        <form method="post" th:action="@{/admin/users}" enctype="multipart/form-data">
+
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" name="username" class="form-control" id="username">
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email address:</label>
+                <input type="email" name="email" class="form-control" id="email">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" name="password" class="form-control" id="password">
+            </div>
+
+            <div class="form-group">
+                <label for="avatar">Avatar</label>
+                <input type="file" name="avatar" class="form-control mb-2">
+            </div>
+
+            <button type="submit" class="btn btn-primary mb-3">Submit</button>
+        </form>
+
+
+
+        <table class="table table-bordered table-hover align-middle">
+            <thead class="table-primary">
+                <tr>
+                    <th>ID</th>
+                    <th>Tên</th>
+                    <th>Email</th>
+                    <th>Vai trò</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr th:each="u : ${users}">
+                    <td th:text="${u.id}"></td>
+                    <td th:text="${u.username}"></td>
+                    <td th:text="${u.email}"></td>
+                    <td th:text="${u.role}"></td>
+                    <td>
+                        <button class="btn btn-warning btn-sm">Sửa</button>
+                        <button class="btn btn-danger btn-sm">Xóa</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+    <div th:replace="base :: footer"></div>
+
+</body>
+</html>
