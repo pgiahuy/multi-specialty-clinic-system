@@ -20,4 +20,5 @@ public interface UserService extends UserDetailsService {
     User getUserByUsername(String username) ;
     User addUser(Map<String, String> params, MultipartFile avatar);
     List<User> getUsers(Map<String,String> params);
+    void deleteUser(Long id);
 }
