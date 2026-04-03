@@ -4,8 +4,8 @@
  */
 package com.hb.repository.impl;
 
-import com.hb.pojo.User;
-import com.hb.repository.UserRepository;
+import com.hb.pojo.Doctor;
+import com.hb.repository.DoctorRepository;
 import java.util.List;
 import java.util.Map;
 import org.hibernate.Session;
@@ -24,44 +24,42 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @Transactional
 @PropertySource("classpath:configs.properties")
-public class UserRepositoryImpl implements UserRepository{
-    
+public class DoctorRepositoryImpl implements DoctorRepository{
+
+    @Autowired
+    private LocalSessionFactoryBean factory;
+            
     @Autowired
     private Environment env;
     
-    @Autowired  
-    private LocalSessionFactoryBean factory;
-
     @Override
-    public List<User> getUsers(Map<String, String> params) {
+    public List<Doctor> getDoctors(Map<String,String> params) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<User> q = session.createNamedQuery("User.findAll", User.class);
+        Query<Doctor> q = session.createNamedQuery("Doctor.findAll", Doctor.class);
         
-        if (params != null) {
-            int pageSize = this.env.getProperty("users.page_size", Integer.class);
+        if (params!=null) {
+            int pageSize = env.getProperty("doctors.page_size", Integer.class);
             int page = Integer.parseInt(params.getOrDefault("page", "1"));
-            int start = (page - 1) * pageSize;
+            int start = (page-1)*pageSize;
             q.setMaxResults(pageSize);
             q.setFirstResult(start);
         }
-        
         return q.getResultList();
     }
-    
-    
+
     @Override
-    public User getUserByUsername(String username) {
+    public Doctor addDoctor(Doctor d) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<User> q = session.createNamedQuery("User.findByUsername", User.class);
-        q.setParameter("username", username);
+        session.persist(d);
+        return d;
+    }
+
+    @Override
+    public Doctor getDoctorById(Long id) {
+        Session session = this.factory.getObject().getCurrentSession();
+        Query<Doctor> q = session.createNamedQuery("Doctor.findById", Doctor.class);
+        q.setParameter("id", id);
         return q.getSingleResult();
-
     }
-
-    @Override
-    public User addUser(User u) {
-        Session session = this.factory.getObject().getCurrentSession();
-        session.persist(u);
-        return u;
-    }
+    
 }
