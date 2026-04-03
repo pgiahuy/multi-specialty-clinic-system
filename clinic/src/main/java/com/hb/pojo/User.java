@@ -21,6 +21,7 @@ import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
 
@@ -62,12 +63,12 @@ public class User implements Serializable {
     @Size(min = 1, max = 100)
     @Column(name = "username")
     private String username;
-    @Size(max = 5)
+    @Size(max = 10)
     @Column(name = "role")
     private String role;
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt;
+    private LocalDateTime createdAt;
     @Size(max = 255)
     @Column(name = "secure_url")
     private String secureUrl;
@@ -134,11 +135,11 @@ public class User implements Serializable {
         this.role = role;
     }
 
-    public Date getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
