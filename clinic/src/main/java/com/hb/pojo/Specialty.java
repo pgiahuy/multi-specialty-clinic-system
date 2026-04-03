@@ -26,12 +26,12 @@ import java.util.Collection;
  * @author HUY
  */
 @Entity
-@Table(name = "specialtie")
+@Table(name = "specialty")
 @NamedQueries({
-    @NamedQuery(name = "Specialtie.findAll", query = "SELECT s FROM Specialtie s"),
-    @NamedQuery(name = "Specialtie.findById", query = "SELECT s FROM Specialtie s WHERE s.id = :id"),
-    @NamedQuery(name = "Specialtie.findByName", query = "SELECT s FROM Specialtie s WHERE s.name = :name")})
-public class Specialtie implements Serializable {
+    @NamedQuery(name = "Specialty.findAll", query = "SELECT s FROM Specialty s"),
+    @NamedQuery(name = "Specialty.findById", query = "SELECT s FROM Specialty s WHERE s.id = :id"),
+    @NamedQuery(name = "Specialty.findByName", query = "SELECT s FROM Specialty s WHERE s.name = :name")})
+public class Specialty implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -47,17 +47,17 @@ public class Specialtie implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idSpecailty", fetch = FetchType.LAZY)
     private Collection<Doctor> doctorCollection;
     @JoinColumn(name = "id_hod", referencedColumnName = "id")
-    @ManyToOne(optional = true, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Doctor idHod;
 
-    public Specialtie() {
+    public Specialty() {
     }
 
-    public Specialtie(Long id) {
+    public Specialty(Long id) {
         this.id = id;
     }
 
-    public Specialtie(Long id, String name) {
+    public Specialty(Long id, String name) {
         this.id = id;
         this.name = name;
     }
@@ -104,10 +104,10 @@ public class Specialtie implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Specialtie)) {
+        if (!(object instanceof Specialty)) {
             return false;
         }
-        Specialtie other = (Specialtie) object;
+        Specialty other = (Specialty) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -116,7 +116,7 @@ public class Specialtie implements Serializable {
 
     @Override
     public String toString() {
-        return "com.hb.pojo.Specialtie[ id=" + id + " ]";
+        return "com.hb.pojo.Specialty[ id=" + id + " ]";
     }
     
 }

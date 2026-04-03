@@ -45,17 +45,14 @@ public class Doctor implements Serializable {
     @Size(max = 65535)
     @Column(name = "description")
     private String description;
-    
     @JoinColumn(name = "id_specailty", referencedColumnName = "id")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    private Specialtie idSpecailty;
-    
-    
+    private Specialty idSpecailty;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @OneToOne(fetch = FetchType.LAZY)
-    private User user;
+    private User userId;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idHod", fetch = FetchType.LAZY)
-    private Collection<Specialtie> specialtieCollection;
+    private Collection<Specialty> specialtyCollection;
     @OneToMany(mappedBy = "doctorId", fetch = FetchType.LAZY)
     private Collection<Appointment> appointmentCollection;
 
@@ -82,28 +79,28 @@ public class Doctor implements Serializable {
         this.description = description;
     }
 
-    public Specialtie getIdSpecailty() {
+    public Specialty getIdSpecailty() {
         return idSpecailty;
     }
 
-    public void setIdSpecailty(Specialtie idSpecailty) {
+    public void setIdSpecailty(Specialty idSpecailty) {
         this.idSpecailty = idSpecailty;
     }
 
-    public User getUser(){
-        return user;
+    public User getUserId() {
+        return userId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUserId(User userId) {
+        this.userId = userId;
     }
 
-    public Collection<Specialtie> getSpecialtieCollection() {
-        return specialtieCollection;
+    public Collection<Specialty> getSpecialtyCollection() {
+        return specialtyCollection;
     }
 
-    public void setSpecialtieCollection(Collection<Specialtie> specialtieCollection) {
-        this.specialtieCollection = specialtieCollection;
+    public void setSpecialtyCollection(Collection<Specialty> specialtyCollection) {
+        this.specialtyCollection = specialtyCollection;
     }
 
     public Collection<Appointment> getAppointmentCollection() {

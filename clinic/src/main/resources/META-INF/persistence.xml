@@ -6,7 +6,6 @@
     <class>com.hb.pojo.InventoryLog</class>
     <class>com.hb.pojo.Doctor</class>
     <class>com.hb.pojo.Appointment</class>
-    <class>com.hb.pojo.Specialtie</class>
     <class>com.hb.pojo.User</class>
     <class>com.hb.pojo.Medicine</class>
     <class>com.hb.pojo.Prescription</class>
@@ -14,5 +13,6 @@
     <class>com.hb.pojo.Payment</class>
     <class>com.hb.pojo.Patient</class>
     <class>com.hb.pojo.Notification</class>
+    <class>com.hb.pojo.Specialty</class>
   </persistence-unit>
 </persistence>

@@ -5,16 +5,16 @@
 package com.hb.service.impl;
 
 import com.hb.pojo.Doctor;
-import com.hb.pojo.Specialtie;
+import com.hb.pojo.Specialty;
 import com.hb.pojo.User;
 import com.hb.repository.DoctorRepository;
-import com.hb.repository.SpecialtieRepository;
 import com.hb.repository.UserRepository;
 import com.hb.service.DoctorService;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.hb.repository.SpecialtyRepository;
 
 /**
  *
@@ -27,7 +27,7 @@ public class DoctorServiceImpl implements DoctorService {
     private DoctorRepository doctorRepo;
     
     @Autowired
-    private SpecialtieRepository specialtieRepo;
+    private SpecialtyRepository specialtieRepo;
 
     @Autowired
     private UserRepository userRepo;
@@ -44,7 +44,7 @@ public class DoctorServiceImpl implements DoctorService {
             if (u == null) {
                 throw new RuntimeException("User not found");
             }
-            d.setUser(u);
+            d.setUserId(u);
         } else {
             throw new RuntimeException("Missing username");
         }
@@ -52,7 +52,7 @@ public class DoctorServiceImpl implements DoctorService {
         String specIdStr = params.get("specialtyId");
         if (specIdStr != null && !specIdStr.isEmpty()) {
             Long specId = Long.valueOf(specIdStr);
-            Specialtie s = this.specialtieRepo.getSpecialtieById(specId);
+            Specialty s = this.specialtieRepo.getSpecialtieById(specId);
             if (s == null) {
                 throw new RuntimeException("Specialty not found");
             }

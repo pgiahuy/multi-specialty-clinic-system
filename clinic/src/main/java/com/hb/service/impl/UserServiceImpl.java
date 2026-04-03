@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.hb.repository.UserRepository;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -73,6 +74,11 @@ public class UserServiceImpl implements UserService{
         
         return new org.springframework.security.core.userdetails.User(user.getUsername(),
                 user.getPassword(), authorities);
+    }
+
+    @Override
+    public List<User> getUsers(Map<String, String> params) {
+        return this.userRepo.getUsers(params);
     }
 
     

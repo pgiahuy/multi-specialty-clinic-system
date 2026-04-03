@@ -5,36 +5,36 @@
 package com.hb.service.impl;
 
 import com.hb.pojo.Doctor;
-import com.hb.pojo.Specialtie;
+import com.hb.pojo.Specialty;
 import com.hb.repository.DoctorRepository;
-import com.hb.repository.SpecialtieRepository;
-import com.hb.service.SpecialtieService;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.hb.repository.SpecialtyRepository;
+import com.hb.service.SpecialtyService;
 
 /**
  *
  * @author HUY
  */
 @Service
-public class SpecialtieServiceImpl implements SpecialtieService {
+public class SpecialtyServiceImpl implements SpecialtyService {
 
     @Autowired
-    private SpecialtieRepository specialtieRepo;
+    private SpecialtyRepository specialtieRepo;
     
     @Autowired
     private DoctorRepository doctorRepo;
 
     @Override
-    public List<Specialtie> getSpecialties(Map<String, String> params) {
+    public List<Specialty> getSpecialties(Map<String, String> params) {
         return this.specialtieRepo.getSpecialties(params);
     }
 
     @Override
-    public Specialtie getSpecialtieById(Long id) {
-        Specialtie s = this.specialtieRepo.getSpecialtieById(id);
+    public Specialty getSpecialtieById(Long id) {
+        Specialty s = this.specialtieRepo.getSpecialtieById(id);
         if (s == null) {
             throw new RuntimeException("Specialtie not found!");
         }
@@ -42,8 +42,8 @@ public class SpecialtieServiceImpl implements SpecialtieService {
     }
 
     @Override
-    public Specialtie addSpecialtie(Map<String, String> params) {
-        Specialtie s = new Specialtie();
+    public Specialty addSpecialtie(Map<String, String> params) {
+        Specialty s = new Specialty();
 
         String name = params.get("name");
         if (name == null || name.isEmpty()) {

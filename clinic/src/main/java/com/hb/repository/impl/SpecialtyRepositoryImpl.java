@@ -4,8 +4,7 @@
  */
 package com.hb.repository.impl;
 
-import com.hb.pojo.Specialtie;
-import com.hb.repository.SpecialtieRepository;
+import com.hb.pojo.Specialty;
 import java.util.List;
 import java.util.Map;
 import org.hibernate.Session;
@@ -16,6 +15,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import com.hb.repository.SpecialtyRepository;
 
 /**
  *
@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @Transactional
 @PropertySource("classpath:configs.properties")
-public class SpecialtieRepositoryImpl implements SpecialtieRepository{
+public class SpecialtyRepositoryImpl implements SpecialtyRepository{
     
     @Autowired
     private LocalSessionFactoryBean factory;
@@ -35,9 +35,9 @@ public class SpecialtieRepositoryImpl implements SpecialtieRepository{
     
 
     @Override
-    public List<Specialtie> getSpecialties(Map<String, String> params) {
+    public List<Specialty> getSpecialties(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<Specialtie> q = session.createNamedQuery("Specialtie.findAll",Specialtie.class);
+        Query<Specialty> q = session.createNamedQuery("Specialtie.findAll",Specialty.class);
         
         if(params!= null){
             int pageSize = env.getProperty("specialties.page_size", Integer.class);
@@ -52,15 +52,15 @@ public class SpecialtieRepositoryImpl implements SpecialtieRepository{
     }
 
     @Override
-    public Specialtie getSpecialtieById(Long id) {
+    public Specialty getSpecialtieById(Long id) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<Specialtie> q = session.createNamedQuery("Specialtie.findById", Specialtie.class);
+        Query<Specialty> q = session.createNamedQuery("Specialtie.findById", Specialty.class);
         q.setParameter("id", id);
         return q.getSingleResult();
     }
 
     @Override
-    public Specialtie addSpecialtie(Specialtie s) {
+    public Specialty addSpecialtie(Specialty s) {
         Session session = this.factory.getObject().getCurrentSession();
         session.persist(s);
         return s;
