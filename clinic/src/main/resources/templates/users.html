@@ -4,6 +4,8 @@
         <title>Quản lý người dùng</title>
 
     <th:block th:replace="base :: css"></th:block>
+    <th:block th:replace="base :: js"></th:block>
+    <script th:src="@{/js/user.js}"></script>
 </head>
 
 <body>
@@ -50,6 +52,7 @@
                     <th>Tên</th>
                     <th>Email</th>
                     <th>Vai trò</th>
+                    <th>Avatar</th>
                     <th>Hành động</th>
                 </tr>
             </thead>
@@ -61,8 +64,14 @@
                     <td th:text="${u.email}"></td>
                     <td th:text="${u.role}"></td>
                     <td>
+                        <img th:src="${u.secureUrl}" alt="avatar" width="50" height="50"/>
+                    </td>
+                    <td>
                         <button class="btn btn-warning btn-sm">Sửa</button>
-                        <button class="btn btn-danger btn-sm">Xóa</button>
+                        <button class="btn btn-danger btn-sm"
+                                th:onclick="'deleteUser(' + ${u.id} + ')'">
+                            Xóa
+                        </button>
                     </td>
                 </tr>
             </tbody>
@@ -70,7 +79,8 @@
 
     </div>
 
-    <div th:replace="base :: footer"></div>
+    <div th:replace="base :: footer">
 
+    </div>
 </body>
 </html>

@@ -13,6 +13,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.hb.repository.UserRepository;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -50,12 +53,13 @@ public class UserServiceImpl implements UserService{
         u.setUsername(params.get("username"));
         u.setPassword(passwordEncoder.encode(params.get("password")));
         u.setRole("ROLE_USER");
+        u.setCreatedAt(LocalDateTime.now());
 
         if ( !avatar.isEmpty()) {
             Map res = this.cloudinaryService.uploadFile(avatar, "avatar");
             
-            u.setSecureUrl(res.get("secure_url").toString());
-            u.setPublicId(res.get("public_id").toString());
+            u.setSecureUrl(res.get("secureUrl").toString());
+            u.setPublicId(res.get("publicId").toString());
         }
         
        
@@ -79,6 +83,11 @@ public class UserServiceImpl implements UserService{
     @Override
     public List<User> getUsers(Map<String, String> params) {
         return this.userRepo.getUsers(params);
+    }
+
+    @Override
+    public void deleteUser(Long id) {
+        this.userRepo.deleteUser(id);
     }
 
     
