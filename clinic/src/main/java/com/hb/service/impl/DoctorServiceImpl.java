@@ -4,7 +4,16 @@
  */
 package com.hb.service.impl;
 
+import com.hb.pojo.Doctor;
+import com.hb.pojo.Specialtie;
+import com.hb.pojo.User;
+import com.hb.repository.DoctorRepository;
+import com.hb.repository.SpecialtieRepository;
+import com.hb.repository.UserRepository;
 import com.hb.service.DoctorService;
+import java.util.List;
+import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -13,5 +22,60 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class DoctorServiceImpl implements DoctorService {
+
+    @Autowired
+    private DoctorRepository doctorRepo;
     
+    @Autowired
+    private SpecialtieRepository specialtieRepo;
+
+    @Autowired
+    private UserRepository userRepo;
+
+    @Override
+    public Doctor addDoctor(Map<String, String> params) {
+        Doctor d = new Doctor();
+
+        d.setDescription(params.getOrDefault("description", ""));
+
+        String username = params.get("username");
+        if (username != null && !username.isEmpty()) {
+            User u = this.userRepo.getUserByUsername(username);
+            if (u == null) {
+                throw new RuntimeException("User not found");
+            }
+            d.setUser(u);
+        } else {
+            throw new RuntimeException("Missing username");
+        }
+
+        String specIdStr = params.get("specialtyId");
+        if (specIdStr != null && !specIdStr.isEmpty()) {
+            Long specId = Long.valueOf(specIdStr);
+            Specialtie s = this.specialtieRepo.getSpecialtieById(specId);
+            if (s == null) {
+                throw new RuntimeException("Specialty not found");
+            }
+            d.setIdSpecailty(s);
+        } else {
+            throw new RuntimeException("Missing specialty");
+        }
+
+        return this.doctorRepo.addDoctor(d);
+    }
+
+    @Override
+    public List<Doctor> getDoctors(Map<String, String> params) {
+        return doctorRepo.getDoctors(params);
+    }
+
+    @Override
+    public Doctor getDoctorById(Long id) {
+        Doctor d = doctorRepo.getDoctorById(id);
+        if (d == null) {
+            throw new RuntimeException("Doctor not found!");
+        }
+        return d;
+    }
+
 }

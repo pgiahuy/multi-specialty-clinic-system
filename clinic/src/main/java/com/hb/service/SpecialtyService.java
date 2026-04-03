@@ -4,7 +4,7 @@
  */
 package com.hb.service;
 
-import com.hb.pojo.Doctor;
+import com.hb.pojo.Specialtie;
 import java.util.List;
 import java.util.Map;
 
@@ -12,8 +12,8 @@ import java.util.Map;
  *
  * @author HUY
  */
-public interface DoctorService {
-    Doctor addDoctor(Map<String,String> params);
-    List<Doctor> getDoctors(Map<String,String> params);
-    Doctor getDoctorById(Long id);
+public interface SpecialtieService {
+    List<Specialtie> getSpecialties(Map<String,String> params);
+    Specialtie getSpecialtieById(Long id);
+    Specialtie addSpecialtie(Map<String, String> params);
 }
