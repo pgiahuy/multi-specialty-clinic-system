@@ -4,38 +4,40 @@
  */
 package com.hb.pojo;
 
+import jakarta.persistence.Basic;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.NamedQueries;
+import jakarta.persistence.NamedQuery;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
+import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
  *
  * @author HUY
  */
 @Entity
-@Table(name = "payments")
+@Table(name = "payment")
 @NamedQueries({
-    @NamedQuery(name = "Payments.findAll", query = "SELECT p FROM Payments p"),
-    @NamedQuery(name = "Payments.findById", query = "SELECT p FROM Payments p WHERE p.id = :id"),
-    @NamedQuery(name = "Payments.findByAmount", query = "SELECT p FROM Payments p WHERE p.amount = :amount"),
-    @NamedQuery(name = "Payments.findByMethod", query = "SELECT p FROM Payments p WHERE p.method = :method"),
-    @NamedQuery(name = "Payments.findByStatus", query = "SELECT p FROM Payments p WHERE p.status = :status"),
-    @NamedQuery(name = "Payments.findByCreatedAt", query = "SELECT p FROM Payments p WHERE p.createdAt = :createdAt")})
-public class Payments implements Serializable {
+    @NamedQuery(name = "Payment.findAll", query = "SELECT p FROM Payment p"),
+    @NamedQuery(name = "Payment.findById", query = "SELECT p FROM Payment p WHERE p.id = :id"),
+    @NamedQuery(name = "Payment.findByAmount", query = "SELECT p FROM Payment p WHERE p.amount = :amount"),
+    @NamedQuery(name = "Payment.findByMethod", query = "SELECT p FROM Payment p WHERE p.method = :method"),
+    @NamedQuery(name = "Payment.findByStatus", query = "SELECT p FROM Payment p WHERE p.status = :status"),
+    @NamedQuery(name = "Payment.findByCreatedAt", query = "SELECT p FROM Payment p WHERE p.createdAt = :createdAt"),
+    @NamedQuery(name = "Payment.findByPaymentscol", query = "SELECT p FROM Payment p WHERE p.paymentscol = :paymentscol")})
+public class Payment implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -46,21 +48,26 @@ public class Payments implements Serializable {
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "amount")
     private BigDecimal amount;
+    @Size(max = 50)
     @Column(name = "method")
     private String method;
+    @Size(max = 7)
     @Column(name = "status")
     private String status;
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
+    @Size(max = 45)
+    @Column(name = "paymentscol")
+    private String paymentscol;
     @JoinColumn(name = "appointment_id", referencedColumnName = "id")
     @OneToOne(fetch = FetchType.LAZY)
-    private Appointments appointmentId;
+    private Appointment appointmentId;
 
-    public Payments() {
+    public Payment() {
     }
 
-    public Payments(Long id) {
+    public Payment(Long id) {
         this.id = id;
     }
 
@@ -104,11 +111,19 @@ public class Payments implements Serializable {
         this.createdAt = createdAt;
     }
 
-    public Appointments getAppointmentId() {
+    public String getPaymentscol() {
+        return paymentscol;
+    }
+
+    public void setPaymentscol(String paymentscol) {
+        this.paymentscol = paymentscol;
+    }
+
+    public Appointment getAppointmentId() {
         return appointmentId;
     }
 
-    public void setAppointmentId(Appointments appointmentId) {
+    public void setAppointmentId(Appointment appointmentId) {
         this.appointmentId = appointmentId;
     }
 
@@ -122,10 +137,10 @@ public class Payments implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Payments)) {
+        if (!(object instanceof Payment)) {
             return false;
         }
-        Payments other = (Payments) object;
+        Payment other = (Payment) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -134,7 +149,7 @@ public class Payments implements Serializable {
 
     @Override
     public String toString() {
-        return "com.hb.pojo.Payments[ id=" + id + " ]";
+        return "com.hb.pojo.Payment[ id=" + id + " ]";
     }
     
 }

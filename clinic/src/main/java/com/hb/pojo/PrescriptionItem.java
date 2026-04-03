@@ -4,31 +4,31 @@
  */
 package com.hb.pojo;
 
+import jakarta.persistence.Basic;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedQueries;
+import jakarta.persistence.NamedQuery;
+import jakarta.persistence.Table;
 import java.io.Serializable;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
 
 /**
  *
  * @author HUY
  */
 @Entity
-@Table(name = "prescription_items")
+@Table(name = "prescription_item")
 @NamedQueries({
-    @NamedQuery(name = "PrescriptionItems.findAll", query = "SELECT p FROM PrescriptionItems p"),
-    @NamedQuery(name = "PrescriptionItems.findById", query = "SELECT p FROM PrescriptionItems p WHERE p.id = :id"),
-    @NamedQuery(name = "PrescriptionItems.findByQuantity", query = "SELECT p FROM PrescriptionItems p WHERE p.quantity = :quantity")})
-public class PrescriptionItems implements Serializable {
+    @NamedQuery(name = "PrescriptionItem.findAll", query = "SELECT p FROM PrescriptionItem p"),
+    @NamedQuery(name = "PrescriptionItem.findById", query = "SELECT p FROM PrescriptionItem p WHERE p.id = :id"),
+    @NamedQuery(name = "PrescriptionItem.findByQuantity", query = "SELECT p FROM PrescriptionItem p WHERE p.quantity = :quantity")})
+public class PrescriptionItem implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -40,15 +40,15 @@ public class PrescriptionItems implements Serializable {
     private Integer quantity;
     @JoinColumn(name = "medicine_id", referencedColumnName = "id")
     @ManyToOne(fetch = FetchType.LAZY)
-    private Medicines medicineId;
+    private Medicine medicineId;
     @JoinColumn(name = "prescription_id", referencedColumnName = "id")
     @ManyToOne(fetch = FetchType.LAZY)
-    private Prescriptions prescriptionId;
+    private Prescription prescriptionId;
 
-    public PrescriptionItems() {
+    public PrescriptionItem() {
     }
 
-    public PrescriptionItems(Long id) {
+    public PrescriptionItem(Long id) {
         this.id = id;
     }
 
@@ -68,19 +68,19 @@ public class PrescriptionItems implements Serializable {
         this.quantity = quantity;
     }
 
-    public Medicines getMedicineId() {
+    public Medicine getMedicineId() {
         return medicineId;
     }
 
-    public void setMedicineId(Medicines medicineId) {
+    public void setMedicineId(Medicine medicineId) {
         this.medicineId = medicineId;
     }
 
-    public Prescriptions getPrescriptionId() {
+    public Prescription getPrescriptionId() {
         return prescriptionId;
     }
 
-    public void setPrescriptionId(Prescriptions prescriptionId) {
+    public void setPrescriptionId(Prescription prescriptionId) {
         this.prescriptionId = prescriptionId;
     }
 
@@ -94,10 +94,10 @@ public class PrescriptionItems implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof PrescriptionItems)) {
+        if (!(object instanceof PrescriptionItem)) {
             return false;
         }
-        PrescriptionItems other = (PrescriptionItems) object;
+        PrescriptionItem other = (PrescriptionItem) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -106,7 +106,7 @@ public class PrescriptionItems implements Serializable {
 
     @Override
     public String toString() {
-        return "com.hb.pojo.PrescriptionItems[ id=" + id + " ]";
+        return "com.hb.pojo.PrescriptionItem[ id=" + id + " ]";
     }
     
 }
