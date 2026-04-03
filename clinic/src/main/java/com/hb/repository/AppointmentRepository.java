@@ -4,7 +4,7 @@
  */
 package com.hb.repository;
 
-import com.hb.pojo.User;
+import com.hb.pojo.Appointment;
 import java.util.List;
 import java.util.Map;
 
@@ -12,8 +12,11 @@ import java.util.Map;
  *
  * @author HUY
  */
-public interface UserRepository{
-    List<User> getUsers(Map<String, String> params);
-    User getUserByUsername(String username);
-    User addUser(User u);
+public interface AppointmentRepository {
+    
+    List<Appointment> getAppointments(Map<String,String> params);
+    Appointment getAppointmentById(Long id);
+    Appointment addAppointment(Appointment a);
+    
+    
 }
