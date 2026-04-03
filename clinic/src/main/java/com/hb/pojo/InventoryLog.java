@@ -4,36 +4,37 @@
  */
 package com.hb.pojo;
 
+import jakarta.persistence.Basic;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedQueries;
+import jakarta.persistence.NamedQuery;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
+import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
  *
  * @author HUY
  */
 @Entity
-@Table(name = "inventory_logs")
+@Table(name = "inventory_log")
 @NamedQueries({
-    @NamedQuery(name = "InventoryLogs.findAll", query = "SELECT i FROM InventoryLogs i"),
-    @NamedQuery(name = "InventoryLogs.findById", query = "SELECT i FROM InventoryLogs i WHERE i.id = :id"),
-    @NamedQuery(name = "InventoryLogs.findByChangeAmount", query = "SELECT i FROM InventoryLogs i WHERE i.changeAmount = :changeAmount"),
-    @NamedQuery(name = "InventoryLogs.findByReason", query = "SELECT i FROM InventoryLogs i WHERE i.reason = :reason"),
-    @NamedQuery(name = "InventoryLogs.findByCreatedAt", query = "SELECT i FROM InventoryLogs i WHERE i.createdAt = :createdAt")})
-public class InventoryLogs implements Serializable {
+    @NamedQuery(name = "InventoryLog.findAll", query = "SELECT i FROM InventoryLog i"),
+    @NamedQuery(name = "InventoryLog.findById", query = "SELECT i FROM InventoryLog i WHERE i.id = :id"),
+    @NamedQuery(name = "InventoryLog.findByChangeAmount", query = "SELECT i FROM InventoryLog i WHERE i.changeAmount = :changeAmount"),
+    @NamedQuery(name = "InventoryLog.findByReason", query = "SELECT i FROM InventoryLog i WHERE i.reason = :reason"),
+    @NamedQuery(name = "InventoryLog.findByCreatedAt", query = "SELECT i FROM InventoryLog i WHERE i.createdAt = :createdAt")})
+public class InventoryLog implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -43,6 +44,7 @@ public class InventoryLogs implements Serializable {
     private Long id;
     @Column(name = "change_amount")
     private Integer changeAmount;
+    @Size(max = 255)
     @Column(name = "reason")
     private String reason;
     @Column(name = "created_at")
@@ -50,12 +52,12 @@ public class InventoryLogs implements Serializable {
     private Date createdAt;
     @JoinColumn(name = "medicine_id", referencedColumnName = "id")
     @ManyToOne(fetch = FetchType.LAZY)
-    private Medicines medicineId;
+    private Medicine medicineId;
 
-    public InventoryLogs() {
+    public InventoryLog() {
     }
 
-    public InventoryLogs(Long id) {
+    public InventoryLog(Long id) {
         this.id = id;
     }
 
@@ -91,11 +93,11 @@ public class InventoryLogs implements Serializable {
         this.createdAt = createdAt;
     }
 
-    public Medicines getMedicineId() {
+    public Medicine getMedicineId() {
         return medicineId;
     }
 
-    public void setMedicineId(Medicines medicineId) {
+    public void setMedicineId(Medicine medicineId) {
         this.medicineId = medicineId;
     }
 
@@ -109,10 +111,10 @@ public class InventoryLogs implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof InventoryLogs)) {
+        if (!(object instanceof InventoryLog)) {
             return false;
         }
-        InventoryLogs other = (InventoryLogs) object;
+        InventoryLog other = (InventoryLog) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -121,7 +123,7 @@ public class InventoryLogs implements Serializable {
 
     @Override
     public String toString() {
-        return "com.hb.pojo.InventoryLogs[ id=" + id + " ]";
+        return "com.hb.pojo.InventoryLog[ id=" + id + " ]";
     }
     
 }

@@ -4,35 +4,36 @@
  */
 package com.hb.pojo;
 
+import jakarta.persistence.Basic;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
+import jakarta.persistence.NamedQueries;
+import jakarta.persistence.NamedQuery;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
+import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
  *
  * @author HUY
  */
 @Entity
-@Table(name = "medical_records")
+@Table(name = "medical_record")
 @NamedQueries({
-    @NamedQuery(name = "MedicalRecords.findAll", query = "SELECT m FROM MedicalRecords m"),
-    @NamedQuery(name = "MedicalRecords.findById", query = "SELECT m FROM MedicalRecords m WHERE m.id = :id"),
-    @NamedQuery(name = "MedicalRecords.findByCreatedAt", query = "SELECT m FROM MedicalRecords m WHERE m.createdAt = :createdAt")})
-public class MedicalRecords implements Serializable {
+    @NamedQuery(name = "MedicalRecord.findAll", query = "SELECT m FROM MedicalRecord m"),
+    @NamedQuery(name = "MedicalRecord.findById", query = "SELECT m FROM MedicalRecord m WHERE m.id = :id"),
+    @NamedQuery(name = "MedicalRecord.findByCreatedAt", query = "SELECT m FROM MedicalRecord m WHERE m.createdAt = :createdAt")})
+public class MedicalRecord implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -41,9 +42,11 @@ public class MedicalRecords implements Serializable {
     @Column(name = "id")
     private Long id;
     @Lob
+    @Size(max = 65535)
     @Column(name = "diagnosis")
     private String diagnosis;
     @Lob
+    @Size(max = 65535)
     @Column(name = "note")
     private String note;
     @Column(name = "created_at")
@@ -51,14 +54,14 @@ public class MedicalRecords implements Serializable {
     private Date createdAt;
     @JoinColumn(name = "appointment_id", referencedColumnName = "id")
     @OneToOne(fetch = FetchType.LAZY)
-    private Appointments appointmentId;
+    private Appointment appointmentId;
     @OneToOne(mappedBy = "medicalRecordId", fetch = FetchType.LAZY)
-    private Prescriptions prescriptions;
+    private Prescription prescription;
 
-    public MedicalRecords() {
+    public MedicalRecord() {
     }
 
-    public MedicalRecords(Long id) {
+    public MedicalRecord(Long id) {
         this.id = id;
     }
 
@@ -94,20 +97,20 @@ public class MedicalRecords implements Serializable {
         this.createdAt = createdAt;
     }
 
-    public Appointments getAppointmentId() {
+    public Appointment getAppointmentId() {
         return appointmentId;
     }
 
-    public void setAppointmentId(Appointments appointmentId) {
+    public void setAppointmentId(Appointment appointmentId) {
         this.appointmentId = appointmentId;
     }
 
-    public Prescriptions getPrescriptions() {
-        return prescriptions;
+    public Prescription getPrescription() {
+        return prescription;
     }
 
-    public void setPrescriptions(Prescriptions prescriptions) {
-        this.prescriptions = prescriptions;
+    public void setPrescription(Prescription prescription) {
+        this.prescription = prescription;
     }
 
     @Override
@@ -120,10 +123,10 @@ public class MedicalRecords implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof MedicalRecords)) {
+        if (!(object instanceof MedicalRecord)) {
             return false;
         }
-        MedicalRecords other = (MedicalRecords) object;
+        MedicalRecord other = (MedicalRecord) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -132,7 +135,7 @@ public class MedicalRecords implements Serializable {
 
     @Override
     public String toString() {
-        return "com.hb.pojo.MedicalRecords[ id=" + id + " ]";
+        return "com.hb.pojo.MedicalRecord[ id=" + id + " ]";
     }
     
 }

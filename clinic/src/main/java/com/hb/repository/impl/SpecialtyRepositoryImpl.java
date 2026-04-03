@@ -4,8 +4,7 @@
  */
 package com.hb.repository.impl;
 
-import com.hb.pojo.User;
-import com.hb.repository.UserRepository;
+import com.hb.pojo.Specialty;
 import java.util.List;
 import java.util.Map;
 import org.hibernate.Session;
@@ -16,52 +15,55 @@ import org.springframework.core.env.Environment;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import com.hb.repository.SpecialtyRepository;
 
 /**
  *
  * @author HUY
  */
+
 @Repository
 @Transactional
 @PropertySource("classpath:configs.properties")
-public class UserRepositoryImpl implements UserRepository{
+public class SpecialtyRepositoryImpl implements SpecialtyRepository{
+    
+    @Autowired
+    private LocalSessionFactoryBean factory;
     
     @Autowired
     private Environment env;
     
-    @Autowired  
-    private LocalSessionFactoryBean factory;
 
     @Override
-    public List<User> getUsers(Map<String, String> params) {
+    public List<Specialty> getSpecialties(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<User> q = session.createNamedQuery("User.findAll", User.class);
+        Query<Specialty> q = session.createNamedQuery("Specialtie.findAll",Specialty.class);
         
-        if (params != null) {
-            int pageSize = this.env.getProperty("users.page_size", Integer.class);
-            int page = Integer.parseInt(params.getOrDefault("page", "1"));
-            int start = (page - 1) * pageSize;
+        if(params!= null){
+            int pageSize = env.getProperty("specialties.page_size", Integer.class);
+            int page = Integer.parseInt( params.getOrDefault("page", "1"));
+            int start = (page-1)*pageSize;
+            
             q.setMaxResults(pageSize);
             q.setFirstResult(start);
+            
         }
-        
         return q.getResultList();
     }
-    
-    
+
     @Override
-    public User getUserByUsername(String username) {
+    public Specialty getSpecialtieById(Long id) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<User> q = session.createNamedQuery("User.findByUsername", User.class);
-        q.setParameter("username", username);
+        Query<Specialty> q = session.createNamedQuery("Specialtie.findById", Specialty.class);
+        q.setParameter("id", id);
         return q.getSingleResult();
-
     }
 
     @Override
-    public User addUser(User u) {
+    public Specialty addSpecialtie(Specialty s) {
         Session session = this.factory.getObject().getCurrentSession();
-        session.persist(u);
-        return u;
+        session.persist(s);
+        return s;
     }
+    
 }

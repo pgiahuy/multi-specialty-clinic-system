@@ -4,7 +4,7 @@
  */
 package com.hb.repository;
 
-import com.hb.pojo.User;
+import com.hb.pojo.Specialty;
 import java.util.List;
 import java.util.Map;
 
@@ -12,8 +12,9 @@ import java.util.Map;
  *
  * @author HUY
  */
-public interface UserRepository{
-    List<User> getUsers(Map<String, String> params);
-    User getUserByUsername(String username);
-    User addUser(User u);
+public interface SpecialtyRepository {
+    List<Specialty> getSpecialties(Map<String,String> params);
+    Specialty getSpecialtieById(Long id);
+    Specialty addSpecialtie(Specialty s);
+    
 }
