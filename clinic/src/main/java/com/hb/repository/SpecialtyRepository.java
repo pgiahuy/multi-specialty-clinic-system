@@ -2,9 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.hb.service;
+package com.hb.repository;
 
-import com.hb.pojo.Doctor;
+import com.hb.pojo.Specialtie;
 import java.util.List;
 import java.util.Map;
 
@@ -12,8 +12,9 @@ import java.util.Map;
  *
  * @author HUY
  */
-public interface DoctorService {
-    Doctor addDoctor(Map<String,String> params);
-    List<Doctor> getDoctors(Map<String,String> params);
-    Doctor getDoctorById(Long id);
+public interface SpecialtieRepository {
+    List<Specialtie> getSpecialties(Map<String,String> params);
+    Specialtie getSpecialtieById(Long id);
+    Specialtie addSpecialtie(Specialtie s);
+    
 }

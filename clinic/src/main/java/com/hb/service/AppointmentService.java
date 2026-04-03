@@ -4,10 +4,16 @@
  */
 package com.hb.service;
 
+import com.hb.pojo.Appointment;
+import java.util.List;
+import java.util.Map;
+
 /**
  *
  * @author HUY
  */
 public interface AppointmentService {
-    
+    List<Appointment> getAppointments(Map<String,String> params);
+    Appointment getAppointmentById(Long id);
+    Appointment addAppointment(Map<String,String> params);
 }
