@@ -24,19 +24,19 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @Transactional
 @PropertySource("classpath:configs.properties")
-public class UserRepositoryImpl implements UserRepository{
-    
+public class UserRepositoryImpl implements UserRepository {
+
     @Autowired
     private Environment env;
-    
-    @Autowired  
+
+    @Autowired
     private LocalSessionFactoryBean factory;
 
     @Override
     public List<User> getUsers(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
         Query<User> q = session.createNamedQuery("User.findAll", User.class);
-        
+
         if (params != null) {
             int pageSize = this.env.getProperty("users.page_size", Integer.class);
             int page = Integer.parseInt(params.getOrDefault("page", "1"));
@@ -44,11 +44,10 @@ public class UserRepositoryImpl implements UserRepository{
             q.setMaxResults(pageSize);
             q.setFirstResult(start);
         }
-        
+
         return q.getResultList();
     }
-    
-    
+
     @Override
     public User getUserByUsername(String username) {
         Session session = this.factory.getObject().getCurrentSession();
@@ -63,5 +62,18 @@ public class UserRepositoryImpl implements UserRepository{
         Session session = this.factory.getObject().getCurrentSession();
         session.persist(u);
         return u;
+    }
+
+    @Override
+    public void deleteUser(Long id) {
+        Session session = this.factory.getObject().getCurrentSession();
+
+        User u = session.get(User.class, id);
+
+        if (u != null) {
+            session.remove(u);
+        } else {
+            throw new RuntimeException("User not found!");
+        }
     }
 }
