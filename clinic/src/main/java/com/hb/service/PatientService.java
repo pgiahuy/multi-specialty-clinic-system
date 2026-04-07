@@ -5,7 +5,7 @@
 package com.hb.service;
 
 import com.hb.pojo.Patient;
-import com.hb.service.impl.PatienrServiceImpl;
+import com.hb.pojo.User;
 import java.util.List;
 import java.util.Map;
 
@@ -16,5 +16,5 @@ import java.util.Map;
 public interface PatientService {
     List<Patient> getPatients(Map<String,String> params);
     Patient getPatientById(Long id);
-    Patient addPatient(Map<String,String> params);
+    Patient addPatient(Map<String,String> params, User u);
 }
