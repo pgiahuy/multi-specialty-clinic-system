@@ -1,0 +1,70 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Đăng ký tài khoản</title>
+
+    <th:block th:replace="base :: css"></th:block>
+    <th:block th:replace="base :: js"></th:block>
+    <script th:src="@{/js/user.js}"></script>
+</head>
+
+<body>
+
+    <div th:replace="base :: header"></div>
+
+    <div th:replace="base :: sidebar"></div>
+
+    <div class="content">
+
+        <h2 class="mb-4">Đăng ký tài khoản</h2>
+
+        <form method="post" th:action="@{/register}" enctype="multipart/form-data" id="registerForm">
+
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" name="username" class="form-control" id="username">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" name="password" class="form-control" id="password">
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email address:</label>
+                <input type="email" name="email" class="form-control" id="email">
+            </div>
+            
+            <div class="form-group">
+                <label for="dob">Ngày sinh:</label>
+                <input type="date" name="dob" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Số điện thoại:</label>
+                <input name="phone" placeholder="Phone" class="form-control"/>
+            </div>
+            
+            <div class="form-group">
+                <label for="gender">Giới tính:</label>
+                <select name="gender" class="form-control">
+                    <option value="MALE">Nam</option>
+                    <option value="FEMALE">Nữ</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="avatar">Avatar</label>
+                <input type="file" name="avatar" class="form-control mb-2">
+            </div>
+
+            <button type="submit" class="btn btn-primary mb-3">Đăng ký</button>
+            <a th:href="@{/login}">Đã có tài khoản? Đăng nhập</a>
+        </form>
+    </div>
+
+    <div th:replace="base :: footer">
+
+    </div>
+</body>
+</html>
