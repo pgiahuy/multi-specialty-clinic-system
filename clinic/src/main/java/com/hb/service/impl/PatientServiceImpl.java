@@ -10,6 +10,7 @@ import com.hb.repository.PatientRepository;
 import com.hb.service.PatientService;
 import java.io.Serial;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -20,9 +21,9 @@ import org.springframework.stereotype.Service;
  *
  * @author HUY
  */
-
 @Service
 public class PatientServiceImpl implements PatientService {
+
     @Autowired
     private PatientRepository patientRepo;
 
@@ -33,27 +34,38 @@ public class PatientServiceImpl implements PatientService {
 
     @Override
     public Patient getPatientById(Long id) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        return this.patientRepo.getPatientById(id);
     }
 
     @Override
-    public Patient addPatient(Map<String, String> params, User u) {
+    public Patient addPatient(User u) {
         Patient p = new Patient();
         p.setUserId(u);
-        
-        p.setPhone(params.get("phone"));
-        p.setGender(params.get("gender"));
-        
-        String dobStr = params.get("dob");
-        if (dobStr != null && !dobStr.isEmpty()) {
+
+        return this.patientRepo.addPatient(p);
+    }
+
+    @Override
+    public void updateProfile(Long id, Map<String, String> params) {
+        Patient p = patientRepo.getPatientById(id);
+
+        if (params.containsKey("phone")) {
+            p.setPhone(params.get("phone"));
+        }
+        if (params.containsKey("gender")) {
+            p.setGender(params.get("gender"));
+        }
+        if (params.containsKey("dob")) {
+            String dobStr = params.get("dob");
             try {
-                Date dob = new SimpleDateFormat("yyyy-MM-dd").parse(dobStr);
+                Date dob = new SimpleDateFormat("dd/MM/yyyy").parse(dobStr);
                 p.setDob(dob);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        return this.patientRepo.addPatient(p);
+        patientRepo.updatePatient(p);
     }
-    
 }
+
+

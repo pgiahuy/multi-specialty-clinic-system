@@ -30,8 +30,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public void registerPatient(Map<String, String> params, MultipartFile avatar){
-        User u = userService.addUser(params, avatar);
-        Patient p = patientService.addPatient(params, u);
+        User u = userService.addUser(params, avatar);     
+        patientService.addPatient(u);    
     }
 
     @Override
