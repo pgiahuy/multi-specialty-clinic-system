@@ -16,4 +16,5 @@ public interface  PatientRepository {
     List<Patient> getPatients(Map<String,String> params);
     Patient getPatientById(Long id);
     Patient addPatient(Patient p);
+    void updatePatient(Patient p);
 }
