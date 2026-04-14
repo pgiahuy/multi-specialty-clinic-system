@@ -24,13 +24,18 @@ import org.springframework.web.multipart.MultipartFile;
  * @author HUY
  */
 @Controller
-@RequestMapping("/admin/users")
+@RequestMapping("/admin")
 public class UserController {
 
     @Autowired
     private UserService userService;
+    
+    @GetMapping("/login")
+    public String loginView() {
+        return "login";
+    }
 
-    @GetMapping("")
+    @GetMapping("/users")
     public String createView(Model model, @RequestParam Map<String, String> params) {
         model.addAttribute("users", userService.getUsers(params));
         return "users";
@@ -54,4 +59,6 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
     }
+    
+    
 }
