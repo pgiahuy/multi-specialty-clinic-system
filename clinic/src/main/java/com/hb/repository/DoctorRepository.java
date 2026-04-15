@@ -16,4 +16,5 @@ public interface DoctorRepository {
     List<Doctor> getDoctors(Map<String,String> params);
     Doctor addDoctor(Doctor d);
     Doctor getDoctorById(Long id);
+    void deleteDoctor(Long id);
 }

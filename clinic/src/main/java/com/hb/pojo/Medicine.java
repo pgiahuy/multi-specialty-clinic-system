@@ -7,7 +7,6 @@ package com.hb.pojo;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -24,7 +23,7 @@ import java.util.Date;
 
 /**
  *
- * @author HUY
+ * @author DELL
  */
 @Entity
 @Table(name = "medicine")
@@ -58,9 +57,9 @@ public class Medicine implements Serializable {
     @Size(max = 255)
     @Column(name = "public_id")
     private String publicId;
-    @OneToMany(mappedBy = "medicineId", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "medicineId")
     private Collection<InventoryLog> inventoryLogCollection;
-    @OneToMany(mappedBy = "medicineId", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "medicineId")
     private Collection<PrescriptionItem> prescriptionItemCollection;
 
     public Medicine() {

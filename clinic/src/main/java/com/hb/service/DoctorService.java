@@ -16,4 +16,5 @@ public interface DoctorService {
     Doctor addDoctor(Map<String,String> params);
     List<Doctor> getDoctors(Map<String,String> params);
     Doctor getDoctorById(Long id);
+    void deleteDoctor(Long id);
 }

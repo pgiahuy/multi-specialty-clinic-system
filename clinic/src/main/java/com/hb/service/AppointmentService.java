@@ -4,7 +4,10 @@
  */
 package com.hb.service;
 
+import com.hb.dto.request.AppointmentCreateRequest;
+import com.hb.dto.response.AppointmentResponse;
 import com.hb.pojo.Appointment;
+import com.hb.repository.AppointmentRepository;
 import java.util.List;
 import java.util.Map;
 
@@ -15,5 +18,5 @@ import java.util.Map;
 public interface AppointmentService {
     List<Appointment> getAppointments(Map<String,String> params);
     Appointment getAppointmentById(Long id);
-    Appointment addAppointment(Map<String,String> params);
+    AppointmentResponse addAppointment(AppointmentCreateRequest req);
 }
