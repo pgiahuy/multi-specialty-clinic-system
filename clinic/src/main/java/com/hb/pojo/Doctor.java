@@ -26,7 +26,7 @@ import java.util.Collection;
 
 /**
  *
- * @author HUY
+ * @author DELL
  */
 @Entity
 @Table(name = "doctor")
@@ -54,12 +54,15 @@ public class Doctor implements Serializable {
     private Specialty idSpecailty;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @OneToOne
+    @JsonIgnore
     private User userId;
     
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idHod")
     private Collection<Specialty> specialtyCollection;
+
     @OneToMany(mappedBy = "doctor")
+    @JsonIgnore
     private Collection<Appointment> appointmentCollection;
 
     public Doctor() {

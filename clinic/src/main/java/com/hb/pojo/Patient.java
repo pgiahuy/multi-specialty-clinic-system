@@ -4,6 +4,7 @@
  */
 package com.hb.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -25,7 +26,7 @@ import java.util.Date;
 
 /**
  *
- * @author HUY
+ * @author DELL
  */
 @Entity
 @Table(name = "patient")
@@ -59,8 +60,11 @@ public class Patient implements Serializable {
     private String fullName;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @OneToOne
+    @JsonIgnore
     private User userId;
+
     @OneToMany(mappedBy = "patient")
+    @JsonIgnore
     private Collection<Appointment> appointmentCollection;
 
     public Patient() {

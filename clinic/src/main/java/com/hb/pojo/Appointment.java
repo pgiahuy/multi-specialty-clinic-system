@@ -24,7 +24,7 @@ import java.util.Date;
 
 /**
  *
- * @author HUY
+ * @author DELL
  */
 @Entity
 @Table(name = "appointment")
@@ -60,11 +60,13 @@ public class Appointment implements Serializable {
     
     @JoinColumn(name = "doctor_id", referencedColumnName = "id")
     @ManyToOne
+
     private Doctor doctor;
     
     @JoinColumn(name = "patient_id", referencedColumnName = "id")
     @ManyToOne
     private Patient patient;
+
     @OneToOne(mappedBy = "appointmentId")
     private Payment payment;
 
