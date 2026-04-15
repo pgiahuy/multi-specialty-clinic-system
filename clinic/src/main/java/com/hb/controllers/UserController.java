@@ -41,7 +41,7 @@ public class UserController {
         return "users";
     }
 
-    @PostMapping("")
+    @PostMapping("/users")
     public String create(@RequestParam Map<String, String> params,
             @RequestParam("avatar") MultipartFile avatar) {
 
@@ -50,7 +50,7 @@ public class UserController {
         return "redirect:/admin/users";
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/users/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") Long id) {
         try {
             userService.deleteUser(id);
