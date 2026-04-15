@@ -8,6 +8,7 @@ import com.hb.pojo.Patient;
 import com.hb.pojo.User;
 import java.util.List;
 import java.util.Map;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -16,6 +17,7 @@ import java.util.Map;
 public interface PatientService {
     List<Patient> getPatients(Map<String,String> params);
     Patient getPatientById(Long id);
-    Patient addPatient(User u);
-    void updateProfile(Long id, Map<String, String> params);
+    void updateProfile(Long id, Map<String, String> params, MultipartFile avatar);
+    Patient addPatient(Map<String, String> params, User user);
+
 }

@@ -7,7 +7,6 @@ package com.hb.pojo;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -25,7 +24,7 @@ import java.util.Date;
 
 /**
  *
- * @author HUY
+ * @author DELL
  */
 @Entity
 @Table(name = "appointment")
@@ -56,15 +55,17 @@ public class Appointment implements Serializable {
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
-    @OneToOne(mappedBy = "appointmentId", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "appointmentId")
     private MedicalRecord medicalRecord;
     @JoinColumn(name = "doctor_id", referencedColumnName = "id")
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Doctor doctorId;
+    @ManyToOne
+
+    private Doctor doctor;
     @JoinColumn(name = "patient_id", referencedColumnName = "id")
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Patient patientId;
-    @OneToOne(mappedBy = "appointmentId", fetch = FetchType.LAZY)
+    @ManyToOne
+    private Patient patient;
+
+    @OneToOne(mappedBy = "appointmentId")
     private Payment payment;
 
     public Appointment() {
@@ -122,20 +123,20 @@ public class Appointment implements Serializable {
         this.medicalRecord = medicalRecord;
     }
 
-    public Doctor getDoctorId() {
-        return doctorId;
+    public Doctor getDoctor() {
+        return doctor;
     }
 
-    public void setDoctorId(Doctor doctorId) {
-        this.doctorId = doctorId;
+    public void setDoctor(Doctor doctor) {
+        this.doctor = doctor;
     }
 
-    public Patient getPatientId() {
-        return patientId;
+    public Patient getPatient() {
+        return patient;
     }
 
-    public void setPatientId(Patient patientId) {
-        this.patientId = patientId;
+    public void setPatient(Patient patient) {
+        this.patient = patient;
     }
 
     public Payment getPayment() {

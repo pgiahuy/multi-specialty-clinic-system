@@ -8,7 +8,6 @@ import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -23,7 +22,7 @@ import java.util.Collection;
 
 /**
  *
- * @author HUY
+ * @author DELL
  */
 @Entity
 @Table(name = "specialty")
@@ -44,10 +43,10 @@ public class Specialty implements Serializable {
     @Size(min = 1, max = 100)
     @Column(name = "name")
     private String name;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idSpecailty", fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idSpecailty")
     private Collection<Doctor> doctorCollection;
     @JoinColumn(name = "id_hod", referencedColumnName = "id")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false)
     private Doctor idHod;
 
     public Specialty() {
