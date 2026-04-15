@@ -24,9 +24,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
         basePackages = {
             "com.hb.controllers",
             "com.hb.repository",
-            "com.hb.service"
+            "com.hb.service",
+            "com.hb.mapper"
         }
 )
+@ComponentScan("com.hb.controllers")
 @EnableWebMvc
 @EnableTransactionManagement
 public class WebAppContextConfigs implements WebMvcConfigurer {
@@ -49,6 +51,7 @@ public class WebAppContextConfigs implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/js/**").addResourceLocations("classpath:/static/js/");
+        registry.addResourceHandler("/css/**").addResourceLocations("classpath:/static/css/");
     }
 
     
