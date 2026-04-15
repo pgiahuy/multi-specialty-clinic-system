@@ -18,11 +18,14 @@ import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 
 
+import org.springframework.context.annotation.ComponentScan;
+
 /**
  *
  * @author HUY
  */
 @Configuration
+@ComponentScan("com.hb.mapper,com.hb.service,com.hb.repository")
 @PropertySource("classpath:databases.properties")
 public class HibernateConfigs {
     @Autowired

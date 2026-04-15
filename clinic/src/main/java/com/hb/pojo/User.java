@@ -4,11 +4,9 @@
  */
 package com.hb.pojo;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -24,6 +22,7 @@ import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Date;
 
 /**
  *
@@ -68,7 +67,6 @@ public class User implements Serializable {
     private String role;
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
-    @JsonIgnore
     private LocalDateTime createdAt;
     @Size(max = 255)
     @Column(name = "secure_url")
@@ -76,11 +74,11 @@ public class User implements Serializable {
     @Size(max = 255)
     @Column(name = "public_id")
     private String publicId;
-    @OneToOne(mappedBy = "userId", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "userId")
     private Doctor doctor;
-    @OneToMany(mappedBy = "userId", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "userId")
     private Collection<Notification> notificationCollection;
-    @OneToOne(mappedBy = "userId", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "userId")
     private Patient patient;
 
     public User() {

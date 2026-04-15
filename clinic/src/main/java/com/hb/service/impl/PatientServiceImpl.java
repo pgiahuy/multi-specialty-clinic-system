@@ -29,7 +29,7 @@ public class PatientServiceImpl implements PatientService {
 
     @Override
     public List<Patient> getPatients(Map<String, String> params) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        return patientRepo.getPatients(params);
     }
 
     @Override
@@ -38,9 +38,9 @@ public class PatientServiceImpl implements PatientService {
     }
 
     @Override
-    public Patient addPatient(User u) {
+    public Patient addPatient(Map<String,String> params, User user) {
         Patient p = new Patient();
-        p.setUserId(u);
+        p.setUserId(user);
 
         return this.patientRepo.addPatient(p);
     }
