@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Context path="/clinic">
-  <Resource auth="Container" driverClassName="com.mysql.cj.jdbc.Driver" maxActive="20" maxIdle="10" maxWait="-1" name="clinic" password="root" type="javax.sql.DataSource" url="jdbc:mysql://localhost:3306/clinicdb?zeroDateTimeBehavior=CONVERT_TO_NULL" username="root"/>
+  <Resource auth="Container" driverClassName="com.mysql.cj.jdbc.Driver" maxActive="20" maxIdle="10" maxWait="-1" name="clinicdb" password="root" type="javax.sql.DataSource" url="jdbc:mysql://localhost:3306/clinicdb?zeroDateTimeBehavior=CONVERT_TO_NULL" username="root"/>
 </Context>
