@@ -5,6 +5,7 @@
 package com.hb.pojo;
 
 import jakarta.persistence.Basic;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -46,7 +47,8 @@ public class Prescription implements Serializable {
     @JoinColumn(name = "medical_record_id", referencedColumnName = "id")
     @OneToOne
     private MedicalRecord medicalRecordId;
-    @OneToMany(mappedBy = "prescriptionId")
+    
+    @OneToMany(mappedBy = "prescriptionId", cascade = CascadeType.ALL, orphanRemoval = true)
     private Collection<PrescriptionItem> prescriptionItemCollection;
 
     public Prescription() {

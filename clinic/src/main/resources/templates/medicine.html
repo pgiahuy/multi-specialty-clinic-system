@@ -1,0 +1,59 @@
+
+
+
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Quản lý Bác sĩ</title>
+
+    <th:block th:replace="base :: css"></th:block>
+    <th:block th:replace="base :: js"></th:block>
+    <script th:src="@{/js/doctor.js}"></script>
+</head>
+
+<body>
+
+    <div th:replace="base :: header"></div>
+
+    <div th:replace="base :: sidebar"></div>
+
+    <div class="content">
+
+        <h2 class="mb-4">Dược phẩm</h2>
+
+        <table class="table table-bordered table-hover align-middle">
+            <thead class="table-primary">
+                <tr>
+                    <th>ID</th>
+                    <th>Họ tên</th>
+                    <th>Chuyên khoa</th>
+                    <th>Thông tin</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr th:each="d : ${doctors}">
+                    <td th:text="${d.id}"></td>
+                    <td th:text="${d.fullName}"></td>
+                    <td th:text="${d.idSpecailty}"></td>
+                    <td th:text="${d.description}"></td>
+           
+                    <td>
+                        <button class="btn btn-warning btn-sm">Sửa</button>
+                        <button class="btn btn-danger btn-sm"
+                                th:onclick="'deleteDoctor(' + ${d.id} + ')'">
+                            Xóa
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+    <div th:replace="base :: footer">
+
+    </div>
+</body>
+</html>

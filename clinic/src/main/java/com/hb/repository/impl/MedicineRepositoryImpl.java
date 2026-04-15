@@ -4,13 +4,14 @@
  */
 package com.hb.repository.impl;
 
-import com.hb.pojo.Patient;
-import com.hb.repository.PatientRepository;
+import com.hb.pojo.Medicine;
+import com.hb.repository.MedicineRepository;
 import java.util.List;
 import java.util.Map;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Repository;
@@ -20,52 +21,56 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author HUY
  */
-
 @Repository
 @Transactional
-public class PatientRepositoryImpl implements PatientRepository{
+@PropertySource("classpath:configs.properties")
+public class MedicineRepositoryImpl implements MedicineRepository {
+
+    @Autowired
+    private Environment env;
 
     @Autowired
     private LocalSessionFactoryBean factory;
-    
-    @Autowired
-    private Environment env;
-    
+
     @Override
-    public List<Patient> getPatients(Map<String,String> params) {
+    public List<Medicine> getMedicines(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<Patient> q = session.createNamedQuery("Patient.findAll", Patient.class);
-        
+        Query<Medicine> q = session.createNamedQuery("Medicine.findAll", Medicine.class);
+
         if (params != null) {
-            int pageSize = this.env.getProperty("patients.page_size", Integer.class);
+            int pageSize = this.env.getProperty("medicines.page_size", Integer.class);
             int page = Integer.parseInt(params.getOrDefault("page", "1"));
-            int start = (page-1)*pageSize;
+            int start = (page - 1) * pageSize;
             q.setMaxResults(pageSize);
             q.setFirstResult(start);
-            
         }
+
         return q.getResultList();
     }
 
     @Override
-    public Patient getPatientById(Long id) {
+    public Medicine addMedicine(Medicine d) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<Patient> q = session.createNamedQuery("Patient.findById", Patient.class);
-        q.setParameter("id", id);
-        return q.getSingleResult();
+        session.persist(d);
+        return d;
     }
 
     @Override
-    public Patient addPatient(Patient p) {
+    public Medicine getMedicineById(Long id) {
         Session session = this.factory.getObject().getCurrentSession();
-        session.persist(p);
-        return p;
+        return session.get(Medicine.class, id);
     }
 
     @Override
-    public void updatePatient(Patient p) {
+    public void deleteMedicine(Long id) {
         Session session = this.factory.getObject().getCurrentSession();
-        session.merge(p);
+
+        Medicine d = session.get(Medicine.class, id);
+
+        if (d != null) {
+            session.remove(d);
+        } else {
+            throw new RuntimeException("Medicine not found!");
+        }
     }
-    
 }
