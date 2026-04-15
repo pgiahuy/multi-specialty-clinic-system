@@ -37,6 +37,7 @@ public class JwtFilter implements Filter{
             }
             else {
                 String token = header.substring(7);
+                
                 try {
                     String username = JwtUtils.validateTokenAndGetUsername(token);
                     if (username != null) {
@@ -54,6 +55,7 @@ public class JwtFilter implements Filter{
 
             ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED, 
                     "Token không hợp lệ hoặc hết hạn");
+             return;
         }
         
         chain.doFilter(request, response);
