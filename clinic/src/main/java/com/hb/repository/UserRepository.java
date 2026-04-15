@@ -12,9 +12,10 @@ import java.util.Map;
  *
  * @author HUY
  */
-public interface UserRepository{
+public interface UserRepository {
     List<User> getUsers(Map<String, String> params);
     User getUserByUsername(String username);
     User addUser(User u);
     void deleteUser(Long id);
+    boolean authenticate(String username, String password);
 }

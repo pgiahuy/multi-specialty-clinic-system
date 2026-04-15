@@ -4,8 +4,8 @@
  */
 package com.hb.service.impl;
 
-import com.hb.pojo.Patient;
 import com.hb.pojo.User;
+import com.hb.repository.UserRepository;
 import com.hb.service.AuthService;
 import com.hb.service.PatientService;
 import com.hb.service.UserService;
@@ -27,15 +27,18 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private PatientService patientService;
     
+    @Autowired
+    private UserRepository userRepo;
+    
     @Override
     @Transactional
-    public void registerPatient(Map<String, String> params, MultipartFile avatar){
-        User u = userService.addUser(params, avatar);
-        Patient p = patientService.addPatient(params, u);
+    public void registerPatient(Map<String, String> params, MultipartFile avatar) {
+        User u = userService.addUser(params, avatar);     
+        patientService.addPatient(u);    
     }
 
     @Override
-    public void login(Map<String, String> params) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public boolean authenticate(String username, String password) {
+        return this.userRepo.authenticate(username, password);
     }
 }

@@ -4,6 +4,7 @@
  */
 package com.hb.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,7 +24,6 @@ import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Date;
 
 /**
  *
@@ -68,6 +68,7 @@ public class User implements Serializable {
     private String role;
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
+    @JsonIgnore
     private LocalDateTime createdAt;
     @Size(max = 255)
     @Column(name = "secure_url")

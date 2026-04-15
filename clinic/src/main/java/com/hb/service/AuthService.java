@@ -13,5 +13,5 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public interface AuthService {
     void registerPatient(Map<String, String> params, MultipartFile avatar);
-    void login(Map<String, String> params);
+    boolean authenticate(String username, String password);
 }
