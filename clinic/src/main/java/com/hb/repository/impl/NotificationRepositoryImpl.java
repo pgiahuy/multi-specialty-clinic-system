@@ -4,13 +4,14 @@
  */
 package com.hb.repository.impl;
 
-import com.hb.pojo.Patient;
-import com.hb.repository.PatientRepository;
+import com.hb.pojo.Notification;
+import com.hb.repository.NotificationRepository;
 import java.util.List;
 import java.util.Map;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Repository;
@@ -20,52 +21,59 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author HUY
  */
-
 @Repository
 @Transactional
-public class PatientRepositoryImpl implements PatientRepository{
+@PropertySource("classpath:configs.properties")
+public class NotificationRepositoryImpl implements NotificationRepository {
+
+    @Autowired
+    private Environment env;
 
     @Autowired
     private LocalSessionFactoryBean factory;
-    
-    @Autowired
-    private Environment env;
-    
+
     @Override
-    public List<Patient> getPatients(Map<String,String> params) {
+    public List<Notification> getNotificationsByUserId(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<Patient> q = session.createNamedQuery("Patient.findAll", Patient.class);
-        
+        Query<Notification> q = session.createNamedQuery("Notification.findByUserId", Notification.class);
+
         if (params != null) {
-            int pageSize = this.env.getProperty("patients.page_size", Integer.class);
+            Long userId = Long.valueOf(params.get("userId"));
+            q.setParameter("userId", userId);
+
+            int pageSize = this.env.getProperty("notifications.page_size", Integer.class, 1);
             int page = Integer.parseInt(params.getOrDefault("page", "1"));
-            int start = (page-1)*pageSize;
+            int start = (page - 1) * pageSize;
             q.setMaxResults(pageSize);
             q.setFirstResult(start);
-            
         }
+
         return q.getResultList();
     }
 
     @Override
-    public Patient getPatientById(Long id) {
+    public Notification addNotification(Notification n) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<Patient> q = session.createNamedQuery("Patient.findById", Patient.class);
-        q.setParameter("id", id);
-        return q.getSingleResult();
+        session.persist(n);
+        return n;
     }
 
     @Override
-    public Patient addPatient(Patient p) {
+    public Notification getNotificationById(Long id) {
         Session session = this.factory.getObject().getCurrentSession();
-        session.persist(p);
-        return p;
+        return session.get(Notification.class, id);
     }
 
     @Override
-    public void updatePatient(Patient p) {
+    public void deleteNotification(Long id) {
         Session session = this.factory.getObject().getCurrentSession();
-        session.merge(p);
+
+        Notification n = session.get(Notification.class, id);
+
+        if (n != null) {
+            session.remove(n);
+        } else {
+            throw new RuntimeException("Notification not found!");
+        }
     }
-    
 }

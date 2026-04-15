@@ -4,7 +4,7 @@
  */
 package com.hb.service;
 
-import com.hb.pojo.Specialty;
+import com.hb.pojo.Notification;
 import java.util.List;
 import java.util.Map;
 
@@ -12,9 +12,9 @@ import java.util.Map;
  *
  * @author HUY
  */
-public interface SpecialtyService {
-    List<Specialty> getSpecialties(Map<String,String> params);
-    Specialty getSpecialtieById(Long id);
-    Specialty addSpecialtie(Map<String, String> params);
-    void deleteDoctor(Long id);
+public interface NotificationService {
+    Notification addNotification(Map<String, String> params);
+    List<Notification> getNotificationsByUserId(Map<String, String> params);
+    Notification getNotificationById(Long id);
+    void deleteNotification(Long id);
 }

@@ -1,7 +1,12 @@
+
+
+* {
+    font-family: "Barlow Semi Condensed", sans-serif;
+}
+
 body {
     overflow-x: hidden;
     background-color: #f5f7fa;
-    font-family: "Segoe UI", Tahoma, sans-serif;
 }
 
 .navbar {

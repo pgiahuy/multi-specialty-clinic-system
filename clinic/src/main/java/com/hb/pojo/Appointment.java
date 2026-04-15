@@ -55,7 +55,7 @@ public class Appointment implements Serializable {
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
-    @OneToOne(mappedBy = "appointmentId")
+    @OneToOne(mappedBy = "appointment")
     private MedicalRecord medicalRecord;
     
     @JoinColumn(name = "doctor_id", referencedColumnName = "id")

@@ -45,6 +45,7 @@ public class Specialty implements Serializable {
     private String name;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idSpecailty")
     private Collection<Doctor> doctorCollection;
+    
     @JoinColumn(name = "id_hod", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Doctor idHod;

@@ -4,11 +4,9 @@
  */
 package com.hb.controllers;
 
-import com.hb.service.UserService;
+import com.hb.service.MedicineService;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,34 +22,28 @@ import org.springframework.web.multipart.MultipartFile;
  * @author HUY
  */
 @Controller
-@RequestMapping("/admin")
-public class UserController {
+@RequestMapping("/admin/medicine")
+public class MedicineController {
 
     @Autowired
-    private UserService userService;
-    
-    
+    private MedicineService medicineService;
 
-    @GetMapping("/users")
-    public String createView(Model model, @RequestParam Map<String, String> params) {
-        model.addAttribute("users", userService.getUsers(params));
-        return "user";
+    @GetMapping("")
+    public String list(Model model, @RequestParam Map<String, String> params) {
+        model.addAttribute("medicines", this.medicineService.getMedicines(params));
+        return "medicine";
     }
 
-    @PostMapping("/users")
+    @PostMapping("")
     public String create(@RequestParam Map<String, String> params,
-            @RequestParam("avatar") MultipartFile avatar) {
-
-        userService.addUser(params, avatar);
-
-        return "redirect:/admin/users";
+            @RequestParam("image") MultipartFile avatar) {
+        medicineService.addMedicine(params, avatar);
+        return "redirect:/admin/medicines";
     }
 
-    @DeleteMapping("/users/{id}")
-    public String delete(@PathVariable("id") Long id) {
-        userService.deleteUser(id);
-        return "redirect:/admin/users";
+    @DeleteMapping("/admin/medicines/{id}")
+    public String delete(@PathVariable Long id) {
+        medicineService.deleteMedicine(id);
+        return "redirect:/admin/medicines";
     }
-    
-    
 }

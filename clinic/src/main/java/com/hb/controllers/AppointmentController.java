@@ -26,6 +26,6 @@ public class AppointmentController {
     @GetMapping("")
     public String list(Model model, @RequestParam Map<String,String> params){
         model.addAttribute("appointments", this.appointmentService.getAppointments(params));
-        return "appointments";
+        return "appointment";
     }
 }
