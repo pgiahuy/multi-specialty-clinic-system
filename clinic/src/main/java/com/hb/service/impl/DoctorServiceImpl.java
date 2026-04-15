@@ -78,4 +78,9 @@ public class DoctorServiceImpl implements DoctorService {
         return d;
     }
 
+    @Override
+    public void deleteDoctor(Long id) {
+        doctorRepo.deleteDoctor(id);
+    }
+
 }

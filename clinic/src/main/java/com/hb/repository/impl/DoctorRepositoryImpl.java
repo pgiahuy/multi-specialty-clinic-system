@@ -62,4 +62,17 @@ public class DoctorRepositoryImpl implements DoctorRepository{
         return q.getSingleResult();
     }
     
+    @Override
+    public void deleteDoctor(Long id) {
+        Session session = this.factory.getObject().getCurrentSession();
+
+        Doctor d = session.get(Doctor.class, id);
+
+        if (d != null) {
+            session.remove(d);
+        } else {
+            throw new RuntimeException("Doctor not found!");
+        }
+    }
+    
 }
