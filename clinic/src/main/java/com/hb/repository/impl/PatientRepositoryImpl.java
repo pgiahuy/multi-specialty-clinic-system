@@ -61,5 +61,11 @@ public class PatientRepositoryImpl implements PatientRepository{
         session.persist(p);
         return p;
     }
+
+    @Override
+    public void updatePatient(Patient p) {
+        Session session = this.factory.getObject().getCurrentSession();
+        session.merge(p);
+    }
     
 }
