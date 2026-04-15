@@ -4,6 +4,7 @@
  */
 package com.hb.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -26,7 +27,7 @@ import java.util.Date;
 
 /**
  *
- * @author HUY
+ * @author DELL
  */
 @Entity
 @Table(name = "user")
@@ -56,6 +57,7 @@ public class User implements Serializable {
     @NotNull
     @Size(min = 1, max = 255)
     @Column(name = "password")
+   
     private String password;
     @Basic(optional = false)
     @NotNull
@@ -67,6 +69,7 @@ public class User implements Serializable {
     private String role;
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
+    @JsonIgnore
     private LocalDateTime createdAt;
     @Size(max = 255)
     @Column(name = "secure_url")
@@ -77,6 +80,7 @@ public class User implements Serializable {
     @OneToOne(mappedBy = "userId")
     private Doctor doctor;
     @OneToMany(mappedBy = "userId")
+    @JsonIgnore
     private Collection<Notification> notificationCollection;
     @OneToOne(mappedBy = "userId")
     private Patient patient;
