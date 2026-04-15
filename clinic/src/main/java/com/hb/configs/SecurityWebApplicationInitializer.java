@@ -4,10 +4,12 @@
  */
 package com.hb.configs;
 
+import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
+
 /**
  *
  * @author HUY
  */
-public class SecurityWebApplicationInitializer {
+public class SecurityWebApplicationInitializer extends AbstractSecurityWebApplicationInitializer {
     
 }

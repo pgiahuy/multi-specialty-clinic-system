@@ -1,7 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <persistence version="3.0" xmlns="https://jakarta.ee/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd">
-    <!-- Define Persistence Unit -->
-    <persistence-unit name="my_persistence_unit">
-        
-    </persistence-unit>
+  <!-- Define Persistence Unit -->
+  <persistence-unit name="my_persistence_unit">
+    <class>com.hb.pojo.MedicalRecord</class>
+    <class>com.hb.pojo.InventoryLog</class>
+    <class>com.hb.pojo.Doctor</class>
+    <class>com.hb.pojo.Appointment</class>
+    <class>com.hb.pojo.User</class>
+    <class>com.hb.pojo.Medicine</class>
+    <class>com.hb.pojo.Prescription</class>
+    <class>com.hb.pojo.PrescriptionItem</class>
+    <class>com.hb.pojo.Payment</class>
+    <class>com.hb.pojo.Patient</class>
+    <class>com.hb.pojo.Notification</class>
+    <class>com.hb.pojo.Specialty</class>
+  </persistence-unit>
 </persistence>
