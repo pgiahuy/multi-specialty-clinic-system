@@ -7,7 +7,6 @@ package com.hb.pojo;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -25,7 +24,7 @@ import java.util.Date;
 
 /**
  *
- * @author HUY
+ * @author DELL
  */
 @Entity
 @Table(name = "appointment")
@@ -56,15 +55,15 @@ public class Appointment implements Serializable {
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
-    @OneToOne(mappedBy = "appointmentId", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "appointmentId")
     private MedicalRecord medicalRecord;
     @JoinColumn(name = "doctor_id", referencedColumnName = "id")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     private Doctor doctorId;
     @JoinColumn(name = "patient_id", referencedColumnName = "id")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     private Patient patientId;
-    @OneToOne(mappedBy = "appointmentId", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "appointmentId")
     private Payment payment;
 
     public Appointment() {

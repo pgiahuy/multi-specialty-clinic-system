@@ -4,7 +4,6 @@
  */
 package com.hb.controllers.api;
 
-
 import com.hb.pojo.User;
 import com.hb.service.AuthService;
 import com.hb.utils.JwtUtils;
@@ -27,19 +26,21 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api/auth")
 public class ApiAuthController {
+
     @Autowired
     private AuthService authService;
-    
+
     @PostMapping("/register")
-    public ResponseEntity<?> create(@RequestParam Map<String, String> params, 
-            @RequestParam(value = "avatar") MultipartFile avatar){        
+    public ResponseEntity<?> create(@RequestParam Map<String, String> params,
+            @RequestParam(value = "avatar") MultipartFile avatar) {
         authService.registerPatient(params, avatar);
-        return new ResponseEntity<>(HttpStatus.CREATED); 
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
-    
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User u) {
-
+        System.out.println("Login Request - Username: " + u.getUsername());
+        System.out.println("Login Request - Password: " + u.getPassword());
         if (this.authService.authenticate(u.getUsername(), u.getPassword())) {
             try {
                 String token = JwtUtils.generateToken(u.getUsername());
