@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -26,6 +28,9 @@ public class PatientServiceImpl implements PatientService {
 
     @Autowired
     private PatientRepository patientRepo;
+    
+    @Autowired
+    private CloudinaryService cloudinaryService;
 
     @Override
     public List<Patient> getPatients(Map<String, String> params) {
@@ -46,7 +51,8 @@ public class PatientServiceImpl implements PatientService {
     }
 
     @Override
-    public void updateProfile(Long id, Map<String, String> params) {
+    @Transactional
+    public void updateProfile(Long id, Map<String, String> params, MultipartFile avatar) {
         Patient p = patientRepo.getPatientById(id);
 
         if (params.containsKey("phone")) {
@@ -64,8 +70,19 @@ public class PatientServiceImpl implements PatientService {
                 e.printStackTrace();
             }
         }
+        
+        if ( !avatar.isEmpty()) {
+            User u = p.getUserId();
+            Map res = this.cloudinaryService.uploadFile(avatar, "avatar");
+            
+            u.setSecureUrl(res.get("secureUrl").toString());
+            u.setPublicId(res.get("publicId").toString());
+        }
+        
         patientRepo.updatePatient(p);
     }
+
+   
 }
 
 

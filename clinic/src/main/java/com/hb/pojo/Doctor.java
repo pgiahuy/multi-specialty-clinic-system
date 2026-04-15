@@ -8,7 +8,6 @@ import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -26,13 +25,14 @@ import java.util.Collection;
 
 /**
  *
- * @author HUY
+ * @author DELL
  */
 @Entity
 @Table(name = "doctor")
 @NamedQueries({
     @NamedQuery(name = "Doctor.findAll", query = "SELECT d FROM Doctor d"),
-    @NamedQuery(name = "Doctor.findById", query = "SELECT d FROM Doctor d WHERE d.id = :id")})
+    @NamedQuery(name = "Doctor.findById", query = "SELECT d FROM Doctor d WHERE d.id = :id"),
+    @NamedQuery(name = "Doctor.findByFullName", query = "SELECT d FROM Doctor d WHERE d.fullName = :fullName")})
 public class Doctor implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -45,15 +45,18 @@ public class Doctor implements Serializable {
     @Size(max = 65535)
     @Column(name = "description")
     private String description;
+    @Size(max = 255)
+    @Column(name = "full_name")
+    private String fullName;
     @JoinColumn(name = "id_specailty", referencedColumnName = "id")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false)
     private Specialty idSpecailty;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
     private User userId;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idHod", fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idHod")
     private Collection<Specialty> specialtyCollection;
-    @OneToMany(mappedBy = "doctorId", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "doctorId")
     private Collection<Appointment> appointmentCollection;
 
     public Doctor() {
@@ -77,6 +80,14 @@ public class Doctor implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public Specialty getIdSpecailty() {

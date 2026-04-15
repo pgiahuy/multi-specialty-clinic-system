@@ -7,7 +7,6 @@ package com.hb.pojo;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -26,7 +25,7 @@ import java.util.Date;
 
 /**
  *
- * @author HUY
+ * @author DELL
  */
 @Entity
 @Table(name = "patient")
@@ -35,7 +34,8 @@ import java.util.Date;
     @NamedQuery(name = "Patient.findById", query = "SELECT p FROM Patient p WHERE p.id = :id"),
     @NamedQuery(name = "Patient.findByDob", query = "SELECT p FROM Patient p WHERE p.dob = :dob"),
     @NamedQuery(name = "Patient.findByGender", query = "SELECT p FROM Patient p WHERE p.gender = :gender"),
-    @NamedQuery(name = "Patient.findByPhone", query = "SELECT p FROM Patient p WHERE p.phone = :phone")})
+    @NamedQuery(name = "Patient.findByPhone", query = "SELECT p FROM Patient p WHERE p.phone = :phone"),
+    @NamedQuery(name = "Patient.findByFullName", query = "SELECT p FROM Patient p WHERE p.fullName = :fullName")})
 public class Patient implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -54,10 +54,13 @@ public class Patient implements Serializable {
     @Size(max = 20)
     @Column(name = "phone")
     private String phone;
+    @Size(max = 255)
+    @Column(name = "full_name")
+    private String fullName;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
     private User userId;
-    @OneToMany(mappedBy = "patientId", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "patientId")
     private Collection<Appointment> appointmentCollection;
 
     public Patient() {
@@ -97,6 +100,14 @@ public class Patient implements Serializable {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public User getUserId() {
