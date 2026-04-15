@@ -12,6 +12,7 @@ import com.hb.service.PatientService;
 import com.hb.service.UserService;
 import java.security.Principal;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -35,13 +36,14 @@ public class ApiPatientController {
     @Autowired
     private UserService userService;
 
-    @PutMapping("/{id}")
+    @PutMapping(value = "/profile/{id}",
+        consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateProfile(
             @PathVariable("id") Long id,
             @ModelAttribute PatientCreateRequest prq) {
 
         patientService.updateProfile(id, prq);
-        return (ResponseEntity<?>) ResponseEntity.ok();
+        return ResponseEntity.ok().build();
     }
 
     @RequestMapping("/secure/profile")

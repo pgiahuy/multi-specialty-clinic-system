@@ -72,8 +72,8 @@ public class AppointmentServiceImpl implements AppointmentService {
             throw new ResourceNotFoundException("Patient not found!");
         }
         
-//        a.setDoctorId(req.getDoctorId());
-//        a.setPatientId(req.getPatientId());
+        a.setDoctor(doctor);
+        a.setPatient(patient);
         
         a.setDate(date);
         a.setTimeSlot(timeSlot);
