@@ -4,6 +4,7 @@
  */
 package com.hb.service;
 
+import com.hb.dto.request.UserCreateRequest;
 import com.hb.pojo.User;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService extends UserDetailsService {
     User getUserByUsername(String username);
-    User addUser(Map<String, String> params, MultipartFile avatar);
+    User addUser(UserCreateRequest urq);
     List<User> getUsers(Map<String,String> params);
     void deleteUser(Long id);
 }

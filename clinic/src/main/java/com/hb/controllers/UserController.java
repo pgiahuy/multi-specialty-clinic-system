@@ -4,6 +4,7 @@
  */
 package com.hb.controllers;
 
+import com.hb.dto.request.UserCreateRequest;
 import com.hb.service.UserService;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,10 +44,9 @@ public class UserController {
     }
 
     @PostMapping("/users")
-    public String create(@RequestParam Map<String, String> params,
-            @RequestParam("avatar") MultipartFile avatar) {
+    public String create(@ModelAttribute UserCreateRequest urq) {
 
-        userService.addUser(params, avatar);
+        userService.addUser(urq);
 
         return "redirect:/admin/users";
     }

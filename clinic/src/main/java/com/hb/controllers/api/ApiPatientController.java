@@ -4,24 +4,22 @@
  */
 package com.hb.controllers.api;
 
+import com.hb.dto.request.PatientCreateRequest;
+import com.hb.dto.response.PatientResponse;
 import com.hb.pojo.Patient;
 import com.hb.pojo.User;
 import com.hb.service.PatientService;
 import com.hb.service.UserService;
 import java.security.Principal;
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -30,9 +28,9 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api")
 public class ApiPatientController {
+
     @Autowired
     private PatientService patientService;
-    
 
     @Autowired
     private UserService userService;
@@ -40,20 +38,27 @@ public class ApiPatientController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateProfile(
             @PathVariable("id") Long id,
-            @RequestParam Map<String, String> params,
-            @RequestParam(value = "avatar") MultipartFile avatar) {
+            @ModelAttribute PatientCreateRequest prq) {
 
-        patientService.updateProfile(id, params,avatar);
-        return ResponseEntity.ok("Cập nhật thành công");
+        patientService.updateProfile(id, prq);
+        return (ResponseEntity<?>) ResponseEntity.ok();
     }
-    
 
     @RequestMapping("/secure/profile")
     @ResponseBody
     @CrossOrigin
-    public ResponseEntity<Patient> getProfile(Principal principal) {
+    public ResponseEntity<PatientResponse> getProfile(Principal principal) {
         User u = this.userService.getUserByUsername(principal.getName());
-        return new ResponseEntity<>(u.getPatient(), HttpStatus.OK);
+        Patient p = u.getPatient();
+
+        PatientResponse res = new PatientResponse(
+                p.getFullName(),
+                p.getPhone(),
+                p.getDob(),
+                u.getEmail(),
+                u.getSecureUrl()
+        );
+        return ResponseEntity.ok(res);
     }
 
 }
