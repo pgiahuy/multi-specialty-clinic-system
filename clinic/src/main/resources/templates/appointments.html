@@ -1,0 +1,61 @@
+
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Quản lý lịch hẹn</title>
+
+    <th:block th:replace="base :: css"></th:block>
+    <th:block th:replace="base :: js"></th:block>
+    <script th:src="@{/js/user.js}"></script>
+</head>
+
+<body>
+
+    <div th:replace="base :: header"></div>
+
+    <div th:replace="base :: sidebar"></div>
+
+    <div class="content">
+
+        <h2 class="mb-4">Quản lý lịch hẹn</h2>
+
+        <table class="table table-bordered table-hover align-middle">
+            <thead class="table-primary">
+                <tr>
+                    <th>ID</th>
+                    <th>Bác sĩ</th>
+                    <th>Bệnh nhân</th>
+                    <th>Ngày</th>
+                    <th>Giờ</th>
+                    <th>Trạng thái</th>
+                    <th>Ngày tạo</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr th:each="a : ${appointments}">
+                    <td th:text="${a.id}"></td>
+
+                    <td th:text="${a.doctor.fullName}"></td>
+                    <td th:text="${a.patient.fullName}"></td>
+
+                    <td th:text="${a.date}"></td>
+                    <td th:text="${a.timeSlot}"></td>
+                    <td th:text="${a.status}"></td>
+                    <td th:text="${a.createdAt}"></td>
+                    <td>
+                        <button class="btn btn-warning btn-sm">Sửa</button>
+                       
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+    <div th:replace="base :: footer">
+
+    </div>
+</body>
+</html>

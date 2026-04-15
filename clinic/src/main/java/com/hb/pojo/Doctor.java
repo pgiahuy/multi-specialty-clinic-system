@@ -56,6 +56,8 @@ public class Doctor implements Serializable {
     @OneToOne
     @JsonIgnore
     private User userId;
+    
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idHod")
     private Collection<Specialty> specialtyCollection;
 
