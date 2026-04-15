@@ -4,6 +4,7 @@
  */
 package com.hb.controllers.api;
 
+import com.hb.dto.request.UserCreateRequest;
 import com.hb.pojo.User;
 import com.hb.service.UserService;
 import java.util.Map;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,9 +32,8 @@ public class ApiUserController {
     @PostMapping(path = "/users", 
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE, 
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> create(@RequestParam Map<String, String> params, 
-            @RequestParam(value = "avatar") MultipartFile avatar) {
-        User u = this.userService.addUser(params, avatar);       
+    public ResponseEntity<User> create(@ModelAttribute UserCreateRequest urq) {
+        User u = this.userService.addUser(urq);       
         return new ResponseEntity<>(u, HttpStatus.CREATED);
     }
 }

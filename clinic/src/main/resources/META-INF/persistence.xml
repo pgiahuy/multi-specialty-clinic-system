@@ -14,5 +14,6 @@
     <class>com.hb.pojo.Patient</class>
     <class>com.hb.pojo.Notification</class>
     <class>com.hb.pojo.Specialty</class>
+    <class>com.hb.dto.request.UserCreateRequest</class>
   </persistence-unit>
 </persistence>

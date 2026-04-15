@@ -54,13 +54,13 @@ public class Doctor implements Serializable {
     private Specialty idSpecailty;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @OneToOne
-    @JsonIgnore
-    private User userId;
+    
+    private User user;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idHod")
     private Collection<Specialty> specialtyCollection;
 
     @OneToMany(mappedBy = "doctor")
-    @JsonIgnore
+    
     private Collection<Appointment> appointmentCollection;
 
     public Doctor() {
@@ -102,12 +102,12 @@ public class Doctor implements Serializable {
         this.idSpecailty = idSpecailty;
     }
 
-    public User getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(User userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public Collection<Specialty> getSpecialtyCollection() {
