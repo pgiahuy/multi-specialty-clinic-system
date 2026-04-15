@@ -4,10 +4,18 @@
  */
 package com.hb.repository;
 
+import com.hb.pojo.User;
+import java.util.List;
+import java.util.Map;
+
 /**
  *
  * @author HUY
  */
-public class UserRepository {
-    
+public interface UserRepository {
+    List<User> getUsers(Map<String, String> params);
+    User getUserByUsername(String username);
+    User addUser(User u);
+    void deleteUser(Long id);
+    boolean authenticate(String username, String password);
 }

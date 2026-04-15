@@ -12,24 +12,22 @@ import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatche
  *
  * @author HUY
  */
-public class DispatcherServletInit  extends AbstractAnnotationConfigDispatcherServletInitializer{
+public class DispatcherServletInit extends AbstractAnnotationConfigDispatcherServletInitializer {
 
     @Override
     protected Class<?>[] getRootConfigClasses() {
-        return new Class[]{
+        return new Class[] {
             ThymeleafConfigs.class,
             HibernateConfigs.class,
-            SpringSecurityConfigs.class  
+            SpringSecurityConfigs.class
         };
-        
     }
 
     @Override
     protected Class<?>[] getServletConfigClasses() {
-        return new Class[]{
+        return new Class[] {
             WebAppContextConfigs.class
         };
-                
     }
 
     @Override
@@ -44,9 +42,6 @@ public class DispatcherServletInit  extends AbstractAnnotationConfigDispatcherSe
         long maxRequestSize = 20971520; // 20MB
         int fileSizeThreshold = 0;
 
-        registration.setMultipartConfig(new MultipartConfigElement(location, maxFileSize, maxRequestSize, fileSizeThreshold)); 
+        registration.setMultipartConfig(new MultipartConfigElement(location, maxFileSize, maxRequestSize, fileSizeThreshold));
     }
-    
-    
-    
 }

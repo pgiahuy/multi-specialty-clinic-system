@@ -4,10 +4,21 @@
  */
 package com.hb.controllers;
 
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+
 /**
  *
  * @author HUY
  */
+
+@Controller
 public class HomeController {
+      
+    @GetMapping("/") 
+    public String index() {
+        return "index";
+    }
     
 }
