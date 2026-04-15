@@ -30,7 +30,7 @@ public class DoctorController {
     private DoctorService doctorService;
     
     @GetMapping("/doctors")
-    public String createView(Model model, @RequestParam Map<String, String> params) {
+    public String list(Model model, @RequestParam Map<String, String> params) {
         model.addAttribute("doctors", doctorService.getDoctors(params));
         return "doctors";
     }
