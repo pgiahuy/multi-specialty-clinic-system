@@ -32,10 +32,7 @@ public class UserController {
     @Autowired
     private UserService userService;
     
-    @GetMapping("/login")
-    public String loginView() {
-        return "login";
-    }
+    
 
     @GetMapping("/users")
     public String createView(Model model, @RequestParam Map<String, String> params) {

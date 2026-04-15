@@ -26,7 +26,8 @@ public class JwtFilter implements Filter{
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         
         HttpServletRequest httpRequest = (HttpServletRequest) request;
-        
+        System.out.println("URI: " + httpRequest.getRequestURI());
+        System.out.println("Auth header: " + httpRequest.getHeader("Authorization"));
         if (httpRequest.getRequestURI().startsWith(String.format("%s/api/secure", httpRequest.getContextPath())) == true) {
            
             String header = httpRequest.getHeader("Authorization");
@@ -57,6 +58,7 @@ public class JwtFilter implements Filter{
                     "Token không hợp lệ hoặc hết hạn");
              return;
         }
+        
         
         chain.doFilter(request, response);
     }
