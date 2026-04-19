@@ -10,10 +10,14 @@ import com.hb.pojo.User;
 import com.hb.service.AppointmentService;
 import com.hb.service.UserService;
 import java.security.Principal;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,4 +46,10 @@ public class ApiAppointmentController {
         AppointmentResponse a = this.appointmentService.addAppointment(req);
         return new ResponseEntity<>(a, HttpStatus.CREATED);
     }
+    
+//    @GetMapping("/appointments/specialtys/{id}")
+//    public ResponseEntity<List<AppointmentResponse>> getBySpecialtyId(@PathVariable Long id){
+//        
+//    }
+//            
 }
