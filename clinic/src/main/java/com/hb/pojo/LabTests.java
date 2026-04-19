@@ -22,6 +22,7 @@ import java.util.Collection;
  *
  * @author HUY
  */
+
 @Entity
 @Table(name = "lab_tests")
 @NamedQueries({

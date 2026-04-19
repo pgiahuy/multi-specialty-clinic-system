@@ -4,6 +4,7 @@
  */
 package com.hb.repository.impl;
 
+import com.hb.exception.ResourceNotFoundException;
 import com.hb.pojo.Doctor;
 import com.hb.repository.DoctorRepository;
 import java.util.List;
@@ -65,13 +66,11 @@ public class DoctorRepositoryImpl implements DoctorRepository{
     @Override
     public void deleteDoctor(Long id) {
         Session session = this.factory.getObject().getCurrentSession();
-
         Doctor d = session.get(Doctor.class, id);
-
         if (d != null) {
             session.remove(d);
-        } else {
-            throw new RuntimeException("Doctor not found!");
+        } else{
+            throw new ResourceNotFoundException("Doctor not found!");
         }
     }
     

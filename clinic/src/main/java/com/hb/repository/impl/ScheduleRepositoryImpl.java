@@ -4,7 +4,8 @@
  */
 package com.hb.repository.impl;
 
-import com.hb.pojo.Specialty;
+import com.hb.pojo.Schedules;
+import com.hb.repository.ScheduleRepository;
 import java.util.List;
 import java.util.Map;
 import org.hibernate.Session;
@@ -15,7 +16,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import com.hb.repository.SpecialtyRepository;
 
 /**
  *
@@ -25,8 +25,7 @@ import com.hb.repository.SpecialtyRepository;
 @Repository
 @Transactional
 @PropertySource("classpath:configs.properties")
-public class SpecialtyRepositoryImpl implements SpecialtyRepository{
-    
+public class ScheduleRepositoryImpl implements ScheduleRepository{
     @Autowired
     private LocalSessionFactoryBean factory;
     
@@ -35,14 +34,13 @@ public class SpecialtyRepositoryImpl implements SpecialtyRepository{
     
 
     @Override
-    public List<Specialty> getSpecialties(Map<String, String> params) {
+    public List<Schedules> getSchedules(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<Specialty> q = session.createNamedQuery("Specialty.findAllWithDoctors",Specialty.class);
+        Query<Schedules> q = session.createNamedQuery("Schedules.findAllWithDetails",Schedules.class);
+        
         
         if(params!= null){
-            int pageSize = this.env.getProperty("specialties.page_size", Integer.class);
-            System.out.println("===========" );
-            System.out.println(pageSize );
+            int pageSize = this.env.getProperty("schedules.page_size", Integer.class);
             int page = Integer.parseInt( params.getOrDefault("page", "1"));
             int start = (page-1)*pageSize;
             
@@ -50,26 +48,33 @@ public class SpecialtyRepositoryImpl implements SpecialtyRepository{
             q.setFirstResult(start);
             
         }
-        System.out.println("=======print_list==============");
+        System.out.println("============");
         System.out.println(q.getResultList());
-                System.out.println("=======print_list==============");
-
+        System.out.println(this.env.getProperty("schedules.page_size", Integer.class));
+        System.out.println("============");
         return q.getResultList();
     }
 
     @Override
-    public Specialty getSpecialtieById(Long id) {
+    public Schedules addSchedule(Schedules d) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<Specialty> q = session.createNamedQuery("Specialty.findById", Specialty.class);
-        q.setParameter("id", id);
-        return q.getSingleResult();
+        session.persist(d);
+        return d;
     }
 
     @Override
-    public Specialty addSpecialtie(Specialty s) {
+    public Schedules getScheduleById(Long id) {
         Session session = this.factory.getObject().getCurrentSession();
-        session.persist(s);
-        return s;
+        return session.get(Schedules.class, id);
+    }
+
+    @Override
+    public void deleteSchedule(Long id) {
+        Session session = this.factory.getObject().getCurrentSession();
+        Schedules s = session.get(Schedules.class, id);
+        if (s != null) {
+            session.remove(s);
+        }
     }
     
 }
