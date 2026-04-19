@@ -7,6 +7,8 @@ package com.hb.controllers;
 import com.hb.service.DoctorService;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -23,23 +25,41 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @author HUY
  */
 
+
 @Controller
 @RequestMapping("/admin")
+@PropertySource("classpath:configs.properties")
 public class DoctorController {
     @Autowired
     private DoctorService doctorService;
     
+    @Autowired
+    private Environment env;
+
+    
     @GetMapping("/doctors")
-    public String createView(Model model, @RequestParam Map<String, String> params) {
+    public String list(Model model, @RequestParam Map<String, String> params) {
+        int page = params.containsKey("page") ? Integer.parseInt(params.get("page")) : 1;
+        int pageSize = this.env.getProperty("admin.page_size", Integer.class);
+        
+        params.put("pageSize", String.valueOf(pageSize));
         model.addAttribute("doctors", doctorService.getDoctors(params));
-        return "doctors";
+
+        long totalDoctors = doctorService.countDoctors(params);
+        int totalPages = (int) Math.ceil((double) totalDoctors / pageSize);
+
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("currentPage", page);
+
+        return "doctor";
     }
+    
 
     @PostMapping("/doctors")
     public String create(@RequestParam Map<String, String> params) {
 
         doctorService.addDoctor(params);
-        return "redirect:/admin/doctors";
+        return "redirect:/admin/doctor";
     }
 
     @DeleteMapping("/doctors/{id}")

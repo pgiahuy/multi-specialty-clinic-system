@@ -24,7 +24,7 @@ import java.util.Date;
 
 /**
  *
- * @author DELL
+ * @author HUY
  */
 @Entity
 @Table(name = "medical_record")
@@ -53,7 +53,7 @@ public class MedicalRecord implements Serializable {
     private Date createdAt;
     @JoinColumn(name = "appointment_id", referencedColumnName = "id")
     @OneToOne
-    private Appointment appointmentId;
+    private Appointment appointment;
     @OneToOne(mappedBy = "medicalRecordId")
     private Prescription prescription;
 
@@ -96,12 +96,12 @@ public class MedicalRecord implements Serializable {
         this.createdAt = createdAt;
     }
 
-    public Appointment getAppointmentId() {
-        return appointmentId;
+    public Appointment getAppointment() {
+        return appointment;
     }
 
-    public void setAppointmentId(Appointment appointmentId) {
-        this.appointmentId = appointmentId;
+    public void setAppointment(Appointment appointment) {
+        this.appointment = appointment;
     }
 
     public Prescription getPrescription() {

@@ -12,7 +12,7 @@ import java.util.Map;
  *
  * @author HUY
  */
-public interface  PatientRepository {
+public interface  PatientRepository extends BaseRepository<Patient>{
     List<Patient> getPatients(Map<String,String> params);
     Patient getPatientById(Long id);
     Patient addPatient(Patient p);
