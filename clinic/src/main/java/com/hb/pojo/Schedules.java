@@ -49,7 +49,7 @@ public class Schedules implements Serializable {
     private Integer currentPatients;
     @JoinColumn(name = "doctor_id", referencedColumnName = "id")
     @ManyToOne
-    private Doctor doctorId;
+    private Doctor doctor;
     @JoinColumn(name = "room_id", referencedColumnName = "id")
     @ManyToOne
     private Rooms roomId;
@@ -96,12 +96,12 @@ public class Schedules implements Serializable {
         this.currentPatients = currentPatients;
     }
 
-    public Doctor getDoctorId() {
-        return doctorId;
+    public Doctor getDoctor() {
+        return doctor;
     }
 
-    public void setDoctorId(Doctor doctorId) {
-        this.doctorId = doctorId;
+    public void setDoctor(Doctor doctor) {
+        this.doctor = doctor;
     }
 
     public Rooms getRoomId() {
