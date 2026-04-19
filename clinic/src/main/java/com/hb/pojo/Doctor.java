@@ -4,9 +4,7 @@
  */
 package com.hb.pojo;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Basic;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,14 +24,15 @@ import java.util.Collection;
 
 /**
  *
- * @author DELL
+ * @author HUY
  */
 @Entity
 @Table(name = "doctor")
 @NamedQueries({
     @NamedQuery(name = "Doctor.findAll", query = "SELECT d FROM Doctor d"),
     @NamedQuery(name = "Doctor.findById", query = "SELECT d FROM Doctor d WHERE d.id = :id"),
-    @NamedQuery(name = "Doctor.findByFullName", query = "SELECT d FROM Doctor d WHERE d.fullName = :fullName")})
+    @NamedQuery(name = "Doctor.findByFullName", query = "SELECT d FROM Doctor d WHERE d.fullName = :fullName"),
+    @NamedQuery(name = "Doctor.findByGender", query = "SELECT d FROM Doctor d WHERE d.gender = :gender")})
 public class Doctor implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -42,26 +41,28 @@ public class Doctor implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
+    @Size(max = 255)
+    @Column(name = "full_name")
+    private String fullName;
     @Lob
     @Size(max = 65535)
     @Column(name = "description")
     private String description;
-    @Size(max = 255)
-    @Column(name = "full_name")
-    private String fullName;
+    @Size(max = 3)
+    @Column(name = "gender")
+    private String gender;
+    @OneToMany(mappedBy = "idHod")
+    private Collection<Specialty> specialtyCollection;
+    @OneToMany(mappedBy = "doctor")
+    private Collection<Appointment> appointmentCollection;
     @JoinColumn(name = "id_specailty", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Specialty idSpecailty;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @OneToOne
-    @JsonIgnore
-    private User userId;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idHod")
-    private Collection<Specialty> specialtyCollection;
-
+    private User user;
     @OneToMany(mappedBy = "doctor")
-    @JsonIgnore
-    private Collection<Appointment> appointmentCollection;
+    private Collection<Schedules> schedulesCollection;
 
     public Doctor() {
     }
@@ -78,14 +79,6 @@ public class Doctor implements Serializable {
         this.id = id;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public String getFullName() {
         return fullName;
     }
@@ -94,20 +87,20 @@ public class Doctor implements Serializable {
         this.fullName = fullName;
     }
 
-    public Specialty getIdSpecailty() {
-        return idSpecailty;
+    public String getDescription() {
+        return description;
     }
 
-    public void setIdSpecailty(Specialty idSpecailty) {
-        this.idSpecailty = idSpecailty;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public User getUserId() {
-        return userId;
+    public String getGender() {
+        return gender;
     }
 
-    public void setUserId(User userId) {
-        this.userId = userId;
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     public Collection<Specialty> getSpecialtyCollection() {
@@ -124,6 +117,30 @@ public class Doctor implements Serializable {
 
     public void setAppointmentCollection(Collection<Appointment> appointmentCollection) {
         this.appointmentCollection = appointmentCollection;
+    }
+
+    public Specialty getIdSpecailty() {
+        return idSpecailty;
+    }
+
+    public void setIdSpecailty(Specialty idSpecailty) {
+        this.idSpecailty = idSpecailty;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user= user;
+    }
+
+    public Collection<Schedules> getSchedulesCollection() {
+        return schedulesCollection;
+    }
+
+    public void setSchedulesCollection(Collection<Schedules> schedulesCollection) {
+        this.schedulesCollection = schedulesCollection;
     }
 
     @Override

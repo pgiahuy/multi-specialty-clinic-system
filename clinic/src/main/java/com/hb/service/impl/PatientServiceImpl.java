@@ -4,23 +4,19 @@
  */
 package com.hb.service.impl;
 
+import com.hb.dto.request.PatientCreateRequest;
+import com.hb.mapper.PatientMapper;
 import com.hb.pojo.Patient;
 import com.hb.pojo.User;
 import com.hb.repository.PatientRepository;
 import com.hb.service.PatientService;
-import java.io.Serial;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.util.Date;
+
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -35,6 +31,9 @@ public class PatientServiceImpl implements PatientService {
     @Autowired
     private CloudinaryService cloudinaryService;
     
+    @Autowired
+    private PatientMapper patientMapper;
+    
     @Override
     public List<Patient> getPatients(Map<String, String> params) {
         return patientRepo.getPatients(params);
@@ -46,57 +45,18 @@ public class PatientServiceImpl implements PatientService {
     }
     
     @Override
-    public Patient addPatient(Map<String, String> params, User user) {
-        Patient p = new Patient();
-        p.setUserId(user);
-        p.setFullName(params.get("fullName"));
-        p.setGender(params.get("gender"));
-        p.setPhone(params.get("phone"));
-        String dobStr = params.get("dob");
-        Date dob;
-        try {
-            dob = new SimpleDateFormat("dd/MM/yyyy").parse(dobStr);
-            p.setDob(dob);
-        } catch (ParseException ex) {
-            Logger.getLogger(PatientServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
+    public Patient addPatient(PatientCreateRequest prq, User u) {
+        Patient p = patientMapper.toEntiy(prq);
+        p.setUser(u);
         return this.patientRepo.addPatient(p);
     }
     
     @Override
     @Transactional
-    public void updateProfile(Long id, Map<String, String> params, MultipartFile avatar) {
-        Patient p = patientRepo.getPatientById(id);
-        if(params.containsKey("fullName")){
-            p.setFullName(params.get("fullName"));
-        }
-        
-        if (params.containsKey("phone")) {
-            p.setPhone(params.get("phone"));
-        }
-        if (params.containsKey("gender")) {
-            p.setGender(params.get("gender"));
-        }
-        if (params.containsKey("dob")) {
-            String dobStr = params.get("dob");
-            try {
-                Date dob = new SimpleDateFormat("dd/MM/yyyy").parse(dobStr);
-                p.setDob(dob);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        
-        if (!avatar.isEmpty()) {
-            User u = p.getUserId();
-            Map res = this.cloudinaryService.uploadFile(avatar, "avatar");
-            
-            u.setSecureUrl(res.get("secureUrl").toString());
-            u.setPublicId(res.get("publicId").toString());
-        }
-        
-        patientRepo.updatePatient(p);
+    public void updateProfile(Long id, PatientCreateRequest prq) {
+        Patient patient = patientRepo.getPatientById(id);
+        patientMapper.updateFromRequest(prq, patient);
+        patientRepo.updatePatient(patient);
     }
     
 }

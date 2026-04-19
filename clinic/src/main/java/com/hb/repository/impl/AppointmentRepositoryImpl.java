@@ -6,8 +6,7 @@ package com.hb.repository.impl;
 
 import com.hb.pojo.Appointment;
 import com.hb.repository.AppointmentRepository;
-import jakarta.ejb.Local;
-import jakarta.persistence.TemporalType;
+
 import java.util.List;
 import java.util.Map;
 import org.hibernate.Session;
@@ -42,7 +41,7 @@ public class AppointmentRepositoryImpl implements AppointmentRepository{
         
         
         if (params!=null) {
-            int pageSize = env.getProperty("appoitnment.page_size", Integer.class);
+            int pageSize = env.getProperty("appointments.page_size", Integer.class);
             int page = Integer.parseInt(params.getOrDefault("page", "1"));
             int start = (page-1)*pageSize;
             

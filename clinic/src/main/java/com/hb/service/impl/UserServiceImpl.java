@@ -4,6 +4,7 @@
  */
 package com.hb.service.impl;
 
+import com.hb.dto.request.UserCreateRequest;
 import com.hb.pojo.User;
 import com.hb.service.UserService;
 import java.util.Map;
@@ -45,16 +46,17 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public User addUser(Map<String, String> params, MultipartFile avatar) {
+    public User addUser(UserCreateRequest urq) {
         User u = new User();
-        u.setEmail(params.get("email"));
-        u.setUsername(params.get("username"));
-        u.setPassword(passwordEncoder.encode(params.get("password")));
+        
+        u.setEmail(urq.getEmail());
+        u.setUsername(urq.getUsername());
+        u.setPassword(passwordEncoder.encode(urq.getPassword()));
         u.setRole("ROLE_USER");
         u.setCreatedAt(LocalDateTime.now());
 
-        if ( !avatar.isEmpty()) {
-            Map res = this.cloudinaryService.uploadFile(avatar, "avatar");
+        if ( !urq.getAvatar().isEmpty()) {
+            Map res = this.cloudinaryService.uploadFile(urq.getAvatar(), "avatar");
             
             u.setSecureUrl(res.get("secureUrl").toString());
             u.setPublicId(res.get("publicId").toString());
@@ -86,6 +88,11 @@ public class UserServiceImpl implements UserService{
     @Override
     public void deleteUser(Long id) {
         this.userRepo.deleteUser(id);
+    }
+
+    @Override
+    public User processSocialLogin(String email, String name, String providerId, String providerName) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     
