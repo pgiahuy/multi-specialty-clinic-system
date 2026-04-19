@@ -4,6 +4,8 @@
  */
 package com.hb.service.impl;
 
+import com.hb.dto.request.PatientCreateRequest;
+import com.hb.dto.request.UserCreateRequest;
 import com.hb.pojo.User;
 import com.hb.repository.UserRepository;
 import com.hb.service.AuthService;
@@ -32,9 +34,9 @@ public class AuthServiceImpl implements AuthService {
     
     @Override
     @Transactional
-    public void registerPatient(Map<String, String> params, MultipartFile avatar) {
-        User u = userService.addUser(params, avatar);     
-        patientService.addPatient(params, u);    
+    public void registerPatient(UserCreateRequest urq, PatientCreateRequest prq) {
+        User u = userService.addUser(urq);     
+        patientService.addPatient(prq, u);    
     }
 
     @Override
