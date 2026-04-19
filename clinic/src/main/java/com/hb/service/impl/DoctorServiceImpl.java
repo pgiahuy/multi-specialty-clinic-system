@@ -4,6 +4,7 @@
  */
 package com.hb.service.impl;
 
+import com.hb.exception.ResourceNotFoundException;
 import com.hb.pojo.Doctor;
 import com.hb.pojo.Specialty;
 import com.hb.pojo.User;
@@ -42,9 +43,9 @@ public class DoctorServiceImpl implements DoctorService {
         if (username != null && !username.isEmpty()) {
             User u = this.userRepo.getUserByUsername(username);
             if (u == null) {
-                throw new RuntimeException("User not found");
+                throw new ResourceNotFoundException("User not found");
             }
-            d.setUserId(u);
+            d.setUser(u);
         } else {
             throw new RuntimeException("Missing username");
         }
@@ -54,7 +55,7 @@ public class DoctorServiceImpl implements DoctorService {
             Long specId = Long.valueOf(specIdStr);
             Specialty s = this.specialtieRepo.getSpecialtieById(specId);
             if (s == null) {
-                throw new RuntimeException("Specialty not found");
+                throw new ResourceNotFoundException("Specialty not found");
             }
             d.setIdSpecailty(s);
         } else {
@@ -80,7 +81,7 @@ public class DoctorServiceImpl implements DoctorService {
 
     @Override
     public void deleteDoctor(Long id) {
-        doctorRepo.deleteDoctor(id);
+        this.doctorRepo.deleteDoctor(id);
     }
 
 }

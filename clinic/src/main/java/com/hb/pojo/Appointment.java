@@ -14,17 +14,19 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 
 /**
  *
- * @author DELL
+ * @author HUY
  */
 @Entity
 @Table(name = "appointment")
@@ -55,18 +57,19 @@ public class Appointment implements Serializable {
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
-    @OneToOne(mappedBy = "appointmentId")
+    @OneToOne(mappedBy = "appointment")
     private MedicalRecord medicalRecord;
+    
+    @OneToMany(mappedBy = "appointment")
+    private Collection<PaymentItems> paymentItemsCollection;
     @JoinColumn(name = "doctor_id", referencedColumnName = "id")
     @ManyToOne
-
     private Doctor doctor;
     @JoinColumn(name = "patient_id", referencedColumnName = "id")
     @ManyToOne
     private Patient patient;
-
-    @OneToOne(mappedBy = "appointmentId")
-    private Payment payment;
+    @OneToMany(mappedBy = "appointmentId")
+    private Collection<LabResults> labResultsCollection;
 
     public Appointment() {
     }
@@ -123,12 +126,20 @@ public class Appointment implements Serializable {
         this.medicalRecord = medicalRecord;
     }
 
+    public Collection<PaymentItems> getPaymentItemsCollection() {
+        return paymentItemsCollection;
+    }
+
+    public void setPaymentItemsCollection(Collection<PaymentItems> paymentItemsCollection) {
+        this.paymentItemsCollection = paymentItemsCollection;
+    }
+
     public Doctor getDoctor() {
         return doctor;
     }
 
     public void setDoctor(Doctor doctor) {
-        this.doctor = doctor;
+        this.doctor= doctor;
     }
 
     public Patient getPatient() {
@@ -136,15 +147,15 @@ public class Appointment implements Serializable {
     }
 
     public void setPatient(Patient patient) {
-        this.patient = patient;
+        this.patient= patient;
     }
 
-    public Payment getPayment() {
-        return payment;
+    public Collection<LabResults> getLabResultsCollection() {
+        return labResultsCollection;
     }
 
-    public void setPayment(Payment payment) {
-        this.payment = payment;
+    public void setLabResultsCollection(Collection<LabResults> labResultsCollection) {
+        this.labResultsCollection = labResultsCollection;
     }
 
     @Override
