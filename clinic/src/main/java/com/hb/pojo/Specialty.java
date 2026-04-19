@@ -31,7 +31,8 @@ import java.util.Collection;
     @NamedQuery(name = "Specialty.findAll", query = "SELECT s FROM Specialty s"),
     @NamedQuery(name = "Specialty.findById", query = "SELECT s FROM Specialty s WHERE s.id = :id"),
     @NamedQuery(name = "Specialty.findByName", query = "SELECT s FROM Specialty s WHERE s.name = :name"),
-    @NamedQuery(name = "Specialty.findByPrice", query = "SELECT s FROM Specialty s WHERE s.price = :price")})
+    @NamedQuery(name = "Specialty.findByPrice", query = "SELECT s FROM Specialty s WHERE s.price = :price"),
+    @NamedQuery(name = "Specialty.findAllWithDoctors", query = "SELECT DISTINCT s FROM Specialty s LEFT JOIN FETCH s.doctorCollection")})
 public class Specialty implements Serializable {
 
     private static final long serialVersionUID = 1L;

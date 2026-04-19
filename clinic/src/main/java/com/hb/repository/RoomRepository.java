@@ -12,7 +12,7 @@ import java.util.Map;
  *
  * @author DELL
  */
-public interface RoomRepository {
+public interface RoomRepository extends BaseRepository<Rooms>{
     List<Rooms> getRooms(Map<String,String> params);
     Rooms getRoomById(Long id);
     Rooms addRoom(Rooms a);

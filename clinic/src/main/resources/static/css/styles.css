@@ -8,16 +8,20 @@ body {
     overflow-x: hidden;
     background-color: #f5f7fa;
 }
-
 .navbar {
-    height: 56px;
+    margin-left: 250px;
+    height: 65px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;     
 }
 
 .sidebar {
     width: 250px;
     height: 100vh;
     position: fixed;
-    top: 56px;
+    top: 0;
     left: 0;
     background-color: #0d6efd; 
     color: white;
@@ -41,6 +45,7 @@ body {
 }
 
 .content {
+    margin-top: 56px;
     margin-left: 250px;
     padding: 20px;
 }

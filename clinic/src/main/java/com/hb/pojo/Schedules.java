@@ -24,6 +24,7 @@ import java.util.Date;
  *
  * @author HUY
  */
+
 @Entity
 @Table(name = "schedules")
 @NamedQueries({
@@ -31,7 +32,8 @@ import java.util.Date;
     @NamedQuery(name = "Schedules.findById", query = "SELECT s FROM Schedules s WHERE s.id = :id"),
     @NamedQuery(name = "Schedules.findByDate", query = "SELECT s FROM Schedules s WHERE s.date = :date"),
     @NamedQuery(name = "Schedules.findByMaxPatients", query = "SELECT s FROM Schedules s WHERE s.maxPatients = :maxPatients"),
-    @NamedQuery(name = "Schedules.findByCurrentPatients", query = "SELECT s FROM Schedules s WHERE s.currentPatients = :currentPatients")})
+    @NamedQuery(name = "Schedules.findByCurrentPatients", query = "SELECT s FROM Schedules s WHERE s.currentPatients = :currentPatients"),
+    @NamedQuery(name = "Schedules.findAllWithDetails",query = "SELECT DISTINCT s FROM Schedules s JOIN FETCH s.doctor JOIN FETCH s.roomId JOIN FETCH s.shiftId")})
 public class Schedules implements Serializable {
 
     private static final long serialVersionUID = 1L;

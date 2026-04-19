@@ -23,12 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Repository
 @Transactional
-@PropertySource("classpath:configs.properties")
-public class MedicalRecordRepositoryImpl implements MedicalRecordRepository {
+public class MedicalRecordRepositoryImpl extends BaseRepositoryImpl<MedicalRecord> implements MedicalRecordRepository {
 
-    @Autowired
-    private Environment env;
-
+ 
     @Autowired
     private LocalSessionFactoryBean factory;
 
@@ -38,7 +35,7 @@ public class MedicalRecordRepositoryImpl implements MedicalRecordRepository {
         Query<MedicalRecord> q = session.createNamedQuery("MedicalRecord.findAll", MedicalRecord.class);
 
         if (params != null) {
-            int pageSize = this.env.getProperty("medical_records.page_size", Integer.class);
+            int pageSize = Integer.parseInt(params.get("pageSize"));
             int page = Integer.parseInt(params.getOrDefault("page", "1"));
             int start = (page - 1) * pageSize;
             q.setMaxResults(pageSize);

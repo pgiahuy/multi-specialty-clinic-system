@@ -23,11 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Repository
 @Transactional
-@PropertySource("classpath:configs.properties")
-public class AreasRepositoryImpl implements AreasRepository {
-
-    @Autowired
-    private Environment env;
+public class AreasRepositoryImpl extends BaseRepositoryImpl<Areas> implements AreasRepository {
 
     @Autowired
     private LocalSessionFactoryBean factory;
@@ -38,7 +34,7 @@ public class AreasRepositoryImpl implements AreasRepository {
         Query<Areas> q = session.createNamedQuery("Areas.findAll", Areas.class);
 
         if (params != null) {
-            int pageSize = env.getProperty("areas.page_size", Integer.class);
+            int pageSize = Integer.parseInt(params.get("pageSize"));
             int page = Integer.parseInt(params.getOrDefault("page", "1"));
             int start = (page - 1) * pageSize;
             q.setMaxResults(pageSize);

@@ -13,13 +13,12 @@
 
 <body>
 
-    <div th:replace="base :: header"></div>
+    <div th:replace="base :: header('QUẢN LÝ ĐƠN THUỐC')"></div>
 
     <div th:replace="base :: sidebar"></div>
 
     <div class="content">
 
-        <h2 class="mb-4">Quản lý Bác sĩ</h2>
 
 <!--        <form method="post" th:action="@{/admin/doctors}" enctype="multipart/form-data">
 
@@ -51,7 +50,6 @@
         <table class="table table-bordered table-hover align-middle">
             <thead class="table-primary">
                 <tr>
-                    <th>ID</th>
                     <th>Họ tên</th>
                     <th>Chuyên khoa</th>
                     <th>Thông tin</th>
@@ -61,7 +59,6 @@
 
             <tbody>
                 <tr th:each="d : ${doctors}">
-                    <td th:text="${d.id}"></td>
                     <td th:text="${d.fullName}"></td>
                     <td th:text="${d.idSpecailty}"></td>
                     <td th:text="${d.description}"></td>
