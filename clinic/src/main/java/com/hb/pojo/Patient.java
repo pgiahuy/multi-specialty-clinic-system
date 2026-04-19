@@ -4,7 +4,6 @@
  */
 package com.hb.pojo;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,6 +18,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Collection;
@@ -26,17 +26,19 @@ import java.util.Date;
 
 /**
  *
- * @author DELL
+ * @author HUY
  */
 @Entity
 @Table(name = "patient")
 @NamedQueries({
     @NamedQuery(name = "Patient.findAll", query = "SELECT p FROM Patient p"),
     @NamedQuery(name = "Patient.findById", query = "SELECT p FROM Patient p WHERE p.id = :id"),
+    @NamedQuery(name = "Patient.findByCccd", query = "SELECT p FROM Patient p WHERE p.cccd = :cccd"),
+    @NamedQuery(name = "Patient.findByFullName", query = "SELECT p FROM Patient p WHERE p.fullName = :fullName"),
     @NamedQuery(name = "Patient.findByDob", query = "SELECT p FROM Patient p WHERE p.dob = :dob"),
     @NamedQuery(name = "Patient.findByGender", query = "SELECT p FROM Patient p WHERE p.gender = :gender"),
-    @NamedQuery(name = "Patient.findByPhone", query = "SELECT p FROM Patient p WHERE p.phone = :phone"),
-    @NamedQuery(name = "Patient.findByFullName", query = "SELECT p FROM Patient p WHERE p.fullName = :fullName")})
+    @NamedQuery(name = "Patient.findByAddress", query = "SELECT p FROM Patient p WHERE p.address = :address"),
+    @NamedQuery(name = "Patient.findByPhone", query = "SELECT p FROM Patient p WHERE p.phone = :phone")})
 public class Patient implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -45,25 +47,42 @@ public class Patient implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 12)
+    @Column(name = "cccd")
+    private String cccd;
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 255)
+    @Column(name = "full_name")
+    private String fullName;
+    @Basic(optional = false)
+    @NotNull
     @Column(name = "dob")
     @Temporal(TemporalType.DATE)
     private Date dob;
-    @Size(max = 10)
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 10)
     @Column(name = "gender")
     private String gender;
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 255)
+    @Column(name = "address")
+    private String address;
     // @Pattern(regexp="^\\(?(\\d{3})\\)?[- ]?(\\d{3})[- ]?(\\d{4})$", message="Invalid phone/fax format, should be as xxx-xxx-xxxx")//if the field contains phone or fax number consider using this annotation to enforce field validation
     @Size(max = 20)
     @Column(name = "phone")
     private String phone;
-    @Size(max = 255)
-    @Column(name = "full_name")
-    private String fullName;
+    @OneToMany(mappedBy = "patientId")
+    private Collection<Appointment> appointmentCollection;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @OneToOne
     private User user;
-
-    @OneToMany(mappedBy = "patient")
-    private Collection<Appointment> appointmentCollection;
+    @OneToMany(mappedBy = "patientId")
+    private Collection<LabResults> labResultsCollection;
 
     public Patient() {
     }
@@ -72,12 +91,37 @@ public class Patient implements Serializable {
         this.id = id;
     }
 
+    public Patient(Long id, String cccd, String fullName, Date dob, String gender, String address) {
+        this.id = id;
+        this.cccd = cccd;
+        this.fullName = fullName;
+        this.dob = dob;
+        this.gender = gender;
+        this.address = address;
+    }
+
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getCccd() {
+        return cccd;
+    }
+
+    public void setCccd(String cccd) {
+        this.cccd = cccd;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public Date getDob() {
@@ -96,6 +140,14 @@ public class Patient implements Serializable {
         this.gender = gender;
     }
 
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
     public String getPhone() {
         return phone;
     }
@@ -104,12 +156,12 @@ public class Patient implements Serializable {
         this.phone = phone;
     }
 
-    public String getFullName() {
-        return fullName;
+    public Collection<Appointment> getAppointmentCollection() {
+        return appointmentCollection;
     }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    public void setAppointmentCollection(Collection<Appointment> appointmentCollection) {
+        this.appointmentCollection = appointmentCollection;
     }
 
     public User getUser() {
@@ -117,15 +169,15 @@ public class Patient implements Serializable {
     }
 
     public void setUser(User user) {
-        this.user = user;
+        this.user= user;
     }
 
-    public Collection<Appointment> getAppointmentCollection() {
-        return appointmentCollection;
+    public Collection<LabResults> getLabResultsCollection() {
+        return labResultsCollection;
     }
 
-    public void setAppointmentCollection(Collection<Appointment> appointmentCollection) {
-        this.appointmentCollection = appointmentCollection;
+    public void setLabResultsCollection(Collection<LabResults> labResultsCollection) {
+        this.labResultsCollection = labResultsCollection;
     }
 
     @Override

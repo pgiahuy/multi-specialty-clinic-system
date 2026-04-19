@@ -9,7 +9,6 @@ import com.hb.pojo.User;
 import com.hb.repository.NotificationRepository;
 import com.hb.repository.UserRepository;
 import com.hb.service.NotificationService;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +40,7 @@ public class NotificationServiceImpl implements NotificationService {
         String userName = params.get("username");
         if (userName != null && !userName.isEmpty()) {
             User user = userRepo.getUserByUsername(userName);
-            n.setUserId(user);
+            n.setUser(user);
         }
 
         return this.notificationRepo.addNotification(n);

@@ -23,7 +23,7 @@ import java.util.Date;
 
 /**
  *
- * @author DELL
+ * @author HUY
  */
 @Entity
 @Table(name = "inventory_log")

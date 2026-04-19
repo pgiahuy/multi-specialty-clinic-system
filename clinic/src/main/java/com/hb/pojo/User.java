@@ -4,7 +4,6 @@
  */
 package com.hb.pojo;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,7 +26,7 @@ import java.util.Date;
 
 /**
  *
- * @author DELL
+ * @author HUY
  */
 @Entity
 @Table(name = "user")
@@ -57,14 +56,13 @@ public class User implements Serializable {
     @NotNull
     @Size(min = 1, max = 255)
     @Column(name = "password")
-   
     private String password;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 100)
     @Column(name = "username")
     private String username;
-    @Size(max = 10)
+    @Size(max = 12)
     @Column(name = "role")
     private String role;
     @Column(name = "created_at")
@@ -76,12 +74,14 @@ public class User implements Serializable {
     @Size(max = 255)
     @Column(name = "public_id")
     private String publicId;
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "userId")
     private Doctor doctor;
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "userId")
     private Collection<Notification> notificationCollection;
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "userId")
     private Patient patient;
+    @OneToMany(mappedBy = "userId")
+    private Collection<SocialAccount> socialAccountCollection;
 
     public User() {
     }
@@ -182,6 +182,14 @@ public class User implements Serializable {
 
     public void setPatient(Patient patient) {
         this.patient = patient;
+    }
+
+    public Collection<SocialAccount> getSocialAccountCollection() {
+        return socialAccountCollection;
+    }
+
+    public void setSocialAccountCollection(Collection<SocialAccount> socialAccountCollection) {
+        this.socialAccountCollection = socialAccountCollection;
     }
 
     @Override

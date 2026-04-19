@@ -34,6 +34,7 @@ public class DoctorController {
         model.addAttribute("doctors", doctorService.getDoctors(params));
         return "doctor";
     }
+    
 
     @PostMapping("/doctors")
     public String create(@RequestParam Map<String, String> params) {

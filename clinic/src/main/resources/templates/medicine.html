@@ -4,11 +4,11 @@
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
     <head>
-        <title>Quản lý Bác sĩ</title>
+        <title>Quản lý dược phẩm</title>
 
     <th:block th:replace="base :: css"></th:block>
     <th:block th:replace="base :: js"></th:block>
-    <script th:src="@{/js/doctor.js}"></script>
+    <script th:src="@{/js/medicine.js}"></script>
 </head>
 
 <body>
@@ -24,21 +24,20 @@
         <table class="table table-bordered table-hover align-middle">
             <thead class="table-primary">
                 <tr>
-                    <th>ID</th>
-                    <th>Họ tên</th>
-                    <th>Chuyên khoa</th>
-                    <th>Thông tin</th>
+                    <th>Tên</th>
+                    <th>Tồn kho>
+                    <th>Ngày hết hạn</th>
+                    <th>Ảnh</th>
                     <th></th>
                 </tr>
             </thead>
 
             <tbody>
                 <tr th:each="d : ${doctors}">
-                    <td th:text="${d.id}"></td>
-                    <td th:text="${d.fullName}"></td>
-                    <td th:text="${d.idSpecailty}"></td>
-                    <td th:text="${d.description}"></td>
-           
+                    <td th:text="${d.name}"></td>
+                    <td th:text="${d.stock}"></td>
+                    <td th:text="${d.expirationDate}"></td>
+                    <td th:text="${d.secureUrl}"></td>
                     <td>
                         <button class="btn btn-warning btn-sm">Sửa</button>
                         <button class="btn btn-danger btn-sm"

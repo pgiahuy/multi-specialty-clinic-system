@@ -14,20 +14,23 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.Collection;
 
 /**
  *
  * @author HUY
  */
 @Entity
-@Table(name = "prescription_item")
+@Table(name = "rooms")
 @NamedQueries({
-    @NamedQuery(name = "PrescriptionItem.findAll", query = "SELECT p FROM PrescriptionItem p"),
-    @NamedQuery(name = "PrescriptionItem.findById", query = "SELECT p FROM PrescriptionItem p WHERE p.id = :id"),
-    @NamedQuery(name = "PrescriptionItem.findByQuantity", query = "SELECT p FROM PrescriptionItem p WHERE p.quantity = :quantity")})
-public class PrescriptionItem implements Serializable {
+    @NamedQuery(name = "Rooms.findAll", query = "SELECT r FROM Rooms r"),
+    @NamedQuery(name = "Rooms.findById", query = "SELECT r FROM Rooms r WHERE r.id = :id"),
+    @NamedQuery(name = "Rooms.findByRoomNumber", query = "SELECT r FROM Rooms r WHERE r.roomNumber = :roomNumber")})
+public class Rooms implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -35,19 +38,19 @@ public class PrescriptionItem implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
-    @Column(name = "quantity")
-    private Integer quantity;
-    @JoinColumn(name = "medicine_id", referencedColumnName = "id")
+    @Size(max = 20)
+    @Column(name = "room_number")
+    private String roomNumber;
+    @JoinColumn(name = "area_id", referencedColumnName = "id")
     @ManyToOne
-    private Medicine medicineId;
-    @JoinColumn(name = "prescription_id", referencedColumnName = "id")
-    @ManyToOne
-    private Prescription prescriptionId;
+    private Areas areaId;
+    @OneToMany(mappedBy = "roomId")
+    private Collection<Schedules> schedulesCollection;
 
-    public PrescriptionItem() {
+    public Rooms() {
     }
 
-    public PrescriptionItem(Long id) {
+    public Rooms(Long id) {
         this.id = id;
     }
 
@@ -59,28 +62,28 @@ public class PrescriptionItem implements Serializable {
         this.id = id;
     }
 
-    public Integer getQuantity() {
-        return quantity;
+    public String getRoomNumber() {
+        return roomNumber;
     }
 
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
+    public void setRoomNumber(String roomNumber) {
+        this.roomNumber = roomNumber;
     }
 
-    public Medicine getMedicineId() {
-        return medicineId;
+    public Areas getAreaId() {
+        return areaId;
     }
 
-    public void setMedicineId(Medicine medicineId) {
-        this.medicineId = medicineId;
+    public void setAreaId(Areas areaId) {
+        this.areaId = areaId;
     }
 
-    public Prescription getPrescriptionId() {
-        return prescriptionId;
+    public Collection<Schedules> getSchedulesCollection() {
+        return schedulesCollection;
     }
 
-    public void setPrescriptionId(Prescription prescriptionId) {
-        this.prescriptionId = prescriptionId;
+    public void setSchedulesCollection(Collection<Schedules> schedulesCollection) {
+        this.schedulesCollection = schedulesCollection;
     }
 
     @Override
@@ -93,10 +96,10 @@ public class PrescriptionItem implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof PrescriptionItem)) {
+        if (!(object instanceof Rooms)) {
             return false;
         }
-        PrescriptionItem other = (PrescriptionItem) object;
+        Rooms other = (Rooms) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -105,7 +108,7 @@ public class PrescriptionItem implements Serializable {
 
     @Override
     public String toString() {
-        return "com.hb.pojo.PrescriptionItem[ id=" + id + " ]";
+        return "com.hb.pojo.Rooms[ id=" + id + " ]";
     }
     
 }
