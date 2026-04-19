@@ -44,7 +44,7 @@ public class DoctorServiceImpl implements DoctorService {
             if (u == null) {
                 throw new RuntimeException("User not found");
             }
-            d.setUserId(u);
+            d.setUser(u);
         } else {
             throw new RuntimeException("Missing username");
         }
