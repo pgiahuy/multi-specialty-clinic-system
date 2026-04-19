@@ -22,7 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author HUY
  */
 @Controller
-@RequestMapping("/admin/medicine")
+@RequestMapping("/admin/medicines")
 public class MedicineController {
 
     @Autowired
@@ -41,7 +41,7 @@ public class MedicineController {
         return "redirect:/admin/medicines";
     }
 
-    @DeleteMapping("/admin/medicines/{id}")
+    @DeleteMapping("/{id}")
     public String delete(@PathVariable Long id) {
         medicineService.deleteMedicine(id);
         return "redirect:/admin/medicines";

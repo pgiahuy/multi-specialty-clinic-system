@@ -5,7 +5,6 @@
 package com.hb.pojo;
 
 import jakarta.persistence.Basic;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -25,7 +24,7 @@ import java.util.Date;
 
 /**
  *
- * @author DELL
+ * @author HUY
  */
 @Entity
 @Table(name = "prescription")
@@ -44,11 +43,12 @@ public class Prescription implements Serializable {
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
+    @OneToMany(mappedBy = "prescriptionId")
+    private Collection<PaymentItems> paymentItemsCollection;
     @JoinColumn(name = "medical_record_id", referencedColumnName = "id")
     @OneToOne
     private MedicalRecord medicalRecordId;
-    
-    @OneToMany(mappedBy = "prescriptionId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "prescriptionId")
     private Collection<PrescriptionItem> prescriptionItemCollection;
 
     public Prescription() {
@@ -72,6 +72,14 @@ public class Prescription implements Serializable {
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Collection<PaymentItems> getPaymentItemsCollection() {
+        return paymentItemsCollection;
+    }
+
+    public void setPaymentItemsCollection(Collection<PaymentItems> paymentItemsCollection) {
+        this.paymentItemsCollection = paymentItemsCollection;
     }
 
     public MedicalRecord getMedicalRecordId() {
