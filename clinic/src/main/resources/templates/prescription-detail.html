@@ -51,7 +51,6 @@
         <table class="table table-bordered table-hover align-middle">
             <thead class="table-primary">
                 <tr>
-                    <th>ID</th>
                     <th>Họ tên</th>
                     <th>Chuyên khoa</th>
                     <th>Thông tin</th>
@@ -61,7 +60,6 @@
 
             <tbody>
                 <tr th:each="d : ${doctors}">
-                    <td th:text="${d.id}"></td>
                     <td th:text="${d.fullName}"></td>
                     <td th:text="${d.idSpecailty}"></td>
                     <td th:text="${d.description}"></td>

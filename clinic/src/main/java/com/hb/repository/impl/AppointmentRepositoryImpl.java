@@ -24,15 +24,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @Transactional
-public class AppointmentRepositoryImpl implements AppointmentRepository{
+public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> implements AppointmentRepository{
 
     @Autowired
     private LocalSessionFactoryBean factory;
     
-    @Autowired
-    private Environment env;
-    
-    
+
     @Override
     public List<Appointment> getAppointments(Map<String,String> params) {
         
@@ -41,7 +38,7 @@ public class AppointmentRepositoryImpl implements AppointmentRepository{
         
         
         if (params!=null) {
-            int pageSize = env.getProperty("appointments.page_size", Integer.class);
+            int pageSize = Integer.parseInt(params.get("pageSize"));
             int page = Integer.parseInt(params.getOrDefault("page", "1"));
             int start = (page-1)*pageSize;
             
@@ -65,5 +62,7 @@ public class AppointmentRepositoryImpl implements AppointmentRepository{
         session.persist(a);
         return a;
     }
+
+
     
 }

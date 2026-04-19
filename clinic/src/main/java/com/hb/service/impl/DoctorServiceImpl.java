@@ -84,4 +84,9 @@ public class DoctorServiceImpl implements DoctorService {
         this.doctorRepo.deleteDoctor(id);
     }
 
+    @Override
+    public long countDoctors(Map<String, String> params) {
+        return doctorRepo.count(params, Doctor.class);
+    }
+
 }

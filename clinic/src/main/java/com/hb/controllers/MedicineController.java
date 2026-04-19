@@ -7,6 +7,8 @@ package com.hb.controllers;
 import com.hb.service.MedicineService;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,16 +23,30 @@ import org.springframework.web.multipart.MultipartFile;
  *
  * @author HUY
  */
+
+@PropertySource("classpath:configs.properties")
 @Controller
 @RequestMapping("/admin/medicines")
 public class MedicineController {
 
     @Autowired
     private MedicineService medicineService;
-
+    @Autowired
+    private Environment env;
     @GetMapping("")
     public String list(Model model, @RequestParam Map<String, String> params) {
+        int page = params.containsKey("page") ? Integer.parseInt(params.get("page")) : 1;
+
+        int pageSize = this.env.getProperty("admin.page_size", Integer.class);
+        params.put("pageSize", String.valueOf(pageSize));
         model.addAttribute("medicines", this.medicineService.getMedicines(params));
+
+        long totalMedicines = medicineService.countMedicines(params);
+        int totalPages = (int) Math.ceil((double) totalMedicines / pageSize);
+
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("currentPage", page);
+
         return "medicine";
     }
 

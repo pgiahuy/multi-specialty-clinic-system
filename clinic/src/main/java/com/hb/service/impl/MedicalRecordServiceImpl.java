@@ -62,4 +62,9 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
     public void deleteMedicalRecord(Long id) {
         this.medicalRecordRepo.deleteMedicalRecord(id);
     }
+
+    @Override
+    public long countMedicalRecords(Map<String, String> params) {
+        return medicalRecordRepo.count(params, MedicalRecord.class);
+    }
 }

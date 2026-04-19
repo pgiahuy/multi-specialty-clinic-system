@@ -18,6 +18,7 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
+import java.time.LocalTime;
 import java.util.Collection;
 import java.util.Date;
 
@@ -45,10 +46,10 @@ public class Shifts implements Serializable {
     private Long id;
     @Column(name = "start_time")
     @Temporal(TemporalType.TIME)
-    private Date startTime;
+    private LocalTime startTime;
     @Column(name = "end_time")
     @Temporal(TemporalType.TIME)
-    private Date endTime;
+    private LocalTime endTime;
     @Size(max = 9)
     @Column(name = "session")
     private String session;
@@ -74,19 +75,19 @@ public class Shifts implements Serializable {
         this.id = id;
     }
 
-    public Date getStartTime() {
+    public LocalTime getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(Date startTime) {
+    public void setStartTime(LocalTime startTime) {
         this.startTime = startTime;
     }
 
-    public Date getEndTime() {
+    public LocalTime getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(Date endTime) {
+    public void setEndTime(LocalTime endTime) {
         this.endTime = endTime;
     }
 

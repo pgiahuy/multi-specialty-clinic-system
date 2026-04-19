@@ -24,6 +24,7 @@ import java.util.Collection;
  *
  * @author HUY
  */
+
 @Entity
 @Table(name = "rooms")
 @NamedQueries({

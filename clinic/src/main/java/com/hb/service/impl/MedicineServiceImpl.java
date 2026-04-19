@@ -80,4 +80,9 @@ public class MedicineServiceImpl implements MedicineService {
     public void deleteMedicine(Long id) {
         this.medicineRepo.deleteMedicine(id);
     }
+
+    @Override
+    public long countMedicines(Map<String, String> params) {
+        return medicineRepo.count(params, Medicine.class);
+    }
 }
