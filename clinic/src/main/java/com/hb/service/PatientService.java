@@ -9,7 +9,6 @@ import com.hb.pojo.Patient;
 import com.hb.pojo.User;
 import java.util.List;
 import java.util.Map;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -20,5 +19,5 @@ public interface PatientService {
     Patient getPatientById(Long id);
     void updateProfile(Long id, PatientCreateRequest prq);
     Patient addPatient(PatientCreateRequest prq, User u);
-
+    long countPatients(Map<String,String> params);
 }

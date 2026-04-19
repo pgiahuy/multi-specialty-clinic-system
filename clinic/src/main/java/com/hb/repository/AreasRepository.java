@@ -13,7 +13,7 @@ import java.util.Map;
  *
  * @author DELL
  */
-public interface AreasRepository {
+public interface AreasRepository extends BaseRepository<Areas>{
     List<Areas> getAreas(Map<String,String> params);
     Areas getAreasById(Long id);
     Areas addArea(Areas a);

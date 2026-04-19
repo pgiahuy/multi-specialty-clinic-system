@@ -17,4 +17,5 @@ public interface LabTestService {
     LabTests getLabTestById(Integer id);
     void addOrUpdateLabTest(Map<String, String> params);
     void deleteLabTest(Integer id);
+    long countLabTests(Map<String, String> params);
 }

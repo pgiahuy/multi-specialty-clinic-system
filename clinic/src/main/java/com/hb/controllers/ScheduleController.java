@@ -7,6 +7,8 @@ package com.hb.controllers;
 import com.hb.service.ScheduleService;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,17 +23,33 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @author HUY
  */
 
+
+
 @Controller
 @RequestMapping("/admin/schedules")
+@PropertySource("classpath:configs.properties")
 public class ScheduleController {
     
     @Autowired
     private ScheduleService scheduleService;
-    
+    @Autowired
+    private Environment env;
 
     @GetMapping("")
     public String list(Model model ,@RequestParam Map<String,String> params){
+        int page = params.containsKey("page") ? Integer.parseInt(params.get("page")) : 1;
+       
+        int pageSize = this.env.getProperty("admin.page_size", Integer.class);
+        params.put("pageSize", String.valueOf(pageSize));
+
         model.addAttribute("schedules", this.scheduleService.getSchedules(params));
+
+        long totalSchedules = scheduleService.countSchedules(params);
+        int totalPages = (int) Math.ceil((double) totalSchedules / pageSize);
+
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("currentPage", page);
+
         return "schedule";
     }
     

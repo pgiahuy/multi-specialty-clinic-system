@@ -24,14 +24,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @Transactional
-@PropertySource("classpath:configs.properties")
-public class ScheduleRepositoryImpl implements ScheduleRepository{
+public class ScheduleRepositoryImpl extends BaseRepositoryImpl<Schedules> implements ScheduleRepository{
     @Autowired
     private LocalSessionFactoryBean factory;
     
-    @Autowired
-    private Environment env;
-    
+
 
     @Override
     public List<Schedules> getSchedules(Map<String, String> params) {
@@ -40,7 +37,7 @@ public class ScheduleRepositoryImpl implements ScheduleRepository{
         
         
         if(params!= null){
-            int pageSize = this.env.getProperty("schedules.page_size", Integer.class);
+            int pageSize = Integer.parseInt(params.get("pageSize"));
             int page = Integer.parseInt( params.getOrDefault("page", "1"));
             int start = (page-1)*pageSize;
             
@@ -50,7 +47,6 @@ public class ScheduleRepositoryImpl implements ScheduleRepository{
         }
         System.out.println("============");
         System.out.println(q.getResultList());
-        System.out.println(this.env.getProperty("schedules.page_size", Integer.class));
         System.out.println("============");
         return q.getResultList();
     }

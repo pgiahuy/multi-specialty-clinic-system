@@ -14,13 +14,12 @@
 <body>
     
 
-    <div th:replace="base :: header"></div>
+    <div th:replace="base :: header('QUẢN LÝ DƯỢC PHẨM')"></div>
 
     <div th:replace="base :: sidebar"></div>
 
     <div class="content">
 
-        <h2 class="mb-4">Dược phẩm</h2>
 
         <table class="table table-bordered table-hover align-middle">
             <thead class="table-primary">
@@ -54,6 +53,10 @@
             </tbody>
         </table>
 
+    </div>
+
+    <div class="d-flex justify-content-center mt-4">
+        <div th:replace="~{fragments :: pagination('/admin/medicines', ${totalPages}, ${currentPage})}"></div>
     </div>
 
     <div th:replace="base :: footer">

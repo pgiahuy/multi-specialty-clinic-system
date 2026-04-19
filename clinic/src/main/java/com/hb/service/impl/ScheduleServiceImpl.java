@@ -96,5 +96,10 @@ public class ScheduleServiceImpl implements ScheduleService {
     public void deleteSchedule(Long id) {
         this.scheduleRepo.deleteSchedule(id);
     }
+
+    @Override
+    public long countSchedules(Map<String, String> params) {
+        return scheduleRepo.count(params, Schedules.class);
+    }
     
 }

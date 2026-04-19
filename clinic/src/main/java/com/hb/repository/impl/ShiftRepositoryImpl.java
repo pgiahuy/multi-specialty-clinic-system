@@ -24,15 +24,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @Transactional
-@PropertySource("classpath:configs.properties")
-public class ShiftRepositoryImpl implements ShiftRepository{
+public class ShiftRepositoryImpl extends BaseRepositoryImpl<Shifts> implements ShiftRepository{
     @Autowired
     private LocalSessionFactoryBean factory;
     
-    @Autowired
-    private Environment env;
-    
-
+ 
     @Override
     public List<Shifts> getShifts(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
@@ -40,7 +36,7 @@ public class ShiftRepositoryImpl implements ShiftRepository{
         
         
         if(params!= null){
-            int pageSize = this.env.getProperty("shifts.page_size", Integer.class);
+            int pageSize = Integer.parseInt(params.get("pageSize"));
             int page = Integer.parseInt( params.getOrDefault("page", "1"));
             int start = (page-1)*pageSize;
             
@@ -49,7 +45,6 @@ public class ShiftRepositoryImpl implements ShiftRepository{
             
         }
         System.out.println("===========");
-        System.out.println(this.env.getProperty("shifts.page_size", Integer.class));
         System.out.println(q.getResultList());
         System.out.println("===========");
         return q.getResultList();

@@ -25,23 +25,26 @@
 
 <body>
 
-    <header th:fragment="header">
+    <header th:fragment="header(title)">
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
 
-        <nav class="navbar navbar-dark bg-dark">
-            <div class="container-fluid">
-                <div   sec:authorize="isAuthenticated()">
-                    <div>
-                        <span class="text-white me-3">Admin</span>
-                        <a class="btn btn-sm btn-danger" th:href="@{/logout}"><i class="bi bi-box-arrow-right me-2"></i>Logout</a>
-                    </div>
-                </div>
+            <span class="navbar-brand mb-0 h5 text-white"
+                  th:text="${title}">Default</span>
+
+            <div class="ms-auto me-3" sec:authorize="isAuthenticated()">
+                <span class="text-white me-3">Admin</span>
+                <a class="btn btn-sm btn-danger" th:href="@{/logout}">
+                    <i class="bi bi-box-arrow-right me-2"></i>Logout
+                </a>
             </div>
-        </nav>
 
-    </header>
+        </div>
+    </nav>
+</header>
 
     <div th:fragment="sidebar" class="bg-dark text-white sidebar p-3">
-        <h4 class="text-center">MENU</h4>
+        <h4 class="text-center">Danh mục</h4>
         <hr>
 
         <ul class="nav flex-column">
@@ -103,6 +106,7 @@
 
         </ul>
     </div>
+    
 
     <footer th:fragment="footer">
         <div class="text-center p-3 bg-light mt-4">

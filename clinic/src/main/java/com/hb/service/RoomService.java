@@ -21,4 +21,6 @@ public interface RoomService {
     Rooms addRoom(Map<String, String> params);
 
     void deleteRoom(Long id);
+
+    long countRooms(Map<String, String> params);
 }

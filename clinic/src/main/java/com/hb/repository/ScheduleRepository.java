@@ -12,7 +12,7 @@ import java.util.Map;
  *
  * @author HUY
  */
-public interface ScheduleRepository {
+public interface ScheduleRepository extends BaseRepository<Schedules>{
     List<Schedules> getSchedules(Map<String,String> params);
     Schedules addSchedule(Schedules d);
     Schedules getScheduleById(Long id);
