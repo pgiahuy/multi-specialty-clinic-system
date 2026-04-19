@@ -5,6 +5,7 @@
 package com.hb.pojo;
 
 import jakarta.persistence.Basic;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,17 +15,18 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 
 /**
  *
  * @author HUY
  */
-
 @Entity
 @Table(name = "schedules")
 @NamedQueries({
@@ -32,8 +34,7 @@ import java.util.Date;
     @NamedQuery(name = "Schedules.findById", query = "SELECT s FROM Schedules s WHERE s.id = :id"),
     @NamedQuery(name = "Schedules.findByDate", query = "SELECT s FROM Schedules s WHERE s.date = :date"),
     @NamedQuery(name = "Schedules.findByMaxPatients", query = "SELECT s FROM Schedules s WHERE s.maxPatients = :maxPatients"),
-    @NamedQuery(name = "Schedules.findByCurrentPatients", query = "SELECT s FROM Schedules s WHERE s.currentPatients = :currentPatients"),
-    @NamedQuery(name = "Schedules.findAllWithDetails",query = "SELECT DISTINCT s FROM Schedules s JOIN FETCH s.doctor JOIN FETCH s.roomId JOIN FETCH s.shiftId")})
+    @NamedQuery(name = "Schedules.findByCurrentPatients", query = "SELECT s FROM Schedules s WHERE s.currentPatients = :currentPatients")})
 public class Schedules implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -49,9 +50,11 @@ public class Schedules implements Serializable {
     private Integer maxPatients;
     @Column(name = "current_patients")
     private Integer currentPatients;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "scheduleId")
+    private Collection<Appointment> appointmentCollection;
     @JoinColumn(name = "doctor_id", referencedColumnName = "id")
     @ManyToOne
-    private Doctor doctor;
+    private Doctor doctorId;
     @JoinColumn(name = "room_id", referencedColumnName = "id")
     @ManyToOne
     private Rooms roomId;
@@ -98,12 +101,20 @@ public class Schedules implements Serializable {
         this.currentPatients = currentPatients;
     }
 
-    public Doctor getDoctor() {
-        return doctor;
+    public Collection<Appointment> getAppointmentCollection() {
+        return appointmentCollection;
     }
 
-    public void setDoctor(Doctor doctor) {
-        this.doctor = doctor;
+    public void setAppointmentCollection(Collection<Appointment> appointmentCollection) {
+        this.appointmentCollection = appointmentCollection;
+    }
+
+    public Doctor getDoctorId() {
+        return doctorId;
+    }
+
+    public void setDoctorId(Doctor doctorId) {
+        this.doctorId = doctorId;
     }
 
     public Rooms getRoomId() {
