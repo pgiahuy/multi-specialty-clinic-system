@@ -12,11 +12,13 @@ import java.util.Date;
  * @author DELL
  */
 public class PatientResponse {
+    private String cccd;
     private String fullName;
     private String phone;
     @JsonFormat(pattern = "dd/MM/yyyy")
     private Date dob;
     private String email;
+    private String address;
     private String avatar;
 
     public PatientResponse() {
@@ -24,12 +26,15 @@ public class PatientResponse {
     
     
     
-    public PatientResponse(String fullName, String phone, Date dob, String email, String avatar) {
+    public PatientResponse(String cccd, String fullName, String phone, Date dob, String email,String address, String avatar) {
+        this.cccd = cccd;
         this.fullName = fullName;
         this.phone = phone;
         this.dob = dob;
         this.email = email;
+        this.address = address;
         this.avatar = avatar;
+        
     }
 
     /**
@@ -100,6 +105,34 @@ public class PatientResponse {
      */
     public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    /**
+     * @return the cccd
+     */
+    public String getCccd() {
+        return cccd;
+    }
+
+    /**
+     * @param cccd the cccd to set
+     */
+    public void setCccd(String cccd) {
+        this.cccd = cccd;
+    }
+
+    /**
+     * @return the address
+     */
+    public String getAddress() {
+        return address;
+    }
+
+    /**
+     * @param address the address to set
+     */
+    public void setAddress(String address) {
+        this.address = address;
     }
     
 

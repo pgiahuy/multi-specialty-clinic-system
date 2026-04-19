@@ -54,9 +54,11 @@ public class ApiPatientController {
         Patient p = u.getPatient();
 
         PatientResponse res = new PatientResponse(
+                p.getCccd(),
                 p.getFullName(),
                 p.getPhone(),
                 p.getDob(),
+                p.getAddress(),
                 u.getEmail(),
                 u.getSecureUrl()
         );
