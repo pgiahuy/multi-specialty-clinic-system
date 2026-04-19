@@ -5,6 +5,7 @@
 package com.hb.service;
 
 import com.hb.dto.request.PatientCreateRequest;
+import com.hb.dto.response.PatientResponse;
 import com.hb.pojo.Patient;
 import com.hb.pojo.User;
 import java.util.List;
@@ -18,6 +19,6 @@ public interface PatientService {
     List<Patient> getPatients(Map<String,String> params);
     Patient getPatientById(Long id);
     void updateProfile(Long id, PatientCreateRequest prq);
-    Patient addPatient(PatientCreateRequest prq, User u);
+    PatientResponse addPatient(PatientCreateRequest prq, User u);
     long countPatients(Map<String,String> params);
 }

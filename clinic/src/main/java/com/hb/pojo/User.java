@@ -74,13 +74,13 @@ public class User implements Serializable {
     @Size(max = 255)
     @Column(name = "public_id")
     private String publicId;
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "userId")
     private Doctor doctor;
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "userId")
     private Collection<Notification> notificationCollection;
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "userId")
     private Patient patient;
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "userId")
     private Collection<SocialAccount> socialAccountCollection;
 
     public User() {

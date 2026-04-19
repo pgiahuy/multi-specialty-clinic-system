@@ -69,7 +69,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         String doctorIdStr = params.get("doctorId");
         if (doctorIdStr != null && !doctorIdStr.isEmpty()) {
             Doctor doctor = doctorRepo.getDoctorById(Long.valueOf(doctorIdStr));
-            schedule.setDoctor(doctor);
+            schedule.setDoctorId(doctor);
         }
 
         String shiftIdStr = params.get("shiftId");

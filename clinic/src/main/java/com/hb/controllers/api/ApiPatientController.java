@@ -6,6 +6,7 @@ package com.hb.controllers.api;
 
 import com.hb.dto.request.PatientCreateRequest;
 import com.hb.dto.response.PatientResponse;
+import com.hb.mapper.PatientMapper;
 import com.hb.pojo.Patient;
 import com.hb.pojo.User;
 import com.hb.service.PatientService;
@@ -32,11 +33,14 @@ public class ApiPatientController {
 
     @Autowired
     private PatientService patientService;
+    
+    @Autowired
+    private PatientMapper patientMapper;
 
     @Autowired
     private UserService userService;
 
-    @PutMapping(value = "/profile/{id}",
+    @PutMapping(value = "/secure/profile/{id}",
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateProfile(
             @PathVariable("id") Long id,
@@ -53,16 +57,8 @@ public class ApiPatientController {
         User u = this.userService.getUserByUsername(principal.getName());
         Patient p = u.getPatient();
 
-        PatientResponse res = new PatientResponse(
-                p.getCccd(),
-                p.getFullName(),
-                p.getPhone(),
-                p.getDob(),
-                p.getAddress(),
-                u.getEmail(),
-                u.getSecureUrl()
-        );
-        return ResponseEntity.ok(res);
+       
+        return ResponseEntity.ok(patientMapper.toResponse(p));
     }
 
 }
