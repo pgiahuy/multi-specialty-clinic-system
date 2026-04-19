@@ -4,13 +4,13 @@
  */
 package com.hb.service.impl;
 
+import com.hb.dto.request.UserCreateRequest;
 import com.hb.pojo.User;
 import com.hb.service.UserService;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.hb.repository.UserRepository;
 import java.time.LocalDateTime;
@@ -21,46 +21,47 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
  * @author HUY
  */
-
 @Service
-public class UserServiceImpl implements UserService{
-    
+@Transactional
+public class UserServiceImpl implements UserService {
+
     @Autowired
     private UserRepository userRepo;
-    
+
     @Autowired
     private CloudinaryService cloudinaryService;
-            
+
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
-    
+
     @Override
     public User getUserByUsername(String username) {
         return userRepo.getUserByUsername(username);
     }
 
     @Override
-    public User addUser(Map<String, String> params, MultipartFile avatar) {
+    public User addUser(UserCreateRequest urq) {
         User u = new User();
-        u.setEmail(params.get("email"));
-        u.setUsername(params.get("username"));
-        u.setPassword(passwordEncoder.encode(params.get("password")));
+
+        u.setEmail(urq.getEmail());
+        u.setUsername(urq.getUsername());
+        u.setPassword(passwordEncoder.encode(urq.getPassword()));
         u.setRole("ROLE_USER");
         u.setCreatedAt(LocalDateTime.now());
 
-        if ( !avatar.isEmpty()) {
-            Map res = this.cloudinaryService.uploadFile(avatar, "avatar");
-            
+        if (!urq.getAvatar().isEmpty()) {
+            Map res = this.cloudinaryService.uploadFile(urq.getAvatar(), "avatar");
+
             u.setSecureUrl(res.get("secureUrl").toString());
             u.setPublicId(res.get("publicId").toString());
         }
-        
-       
+
         return this.userRepo.addUser(u);
     }
 
@@ -70,10 +71,10 @@ public class UserServiceImpl implements UserService{
         if (user == null) {
             throw new UsernameNotFoundException("Không tồn tại!");
         }
-        
+
         Set<GrantedAuthority> authorities = new HashSet<>();
         authorities.add(new SimpleGrantedAuthority(user.getRole()));
-        
+
         return new org.springframework.security.core.userdetails.User(user.getUsername(),
                 user.getPassword(), authorities);
     }
@@ -88,5 +89,20 @@ public class UserServiceImpl implements UserService{
         this.userRepo.deleteUser(id);
     }
 
-    
+    @Override
+    public User processSocialLogin(String email, String name, String providerId, String providerName) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public long countUsers(Map<String, String> params) {
+        return userRepo.count(params, User.class);
+    }
+
+    @Override
+    public User getUserByEmail(String email) {
+        return userRepo.getUserByEmail(email);
+    }
+
+
 }

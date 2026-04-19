@@ -21,4 +21,9 @@ public class HomeController {
         return "index";
     }
     
+    @GetMapping("/admin/login")
+    public String loginView() {
+        return "login";
+    }
+    
 }

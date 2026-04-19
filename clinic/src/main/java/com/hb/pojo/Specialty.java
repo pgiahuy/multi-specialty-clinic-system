@@ -18,18 +18,21 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Collection;
 
 /**
  *
- * @author DELL
+ * @author HUY
  */
 @Entity
 @Table(name = "specialty")
 @NamedQueries({
     @NamedQuery(name = "Specialty.findAll", query = "SELECT s FROM Specialty s"),
     @NamedQuery(name = "Specialty.findById", query = "SELECT s FROM Specialty s WHERE s.id = :id"),
-    @NamedQuery(name = "Specialty.findByName", query = "SELECT s FROM Specialty s WHERE s.name = :name")})
+    @NamedQuery(name = "Specialty.findByName", query = "SELECT s FROM Specialty s WHERE s.name = :name"),
+    @NamedQuery(name = "Specialty.findByPrice", query = "SELECT s FROM Specialty s WHERE s.price = :price"),
+    @NamedQuery(name = "Specialty.findAllWithDoctors", query = "SELECT DISTINCT s FROM Specialty s LEFT JOIN FETCH s.doctorCollection")})
 public class Specialty implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -43,11 +46,16 @@ public class Specialty implements Serializable {
     @Size(min = 1, max = 100)
     @Column(name = "name")
     private String name;
+    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "price")
+    private BigDecimal price;
+    @JoinColumn(name = "id_hod", referencedColumnName = "id")
+    @ManyToOne
+    private Doctor idHod;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idSpecailty")
     private Collection<Doctor> doctorCollection;
-    @JoinColumn(name = "id_hod", referencedColumnName = "id")
-    @ManyToOne(optional = false)
-    private Doctor idHod;
 
     public Specialty() {
     }
@@ -56,9 +64,10 @@ public class Specialty implements Serializable {
         this.id = id;
     }
 
-    public Specialty(Long id, String name) {
+    public Specialty(Long id, String name, BigDecimal price) {
         this.id = id;
         this.name = name;
+        this.price = price;
     }
 
     public Long getId() {
@@ -77,12 +86,12 @@ public class Specialty implements Serializable {
         this.name = name;
     }
 
-    public Collection<Doctor> getDoctorCollection() {
-        return doctorCollection;
+    public BigDecimal getPrice() {
+        return price;
     }
 
-    public void setDoctorCollection(Collection<Doctor> doctorCollection) {
-        this.doctorCollection = doctorCollection;
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 
     public Doctor getIdHod() {
@@ -91,6 +100,14 @@ public class Specialty implements Serializable {
 
     public void setIdHod(Doctor idHod) {
         this.idHod = idHod;
+    }
+
+    public Collection<Doctor> getDoctorCollection() {
+        return doctorCollection;
+    }
+
+    public void setDoctorCollection(Collection<Doctor> doctorCollection) {
+        this.doctorCollection = doctorCollection;
     }
 
     @Override
