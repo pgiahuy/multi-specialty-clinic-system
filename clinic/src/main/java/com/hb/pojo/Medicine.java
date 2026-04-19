@@ -16,14 +16,16 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Date;
 
 /**
  *
- * @author DELL
+ * @author HUY
  */
 @Entity
 @Table(name = "medicine")
@@ -34,7 +36,9 @@ import java.util.Date;
     @NamedQuery(name = "Medicine.findByStock", query = "SELECT m FROM Medicine m WHERE m.stock = :stock"),
     @NamedQuery(name = "Medicine.findByExpirationDate", query = "SELECT m FROM Medicine m WHERE m.expirationDate = :expirationDate"),
     @NamedQuery(name = "Medicine.findBySecureUrl", query = "SELECT m FROM Medicine m WHERE m.secureUrl = :secureUrl"),
-    @NamedQuery(name = "Medicine.findByPublicId", query = "SELECT m FROM Medicine m WHERE m.publicId = :publicId")})
+    @NamedQuery(name = "Medicine.findByPublicId", query = "SELECT m FROM Medicine m WHERE m.publicId = :publicId"),
+    @NamedQuery(name = "Medicine.findByCode", query = "SELECT m FROM Medicine m WHERE m.code = :code"),
+    @NamedQuery(name = "Medicine.findByPrice", query = "SELECT m FROM Medicine m WHERE m.price = :price")})
 public class Medicine implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -57,6 +61,16 @@ public class Medicine implements Serializable {
     @Size(max = 255)
     @Column(name = "public_id")
     private String publicId;
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 45)
+    @Column(name = "code")
+    private String code;
+    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "price")
+    private BigDecimal price;
     @OneToMany(mappedBy = "medicineId")
     private Collection<InventoryLog> inventoryLogCollection;
     @OneToMany(mappedBy = "medicineId")
@@ -67,6 +81,12 @@ public class Medicine implements Serializable {
 
     public Medicine(Long id) {
         this.id = id;
+    }
+
+    public Medicine(Long id, String code, BigDecimal price) {
+        this.id = id;
+        this.code = code;
+        this.price = price;
     }
 
     public Long getId() {
@@ -115,6 +135,22 @@ public class Medicine implements Serializable {
 
     public void setPublicId(String publicId) {
         this.publicId = publicId;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 
     public Collection<InventoryLog> getInventoryLogCollection() {

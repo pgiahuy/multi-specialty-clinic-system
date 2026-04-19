@@ -72,8 +72,8 @@ public class AppointmentServiceImpl implements AppointmentService {
             throw new ResourceNotFoundException("Patient not found!");
         }
         
-//        a.setDoctorId(req.getDoctorId());
-//        a.setPatientId(req.getPatientId());
+        a.setDoctor(doctor);
+        a.setPatient(patient);
         
         a.setDate(date);
         a.setTimeSlot(timeSlot);
@@ -84,5 +84,10 @@ public class AppointmentServiceImpl implements AppointmentService {
         return appointmentMapper.toResponse(appointment);
 //        return null;
 }
+
+    @Override
+    public long countAppointments(Map<String, String> params) {
+        return appointmentRepo.count(params, Appointment.class);
+    }
 
 }

@@ -4,6 +4,7 @@
  */
 package com.hb.service.impl;
 
+import com.hb.exception.ResourceNotFoundException;
 import com.hb.pojo.Doctor;
 import com.hb.pojo.Specialty;
 import com.hb.repository.DoctorRepository;
@@ -47,7 +48,7 @@ public class SpecialtyServiceImpl implements SpecialtyService {
 
         String name = params.get("name");
         if (name == null || name.isEmpty()) {
-            throw new RuntimeException("Missing name");
+            throw new ResourceNotFoundException("Missing name");
         }
         s.setName(name);
 
@@ -59,6 +60,16 @@ public class SpecialtyServiceImpl implements SpecialtyService {
         }
 
         return specialtieRepo.addSpecialtie(s);
+    }
+
+    @Override
+    public void deleteDoctor(Long id) {
+        this.doctorRepo.deleteDoctor(id);
+    }
+
+    @Override
+    public long countSpecialties(Map<String, String> params) {
+        return specialtieRepo.count(params, Specialty.class);
     }
 
 }

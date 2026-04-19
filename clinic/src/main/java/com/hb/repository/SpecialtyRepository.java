@@ -12,7 +12,7 @@ import java.util.Map;
  *
  * @author HUY
  */
-public interface SpecialtyRepository {
+public interface SpecialtyRepository extends BaseRepository<Specialty>{
     List<Specialty> getSpecialties(Map<String,String> params);
     Specialty getSpecialtieById(Long id);
     Specialty addSpecialtie(Specialty s);

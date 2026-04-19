@@ -12,7 +12,7 @@ import java.util.Map;
  *
  * @author HUY
  */
-public interface AppointmentRepository {
+public interface AppointmentRepository extends BaseRepository<Appointment>{
     
     List<Appointment> getAppointments(Map<String,String> params);
     Appointment getAppointmentById(Long id);

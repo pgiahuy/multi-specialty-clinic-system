@@ -1,0 +1,63 @@
+
+
+
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Quản lý Chuyên khoa</title>
+
+    <th:block th:replace="base :: css"></th:block>
+    <th:block th:replace="base :: js"></th:block>
+    <script th:src="@{/js/specialty.js}"></script>
+</head>
+
+<body>
+
+    <div th:replace="base :: header('QUẢN LÝ CHUYÊN KHOA')"></div>
+
+    <div th:replace="base :: sidebar"></div>
+
+    <div class="content">
+
+
+
+        <table class="table table-bordered table-hover align-middle">
+            <thead class="table-primary">
+                <tr>
+                    <th>Khoa</th>
+                    <th>Giá khám</th>
+                    <th>Trưởng khoa</th>
+                    <th>Số lượng Bác sĩ</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr th:each="d : ${specialties}">
+                    <td th:text="${d.name}"></td>
+                    <td th:text="${d.price}"></td>
+                    <td th:text="${d.idHod.fullName}"></td>
+                    <td th:text="${#lists.size(d.doctorCollection)}"></td>
+           
+                    <td>
+                        <button class="btn btn-warning btn-sm">Sửa</button>
+                        <button class="btn btn-danger btn-sm"
+                                th:onclick="'deleteDoctor(' + ${d.id} + ')'">
+                            Xóa
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+    <div class="d-flex justify-content-center mt-4">
+        <div th:replace="~{fragments :: pagination('/admin/specialties', ${totalPages}, ${currentPage})}"></div>
+    </div>
+
+    <div th:replace="base :: footer">
+
+    </div>
+</body>
+</html>

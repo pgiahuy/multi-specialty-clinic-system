@@ -1,0 +1,84 @@
+
+
+
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Quản lý Bác sĩ</title>
+
+    <th:block th:replace="base :: css"></th:block>
+    <th:block th:replace="base :: js"></th:block>
+    <script th:src="@{/js/doctor.js}"></script>
+</head>
+
+<body>
+
+    <div th:replace="base :: header"></div>
+
+    <div th:replace="base :: sidebar"></div>
+
+    <div class="content">
+
+        <h2 class="mb-4">Quản lý Bác sĩ</h2>
+
+<!--        <form method="post" th:action="@{/admin/doctors}" enctype="multipart/form-data">
+
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" name="username" class="form-control" id="username">
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email address:</label>
+                <input type="email" name="email" class="form-control" id="email">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" name="password" class="form-control" id="password">
+            </div>
+
+            <div class="form-group">
+                <label for="avatar">Avatar</label>
+                <input type="file" name="avatar" class="form-control mb-2">
+            </div>
+
+            <button type="submit" class="btn btn-primary mb-3">Submit</button>
+        </form>-->
+
+
+
+        <table class="table table-bordered table-hover align-middle">
+            <thead class="table-primary">
+                <tr>
+                    <th>Họ tên</th>
+                    <th>Chuyên khoa</th>
+                    <th>Thông tin</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr th:each="d : ${doctors}">
+                    <td th:text="${d.fullName}"></td>
+                    <td th:text="${d.idSpecailty}"></td>
+                    <td th:text="${d.description}"></td>
+           
+                    <td>
+                        <button class="btn btn-warning btn-sm">Sửa</button>
+                        <button class="btn btn-danger btn-sm"
+                                th:onclick="'deleteDoctor(' + ${d.id} + ')'">
+                            Xóa
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+    <div th:replace="base :: footer">
+
+    </div>
+</body>
+</html>
