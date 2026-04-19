@@ -28,13 +28,13 @@ public class LabTestsServiceImpl implements LabTestService {
     }
 
     @Override
-    public LabTests getLabTestById(Integer id) {
+    public LabTests getLabTestById(Long id) {
         return labTestRepo.getLabTestById(id);
     }
    
 
     @Override
-    public void deleteLabTest(Integer id) {
+    public void deleteLabTest(Long id) {
         labTestRepo.deleteLabTest(id);
     }
 

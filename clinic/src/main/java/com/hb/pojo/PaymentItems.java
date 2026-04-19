@@ -4,9 +4,12 @@
  */
 package com.hb.pojo;
 
+import com.hb.enums.PaymentStatus;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -34,7 +37,7 @@ import java.util.Date;
     @NamedQuery(name = "PaymentItems.findById", query = "SELECT p FROM PaymentItems p WHERE p.id = :id"),
     @NamedQuery(name = "PaymentItems.findByItemType", query = "SELECT p FROM PaymentItems p WHERE p.itemType = :itemType"),
     @NamedQuery(name = "PaymentItems.findByAmount", query = "SELECT p FROM PaymentItems p WHERE p.amount = :amount"),
-    @NamedQuery(name = "PaymentItems.findByCreatedAt", query = "SELECT p FROM PaymentItems p WHERE p.createdAt = :createdAt"),
+    
     @NamedQuery(name = "PaymentItems.findByStatus", query = "SELECT p FROM PaymentItems p WHERE p.status = :status")})
 public class PaymentItems implements Serializable {
 
@@ -52,18 +55,18 @@ public class PaymentItems implements Serializable {
     @NotNull
     @Column(name = "amount")
     private BigDecimal amount;
-    @Column(name = "created_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt;
+    
     @Size(max = 7)
+    @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    private String status;
+    private PaymentStatus status;
+    
     @JoinColumn(name = "appointment_id", referencedColumnName = "id")
     @ManyToOne
     private Appointment appointment;
-    @JoinColumn(name = "lab_test_id", referencedColumnName = "id")
     @ManyToOne
-    private LabResults labTestId;
+    @JoinColumn(name = "lab_test_id", referencedColumnName = "id")
+    private LabTests labTest;
     @JoinColumn(name = "payment_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Payment paymentId;
@@ -106,22 +109,7 @@ public class PaymentItems implements Serializable {
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
+   
 
     public Appointment getAppointment() {
         return appointment;
@@ -131,13 +119,7 @@ public class PaymentItems implements Serializable {
         this.appointment = appointment;
     }
 
-    public LabResults getLabTestId() {
-        return labTestId;
-    }
-
-    public void setLabTestId(LabResults labTestId) {
-        this.labTestId = labTestId;
-    }
+    
 
     public Payment getPaymentId() {
         return paymentId;
@@ -178,6 +160,34 @@ public class PaymentItems implements Serializable {
     @Override
     public String toString() {
         return "com.hb.pojo.PaymentItems[ id=" + id + " ]";
+    }
+
+    /**
+     * @return the status
+     */
+    public PaymentStatus getStatus() {
+        return status;
+    }
+
+    /**
+     * @param status the status to set
+     */
+    public void setStatus(PaymentStatus status) {
+        this.status = status;
+    }
+
+    /**
+     * @return the labTest
+     */
+    public LabTests getLabTest() {
+        return labTest;
+    }
+
+    /**
+     * @param labTest the labTest to set
+     */
+    public void setLabTest(LabTests labTest) {
+        this.labTest = labTest;
     }
     
 }
