@@ -4,12 +4,9 @@
  */
 package com.hb.controllers;
 
-import com.hb.service.DoctorService;
-import com.hb.service.PatientService;
+import com.hb.service.ShiftService;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,24 +16,34 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-
 /**
  *
  * @author HUY
  */
+
 @Controller
-@RequestMapping("/admin")
-public class PatientController {
+@RequestMapping("/admin/shifts")
+public class ShiftController {
     
     @Autowired
-    private PatientService patientService;
-
+    private ShiftService shiftService;
     
-    @GetMapping("/patients")
-    public String list(Model model, @RequestParam Map<String, String> params) {
-        model.addAttribute("patients", patientService.getPatients(params));
-        return "patient";
+    @GetMapping("")
+    public String list(Model model ,@RequestParam Map<String,String> params){
+        model.addAttribute("shifts", this.shiftService.getShifts(params));
+        return "shift";
+    }
+    
+    @PostMapping("")
+    public String create(@RequestParam Map<String, String> params){
+        shiftService.addShift(params);
+        return "redirect:/admin/shift";
     }
 
-
+    @DeleteMapping("/{id}")
+    public String delete(@PathVariable Long id) {
+        shiftService.deleteShift(id);
+        return "redirect:/admin/shift";
+    }
+    
 }

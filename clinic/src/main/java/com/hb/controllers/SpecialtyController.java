@@ -8,7 +8,6 @@ import com.hb.service.SpecialtyService;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,14 +31,14 @@ public class SpecialtyController {
     
     @GetMapping("")
     public String list(Model model, @RequestParam Map<String,String> params){
-        model.addAttribute("specialty" , this.specialtyService.getSpecialties(params));
+        model.addAttribute("specialties" , this.specialtyService.getSpecialties(params));
         return "specialty";
     }
     
     @PostMapping("")
     public String create(@RequestParam Map<String, String> params) {
         specialtyService.addSpecialtie(params);
-        return "redirect:/admin/specialty";
+        return "redirect:/admin/specialties";
     }
 
     @DeleteMapping("/{id}")

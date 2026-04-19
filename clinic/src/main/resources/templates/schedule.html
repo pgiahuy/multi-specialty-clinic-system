@@ -1,18 +1,14 @@
-
-
-
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
     <head>
-        <title>Quản lý dược phẩm</title>
+        <title>Quản lý Lịch làm việc</title>
 
     <th:block th:replace="base :: css"></th:block>
     <th:block th:replace="base :: js"></th:block>
-    <script th:src="@{/js/medicine.js}"></script>
+    <script th:src="@{/js/schedule.js}"></script>
 </head>
 
 <body>
-    
 
     <div th:replace="base :: header"></div>
 
@@ -20,44 +16,45 @@
 
     <div class="content">
 
-        <h2 class="mb-4">Dược phẩm</h2>
+        <h2 class="mb-4">Lịch làm việc</h2>
 
+       
         <table class="table table-bordered table-hover align-middle">
             <thead class="table-primary">
                 <tr>
-                    <th>Tên</th>
-                    <th>Mã</th>
-                    <th>Tồn kho>
-                    <th>Ngày hết hạn</th>
-                    <th>Đơn giá</th>
-                    <th>Ảnh</th>
+                    <th>Ngày</th>
+                    <th>Bác sĩ</th>
+                    <th>Phòng</th>
+                    <th>Ca</th>
+                    <th>Bệnh nhân tối đa</th>
+                    <th>Bệnh nhân hiện tại</th>
                     <th></th>
                 </tr>
             </thead>
 
             <tbody>
-                <tr th:each="d : ${medicines}">
-                    <td th:text="${d.name}"></td>
-                    <td th:text="${d.code}"></td>
-                    <td th:text="${d.stock}"></td>
-                    <td th:text="${d.expirationDate}"></td>
-                    <td th:text="${d.price}"></td>
-                    <td><img src="${d.secureUrl}" style="width: 50px;"/></td>
+                <tr th:each="d : ${schedules}">
+                    <td th:text="${#temporals.format(d.date, 'dd/MM/yyyy')}"></td>
+                    <td th:text="${d.doctor.fullName}"></td>
+                    <td th:text="${d.roomId.name}"></td>
+                    <td th:text="${d.shiftId.session}"></td>
+                    <td th:text="${d.maxPatients}"></td>
+                    <td th:text="${d.currentPatients}"></td>
+
+
                     <td>
                         <button class="btn btn-warning btn-sm">Sửa</button>
                         <button class="btn btn-danger btn-sm"
-                                th:onclick="'deleteDoctor(' + ${d.id} + ')'">
+                                th:onclick="'deleteSchedule(' + ${d.id} + ')'">
                             Xóa
                         </button>
                     </td>
                 </tr>
             </tbody>
         </table>
-
     </div>
 
     <div th:replace="base :: footer">
-
     </div>
 </body>
 </html>

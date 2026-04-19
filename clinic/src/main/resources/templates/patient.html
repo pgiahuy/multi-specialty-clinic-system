@@ -1,13 +1,14 @@
 
 
+
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
     <head>
-        <title>Quản lý Bác sĩ</title>
+        <title>Quản lý Bệnh nhân</title>
 
     <th:block th:replace="base :: css"></th:block>
     <th:block th:replace="base :: js"></th:block>
-    <script th:src="@{/js/doctor.js}"></script>
+    <script th:src="@{/js/patient.js}"></script>
 </head>
 
 <body>
@@ -18,7 +19,7 @@
 
     <div class="content">
 
-        <h2 class="mb-4">Quản lý Bác sĩ</h2>
+        <h2 class="mb-4">Bệnh nhân</h2>
 
 <!--        <form method="post" th:action="@{/admin/doctors}" enctype="multipart/form-data">
 
@@ -51,21 +52,24 @@
             <thead class="table-primary">
                 <tr>
                     <th>Họ tên</th>
-                    <th>Chuyên khoa</th>
+                    <th>CCCD</th>
+                    <th>SĐT</th>
                     <th>Giới tính</th>
-                    
-                    <th>Thông tin</th>
+                    <th>Ngày sinh</th>
+                    <th>Địa chỉ</th>
                     <th>Tài khoản</th>
                     <th></th>
                 </tr>
             </thead>
 
             <tbody>
-                <tr th:each="d : ${doctors}">
+                <tr th:each="d : ${patients}">
                     <td th:text="${d.fullName}"></td>
-                    <td th:text="${d.idSpecailty.name}"></td>
+                    <td th:text="${d.cccd}"></td>
+                    <td th:text="${d.phone}"></td>
                     <td th:text="${d.gender}"></td>
-                    <td th:text="${d.description}"></td>
+                    <td th:text="${d.dob}"></td>
+                    <td th:text="${d.address}"></td>
                     <td th:text="${d.user.username}"></td>
            
                     <td>

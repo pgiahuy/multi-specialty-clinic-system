@@ -27,6 +27,7 @@ import java.util.Date;
  *
  * @author HUY
  */
+
 @Entity
 @Table(name = "lab_results")
 @NamedQueries({

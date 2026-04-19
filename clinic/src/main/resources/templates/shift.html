@@ -4,15 +4,14 @@
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
     <head>
-        <title>Quản lý dược phẩm</title>
+        <title>Quản lý Ca làm việc</title>
 
     <th:block th:replace="base :: css"></th:block>
     <th:block th:replace="base :: js"></th:block>
-    <script th:src="@{/js/medicine.js}"></script>
+    <script th:src="@{/js/patient.js}"></script>
 </head>
 
 <body>
-    
 
     <div th:replace="base :: header"></div>
 
@@ -20,29 +19,31 @@
 
     <div class="content">
 
-        <h2 class="mb-4">Dược phẩm</h2>
+        <h2 class="mb-4">Ca làm việc</h2>
+
 
         <table class="table table-bordered table-hover align-middle">
             <thead class="table-primary">
                 <tr>
-                    <th>Tên</th>
-                    <th>Mã</th>
-                    <th>Tồn kho>
-                    <th>Ngày hết hạn</th>
-                    <th>Đơn giá</th>
-                    <th>Ảnh</th>
+                    <th>Bắt đầu</th>
+                    <th>Kết thúc</th>
+                    <th>Buổi</th>
+                    <th>Bệnh nhân tối đa</th>
+                    <th>Bệnh nhân tối thiểu</th>
+             
                     <th></th>
                 </tr>
             </thead>
 
             <tbody>
-                <tr th:each="d : ${medicines}">
-                    <td th:text="${d.name}"></td>
-                    <td th:text="${d.code}"></td>
-                    <td th:text="${d.stock}"></td>
-                    <td th:text="${d.expirationDate}"></td>
-                    <td th:text="${d.price}"></td>
-                    <td><img src="${d.secureUrl}" style="width: 50px;"/></td>
+                <tr th:each="d : ${shifts}">
+                    <td th:text="${#temporals.format(d.startTime, 'HH:mm')}"></td>
+                    <td th:text="${#temporals.format(d.endTime, 'HH:mm')}"></td>
+                    <td th:text="${d.session}"></td>
+                    <td th:text="${d.maxPatinets}"></td>
+                    <td th:text="${d.minPatients}"></td>
+   
+           
                     <td>
                         <button class="btn btn-warning btn-sm">Sửa</button>
                         <button class="btn btn-danger btn-sm"

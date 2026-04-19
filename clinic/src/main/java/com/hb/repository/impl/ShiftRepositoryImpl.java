@@ -4,7 +4,8 @@
  */
 package com.hb.repository.impl;
 
-import com.hb.pojo.Specialty;
+import com.hb.pojo.Shifts;
+import com.hb.repository.ShiftRepository;
 import java.util.List;
 import java.util.Map;
 import org.hibernate.Session;
@@ -15,7 +16,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import com.hb.repository.SpecialtyRepository;
 
 /**
  *
@@ -25,8 +25,7 @@ import com.hb.repository.SpecialtyRepository;
 @Repository
 @Transactional
 @PropertySource("classpath:configs.properties")
-public class SpecialtyRepositoryImpl implements SpecialtyRepository{
-    
+public class ShiftRepositoryImpl implements ShiftRepository{
     @Autowired
     private LocalSessionFactoryBean factory;
     
@@ -35,14 +34,13 @@ public class SpecialtyRepositoryImpl implements SpecialtyRepository{
     
 
     @Override
-    public List<Specialty> getSpecialties(Map<String, String> params) {
+    public List<Shifts> getShifts(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<Specialty> q = session.createNamedQuery("Specialty.findAllWithDoctors",Specialty.class);
+        Query<Shifts> q = session.createNamedQuery("Shifts.findAll",Shifts.class);
+        
         
         if(params!= null){
-            int pageSize = this.env.getProperty("specialties.page_size", Integer.class);
-            System.out.println("===========" );
-            System.out.println(pageSize );
+            int pageSize = this.env.getProperty("shifts.page_size", Integer.class);
             int page = Integer.parseInt( params.getOrDefault("page", "1"));
             int start = (page-1)*pageSize;
             
@@ -50,26 +48,26 @@ public class SpecialtyRepositoryImpl implements SpecialtyRepository{
             q.setFirstResult(start);
             
         }
-        System.out.println("=======print_list==============");
+        System.out.println("===========");
+        System.out.println(this.env.getProperty("shifts.page_size", Integer.class));
         System.out.println(q.getResultList());
-                System.out.println("=======print_list==============");
-
+        System.out.println("===========");
         return q.getResultList();
     }
 
     @Override
-    public Specialty getSpecialtieById(Long id) {
-        Session session = this.factory.getObject().getCurrentSession();
-        Query<Specialty> q = session.createNamedQuery("Specialty.findById", Specialty.class);
-        q.setParameter("id", id);
-        return q.getSingleResult();
+    public Shifts addShift(Shifts d) {
+        return null;
     }
 
     @Override
-    public Specialty addSpecialtie(Specialty s) {
+    public Shifts getShiftById(Long id) {
         Session session = this.factory.getObject().getCurrentSession();
-        session.persist(s);
-        return s;
+        return session.get(Shifts.class, id);
+    }
+
+    @Override
+    public void deleteShift(Long id) {
     }
     
 }

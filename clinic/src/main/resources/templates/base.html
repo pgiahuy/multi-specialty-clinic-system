@@ -57,23 +57,33 @@
             </li>
 
             <li class="nav-item">
-                <a class="nav-link text-white" href="#"><i class="bi bi-capsule me-2"></i>Dược phẩm</a>
+                <a class="nav-link text-white" th:href="@{/admin/medicines}"><i class="bi bi-capsule me-2"></i>Dược phẩm</a>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link text-white" href="#"><i class="bi bi-clipboard2-pulse-fill me-2"></i></i>Bệnh án</a>
+                <a class="nav-link text-white" th:href="@{/admin/medical-records}" ><i class="bi bi-clipboard2-pulse-fill me-2"></i></i>Bệnh án</a>
             </li>
 
             <li class="nav-item">
                 <a class="nav-link text-white" th:href="@{/admin/appointments}"><i class="bi bi-calendar2-check me-2"></i>Lịch hẹn</a>
             </li>
-
             <li class="nav-item">
-                <a class="nav-link text-white" href="#">Bác sĩ</a>
+                <a class="nav-link text-white" th:href="@{/admin/specialties}">Chuyên khoa</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" th:href="@{/admin/shifts}">Ca khám</a>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link text-white" href="#">Bệnh nhân</a>
+                <a class="nav-link text-white" th:href="@{/admin/doctors}">Bác sĩ</a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link text-white" th:href="@{/admin/schedules}">Lịch bác sĩ</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link text-white" th:href="@{/admin/patients}">Bệnh nhân</a>
             </li>
 
 
