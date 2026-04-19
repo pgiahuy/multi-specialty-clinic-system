@@ -4,6 +4,7 @@
  */
 package com.hb.repository.impl;
 
+import com.hb.exception.ResourceNotFoundException;
 import com.hb.pojo.Doctor;
 import com.hb.repository.DoctorRepository;
 import java.util.List;
@@ -23,22 +24,19 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Repository
 @Transactional
-@PropertySource("classpath:configs.properties")
-public class DoctorRepositoryImpl implements DoctorRepository{
+public class DoctorRepositoryImpl extends BaseRepositoryImpl<Doctor> implements DoctorRepository{
 
     @Autowired
     private LocalSessionFactoryBean factory;
             
-    @Autowired
-    private Environment env;
-    
+
     @Override
     public List<Doctor> getDoctors(Map<String,String> params) {
         Session session = this.factory.getObject().getCurrentSession();
         Query<Doctor> q = session.createNamedQuery("Doctor.findAll", Doctor.class);
         
         if (params!=null) {
-            int pageSize = env.getProperty("doctors.page_size", Integer.class);
+            int pageSize = Integer.parseInt(params.get("pageSize"));
             int page = Integer.parseInt(params.getOrDefault("page", "1"));
             int start = (page-1)*pageSize;
             q.setMaxResults(pageSize);
@@ -65,13 +63,11 @@ public class DoctorRepositoryImpl implements DoctorRepository{
     @Override
     public void deleteDoctor(Long id) {
         Session session = this.factory.getObject().getCurrentSession();
-
         Doctor d = session.get(Doctor.class, id);
-
         if (d != null) {
             session.remove(d);
-        } else {
-            throw new RuntimeException("Doctor not found!");
+        } else{
+            throw new ResourceNotFoundException("Doctor not found!");
         }
     }
     

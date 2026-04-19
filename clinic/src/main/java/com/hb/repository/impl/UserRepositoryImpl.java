@@ -24,11 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Repository
 @Transactional
-@PropertySource("classpath:configs.properties")
-public class UserRepositoryImpl implements UserRepository {
+public class UserRepositoryImpl extends BaseRepositoryImpl<User> implements UserRepository  {
 
-    @Autowired
-    private Environment env;
 
     @Autowired
     private LocalSessionFactoryBean factory;
@@ -42,7 +39,7 @@ public class UserRepositoryImpl implements UserRepository {
         Query<User> q = session.createNamedQuery("User.findAll", User.class);
 
         if (params != null) {
-            int pageSize = this.env.getProperty("users.page_size", Integer.class);
+            int pageSize = Integer.parseInt(params.get("pageSize"));
             int page = Integer.parseInt(params.getOrDefault("page", "1"));
             int start = (page - 1) * pageSize;
             q.setMaxResults(pageSize);
@@ -86,5 +83,13 @@ public class UserRepositoryImpl implements UserRepository {
         User u = this.getUserByUsername(username);
 
         return this.passwordEncoder.matches(password, u.getPassword());
+    }
+
+    @Override
+    public User getUserByEmail(String email) {
+        Session session = this.factory.getObject().getCurrentSession();
+        Query<User> q = session.createNamedQuery("User.findByEmail", User.class);
+        q.setParameter("email", email);
+        return q.getSingleResult();
     }
 }

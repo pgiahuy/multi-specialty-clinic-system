@@ -1,0 +1,65 @@
+
+
+
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Hồ sơ bệnh án</title>
+
+    <th:block th:replace="base :: css"></th:block>
+    <th:block th:replace="base :: js"></th:block>
+    <script th:src="@{/js/doctor.js}"></script>
+</head>
+
+<body>
+
+    <div th:replace="base :: header('QUẢN LÝ HỒ SƠ')"></div>
+
+    <div th:replace="base :: sidebar"></div>
+
+    <div class="content">
+
+
+
+        <table class="table table-bordered table-hover align-middle">
+            <thead class="table-primary">
+                <tr>
+                    <th>Bệnh nhân</th>
+                    <th>Bác sĩ khám</th>
+                    <th>Chuẩn đoán</th>
+                    <th>Ngày tạo</th>
+                    <th>Ghi chú</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr th:each="m : ${medical_records}">
+                    <td th:text="${m.appointment.patient.fullName}"></td>
+                    <td th:text="${m.appointment.doctor.fullName}"></td>
+                    <td th:text="${m.diadnosis}"></td>
+                    <td th:text="${m.createdAt}"></td>
+                    <td th:text="${m.note}"></td>
+           
+                    <td>
+                        <button class="btn btn-warning btn-sm">Sửa</button>
+                        <button class="btn btn-danger btn-sm"
+                                th:onclick="'deleteDoctor(' + ${m.id} + ')'">
+                            Xóa
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+    <div class="d-flex justify-content-center mt-4">
+        <div th:replace="~{fragments :: pagination('/admin/medical-records', ${totalPages}, ${currentPage})}"></div>
+    </div>
+
+    <div th:replace="base :: footer">
+
+    </div>
+</body>
+</html>
