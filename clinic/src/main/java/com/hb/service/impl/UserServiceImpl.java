@@ -90,5 +90,10 @@ public class UserServiceImpl implements UserService{
         this.userRepo.deleteUser(id);
     }
 
+    @Override
+    public User processSocialLogin(String email, String name, String providerId, String providerName) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
     
 }

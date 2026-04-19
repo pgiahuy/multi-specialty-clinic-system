@@ -15,5 +15,13 @@
     <class>com.hb.pojo.Notification</class>
     <class>com.hb.pojo.Specialty</class>
     <class>com.hb.dto.request.UserCreateRequest</class>
+    <class>com.hb.pojo.Areas</class>
+    <class>com.hb.pojo.SocialAccount</class>
+    <class>com.hb.pojo.LabResults</class>
+    <class>com.hb.pojo.PaymentItems</class>
+    <class>com.hb.pojo.LabTests</class>
+    <class>com.hb.pojo.Schedules</class>
+    <class>com.hb.pojo.Shifts</class>
+    <class>com.hb.pojo.Rooms</class>
   </persistence-unit>
 </persistence>

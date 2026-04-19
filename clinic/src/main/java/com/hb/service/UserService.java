@@ -22,4 +22,5 @@ public interface UserService extends UserDetailsService {
     User addUser(UserCreateRequest urq);
     List<User> getUsers(Map<String,String> params);
     void deleteUser(Long id);
+    User processSocialLogin(String email, String name, String providerId, String providerName);
 }

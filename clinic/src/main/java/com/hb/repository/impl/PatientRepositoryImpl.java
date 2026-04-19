@@ -37,7 +37,7 @@ public class PatientRepositoryImpl implements PatientRepository{
         Query<Patient> q = session.createNamedQuery("Patient.findAll", Patient.class);
         
         if (params != null) {
-            int pageSize = this.env.getProperty("patiens.page_size", Integer.class);
+            int pageSize = this.env.getProperty("patients.page_size", Integer.class);
             int page = Integer.parseInt(params.getOrDefault("page", "1"));
             int start = (page-1)*pageSize;
             q.setMaxResults(pageSize);

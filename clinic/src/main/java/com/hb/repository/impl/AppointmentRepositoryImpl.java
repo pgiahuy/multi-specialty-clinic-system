@@ -6,8 +6,7 @@ package com.hb.repository.impl;
 
 import com.hb.pojo.Appointment;
 import com.hb.repository.AppointmentRepository;
-import jakarta.ejb.Local;
-import jakarta.persistence.TemporalType;
+
 import java.util.List;
 import java.util.Map;
 import org.hibernate.Session;
