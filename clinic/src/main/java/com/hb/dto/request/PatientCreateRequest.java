@@ -13,23 +13,26 @@ import org.springframework.web.multipart.MultipartFile;
  * @author DELL
  */
 public class PatientCreateRequest {
-
+    private String cccd;
     private String fullName;
     private String gender;
     @DateTimeFormat(pattern = "dd/MM/yyyy")
     private Date dob;
     private String phone;
+    private String address;
     private MultipartFile avatar;
 
     public PatientCreateRequest() {
     }
 
-    public PatientCreateRequest(String fullName, String gender, Date dob, String phone, MultipartFile avatar) {
+    public PatientCreateRequest(String cccd, String fullName, String gender, Date dob, String phone,String address, MultipartFile avatar) {
+        this.cccd = cccd;
         this.fullName = fullName;
         this.gender = gender;
         this.dob = dob;
         this.phone = phone;
         this.avatar = avatar;
+        this.address = address;
     }
 
     /**
@@ -102,4 +105,32 @@ public class PatientCreateRequest {
         this.avatar = avatar;
     }
 
+    /**
+     * @return the address
+     */
+    public String getAddress() {
+        return address;
+    }
+
+    /**
+     * @param address the address to set
+     */
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    /**
+     * @return the cccd
+     */
+    public String getCccd() {
+        return cccd;
+    }
+
+    /**
+     * @param cccd the cccd to set
+     */
+    public void setCccd(String cccd) {
+        this.cccd = cccd;
+    }
+    
 }
