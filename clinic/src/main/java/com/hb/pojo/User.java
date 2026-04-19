@@ -69,7 +69,6 @@ public class User implements Serializable {
     private String role;
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
-    @JsonIgnore
     private LocalDateTime createdAt;
     @Size(max = 255)
     @Column(name = "secure_url")
@@ -77,12 +76,11 @@ public class User implements Serializable {
     @Size(max = 255)
     @Column(name = "public_id")
     private String publicId;
-    @OneToOne(mappedBy = "userId")
+    @OneToOne(mappedBy = "user")
     private Doctor doctor;
-    @OneToMany(mappedBy = "userId")
-    @JsonIgnore
+    @OneToMany(mappedBy = "user")
     private Collection<Notification> notificationCollection;
-    @OneToOne(mappedBy = "userId")
+    @OneToOne(mappedBy = "user")
     private Patient patient;
 
     public User() {
