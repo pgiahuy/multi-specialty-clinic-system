@@ -6,11 +6,15 @@ package com.hb.service.impl;
 
 import com.hb.enums.PaymentMethod;
 import com.hb.enums.PaymentStatus;
-import com.hb.exception.ResourceNotFoundException;
-import com.hb.pojo.Appointment;
+import com.hb.pojo.Patient;
 import com.hb.pojo.Payment;
+import com.hb.pojo.PaymentItems;
 import com.hb.repository.AppointmentRepository;
+import com.hb.repository.LabTestRepository;
+import com.hb.repository.PaymentItemRepository;
 import com.hb.repository.PaymentRepository;
+import com.hb.repository.PrescriptionRepository;
+import com.hb.service.PaymentItemsService;
 import com.hb.service.PaymentService;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -28,9 +32,21 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Autowired
     private PaymentRepository paymentRepo;
-    
+
+    @Autowired
+    private LabTestRepository labRepo;
+
     @Autowired
     private AppointmentRepository appointmentRepo;
+
+    @Autowired
+    private PrescriptionRepository prescriptionRepo;
+
+    @Autowired
+    private PaymentItemsService itemService;
+
+    @Autowired
+    private PaymentItemRepository itemRepo;
 
     @Override
     public Payment addPayment(Map<String, String> params) {
@@ -88,4 +104,59 @@ public class PaymentServiceImpl implements PaymentService {
     public void deletePayment(Long id) {
         this.paymentRepo.deletePayment(id);
     }
+
+    @Override
+    public Payment createPayment(Long patientId, Long appId, List<Long> testIds, Long presId) {
+        Payment p = new Payment();
+        p.setPatient(new Patient(patientId));
+        p.setStatus(PaymentStatus.PENDING);
+        p.setCreatedAt(new Date());
+        paymentRepo.addOrUpdatePayment(p);
+
+        // 2. Thêm các hạng mục thông qua ItemService (Tự động tính giá)
+        if (appId != null) {
+            itemService.addAppointmentItem(p, appId);
+        }
+        if (testIds != null) {
+            itemService.addLabTestItems(p, testIds);
+        }
+        if (presId != null) {
+            itemService.addPrescriptionItem(p, presId);
+        }
+
+        // 3. Tính tổng tiền từ các Item vừa tạo để cập nhật lại Payment
+        List<PaymentItems> items = itemRepo.getItemsByPaymentId(p.getId());
+        BigDecimal finalTotal = items.stream()
+                .map(PaymentItems::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        p.setTotalAmount(finalTotal);
+        paymentRepo.addOrUpdatePayment(p);
+
+        return p;
+    }
+
+    @Override
+    public void updateStatus(Long paymentId, PaymentStatus status) {
+        Payment p = paymentRepo.getPaymentById(paymentId);
+        if (p != null) {
+            p.setStatus(status);
+            paymentRepo.addOrUpdatePayment(p);
+        }
+    }
+
+    @Override
+    public void confirmPaymentSuccess(Long paymentId, String transId) {
+        Payment p = paymentRepo.getPaymentById(paymentId);
+        if (p != null) {
+            p.setStatus(PaymentStatus.SUCCESS);
+            p.setMethod(PaymentMethod.MOMO);
+
+            // Lưu mã giao dịch từ MoMo vào DB
+            p.setTransactionId(transId);
+
+            paymentRepo.addOrUpdatePayment(p);
+        }
+    }
+
 }

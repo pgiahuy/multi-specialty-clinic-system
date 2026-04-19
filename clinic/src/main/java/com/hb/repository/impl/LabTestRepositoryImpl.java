@@ -47,7 +47,7 @@ public class LabTestRepositoryImpl implements LabTestRepository{
     }
 
     @Override
-    public LabTests getLabTestById(Integer id) {
+    public LabTests getLabTestById(Long id) {
         Session session = this.factory.getObject().getCurrentSession();
         return session.get(LabTests.class, id);
     }
@@ -63,7 +63,7 @@ public class LabTestRepositoryImpl implements LabTestRepository{
     }
 
     @Override
-    public void deleteLabTest(Integer id) {
+    public void deleteLabTest(Long id) {
         Session session = this.factory.getObject().getCurrentSession();
         LabTests test = this.getLabTestById(id);
         if (test != null) {

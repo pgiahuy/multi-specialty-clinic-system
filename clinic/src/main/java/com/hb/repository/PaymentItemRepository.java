@@ -4,17 +4,16 @@
  */
 package com.hb.repository;
 
-import com.hb.pojo.LabTests;
+import com.hb.pojo.PaymentItems;
 import java.util.List;
-import java.util.Map;
 
 /**
  *
  * @author DELL
  */
-public interface LabTestRepository {
-    List<LabTests> getLabTests(Map<String, String> params);
-    LabTests getLabTestById(Long id);
-    void addOrUpdateLabTest(LabTests test);
-    void deleteLabTest(Long id);
+public interface PaymentItemRepository {
+    List<PaymentItems> getItemsByPaymentId(Long paymentId);
+    PaymentItems getItemById(Long id);
+    void addOrUpdateItem(PaymentItems item);
+    void deleteItem(Long id);
 }

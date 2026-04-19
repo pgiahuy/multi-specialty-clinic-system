@@ -4,17 +4,14 @@
  */
 package com.hb.service;
 
-import com.hb.pojo.LabTests;
-import java.util.List;
+import com.hb.dto.response.MoMoPaymentResponse;
 import java.util.Map;
 
 /**
  *
  * @author DELL
  */
-public interface LabTestService {
-    List<LabTests> getLabTests(Map<String, String> params);
-    LabTests getLabTestById(Long id);
-    void addOrUpdateLabTest(Map<String, String> params);
-    void deleteLabTest(Long id);
+public interface MomoPaymentService {
+    MoMoPaymentResponse createPayment(String orderId, long amount, String orderInfo) throws Exception;
+    boolean verifySignature(Map<String, String> params) throws Exception;
 }
