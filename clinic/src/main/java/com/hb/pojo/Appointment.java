@@ -57,9 +57,10 @@ public class Appointment implements Serializable {
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
-    @OneToOne(mappedBy = "appointmentId")
+    @OneToOne(mappedBy = "appointment")
     private MedicalRecord medicalRecord;
-    @OneToMany(mappedBy = "appointmentId")
+    
+    @OneToMany(mappedBy = "appointment")
     private Collection<PaymentItems> paymentItemsCollection;
     @JoinColumn(name = "doctor_id", referencedColumnName = "id")
     @ManyToOne

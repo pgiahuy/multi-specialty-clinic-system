@@ -22,6 +22,7 @@ import com.restfb.Version;
 import java.util.Collections;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
@@ -42,8 +43,6 @@ import org.springframework.web.bind.annotation.RestController;
 @PropertySource("classpath:configs.properties")
 public class ApiAuthController {
 
-    @Autowired
-    private Environment env;
 
     @Autowired
     private AuthService authService;
@@ -51,7 +50,9 @@ public class ApiAuthController {
     @Autowired
     private UserService userService;
 
-    private final String CLIENT_ID = env.getProperty("CLIENT_ID", String.class);
+ 
+    @Value("${CLIENT_ID}")
+    private String clientId;
 
     @PostMapping(value = "/register",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -78,7 +79,7 @@ public class ApiAuthController {
         String idTokenString = params.get("token");
 
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
-                .setAudience(Collections.singletonList(CLIENT_ID))
+                .setAudience(Collections.singletonList(clientId))
                 .build();
 
         try {
