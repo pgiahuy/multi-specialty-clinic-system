@@ -48,7 +48,7 @@ public class SocialAccount implements Serializable {
     private String providerId;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @ManyToOne
-    private User userId;
+    private User user;
 
     public SocialAccount() {
     }
@@ -86,12 +86,12 @@ public class SocialAccount implements Serializable {
         this.providerId = providerId;
     }
 
-    public User getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(User userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     @Override
