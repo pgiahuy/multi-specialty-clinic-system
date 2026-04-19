@@ -36,11 +36,12 @@ public class LabTestRepositoryImpl implements LabTestRepository{
         Session session = this.factory.getObject().getCurrentSession();
         Query<LabTests> q = session.createNamedQuery("LabTests.findAll", LabTests.class);
 
-        if (params != null && params.containsKey("page")) {
-            int pageSize = Integer.parseInt(env.getProperty("labtests.page_size", "10"));
+        if (params != null) {
+            int pageSize = env.getProperty("labtests.page_size", Integer.class);
             int page = Integer.parseInt(params.getOrDefault("page", "1"));
+            int start = (page - 1) * pageSize;
             q.setMaxResults(pageSize);
-            q.setFirstResult((page - 1) * pageSize);
+            q.setFirstResult(start);
         }
         return q.getResultList();
     }
