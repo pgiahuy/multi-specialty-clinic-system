@@ -24,14 +24,10 @@ import com.hb.repository.SpecialtyRepository;
 
 @Repository
 @Transactional
-@PropertySource("classpath:configs.properties")
-public class SpecialtyRepositoryImpl implements SpecialtyRepository{
+public class SpecialtyRepositoryImpl extends BaseRepositoryImpl<Specialty> implements SpecialtyRepository{
     
     @Autowired
     private LocalSessionFactoryBean factory;
-    
-    @Autowired
-    private Environment env;
     
 
     @Override
@@ -40,7 +36,7 @@ public class SpecialtyRepositoryImpl implements SpecialtyRepository{
         Query<Specialty> q = session.createNamedQuery("Specialty.findAllWithDoctors",Specialty.class);
         
         if(params!= null){
-            int pageSize = this.env.getProperty("specialties.page_size", Integer.class);
+            int pageSize = Integer.parseInt(params.get("pageSize"));
             System.out.println("===========" );
             System.out.println(pageSize );
             int page = Integer.parseInt( params.getOrDefault("page", "1"));

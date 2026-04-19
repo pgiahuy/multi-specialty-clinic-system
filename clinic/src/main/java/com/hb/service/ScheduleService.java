@@ -17,4 +17,5 @@ public interface ScheduleService {
     Schedules addSchedule(Map<String, String> params);
     Schedules getScheduleById(Long id);
     void deleteSchedule(Long id);
+    long countSchedules(Map<String, String> params);
 }

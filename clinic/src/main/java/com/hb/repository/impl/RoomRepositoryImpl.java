@@ -23,11 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Repository
 @Transactional
-@PropertySource("classpath:configs.properties")
-public class RoomRepositoryImpl implements RoomRepository {
+public class RoomRepositoryImpl extends BaseRepositoryImpl<Rooms> implements RoomRepository {
 
-    @Autowired
-    private Environment env;
 
     @Autowired
     private LocalSessionFactoryBean factory;
@@ -38,7 +35,7 @@ public class RoomRepositoryImpl implements RoomRepository {
         Query<Rooms> q = session.createNamedQuery("Rooms.findAll", Rooms.class);
 
         if (params != null) {
-            int pageSize = env.getProperty("rooms.page_size", Integer.class);
+            int pageSize = Integer.parseInt(params.get("pageSize"));
             int page = Integer.parseInt(params.getOrDefault("page", "1"));
             int start = (page - 1) * pageSize;
             q.setMaxResults(pageSize);

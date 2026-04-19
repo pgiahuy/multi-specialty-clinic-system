@@ -23,13 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Repository
 @Transactional
-@PropertySource("classpath:configs.properties")
-public class LabTestRepositoryImpl implements LabTestRepository{
+public class LabTestRepositoryImpl extends BaseRepositoryImpl<LabTests> implements LabTestRepository{
     @Autowired
     private LocalSessionFactoryBean factory;
-    
-    @Autowired
-    private Environment env;
 
     @Override
     public List<LabTests> getLabTests(Map<String, String> params) {
@@ -37,7 +33,7 @@ public class LabTestRepositoryImpl implements LabTestRepository{
         Query<LabTests> q = session.createNamedQuery("LabTests.findAll", LabTests.class);
 
         if (params != null) {
-            int pageSize = env.getProperty("labtests.page_size", Integer.class);
+            int pageSize = Integer.parseInt(params.get("pageSize"));
             int page = Integer.parseInt(params.getOrDefault("page", "1"));
             int start = (page - 1) * pageSize;
             q.setMaxResults(pageSize);

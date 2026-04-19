@@ -85,4 +85,9 @@ public class AppointmentServiceImpl implements AppointmentService {
 //        return null;
 }
 
+    @Override
+    public long countAppointments(Map<String, String> params) {
+        return appointmentRepo.count(params, Appointment.class);
+    }
+
 }

@@ -58,5 +58,10 @@ public class PatientServiceImpl implements PatientService {
         patientMapper.updateFromRequest(prq, patient);
         patientRepo.updatePatient(patient);
     }
+
+    @Override
+    public long countPatients(Map<String, String> params) {
+        return patientRepo.count(params, Patient.class);
+    }
     
 }

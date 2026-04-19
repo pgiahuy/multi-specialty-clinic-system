@@ -17,4 +17,5 @@ public interface AreasService {
     Areas getAreasById(Long id);
     Areas addArea(Map<String,String> params);
     void deleteAreas(Long id);
+    long countAreas(Map<String,String> params);
 }

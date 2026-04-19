@@ -18,4 +18,5 @@ public interface MedicineService {
     List<Medicine> getMedicines(Map<String, String> params);
     Medicine getMedicineById(Long id);
     void deleteMedicine(Long id);
+    long countMedicines(Map<String, String> params);
 }

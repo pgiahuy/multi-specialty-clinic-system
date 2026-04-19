@@ -10,13 +10,12 @@
 
 <body>
 
-    <div th:replace="base :: header"></div>
+    <div th:replace="base :: header('QUẢN LÝ TÀI KHOẢN')"></div>
 
     <div th:replace="base :: sidebar"></div>
 
     <div class="content">
 
-        <h2 class="mb-4">Quản lý người dùng</h2>
 
 <!--        <form method="post" th:action="@{/admin/users}" enctype="multipart/form-data">
 
@@ -48,7 +47,6 @@
         <table class="table table-bordered table-hover align-middle">
             <thead class="table-primary">
                 <tr>
-                    <th>ID</th>
                     <th>Tên tài khoản</th>
                     <th>Email</th>
                     <th>Vai trò</th>
@@ -59,7 +57,6 @@
 
             <tbody>
                 <tr th:each="u : ${users}">
-                    <td th:text="${u.id}"></td>
                     <td th:text="${u.username}"></td>
                     <td th:text="${u.email}"></td>
                     <td th:text="${u.role}"></td>
@@ -76,11 +73,15 @@
                 </tr>
             </tbody>
         </table>
+    
 
     </div>
-
-    <div th:replace="base :: footer">
-
+    
+    <div class="d-flex justify-content-center mt-1">
+        <div th:replace="~{fragments :: pagination('/admin/users', ${totalPages}, ${currentPage})}"></div>
     </div>
+  
+
+    <div th:replace="base :: footer"></div>
 </body>
 </html>

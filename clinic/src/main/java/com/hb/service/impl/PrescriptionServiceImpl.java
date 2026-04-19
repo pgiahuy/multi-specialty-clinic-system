@@ -168,4 +168,9 @@ public class PrescriptionServiceImpl implements PrescriptionService {
     public void deletePrescription(Long id) {
         this.prescriptionRepo.deletePrescription(id);
     }
+
+    @Override
+    public long countPrescription(Map<String, String> params) {
+        return this.prescriptionRepo.count(params, Prescription.class);
+    }
 }

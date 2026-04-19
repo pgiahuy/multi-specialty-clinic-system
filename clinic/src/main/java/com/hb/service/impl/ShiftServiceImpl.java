@@ -43,5 +43,10 @@ public class ShiftServiceImpl implements ShiftService {
     public void deleteShift(Long id) {
         this.shiftRepo.deleteShift(id);
     }
+
+    @Override
+    public long countShifts(Map<String, String> params) {
+        return shiftRepo.count(params, Shifts.class);
+    }
     
 }

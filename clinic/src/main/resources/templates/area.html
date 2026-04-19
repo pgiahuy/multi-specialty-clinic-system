@@ -12,13 +12,12 @@
 
 <body>
 
-    <div th:replace="base :: header"></div>
+    <div th:replace="base :: header('QUẢN LÝ KHU')"></div>
 
     <div th:replace="base :: sidebar"></div>
 
     <div class="content">
 
-        <h2 class="mb-4">Quản lý Khu</h2>
 
 <!--        <form method="post" th:action="@{/admin/doctors}" enctype="multipart/form-data">
 
@@ -50,7 +49,6 @@
         <table class="table table-bordered table-hover align-middle">
             <thead class="table-primary">
                 <tr>
-                    <th>ID</th>
                     <th>Tên khu</th>
                     <th>Tầng</th>
                     <th></th>
@@ -59,7 +57,6 @@
 
             <tbody>
                 <tr th:each="a : ${areas}">
-                    <td th:text="${a.id}"></td>
                     <td th:text="${a.areaName}"></td>
                     <td th:text="${a.locationFloor}"></td>
                     <td>
@@ -73,6 +70,10 @@
             </tbody>
         </table>
 
+    </div>
+
+    <div class="d-flex justify-content-center mt-4">
+        <div th:replace="~{fragments :: pagination('/admin/areas', ${totalPages}, ${currentPage})}"></div>
     </div>
 
     <div th:replace="base :: footer">

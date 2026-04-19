@@ -17,4 +17,5 @@ public interface ShiftService {
     Shifts addShift(Map<String, String> params);
     Shifts getShiftById(Long id);
     void deleteShift(Long id);
+    long countShifts(Map<String, String> params);
 }

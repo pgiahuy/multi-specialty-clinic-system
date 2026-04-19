@@ -12,13 +12,12 @@
 
 <body>
 
-    <div th:replace="base :: header"></div>
+    <div th:replace="base :: header('QUẢN LÝ XÉT NGHIỆM')"></div>
 
     <div th:replace="base :: sidebar"></div>
 
     <div class="content">
 
-        <h2 class="mb-4">Quản lý xét nghiệm</h2>
 
 <!--        <form method="post" th:action="@{/admin/doctors}" enctype="multipart/form-data">
 
@@ -50,7 +49,6 @@
         <table class="table table-bordered table-hover align-middle">
             <thead class="table-primary">
                 <tr>
-                    <th>ID</th>
                     <th>Loại xét nghiệm</th>
                     <th>Đơn vị</th>
                     <th>Bình thường</th>
@@ -60,7 +58,6 @@
 
             <tbody>
                 <tr th:each="t : ${labTests}">
-                    <td th:text="${t.id}"></td>
                     <td th:text="${t.testName}"></td>
                     <td th:text="${t.unit}"></td>
                     <td th:text="${t.normalRange}"></td>
@@ -77,8 +74,13 @@
 
     </div>
 
+    <div class="d-flex justify-content-center mt-4">
+        <div th:replace="~{fragments :: pagination('/admin/lab-tests', ${totalPages}, ${currentPage})}"></div>
+    </div>
+
     <div th:replace="base :: footer">
 
     </div>
+    
 </body>
 </html>

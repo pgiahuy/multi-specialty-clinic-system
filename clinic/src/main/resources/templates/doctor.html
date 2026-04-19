@@ -12,38 +12,11 @@
 
 <body>
 
-    <div th:replace="base :: header"></div>
+    <div th:replace="base :: header('QUẢN LÝ BÁC SĨ')"></div>
 
     <div th:replace="base :: sidebar"></div>
 
     <div class="content">
-
-        <h2 class="mb-4">Quản lý Bác sĩ</h2>
-
-<!--        <form method="post" th:action="@{/admin/doctors}" enctype="multipart/form-data">
-
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" name="username" class="form-control" id="username">
-            </div>
-
-            <div class="form-group">
-                <label for="email">Email address:</label>
-                <input type="email" name="email" class="form-control" id="email">
-            </div>
-
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" name="password" class="form-control" id="password">
-            </div>
-
-            <div class="form-group">
-                <label for="avatar">Avatar</label>
-                <input type="file" name="avatar" class="form-control mb-2">
-            </div>
-
-            <button type="submit" class="btn btn-primary mb-3">Submit</button>
-        </form>-->
 
 
 
@@ -80,9 +53,11 @@
         </table>
 
     </div>
-
-    <div th:replace="base :: footer">
-
+    
+    <div class="d-flex justify-content-center mt-4">
+        <div th:replace="~{fragments :: pagination('/admin/doctors', ${totalPages}, ${currentPage})}"></div>
     </div>
+
+    <div th:replace="base :: footer"></div>
 </body>
 </html>

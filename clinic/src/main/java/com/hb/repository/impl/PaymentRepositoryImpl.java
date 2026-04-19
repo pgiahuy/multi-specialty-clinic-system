@@ -25,11 +25,9 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Repository
 @Transactional
-@PropertySource("classpath:configs.properties")
 public class PaymentRepositoryImpl implements PaymentRepository {
 
-    @Autowired
-    private Environment env;
+  
 
     @Autowired
     private LocalSessionFactoryBean factory;
@@ -56,7 +54,7 @@ public class PaymentRepositoryImpl implements PaymentRepository {
         Query<Payment> q = session.createNamedQuery("Payment.findAll", Payment.class);
 
         if (params != null) {
-            int pageSize = this.env.getProperty("payments.page_size", Integer.class, 1);
+            int pageSize = Integer.parseInt(params.get("pageSize"));
             int page = Integer.parseInt(params.getOrDefault("page", "1"));
             int start = (page - 1) * pageSize;
             q.setMaxResults(pageSize);
