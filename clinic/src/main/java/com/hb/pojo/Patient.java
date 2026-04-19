@@ -60,11 +60,9 @@ public class Patient implements Serializable {
     private String fullName;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @OneToOne
-    @JsonIgnore
-    private User userId;
+    private User user;
 
     @OneToMany(mappedBy = "patient")
-    @JsonIgnore
     private Collection<Appointment> appointmentCollection;
 
     public Patient() {
@@ -114,12 +112,12 @@ public class Patient implements Serializable {
         this.fullName = fullName;
     }
 
-    public User getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(User userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public Collection<Appointment> getAppointmentCollection() {
