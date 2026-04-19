@@ -10,19 +10,13 @@ import com.hb.pojo.Patient;
 import com.hb.pojo.User;
 import com.hb.repository.PatientRepository;
 import com.hb.service.PatientService;
-import java.io.Serial;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.util.Date;
+
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  *

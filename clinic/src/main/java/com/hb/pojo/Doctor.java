@@ -53,7 +53,7 @@ public class Doctor implements Serializable {
     private String gender;
     @OneToMany(mappedBy = "idHod")
     private Collection<Specialty> specialtyCollection;
-    @OneToMany(mappedBy = "doctorId")
+    @OneToMany(mappedBy = "doctor")
     private Collection<Appointment> appointmentCollection;
     @JoinColumn(name = "id_specailty", referencedColumnName = "id")
     @ManyToOne(optional = false)
@@ -61,7 +61,7 @@ public class Doctor implements Serializable {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @OneToOne
     private User user;
-    @OneToMany(mappedBy = "doctorId")
+    @OneToMany(mappedBy = "doctor")
     private Collection<Schedules> schedulesCollection;
 
     public Doctor() {
