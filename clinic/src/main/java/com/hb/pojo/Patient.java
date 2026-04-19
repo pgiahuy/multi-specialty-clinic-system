@@ -76,7 +76,7 @@ public class Patient implements Serializable {
     @Size(max = 20)
     @Column(name = "phone")
     private String phone;
-    @OneToMany(mappedBy = "patientId")
+    @OneToMany(mappedBy = "patient")
     private Collection<Appointment> appointmentCollection;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @OneToOne
