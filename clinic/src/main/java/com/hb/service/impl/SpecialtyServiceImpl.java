@@ -67,4 +67,9 @@ public class SpecialtyServiceImpl implements SpecialtyService {
         this.doctorRepo.deleteDoctor(id);
     }
 
+    @Override
+    public long countSpecialties(Map<String, String> params) {
+        return specialtieRepo.count(params, Specialty.class);
+    }
+
 }

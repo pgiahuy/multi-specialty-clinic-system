@@ -10,6 +10,7 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.hb.dto.request.PatientCreateRequest;
 import com.hb.dto.request.UserCreateRequest;
+import com.hb.dto.request.UserLogin;
 import com.hb.enums.AuthProvider;
 import com.hb.pojo.User;
 import com.hb.service.AuthService;
@@ -62,7 +63,7 @@ public class ApiAuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody User u) {
+    public ResponseEntity<?> login(@RequestBody UserLogin u) {
         if (this.authService.authenticate(u.getUsername(), u.getPassword())) {
             try {
                 String token = JwtUtils.generateToken(u.getUsername());

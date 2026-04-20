@@ -5,6 +5,7 @@
 package com.hb.pojo;
 
 import jakarta.persistence.Basic;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,10 +15,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 
 /**
@@ -47,9 +50,11 @@ public class Schedules implements Serializable {
     private Integer maxPatients;
     @Column(name = "current_patients")
     private Integer currentPatients;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "scheduleId")
+    private Collection<Appointment> appointmentCollection;
     @JoinColumn(name = "doctor_id", referencedColumnName = "id")
     @ManyToOne
-    private Doctor doctor;
+    private Doctor doctorId;
     @JoinColumn(name = "room_id", referencedColumnName = "id")
     @ManyToOne
     private Rooms roomId;
@@ -96,12 +101,20 @@ public class Schedules implements Serializable {
         this.currentPatients = currentPatients;
     }
 
-    public Doctor getDoctor() {
-        return doctor;
+    public Collection<Appointment> getAppointmentCollection() {
+        return appointmentCollection;
     }
 
-    public void setDoctor(Doctor doctor) {
-        this.doctor = doctor;
+    public void setAppointmentCollection(Collection<Appointment> appointmentCollection) {
+        this.appointmentCollection = appointmentCollection;
+    }
+
+    public Doctor getDoctorId() {
+        return doctorId;
+    }
+
+    public void setDoctorId(Doctor doctorId) {
+        this.doctorId = doctorId;
     }
 
     public Rooms getRoomId() {

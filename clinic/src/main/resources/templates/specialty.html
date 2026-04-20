@@ -4,67 +4,40 @@
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
     <head>
-        <title>Quản lý Bác sĩ</title>
+        <title>Quản lý Chuyên khoa</title>
 
     <th:block th:replace="base :: css"></th:block>
     <th:block th:replace="base :: js"></th:block>
-    <script th:src="@{/js/doctor.js}"></script>
+    <script th:src="@{/js/specialty.js}"></script>
 </head>
 
 <body>
 
-    <div th:replace="base :: header"></div>
+    <div th:replace="base :: header('QUẢN LÝ CHUYÊN KHOA')"></div>
 
     <div th:replace="base :: sidebar"></div>
 
     <div class="content">
-
-        <h2 class="mb-4">Quản lý Bác sĩ</h2>
-
-<!--        <form method="post" th:action="@{/admin/doctors}" enctype="multipart/form-data">
-
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" name="username" class="form-control" id="username">
-            </div>
-
-            <div class="form-group">
-                <label for="email">Email address:</label>
-                <input type="email" name="email" class="form-control" id="email">
-            </div>
-
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" name="password" class="form-control" id="password">
-            </div>
-
-            <div class="form-group">
-                <label for="avatar">Avatar</label>
-                <input type="file" name="avatar" class="form-control mb-2">
-            </div>
-
-            <button type="submit" class="btn btn-primary mb-3">Submit</button>
-        </form>-->
 
 
 
         <table class="table table-bordered table-hover align-middle">
             <thead class="table-primary">
                 <tr>
-                    <th>ID</th>
-                    <th>Họ tên</th>
-                    <th>Chuyên khoa</th>
-                    <th>Thông tin</th>
+                    <th>Khoa</th>
+                    <th>Giá khám</th>
+                    <th>Trưởng khoa</th>
+                    <th>Số lượng Bác sĩ</th>
                     <th></th>
                 </tr>
             </thead>
 
             <tbody>
-                <tr th:each="d : ${doctors}">
-                    <td th:text="${d.id}"></td>
-                    <td th:text="${d.fullName}"></td>
-                    <td th:text="${d.idSpecailty}"></td>
-                    <td th:text="${d.description}"></td>
+                <tr th:each="d : ${specialties}">
+                    <td th:text="${d.name}"></td>
+                    <td th:text="${d.price}"></td>
+                    <td th:text="${d.idHod.fullName}"></td>
+                    <td th:text="${#lists.size(d.doctorCollection)}"></td>
            
                     <td>
                         <button class="btn btn-warning btn-sm">Sửa</button>
@@ -77,6 +50,10 @@
             </tbody>
         </table>
 
+    </div>
+
+    <div class="d-flex justify-content-center mt-4">
+        <div th:replace="~{fragments :: pagination('/admin/specialties', ${totalPages}, ${currentPage})}"></div>
     </div>
 
     <div th:replace="base :: footer">

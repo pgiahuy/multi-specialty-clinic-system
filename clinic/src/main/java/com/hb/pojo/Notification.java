@@ -52,7 +52,7 @@ public class Notification implements Serializable {
     private Date createdAt;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @ManyToOne
-    private User user;
+    private User userId;
 
     public Notification() {
     }
@@ -93,12 +93,12 @@ public class Notification implements Serializable {
         this.createdAt = createdAt;
     }
 
-    public User getUser() {
-        return user;
+    public User getUserId() {
+        return userId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUserId(User userId) {
+        this.userId = userId;
     }
 
     @Override

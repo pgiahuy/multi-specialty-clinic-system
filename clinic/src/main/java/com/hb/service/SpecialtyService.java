@@ -17,4 +17,5 @@ public interface SpecialtyService {
     Specialty getSpecialtieById(Long id);
     Specialty addSpecialtie(Map<String, String> params);
     void deleteDoctor(Long id);
+    long countSpecialties(Map<String,String> params);
 }

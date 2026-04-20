@@ -8,6 +8,8 @@ import com.hb.dto.request.UserCreateRequest;
 import com.hb.service.UserService;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,16 +27,29 @@ import org.springframework.web.bind.annotation.RequestParam;
  */
 @Controller
 @RequestMapping("/admin")
+@PropertySource("classpath:configs.properties")
 public class UserController {
+    
+    @Autowired
+    private Environment env;
 
     @Autowired
     private UserService userService;
-    
-    
 
     @GetMapping("/users")
-    public String createView(Model model, @RequestParam Map<String, String> params) {
+    public String list(Model model, @RequestParam Map<String, String> params) {
+        int page = params.containsKey("page") ? Integer.parseInt(params.get("page")) : 1;
+        int pageSize = this.env.getProperty("admin.page_size", Integer.class);
+        params.put("pageSize", String.valueOf(pageSize));
+        
         model.addAttribute("users", userService.getUsers(params));
+
+        long totalUsers = userService.countUsers(params);
+        int totalPages = (int) Math.ceil((double) totalUsers / pageSize);
+
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("currentPage", page);
+
         return "user";
     }
 
@@ -51,6 +66,5 @@ public class UserController {
         userService.deleteUser(id);
         return "redirect:/admin/users";
     }
-    
-    
+
 }

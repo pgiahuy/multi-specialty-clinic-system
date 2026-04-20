@@ -18,4 +18,5 @@ public interface PrescriptionService {
     List<Prescription> getPrescriptions(Map<String, String> params);
     Prescription getPrescriptionById(Long id);
     void deletePrescription(Long id);
+    long countPrescription(Map<String,String> params);
 }

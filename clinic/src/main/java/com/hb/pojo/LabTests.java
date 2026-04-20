@@ -30,7 +30,8 @@ import java.util.Collection;
     @NamedQuery(name = "LabTests.findById", query = "SELECT l FROM LabTests l WHERE l.id = :id"),
     @NamedQuery(name = "LabTests.findByTestName", query = "SELECT l FROM LabTests l WHERE l.testName = :testName"),
     @NamedQuery(name = "LabTests.findByUnit", query = "SELECT l FROM LabTests l WHERE l.unit = :unit"),
-    @NamedQuery(name = "LabTests.findByNormalRange", query = "SELECT l FROM LabTests l WHERE l.normalRange = :normalRange")})
+    @NamedQuery(name = "LabTests.findByNormalRange", query = "SELECT l FROM LabTests l WHERE l.normalRange = :normalRange"),
+    @NamedQuery(name = "LabTests.findByPrice", query = "SELECT l FROM LabTests l WHERE l.price = :price")})
 public class LabTests implements Serializable {
 
     private static long serialVersionUID = 1L;
@@ -48,8 +49,11 @@ public class LabTests implements Serializable {
     @Size(max = 100)
     @Column(name = "normal_range")
     private String normalRange;
+    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "price")
     private BigDecimal price;
+    @OneToMany(mappedBy = "labTestId")
+    private Collection<PaymentItems> paymentItemsCollection;
     @OneToMany(mappedBy = "testId")
     private Collection<LabResults> labResultsCollection;
     @OneToMany(mappedBy = "labTest")
@@ -92,6 +96,22 @@ public class LabTests implements Serializable {
 
     public void setNormalRange(String normalRange) {
         this.normalRange = normalRange;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public Collection<PaymentItems> getPaymentItemsCollection() {
+        return paymentItemsCollection;
+    }
+
+    public void setPaymentItemsCollection(Collection<PaymentItems> paymentItemsCollection) {
+        this.paymentItemsCollection = paymentItemsCollection;
     }
 
     public Collection<LabResults> getLabResultsCollection() {

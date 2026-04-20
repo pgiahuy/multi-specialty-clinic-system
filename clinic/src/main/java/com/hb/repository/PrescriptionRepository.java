@@ -14,7 +14,7 @@ import java.util.Optional;
  *
  * @author HUY
  */
-public interface PrescriptionRepository {
+public interface PrescriptionRepository extends BaseRepository<Prescription>{
     List<Prescription> getPrescriptions(Map<String,String> params);
     Prescription addPrescription(Prescription m);
     Prescription getPrescriptionById(Long id);

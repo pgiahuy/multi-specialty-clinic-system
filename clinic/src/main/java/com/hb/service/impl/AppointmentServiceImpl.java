@@ -11,9 +11,11 @@ import com.hb.mapper.AppointmentMapper;
 import com.hb.pojo.Appointment;
 import com.hb.pojo.Doctor;
 import com.hb.pojo.Patient;
+import com.hb.pojo.Schedules;
 import com.hb.repository.AppointmentRepository;
 import com.hb.repository.DoctorRepository;
 import com.hb.repository.PatientRepository;
+import com.hb.repository.ScheduleRepository;
 import com.hb.service.AppointmentService;
 import java.util.Date;
 import java.util.List;
@@ -32,6 +34,9 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Autowired
     private AppointmentRepository appointmentRepo;
 
+    @Autowired
+    private ScheduleRepository scheduleRepo;
+    
     @Autowired
     private DoctorRepository doctorRepo;
 
@@ -60,29 +65,38 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         Appointment a = new Appointment();
 
-        Date date = req.getDate();
-        String timeSlot = req.getTimeSlot();
-
-        Doctor doctor = doctorRepo.getDoctorById(req.getDoctorId());
-        if (doctor == null){
-            throw new ResourceNotFoundException("Doctor not found!");
-        }
+      
         Patient patient = patientRepo.getPatientById(req.getPatientId());
         if (patient == null){
             throw new ResourceNotFoundException("Patient not found!");
         }
+        Schedules schedule = scheduleRepo.getScheduleById(req.getScheduleId());
+        if (schedule == null){
+            throw new ResourceNotFoundException("Schedule not found!");
+        }
         
-        a.setDoctor(doctor);
-        a.setPatient(patient);
-        
-        a.setDate(date);
-        a.setTimeSlot(timeSlot);
-        a.setStatus("PENDING");
-        a.setCreatedAt(new Date());
 
-        Appointment appointment =  appointmentRepo.addAppointment(a);
-        return appointmentMapper.toResponse(appointment);
-//        return null;
+        if (schedule.getCurrentPatients() >= schedule.getMaxPatients()) {
+            throw new RuntimeException("Rất tiếc, ca khám này đã đủ số lượng người đăng ký!");
+        }
+
+        schedule.setCurrentPatients(schedule.getCurrentPatients() + 1);
+        scheduleRepo.addSchedule(schedule);
+
+
+        Appointment appointment = appointmentMapper.toEntity(req, patient, schedule);
+
+
+        Appointment savedApp = appointmentRepo.addAppointment(appointment);
+
+
+        return appointmentMapper.toResponse(savedApp);
+        
 }
+
+    @Override
+    public long countAppointments(Map<String, String> params) {
+        return appointmentRepo.count(params, Appointment.class);
+    }
 
 }

@@ -1,24 +1,26 @@
+
+
+
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
     <head>
-        <title>Quản lý người dùng</title>
+        <title>Quản lý Bệnh nhân</title>
 
     <th:block th:replace="base :: css"></th:block>
     <th:block th:replace="base :: js"></th:block>
-    <script th:src="@{/js/user.js}"></script>
+    <script th:src="@{/js/patient.js}"></script>
 </head>
 
 <body>
 
-    <div th:replace="base :: header"></div>
+    <div th:replace="base :: header('QUẢN LÝ BỆNH NHÂN')"></div>
 
     <div th:replace="base :: sidebar"></div>
 
     <div class="content">
 
-        <h2 class="mb-4">Quản lý người dùng</h2>
 
-<!--        <form method="post" th:action="@{/admin/users}" enctype="multipart/form-data">
+<!--        <form method="post" th:action="@{/admin/doctors}" enctype="multipart/form-data">
 
             <div class="form-group">
                 <label for="username">Username</label>
@@ -48,28 +50,31 @@
         <table class="table table-bordered table-hover align-middle">
             <thead class="table-primary">
                 <tr>
-                    <th>ID</th>
-                    <th>Tên tài khoản</th>
-                    <th>Email</th>
-                    <th>Vai trò</th>
-                    <th>Avatar</th>
-                    <th>Hành động</th>
+                    <th>Họ tên</th>
+                    <th>CCCD</th>
+                    <th>SĐT</th>
+                    <th>Giới tính</th>
+                    <th>Ngày sinh</th>
+                    <th>Địa chỉ</th>
+                    <th>Tài khoản</th>
+                    <th></th>
                 </tr>
             </thead>
 
             <tbody>
-                <tr th:each="u : ${users}">
-                    <td th:text="${u.id}"></td>
-                    <td th:text="${u.username}"></td>
-                    <td th:text="${u.email}"></td>
-                    <td th:text="${u.role}"></td>
-                    <td>
-                        <img th:src="${u.secureUrl}" alt="avatar" width="50" height="50"/>
-                    </td>
+                <tr th:each="d : ${patients}">
+                    <td th:text="${d.fullName}"></td>
+                    <td th:text="${d.cccd}"></td>
+                    <td th:text="${d.phone}"></td>
+                    <td th:text="${d.gender}"></td>
+                    <td th:text="${d.dob}"></td>
+                    <td th:text="${d.address}"></td>
+                    <td th:text="${d.user.username}"></td>
+           
                     <td>
                         <button class="btn btn-warning btn-sm">Sửa</button>
                         <button class="btn btn-danger btn-sm"
-                                th:onclick="'deleteUser(' + ${u.id} + ')'">
+                                th:onclick="'deleteDoctor(' + ${d.id} + ')'">
                             Xóa
                         </button>
                     </td>
@@ -77,6 +82,10 @@
             </tbody>
         </table>
 
+    </div>
+
+    <div class="d-flex justify-content-center mt-4">
+        <div th:replace="~{fragments :: pagination('/admin/patients', ${totalPages}, ${currentPage})}"></div>
     </div>
 
     <div th:replace="base :: footer">

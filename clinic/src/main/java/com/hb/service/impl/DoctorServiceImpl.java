@@ -45,7 +45,7 @@ public class DoctorServiceImpl implements DoctorService {
             if (u == null) {
                 throw new ResourceNotFoundException("User not found");
             }
-            d.setUser(u);
+            d.setUserId(u);
         } else {
             throw new RuntimeException("Missing username");
         }
@@ -82,6 +82,11 @@ public class DoctorServiceImpl implements DoctorService {
     @Override
     public void deleteDoctor(Long id) {
         this.doctorRepo.deleteDoctor(id);
+    }
+
+    @Override
+    public long countDoctors(Map<String, String> params) {
+        return doctorRepo.count(params, Doctor.class);
     }
 
 }
