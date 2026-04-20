@@ -44,7 +44,7 @@ import java.util.Date;
     @NamedQuery(name = "Payment.findByCreatedAt", query = "SELECT p FROM Payment p WHERE p.createdAt = :createdAt")})
 public class Payment implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
@@ -57,6 +57,10 @@ public class Payment implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
     @Enumerated(EnumType.STRING)
+    
+    @Size(max = 100)
+    @Column(name = "transaction_id")
+    private String transactionId;
 
     @Column(name = "method")
     private PaymentMethod method;
@@ -64,9 +68,7 @@ public class Payment implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private String status;
-    @Column(name = "created_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt;
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "paymentId")
     private Collection<PaymentItems> paymentItemsCollection;
     @JoinColumn(name = "patient_id", referencedColumnName = "id")
@@ -76,103 +78,46 @@ public class Payment implements Serializable {
     public Payment() {
     }
 
-    public Payment(Long id) {
-        this.id = id;
+    /**
+     * @return the serialVersionUID
+     */
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
     }
 
+    /**
+     * @param aSerialVersionUID the serialVersionUID to set
+     */
+    public static void setSerialVersionUID(long aSerialVersionUID) {
+        serialVersionUID = aSerialVersionUID;
+    }
+
+    /**
+     * @return the id
+     */
     public Long getId() {
         return id;
     }
 
+    /**
+     * @param id the id to set
+     */
     public void setId(Long id) {
         this.id = id;
     }
 
+    /**
+     * @return the totalAmount
+     */
     public BigDecimal getTotalAmount() {
         return totalAmount;
     }
 
+    /**
+     * @param totalAmount the totalAmount to set
+     */
     public void setTotalAmount(BigDecimal totalAmount) {
         this.totalAmount = totalAmount;
-    }
-
-    public PaymentMethod getMethod() {
-        return method;
-    }
-
-    public void setMethod(PaymentMethod method) {
-        this.method = method;
-    }
-
-    public PaymentStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(PaymentStatus status) {
-        this.status = status;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Collection<PaymentItems> getPaymentItemsCollection() {
-        return paymentItemsCollection;
-    }
-
-    public void setPaymentItemsCollection(Collection<PaymentItems> paymentItemsCollection) {
-        this.paymentItemsCollection = paymentItemsCollection;
-    }
-
-    public Patient getPatientId() {
-        return patientId;
-    }
-
-    public void setPatientId(Patient patientId) {
-        this.patientId = patientId;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Payment)) {
-            return false;
-        }
-        Payment other = (Payment) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "com.hb.pojo.Payment[ id=" + id + " ]";
-    }
-
-    /**
-     * @return the patient
-     */
-    public Patient getPatient() {
-        return patient;
-    }
-
-    /**
-     * @param patient the patient to set
-     */
-    public void setPatient(Patient patient) {
-        this.patient = patient;
     }
 
     /**
@@ -190,6 +135,62 @@ public class Payment implements Serializable {
     }
 
     /**
+     * @return the method
+     */
+    public PaymentMethod getMethod() {
+        return method;
+    }
+
+    /**
+     * @param method the method to set
+     */
+    public void setMethod(PaymentMethod method) {
+        this.method = method;
+    }
+
+    /**
+     * @return the status
+     */
+    public String getStatus() {
+        return status;
+    }
+
+    /**
+     * @param status the status to set
+     */
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    /**
+     * @return the paymentItemsCollection
+     */
+    public Collection<PaymentItems> getPaymentItemsCollection() {
+        return paymentItemsCollection;
+    }
+
+    /**
+     * @param paymentItemsCollection the paymentItemsCollection to set
+     */
+    public void setPaymentItemsCollection(Collection<PaymentItems> paymentItemsCollection) {
+        this.paymentItemsCollection = paymentItemsCollection;
+    }
+
+    /**
+     * @return the patientId
+     */
+    public Patient getPatientId() {
+        return patientId;
+    }
+
+    /**
+     * @param patientId the patientId to set
+     */
+    public void setPatientId(Patient patientId) {
+        this.patientId = patientId;
+    }
+
+    /**
      * @return the transactionId
      */
     public String getTransactionId() {
@@ -203,4 +204,6 @@ public class Payment implements Serializable {
         this.transactionId = transactionId;
     }
 
+    
+    
 }
