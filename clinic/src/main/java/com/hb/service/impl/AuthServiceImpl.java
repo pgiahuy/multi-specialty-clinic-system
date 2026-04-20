@@ -27,16 +27,12 @@ public class AuthServiceImpl implements AuthService {
     private UserService userService;
 
     @Autowired
-    private PatientService patientService;
-    
-    @Autowired
     private UserRepository userRepo;
     
     @Override
     @Transactional
-    public void registerPatient(UserCreateRequest urq, PatientCreateRequest prq) {
+    public void registerPatient(UserCreateRequest urq) {
         User u = userService.addUser(urq);     
-        patientService.addPatient(prq, u);    
     }
 
     @Override
