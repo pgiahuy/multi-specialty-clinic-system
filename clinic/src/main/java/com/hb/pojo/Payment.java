@@ -4,10 +4,14 @@
  */
 package com.hb.pojo;
 
+import com.hb.enums.PaymentMethod;
+import com.hb.enums.PaymentStatus;
 import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -49,10 +53,15 @@ public class Payment implements Serializable {
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "total_amount")
     private BigDecimal totalAmount;
-    @Size(max = 5)
+    @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
+    @Enumerated(EnumType.STRING)
+
     @Column(name = "method")
-    private String method;
-    @Size(max = 7)
+    private PaymentMethod method;
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private String status;
     @Column(name = "created_at")
@@ -87,19 +96,19 @@ public class Payment implements Serializable {
         this.totalAmount = totalAmount;
     }
 
-    public String getMethod() {
+    public PaymentMethod getMethod() {
         return method;
     }
 
-    public void setMethod(String method) {
+    public void setMethod(PaymentMethod method) {
         this.method = method;
     }
 
-    public String getStatus() {
+    public PaymentStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(PaymentStatus status) {
         this.status = status;
     }
 
@@ -151,5 +160,47 @@ public class Payment implements Serializable {
     public String toString() {
         return "com.hb.pojo.Payment[ id=" + id + " ]";
     }
-    
+
+    /**
+     * @return the patient
+     */
+    public Patient getPatient() {
+        return patient;
+    }
+
+    /**
+     * @param patient the patient to set
+     */
+    public void setPatient(Patient patient) {
+        this.patient = patient;
+    }
+
+    /**
+     * @return the createdAt
+     */
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    /**
+     * @param createdAt the createdAt to set
+     */
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    /**
+     * @return the transactionId
+     */
+    public String getTransactionId() {
+        return transactionId;
+    }
+
+    /**
+     * @param transactionId the transactionId to set
+     */
+    public void setTransactionId(String transactionId) {
+        this.transactionId = transactionId;
+    }
+
 }

@@ -4,6 +4,8 @@
  */
 package com.hb.repository.impl;
 
+import com.hb.enums.PaymentMethod;
+import com.hb.enums.PaymentStatus;
 import com.hb.pojo.Payment;
 import com.hb.pojo.PrescriptionItem;
 import com.hb.repository.PaymentRepository;
@@ -87,6 +89,44 @@ public class PaymentRepositoryImpl implements PaymentRepository {
             session.remove(p);
         } else {
             throw new RuntimeException("Payment not found!");
+        }
+    }
+
+    @Override
+    public void updatePayment(Payment p) {
+        Session session = this.factory.getObject().getCurrentSession();
+        session.merge(p);
+    }
+
+    @Override
+    public Payment getPaymentByOrderId(String orderId) {
+        Session session = this.factory.getObject().getCurrentSession();
+        return session.createQuery(
+                "FROM Payment p WHERE p.orderId = :orderId", Payment.class)
+                .setParameter("orderId", orderId)
+                .uniqueResult();
+    }
+    
+    @Override
+    public void updatePaymentStatus(Long paymentId, PaymentStatus status,PaymentMethod method ) {
+        Session s = this.factory.getObject().getCurrentSession();
+        Payment p = this.getPaymentById(paymentId);
+        if (p != null) {
+            p.setStatus(status);
+            p.setMethod(method);
+            s.merge(p);
+        }
+    }
+    
+    @Override
+    public void addOrUpdatePayment(Payment p) {
+        Session s = this.factory.getObject().getCurrentSession();
+        if (p.getId() != null && p.getId() > 0) {
+            // Nếu đã có ID thì cập nhật (ví dụ cập nhật tổng tiền sau khi thêm items)
+            s.merge(p);
+        } else {
+            // Nếu chưa có ID thì tạo mới hoàn toàn
+            s.persist(p);
         }
     }
 }

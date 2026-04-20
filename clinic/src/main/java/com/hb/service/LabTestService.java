@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public interface LabTestService {
     List<LabTests> getLabTests(Map<String, String> params);
-    LabTests getLabTestById(Integer id);
+    LabTests getLabTestById(Long id);
     void addOrUpdateLabTest(Map<String, String> params);
     void deleteLabTest(Integer id);
     long countLabTests(Map<String, String> params);
