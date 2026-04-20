@@ -13,12 +13,16 @@ import com.hb.service.PatientService;
 import com.hb.service.UserService;
 import java.security.Principal;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,6 +43,14 @@ public class ApiPatientController {
 
     @Autowired
     private UserService userService;
+    
+    
+    @PostMapping
+    public ResponseEntity<PatientResponse> create(@RequestBody PatientCreateRequest req ,Principal principal){
+        User u = this.userService.getUserByUsername(principal.getName());
+        PatientResponse p = patientService.addPatient(req, u);
+        return ResponseEntity.status(HttpStatus.CREATED).body(p);
+    }
 
     @PutMapping(value = "/secure/profile/{id}",
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -56,7 +68,6 @@ public class ApiPatientController {
     public ResponseEntity<PatientResponse> getProfile(Principal principal) {
         User u = this.userService.getUserByUsername(principal.getName());
         Patient p = u.getPatient();
-
        
         return ResponseEntity.ok(patientMapper.toResponse(p));
     }
