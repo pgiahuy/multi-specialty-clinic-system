@@ -12,6 +12,7 @@ import java.util.Date;
  * @author DELL
  */
 public class PatientResponse {
+    private Long id;
     private String cccd;
     private String fullName;
     private String phone;
@@ -23,10 +24,9 @@ public class PatientResponse {
 
     public PatientResponse() {
     }
-    
-    
-    
-    public PatientResponse(String cccd, String fullName, String phone, Date dob, String email,String address, String avatar) {
+
+    public PatientResponse(Long id, String cccd, String fullName, String phone, Date dob, String email, String address, String avatar) {
+        this.id = id;
         this.cccd = cccd;
         this.fullName = fullName;
         this.phone = phone;
@@ -34,7 +34,34 @@ public class PatientResponse {
         this.email = email;
         this.address = address;
         this.avatar = avatar;
-        
+    }
+
+    /**
+     * @return the id
+     */
+    public Long getId() {
+        return id;
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    /**
+     * @return the cccd
+     */
+    public String getCccd() {
+        return cccd;
+    }
+
+    /**
+     * @param cccd the cccd to set
+     */
+    public void setCccd(String cccd) {
+        this.cccd = cccd;
     }
 
     /**
@@ -94,34 +121,6 @@ public class PatientResponse {
     }
 
     /**
-     * @return the avatar
-     */
-    public String getAvatar() {
-        return avatar;
-    }
-
-    /**
-     * @param avatar the avatar to set
-     */
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
-
-    /**
-     * @return the cccd
-     */
-    public String getCccd() {
-        return cccd;
-    }
-
-    /**
-     * @param cccd the cccd to set
-     */
-    public void setCccd(String cccd) {
-        this.cccd = cccd;
-    }
-
-    /**
      * @return the address
      */
     public String getAddress() {
@@ -134,7 +133,21 @@ public class PatientResponse {
     public void setAddress(String address) {
         this.address = address;
     }
-    
 
+    /**
+     * @return the avatar
+     */
+    public String getAvatar() {
+        return avatar;
+    }
+
+    /**
+     * @param avatar the avatar to set
+     */
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+    
+    
     
 }

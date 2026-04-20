@@ -53,15 +53,13 @@ public class Doctor implements Serializable {
     private String gender;
     @OneToMany(mappedBy = "idHod")
     private Collection<Specialty> specialtyCollection;
-    @OneToMany(mappedBy = "doctor")
-    private Collection<Appointment> appointmentCollection;
     @JoinColumn(name = "id_specailty", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Specialty idSpecailty;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @OneToOne
-    private User user;
-    @OneToMany(mappedBy = "doctor")
+    private User userId;
+    @OneToMany(mappedBy = "doctorId")
     private Collection<Schedules> schedulesCollection;
 
     public Doctor() {
@@ -111,14 +109,6 @@ public class Doctor implements Serializable {
         this.specialtyCollection = specialtyCollection;
     }
 
-    public Collection<Appointment> getAppointmentCollection() {
-        return appointmentCollection;
-    }
-
-    public void setAppointmentCollection(Collection<Appointment> appointmentCollection) {
-        this.appointmentCollection = appointmentCollection;
-    }
-
     public Specialty getIdSpecailty() {
         return idSpecailty;
     }
@@ -127,12 +117,12 @@ public class Doctor implements Serializable {
         this.idSpecailty = idSpecailty;
     }
 
-    public User getUser() {
-        return user;
+    public User getUserId() {
+        return userId;
     }
 
-    public void setUser(User user) {
-        this.user= user;
+    public void setUserId(User userId) {
+        this.userId = userId;
     }
 
     public Collection<Schedules> getSchedulesCollection() {
