@@ -112,7 +112,7 @@ public class PaymentRepositoryImpl implements PaymentRepository {
         Session s = this.factory.getObject().getCurrentSession();
         Payment p = this.getPaymentById(paymentId);
         if (p != null) {
-            p.setStatus(status);
+            p.setStatus(status.name());
             p.setMethod(method);
             s.merge(p);
         }

@@ -41,7 +41,7 @@ import java.util.Date;
     @NamedQuery(name = "PaymentItems.findByStatus", query = "SELECT p FROM PaymentItems p WHERE p.status = :status")})
 public class PaymentItems implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
@@ -86,86 +86,60 @@ public class PaymentItems implements Serializable {
         this.amount = amount;
     }
 
+    /**
+     * @return the serialVersionUID
+     */
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+    /**
+     * @param aSerialVersionUID the serialVersionUID to set
+     */
+    public static void setSerialVersionUID(long aSerialVersionUID) {
+        serialVersionUID = aSerialVersionUID;
+    }
+
+    /**
+     * @return the id
+     */
     public Long getId() {
         return id;
     }
 
+    /**
+     * @param id the id to set
+     */
     public void setId(Long id) {
         this.id = id;
     }
 
+    /**
+     * @return the itemType
+     */
     public String getItemType() {
         return itemType;
     }
 
+    /**
+     * @param itemType the itemType to set
+     */
     public void setItemType(String itemType) {
         this.itemType = itemType;
     }
 
+    /**
+     * @return the amount
+     */
     public BigDecimal getAmount() {
         return amount;
     }
 
+    /**
+     * @param amount the amount to set
+     */
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
-    }
-   
-
-    public Appointment getAppointmentId() {
-        return appointmentId;
-    }
-
-    public void setAppointmentId(Appointment appointmentId) {
-        this.appointmentId = appointmentId;
-    }
-
-    public LabTests getLabTestId() {
-        return labTestId;
-    }
-
-    public void setLabTestId(LabTests labTestId) {
-        this.labTestId = labTestId;
-    }
-
-    public Payment getPaymentId() {
-        return paymentId;
-    }
-
-    public void setPaymentId(Payment paymentId) {
-        this.paymentId = paymentId;
-    }
-
-    public Prescription getPrescriptionId() {
-        return prescriptionId;
-    }
-
-    public void setPrescriptionId(Prescription prescriptionId) {
-        this.prescriptionId = prescriptionId;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof PaymentItems)) {
-            return false;
-        }
-        PaymentItems other = (PaymentItems) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "com.hb.pojo.PaymentItems[ id=" + id + " ]";
     }
 
     /**
@@ -183,17 +157,60 @@ public class PaymentItems implements Serializable {
     }
 
     /**
-     * @return the labTest
+     * @return the appointmentId
      */
-    public LabTests getLabTest() {
-        return labTest;
+    public Appointment getAppointmentId() {
+        return appointmentId;
     }
 
     /**
-     * @param labTest the labTest to set
+     * @param appointmentId the appointmentId to set
      */
-    public void setLabTest(LabTests labTest) {
-        this.labTest = labTest;
+    public void setAppointmentId(Appointment appointmentId) {
+        this.appointmentId = appointmentId;
     }
+
+    /**
+     * @return the labTestId
+     */
+    public LabTests getLabTestId() {
+        return labTestId;
+    }
+
+    /**
+     * @param labTestId the labTestId to set
+     */
+    public void setLabTestId(LabTests labTestId) {
+        this.labTestId = labTestId;
+    }
+
+    /**
+     * @return the paymentId
+     */
+    public Payment getPaymentId() {
+        return paymentId;
+    }
+
+    /**
+     * @param paymentId the paymentId to set
+     */
+    public void setPaymentId(Payment paymentId) {
+        this.paymentId = paymentId;
+    }
+
+    /**
+     * @return the prescriptionId
+     */
+    public Prescription getPrescriptionId() {
+        return prescriptionId;
+    }
+
+    /**
+     * @param prescriptionId the prescriptionId to set
+     */
+    public void setPrescriptionId(Prescription prescriptionId) {
+        this.prescriptionId = prescriptionId;
+    }
+
     
 }

@@ -41,13 +41,13 @@ public class PaymentItemsServiceImpl implements PaymentItemsService {
     public void addAppointmentItem(Payment payment, Long appointmentId) {
         Appointment app = appRepo.getAppointmentById(appointmentId);
 
-        BigDecimal price = app.getDoctor().getIdSpecailty().getPrice();
+        BigDecimal price = app.getScheduleId().getDoctorId().getIdSpecailty().getPrice();
 
         PaymentItems item = new PaymentItems();
         item.setPaymentId(payment);
         item.setItemType("APPOINTMENT");
         item.setAmount(price);
-        item.setAppointment(app);
+        item.setAppointmentId(app);
         item.setStatus(PaymentStatus.PENDING);
         itemRepo.addOrUpdateItem(item);
     }
@@ -60,7 +60,7 @@ public class PaymentItemsServiceImpl implements PaymentItemsService {
             item.setPaymentId(payment);
             item.setItemType("TEST");
             item.setAmount(lt.getPrice());
-            item.setLabTest(lt);
+            item.setLabTestId(lt);
             item.setStatus(PaymentStatus.PENDING);
             itemRepo.addOrUpdateItem(item);
         }
