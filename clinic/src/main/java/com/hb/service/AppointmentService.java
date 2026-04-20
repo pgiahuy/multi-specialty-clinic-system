@@ -19,4 +19,5 @@ public interface AppointmentService {
     List<Appointment> getAppointments(Map<String,String> params);
     Appointment getAppointmentById(Long id);
     AppointmentResponse addAppointment(AppointmentCreateRequest req);
+    long countAppointments(Map<String,String> params);
 }

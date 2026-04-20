@@ -44,5 +44,10 @@ public class RoomServiceImpl implements RoomService{
     public void deleteRoom(Long id) {
          this.roomRepo.deleteRoom(id); 
     }
+
+    @Override
+    public long countRooms(Map<String, String> params) {
+        return roomRepo.count(params, Rooms.class);
+    }
     
 }

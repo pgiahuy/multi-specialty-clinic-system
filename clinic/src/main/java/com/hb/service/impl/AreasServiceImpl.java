@@ -45,5 +45,8 @@ public class AreasServiceImpl implements AreasService {
     public void deleteAreas(Long id) {
         this.areaRepo.deleteAreas(id);
     }
-
+    @Override
+    public long countAreas(Map<String, String> params) {
+        return areaRepo.count(params, Areas.class);
+    }
 }

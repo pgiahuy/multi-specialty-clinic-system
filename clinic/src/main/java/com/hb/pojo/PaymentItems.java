@@ -63,10 +63,10 @@ public class PaymentItems implements Serializable {
     
     @JoinColumn(name = "appointment_id", referencedColumnName = "id")
     @ManyToOne
-    private Appointment appointment;
-    @ManyToOne
+    private Appointment appointmentId;
     @JoinColumn(name = "lab_test_id", referencedColumnName = "id")
-    private LabTests labTest;
+    @ManyToOne
+    private LabTests labTestId;
     @JoinColumn(name = "payment_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Payment paymentId;
@@ -111,15 +111,21 @@ public class PaymentItems implements Serializable {
     }
    
 
-    public Appointment getAppointment() {
-        return appointment;
+    public Appointment getAppointmentId() {
+        return appointmentId;
     }
 
-    public void setAppointment(Appointment appointment) {
-        this.appointment = appointment;
+    public void setAppointmentId(Appointment appointmentId) {
+        this.appointmentId = appointmentId;
     }
 
-    
+    public LabTests getLabTestId() {
+        return labTestId;
+    }
+
+    public void setLabTestId(LabTests labTestId) {
+        this.labTestId = labTestId;
+    }
 
     public Payment getPaymentId() {
         return paymentId;

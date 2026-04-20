@@ -17,4 +17,5 @@ public interface MedicalRecordService {
     List<MedicalRecord> getMedicalRecords(Map<String, String> params);
     MedicalRecord getMedicalRecordById(Long id);
     void deleteMedicalRecord(Long id);
+    long countMedicalRecords(Map<String, String> params);
 }

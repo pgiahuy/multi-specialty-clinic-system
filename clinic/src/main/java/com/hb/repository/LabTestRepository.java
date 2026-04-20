@@ -12,7 +12,7 @@ import java.util.Map;
  *
  * @author DELL
  */
-public interface LabTestRepository {
+public interface LabTestRepository extends BaseRepository<LabTests>{
     List<LabTests> getLabTests(Map<String, String> params);
     LabTests getLabTestById(Long id);
     void addOrUpdateLabTest(LabTests test);

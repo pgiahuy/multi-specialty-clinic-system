@@ -38,7 +38,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
             try {
                 Long appointmentId = Long.parseLong(appointmentIdStr);
                 var appointment = appointmentRepo.getAppointmentById(appointmentId);
-                m.setAppointment(appointment);
+                m.setAppointmentId(appointment);
                 
             } catch (NumberFormatException e) {
                 throw new RuntimeException("Invalid appointment ID format");
@@ -61,5 +61,10 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
     @Override
     public void deleteMedicalRecord(Long id) {
         this.medicalRecordRepo.deleteMedicalRecord(id);
+    }
+
+    @Override
+    public long countMedicalRecords(Map<String, String> params) {
+        return medicalRecordRepo.count(params, MedicalRecord.class);
     }
 }

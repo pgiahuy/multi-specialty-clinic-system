@@ -23,21 +23,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @Transactional
-public class PatientRepositoryImpl implements PatientRepository{
+public class PatientRepositoryImpl extends BaseRepositoryImpl<Patient> implements PatientRepository{
 
     @Autowired
     private LocalSessionFactoryBean factory;
     
-    @Autowired
-    private Environment env;
-    
+
     @Override
     public List<Patient> getPatients(Map<String,String> params) {
         Session session = this.factory.getObject().getCurrentSession();
         Query<Patient> q = session.createNamedQuery("Patient.findAll", Patient.class);
         
         if (params != null) {
-            int pageSize = this.env.getProperty("patients.page_size", Integer.class);
+            int pageSize = Integer.parseInt(params.get("pageSize"));
             int page = Integer.parseInt(params.getOrDefault("page", "1"));
             int start = (page-1)*pageSize;
             q.setMaxResults(pageSize);

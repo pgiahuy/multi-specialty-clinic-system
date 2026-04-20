@@ -24,23 +24,21 @@ import com.hb.repository.SpecialtyRepository;
 
 @Repository
 @Transactional
-@PropertySource("classpath:configs.properties")
-public class SpecialtyRepositoryImpl implements SpecialtyRepository{
+public class SpecialtyRepositoryImpl extends BaseRepositoryImpl<Specialty> implements SpecialtyRepository{
     
     @Autowired
     private LocalSessionFactoryBean factory;
-    
-    @Autowired
-    private Environment env;
     
 
     @Override
     public List<Specialty> getSpecialties(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<Specialty> q = session.createNamedQuery("Specialtie.findAll",Specialty.class);
+        Query<Specialty> q = session.createNamedQuery("Specialty.findAllWithDoctors",Specialty.class);
         
         if(params!= null){
-            int pageSize = env.getProperty("specialties.page_size", Integer.class);
+            int pageSize = Integer.parseInt(params.get("pageSize"));
+            System.out.println("===========" );
+            System.out.println(pageSize );
             int page = Integer.parseInt( params.getOrDefault("page", "1"));
             int start = (page-1)*pageSize;
             
@@ -48,13 +46,17 @@ public class SpecialtyRepositoryImpl implements SpecialtyRepository{
             q.setFirstResult(start);
             
         }
+        System.out.println("=======print_list==============");
+        System.out.println(q.getResultList());
+                System.out.println("=======print_list==============");
+
         return q.getResultList();
     }
 
     @Override
     public Specialty getSpecialtieById(Long id) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<Specialty> q = session.createNamedQuery("Specialtie.findById", Specialty.class);
+        Query<Specialty> q = session.createNamedQuery("Specialty.findById", Specialty.class);
         q.setParameter("id", id);
         return q.getSingleResult();
     }

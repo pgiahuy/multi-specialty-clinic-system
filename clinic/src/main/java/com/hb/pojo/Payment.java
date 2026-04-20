@@ -40,7 +40,8 @@ import java.util.Date;
     @NamedQuery(name = "Payment.findById", query = "SELECT p FROM Payment p WHERE p.id = :id"),
     @NamedQuery(name = "Payment.findByTotalAmount", query = "SELECT p FROM Payment p WHERE p.totalAmount = :totalAmount"),
     @NamedQuery(name = "Payment.findByMethod", query = "SELECT p FROM Payment p WHERE p.method = :method"),
-    @NamedQuery(name = "Payment.findByStatus", query = "SELECT p FROM Payment p WHERE p.status = :status")})
+    @NamedQuery(name = "Payment.findByStatus", query = "SELECT p FROM Payment p WHERE p.status = :status"),
+    @NamedQuery(name = "Payment.findByCreatedAt", query = "SELECT p FROM Payment p WHERE p.createdAt = :createdAt")})
 public class Payment implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -56,21 +57,21 @@ public class Payment implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
     @Enumerated(EnumType.STRING)
+
     @Column(name = "method")
     private PaymentMethod method;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    private PaymentStatus status;
-
-    @ManyToOne
-    @JoinColumn(name = "patient_id", referencedColumnName = "id")
-    private Patient patient;
-    @Size(max = 100)
-    @Column(name = "transaction_id")
-    private String transactionId;
+    private String status;
+    @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "paymentId")
     private Collection<PaymentItems> paymentItemsCollection;
+    @JoinColumn(name = "patient_id", referencedColumnName = "id")
+    @ManyToOne(optional = false)
+    private Patient patientId;
 
     public Payment() {
     }
@@ -111,12 +112,28 @@ public class Payment implements Serializable {
         this.status = status;
     }
 
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
     public Collection<PaymentItems> getPaymentItemsCollection() {
         return paymentItemsCollection;
     }
 
     public void setPaymentItemsCollection(Collection<PaymentItems> paymentItemsCollection) {
         this.paymentItemsCollection = paymentItemsCollection;
+    }
+
+    public Patient getPatientId() {
+        return patientId;
+    }
+
+    public void setPatientId(Patient patientId) {
+        this.patientId = patientId;
     }
 
     @Override

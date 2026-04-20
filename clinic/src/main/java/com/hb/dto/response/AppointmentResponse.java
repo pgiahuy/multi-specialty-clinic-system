@@ -4,6 +4,7 @@
  */
 package com.hb.dto.response;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -11,79 +12,34 @@ import java.util.Date;
  * @author HUY
  */
 public class AppointmentResponse {
-    private Date date;
-    private String timeSlot;
-    private Long doctorId;
-    private Long patientId;
+    
+    private Long id;
     private String status;
-    private Date createdAt;
+    private LocalDateTime createdAt;
+    private String patientFullName;
+    private String doctorFullName;
+    private String specialtyName = " ";
+    private String appointmentDate;
+    private String session;
+    private String timeSlot;
+    private String roomName;
+    private String areaName;
 
     public AppointmentResponse() {
     }
 
-    public AppointmentResponse(Date date, String timeSlot, Long doctorId, Long patientId, String status, Date createdAt) {
-        this.date = date;
-        this.timeSlot = timeSlot;
-        this.doctorId = doctorId;
-        this.patientId = patientId;
+    public AppointmentResponse(Long id,String status, LocalDateTime createdAt, String patientFullName, String doctorFullName, String specialtyName, String appointmentDate, String session, String timeSlot, String roomName, String areaName) {
+        this.id =   id;
         this.status = status;
         this.createdAt = createdAt;
-    }
-
-    /**
-     * @return the date
-     */
-    public Date getDate() {
-        return date;
-    }
-
-    /**
-     * @param date the date to set
-     */
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
-    /**
-     * @return the timeSlot
-     */
-    public String getTimeSlot() {
-        return timeSlot;
-    }
-
-    /**
-     * @param timeSlot the timeSlot to set
-     */
-    public void setTimeSlot(String timeSlot) {
+        this.patientFullName = patientFullName;
+        this.doctorFullName = doctorFullName;
+        this.specialtyName = specialtyName;
+        this.appointmentDate = appointmentDate;
+        this.session = session;
         this.timeSlot = timeSlot;
-    }
-
-    /**
-     * @return the doctorId
-     */
-    public Long getDoctorId() {
-        return doctorId;
-    }
-
-    /**
-     * @param doctorId the doctorId to set
-     */
-    public void setDoctorId(Long doctorId) {
-        this.doctorId = doctorId;
-    }
-
-    /**
-     * @return the patientId
-     */
-    public Long getPatientId() {
-        return patientId;
-    }
-
-    /**
-     * @param patientId the patientId to set
-     */
-    public void setPatientId(Long patientId) {
-        this.patientId = patientId;
+        this.roomName = roomName;
+        this.areaName = areaName;
     }
 
     /**
@@ -103,16 +59,142 @@ public class AppointmentResponse {
     /**
      * @return the createdAt
      */
-    public Date getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
     /**
      * @param createdAt the createdAt to set
      */
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+
+    /**
+     * @return the patientFullName
+     */
+    public String getPatientFullName() {
+        return patientFullName;
+    }
+
+    /**
+     * @param patientFullName the patientFullName to set
+     */
+    public void setPatientFullName(String patientFullName) {
+        this.patientFullName = patientFullName;
+    }
+
+    /**
+     * @return the doctorFullName
+     */
+    public String getDoctorFullName() {
+        return doctorFullName;
+    }
+
+    /**
+     * @param doctorFullName the doctorFullName to set
+     */
+    public void setDoctorFullName(String doctorFullName) {
+        this.doctorFullName = doctorFullName;
+    }
+
+    /**
+     * @return the specialtyName
+     */
+    public String getSpecialtyName() {
+        return specialtyName;
+    }
+
+    /**
+     * @param specialtyName the specialtyName to set
+     */
+    public void setSpecialtyName(String specialtyName) {
+        this.specialtyName = specialtyName;
+    }
+
+    /**
+     * @return the appointmentDate
+     */
+    public String getAppointmentDate() {
+        return appointmentDate;
+    }
+
+    /**
+     * @param appointmentDate the appointmentDate to set
+     */
+    public void setAppointmentDate(String appointmentDate) {
+        this.appointmentDate = appointmentDate;
+    }
+
+    /**
+     * @return the session
+     */
+    public String getSession() {
+        return session;
+    }
+
+    /**
+     * @param session the session to set
+     */
+    public void setSession(String session) {
+        this.session = session;
+    }
+
+    /**
+     * @return the timeSlot
+     */
+    public String getTimeSlot() {
+        return timeSlot;
+    }
+
+    /**
+     * @param timeSlot the timeSlot to set
+     */
+    public void setTimeSlot(String timeSlot) {
+        this.timeSlot = timeSlot;
+    }
+
+    /**
+     * @return the roomName
+     */
+    public String getRoomName() {
+        return roomName;
+    }
+
+    /**
+     * @param roomName the roomName to set
+     */
+    public void setRoomName(String roomName) {
+        this.roomName = roomName;
+    }
+
+    /**
+     * @return the areaName
+     */
+    public String getAreaName() {
+        return areaName;
+    }
+
+    /**
+     * @param areaName the areaName to set
+     */
+    public void setAreaName(String areaName) {
+        this.areaName = areaName;
+    }
+
+    /**
+     * @return the id
+     */
+    public Long getId() {
+        return id;
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(Long id) {
+        this.id = id;
+    }
     
-    
+
 }

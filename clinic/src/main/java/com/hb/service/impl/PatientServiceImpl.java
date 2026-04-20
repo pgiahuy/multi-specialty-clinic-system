@@ -5,6 +5,7 @@
 package com.hb.service.impl;
 
 import com.hb.dto.request.PatientCreateRequest;
+import com.hb.dto.response.PatientResponse;
 import com.hb.mapper.PatientMapper;
 import com.hb.pojo.Patient;
 import com.hb.pojo.User;
@@ -45,18 +46,29 @@ public class PatientServiceImpl implements PatientService {
     }
     
     @Override
-    public Patient addPatient(PatientCreateRequest prq, User u) {
-        Patient p = patientMapper.toEntiy(prq);
-        p.setUser(u);
-        return this.patientRepo.addPatient(p);
+    public PatientResponse addPatient(PatientCreateRequest prq, User u) {
+        
+        Patient p = patientMapper.toEntity(prq, u);
+        this.patientRepo.addPatient(p);
+        return this.patientMapper.toResponse(p);
     }
     
+//    @Override
+//    @Transactional
+//    public void updateProfile(Long id, PatientCreateRequest prq) {
+//        Patient patient = patientRepo.getPatientById(id);
+//        patientMapper.toEntity(prq, patient);
+//        patientRepo.updatePatient(patient);
+//    }
+
     @Override
-    @Transactional
+    public long countPatients(Map<String, String> params) {
+        return patientRepo.count(params, Patient.class);
+    }
+
+    @Override
     public void updateProfile(Long id, PatientCreateRequest prq) {
-        Patient patient = patientRepo.getPatientById(id);
-        patientMapper.updateFromRequest(prq, patient);
-        patientRepo.updatePatient(patient);
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
     
 }

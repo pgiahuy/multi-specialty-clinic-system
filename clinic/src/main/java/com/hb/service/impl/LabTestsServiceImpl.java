@@ -53,4 +53,9 @@ public class LabTestsServiceImpl implements LabTestService {
         this.labTestRepo.addOrUpdateLabTest(t);
     }
 
+    @Override
+    public long countLabTests(Map<String, String> params) {
+        return labTestRepo.count(params, LabTests.class);
+    }
+
 }

@@ -53,7 +53,7 @@ public class MedicalRecord implements Serializable {
     private Date createdAt;
     @JoinColumn(name = "appointment_id", referencedColumnName = "id")
     @OneToOne
-    private Appointment appointment;
+    private Appointment appointmentId;
     @OneToOne(mappedBy = "medicalRecordId")
     private Prescription prescription;
 
@@ -96,12 +96,12 @@ public class MedicalRecord implements Serializable {
         this.createdAt = createdAt;
     }
 
-    public Appointment getAppointment() {
-        return appointment;
+    public Appointment getAppointmentId() {
+        return appointmentId;
     }
 
-    public void setAppointment(Appointment appointment) {
-        this.appointment = appointment;
+    public void setAppointmentId(Appointment appointmentId) {
+        this.appointmentId = appointmentId;
     }
 
     public Prescription getPrescription() {

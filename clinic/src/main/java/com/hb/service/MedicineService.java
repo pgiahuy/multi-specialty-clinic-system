@@ -14,8 +14,9 @@ import org.springframework.web.multipart.MultipartFile;
  * @author HUY
  */
 public interface MedicineService {
-    Medicine addMedicine(Map<String, String> params, MultipartFile avatar);
+    Medicine addMedicine(Map<String, String> params, MultipartFile image);
     List<Medicine> getMedicines(Map<String, String> params);
     Medicine getMedicineById(Long id);
     void deleteMedicine(Long id);
+    long countMedicines(Map<String, String> params);
 }
