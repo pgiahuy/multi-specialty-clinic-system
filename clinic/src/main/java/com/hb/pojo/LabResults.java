@@ -14,20 +14,17 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Date;
 
 /**
  *
  * @author HUY
  */
-
 @Entity
 @Table(name = "lab_results")
 @NamedQueries({
@@ -56,8 +53,6 @@ public class LabResults implements Serializable {
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
-    @OneToMany(mappedBy = "labTestId")
-    private Collection<PaymentItems> paymentItemsCollection;
     @JoinColumn(name = "appointment_id", referencedColumnName = "id")
     @ManyToOne
     private Appointment appointmentId;
@@ -113,14 +108,6 @@ public class LabResults implements Serializable {
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public Collection<PaymentItems> getPaymentItemsCollection() {
-        return paymentItemsCollection;
-    }
-
-    public void setPaymentItemsCollection(Collection<PaymentItems> paymentItemsCollection) {
-        this.paymentItemsCollection = paymentItemsCollection;
     }
 
     public Appointment getAppointmentId() {

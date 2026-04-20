@@ -5,6 +5,7 @@
 package com.hb.pojo;
 
 import jakarta.persistence.Basic;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -76,13 +77,15 @@ public class Patient implements Serializable {
     @Size(max = 20)
     @Column(name = "phone")
     private String phone;
-    @OneToMany(mappedBy = "patient")
+    @OneToMany(mappedBy = "patientId")
     private Collection<Appointment> appointmentCollection;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @OneToOne
-    private User user;
+    private User userId;
     @OneToMany(mappedBy = "patientId")
     private Collection<LabResults> labResultsCollection;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "patientId")
+    private Collection<Payment> paymentCollection;
 
     public Patient() {
     }
@@ -164,12 +167,12 @@ public class Patient implements Serializable {
         this.appointmentCollection = appointmentCollection;
     }
 
-    public User getUser() {
-        return user;
+    public User getUserId() {
+        return userId;
     }
 
-    public void setUser(User user) {
-        this.user= user;
+    public void setUserId(User userId) {
+        this.userId = userId;
     }
 
     public Collection<LabResults> getLabResultsCollection() {
@@ -178,6 +181,14 @@ public class Patient implements Serializable {
 
     public void setLabResultsCollection(Collection<LabResults> labResultsCollection) {
         this.labResultsCollection = labResultsCollection;
+    }
+
+    public Collection<Payment> getPaymentCollection() {
+        return paymentCollection;
+    }
+
+    public void setPaymentCollection(Collection<Payment> paymentCollection) {
+        this.paymentCollection = paymentCollection;
     }
 
     @Override
