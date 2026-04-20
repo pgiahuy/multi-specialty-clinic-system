@@ -56,95 +56,8 @@ public class LabTests implements Serializable {
     private Collection<PaymentItems> paymentItemsCollection;
     @OneToMany(mappedBy = "testId")
     private Collection<LabResults> labResultsCollection;
-    @OneToMany(mappedBy = "labTest")
-    private Collection<PaymentItems> paymentItemsCollection;
 
     public LabTests() {
-    }
-
-    public LabTests(Integer id) {
-        this.id = id;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getTestName() {
-        return testName;
-    }
-
-    public void setTestName(String testName) {
-        this.testName = testName;
-    }
-
-    public String getUnit() {
-        return unit;
-    }
-
-    public void setUnit(String unit) {
-        this.unit = unit;
-    }
-
-    public String getNormalRange() {
-        return normalRange;
-    }
-
-    public void setNormalRange(String normalRange) {
-        this.normalRange = normalRange;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-    public Collection<PaymentItems> getPaymentItemsCollection() {
-        return paymentItemsCollection;
-    }
-
-    public void setPaymentItemsCollection(Collection<PaymentItems> paymentItemsCollection) {
-        this.paymentItemsCollection = paymentItemsCollection;
-    }
-
-    public Collection<LabResults> getLabResultsCollection() {
-        return labResultsCollection;
-    }
-
-    public void setLabResultsCollection(Collection<LabResults> labResultsCollection) {
-        this.labResultsCollection = labResultsCollection;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (getId() != null ? getId().hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof LabTests)) {
-            return false;
-        }
-        LabTests other = (LabTests) object;
-        if ((this.getId() == null && other.getId() != null) || (this.getId() != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "com.hb.pojo.LabTests[ id=" + getId() + " ]";
     }
 
     /**
@@ -159,6 +72,62 @@ public class LabTests implements Serializable {
      */
     public static void setSerialVersionUID(long aSerialVersionUID) {
         serialVersionUID = aSerialVersionUID;
+    }
+
+    /**
+     * @return the id
+     */
+    public Integer getId() {
+        return id;
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    /**
+     * @return the testName
+     */
+    public String getTestName() {
+        return testName;
+    }
+
+    /**
+     * @param testName the testName to set
+     */
+    public void setTestName(String testName) {
+        this.testName = testName;
+    }
+
+    /**
+     * @return the unit
+     */
+    public String getUnit() {
+        return unit;
+    }
+
+    /**
+     * @param unit the unit to set
+     */
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
+    /**
+     * @return the normalRange
+     */
+    public String getNormalRange() {
+        return normalRange;
+    }
+
+    /**
+     * @param normalRange the normalRange to set
+     */
+    public void setNormalRange(String normalRange) {
+        this.normalRange = normalRange;
     }
 
     /**
@@ -188,5 +157,23 @@ public class LabTests implements Serializable {
     public void setPaymentItemsCollection(Collection<PaymentItems> paymentItemsCollection) {
         this.paymentItemsCollection = paymentItemsCollection;
     }
+
+    /**
+     * @return the labResultsCollection
+     */
+    public Collection<LabResults> getLabResultsCollection() {
+        return labResultsCollection;
+    }
+
+    /**
+     * @param labResultsCollection the labResultsCollection to set
+     */
+    public void setLabResultsCollection(Collection<LabResults> labResultsCollection) {
+        this.labResultsCollection = labResultsCollection;
+    }
+    
+    
+
+    
 
 }
