@@ -21,7 +21,7 @@ import java.util.Collection;
 
 /**
  *
- * @author HUY
+ * @author DELL
  */
 @Entity
 @Table(name = "areas")

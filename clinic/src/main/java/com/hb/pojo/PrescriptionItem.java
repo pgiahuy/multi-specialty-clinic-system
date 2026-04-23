@@ -19,7 +19,7 @@ import java.io.Serializable;
 
 /**
  *
- * @author HUY
+ * @author DELL
  */
 @Entity
 @Table(name = "prescription_item")

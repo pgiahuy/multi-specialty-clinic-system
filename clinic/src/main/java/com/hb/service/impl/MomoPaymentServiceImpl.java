@@ -10,6 +10,7 @@ import com.hb.dto.request.MoMoPaymentRequest;
 import com.hb.dto.response.MoMoPaymentResponse;
 import com.hb.service.MomoPaymentService;
 import com.hb.utils.MomoSignatureUtil;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -32,15 +33,16 @@ public class MomoPaymentServiceImpl implements MomoPaymentService {
     private MoMoConfigs momoConfig;
 
     @Override
-    public MoMoPaymentResponse createPayment(String orderId, long amount, String orderInfo) throws Exception {
+    public MoMoPaymentResponse createPayment(String orderId, long amount, String orderInfo, String extraData) throws Exception {
+       
+//        String extraData = "";
+        String uniqueOrderId = orderId + "_" + System.currentTimeMillis();
         String requestId = momoConfig.getPartnerCode() + System.currentTimeMillis();
-        String extraData = "";
-
         String rawSignature = "accessKey=" + momoConfig.getAccessKey()
                 + "&amount=" + amount
                 + "&extraData=" + extraData
                 + "&ipnUrl=" + momoConfig.getNotifyUrl()
-                + "&orderId=" + orderId
+                + "&orderId=" + uniqueOrderId
                 + "&orderInfo=" + orderInfo
                 + "&partnerCode=" + momoConfig.getPartnerCode()
                 + "&redirectUrl=" + momoConfig.getReturnUrl()
@@ -53,7 +55,7 @@ public class MomoPaymentServiceImpl implements MomoPaymentService {
         request.setAccessKey(momoConfig.getAccessKey());
         request.setRequestId(requestId);
         request.setAmount(amount);
-        request.setOrderId(orderId);
+        request.setOrderId(uniqueOrderId);
         request.setOrderInfo(orderInfo);
         request.setRedirectUrl(momoConfig.getReturnUrl());
         request.setIpnUrl(momoConfig.getNotifyUrl());

@@ -46,11 +46,18 @@ public class PatientServiceImpl implements PatientService {
     }
     
     @Override
+<<<<<<< HEAD
     public PatientResponse addPatient(PatientCreateRequest prq, User u) {
         
         Patient p = patientMapper.toEntity(prq, u);
         this.patientRepo.addPatient(p);
         return this.patientMapper.toResponse(p);
+=======
+    public Patient addPatient(PatientCreateRequest prq, User u) {
+        Patient p = patientMapper.toEntiy(prq);
+        p.setUserId(u);
+        return this.patientRepo.addPatient(p);
+>>>>>>> b22e0c14 (fix api momopayment)
     }
     
 //    @Override

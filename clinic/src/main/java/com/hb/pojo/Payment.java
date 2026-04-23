@@ -4,7 +4,6 @@
  */
 package com.hb.pojo;
 
-import com.hb.enums.PaymentMethod;
 import com.hb.enums.PaymentStatus;
 import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
@@ -31,7 +30,7 @@ import java.util.Date;
 
 /**
  *
- * @author HUY
+ * @author DELL
  */
 @Entity
 @Table(name = "payment")
@@ -39,7 +38,10 @@ import java.util.Date;
     @NamedQuery(name = "Payment.findAll", query = "SELECT p FROM Payment p"),
     @NamedQuery(name = "Payment.findById", query = "SELECT p FROM Payment p WHERE p.id = :id"),
     @NamedQuery(name = "Payment.findByTotalAmount", query = "SELECT p FROM Payment p WHERE p.totalAmount = :totalAmount"),
+<<<<<<< HEAD
     @NamedQuery(name = "Payment.findByMethod", query = "SELECT p FROM Payment p WHERE p.method = :method"),
+=======
+>>>>>>> b22e0c14 (fix api momopayment)
     @NamedQuery(name = "Payment.findByStatus", query = "SELECT p FROM Payment p WHERE p.status = :status"),
     @NamedQuery(name = "Payment.findByCreatedAt", query = "SELECT p FROM Payment p WHERE p.createdAt = :createdAt")})
 public class Payment implements Serializable {
@@ -53,6 +55,7 @@ public class Payment implements Serializable {
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "total_amount")
     private BigDecimal totalAmount;
+<<<<<<< HEAD
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
@@ -64,6 +67,11 @@ public class Payment implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private String status;
+=======
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private PaymentStatus status;
+>>>>>>> b22e0c14 (fix api momopayment)
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
@@ -71,7 +79,11 @@ public class Payment implements Serializable {
     private Collection<PaymentItems> paymentItemsCollection;
     @JoinColumn(name = "patient_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
+<<<<<<< HEAD
     private Patient patientId;
+=======
+    private Patient patient;
+>>>>>>> b22e0c14 (fix api momopayment)
 
     public Payment() {
     }
@@ -94,14 +106,6 @@ public class Payment implements Serializable {
 
     public void setTotalAmount(BigDecimal totalAmount) {
         this.totalAmount = totalAmount;
-    }
-
-    public PaymentMethod getMethod() {
-        return method;
-    }
-
-    public void setMethod(PaymentMethod method) {
-        this.method = method;
     }
 
     public PaymentStatus getStatus() {
@@ -128,12 +132,21 @@ public class Payment implements Serializable {
         this.paymentItemsCollection = paymentItemsCollection;
     }
 
+<<<<<<< HEAD
     public Patient getPatientId() {
         return patientId;
     }
 
     public void setPatientId(Patient patientId) {
         this.patientId = patientId;
+=======
+    public Patient getPatient() {
+        return patient;
+    }
+
+    public void setPatient(Patient patient) {
+        this.patient = patient;
+>>>>>>> b22e0c14 (fix api momopayment)
     }
 
     @Override
@@ -160,47 +173,5 @@ public class Payment implements Serializable {
     public String toString() {
         return "com.hb.pojo.Payment[ id=" + id + " ]";
     }
-
-    /**
-     * @return the patient
-     */
-    public Patient getPatient() {
-        return patient;
-    }
-
-    /**
-     * @param patient the patient to set
-     */
-    public void setPatient(Patient patient) {
-        this.patient = patient;
-    }
-
-    /**
-     * @return the createdAt
-     */
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    /**
-     * @param createdAt the createdAt to set
-     */
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    /**
-     * @return the transactionId
-     */
-    public String getTransactionId() {
-        return transactionId;
-    }
-
-    /**
-     * @param transactionId the transactionId to set
-     */
-    public void setTransactionId(String transactionId) {
-        this.transactionId = transactionId;
-    }
-
+    
 }

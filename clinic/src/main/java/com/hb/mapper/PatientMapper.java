@@ -58,4 +58,13 @@ public class PatientMapper {
         return p;
     }
 
+<<<<<<< HEAD
+=======
+    @Mapping(source = "userId.email", target = "email")
+    @Mapping(source = "userId.secureUrl", target = "avatar")
+    @Mapping(source = "dob", target = "dob", dateFormat = "dd/MM/yyyy")
+    PatientResponse toResponse(Patient patient);
+    Patient toEntiy(PatientCreateRequest p);
+    void updateFromRequest(PatientCreateRequest prq, @MappingTarget Patient patient);
+>>>>>>> b22e0c14 (fix api momopayment)
 }

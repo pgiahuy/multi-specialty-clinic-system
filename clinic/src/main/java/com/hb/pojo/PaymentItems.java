@@ -4,6 +4,7 @@
  */
 package com.hb.pojo;
 
+import com.hb.enums.PaymentMethod;
 import com.hb.enums.PaymentStatus;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
@@ -28,7 +29,7 @@ import java.util.Date;
 
 /**
  *
- * @author HUY
+ * @author DELL
  */
 @Entity
 @Table(name = "payment_items")
@@ -37,8 +38,11 @@ import java.util.Date;
     @NamedQuery(name = "PaymentItems.findById", query = "SELECT p FROM PaymentItems p WHERE p.id = :id"),
     @NamedQuery(name = "PaymentItems.findByItemType", query = "SELECT p FROM PaymentItems p WHERE p.itemType = :itemType"),
     @NamedQuery(name = "PaymentItems.findByAmount", query = "SELECT p FROM PaymentItems p WHERE p.amount = :amount"),
-    
-    @NamedQuery(name = "PaymentItems.findByStatus", query = "SELECT p FROM PaymentItems p WHERE p.status = :status")})
+    @NamedQuery(name = "PaymentItems.findByCreatedAt", query = "SELECT p FROM PaymentItems p WHERE p.createdAt = :createdAt"),
+    @NamedQuery(name = "PaymentItems.findByStatus", query = "SELECT p FROM PaymentItems p WHERE p.status = :status"),
+    @NamedQuery(name = "PaymentItems.findByMethod", query = "SELECT p FROM PaymentItems p WHERE p.method = :method"),
+    @NamedQuery(name = "PaymentItems.findByPaidAt", query = "SELECT p FROM PaymentItems p WHERE p.paidAt = :paidAt"),
+    @NamedQuery(name = "PaymentItems.findByTransactionId", query = "SELECT p FROM PaymentItems p WHERE p.transactionId = :transactionId")})
 public class PaymentItems implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -55,12 +59,21 @@ public class PaymentItems implements Serializable {
     @NotNull
     @Column(name = "amount")
     private BigDecimal amount;
-    
-    @Size(max = 7)
+    @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private PaymentStatus status;
-    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "method")
+    private PaymentMethod method;
+    @Column(name = "paid_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date paidAt;
+    @Size(max = 100)
+    @Column(name = "transaction_id")
+    private String transactionId;
     @JoinColumn(name = "appointment_id", referencedColumnName = "id")
     @ManyToOne
     private Appointment appointmentId;
@@ -109,7 +122,56 @@ public class PaymentItems implements Serializable {
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
-   
+
+<<<<<<< HEAD
+    public Appointment getAppointmentId() {
+        return appointmentId;
+    }
+
+    public void setAppointmentId(Appointment appointmentId) {
+        this.appointmentId = appointmentId;
+    }
+
+=======
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public PaymentStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(PaymentStatus status) {
+        this.status = status;
+    }
+
+    public PaymentMethod getMethod() {
+        return method;
+    }
+
+    public void setMethod(PaymentMethod method) {
+        this.method = method;
+    }
+
+    public Date getPaidAt() {
+        return paidAt;
+    }
+
+    public void setPaidAt(Date paidAt) {
+        this.paidAt = paidAt;
+    }
+
+    public String getTransactionId() {
+        return transactionId;
+    }
+
+    public void setTransactionId(String transactionId) {
+        this.transactionId = transactionId;
+    }
 
     public Appointment getAppointmentId() {
         return appointmentId;
@@ -119,6 +181,7 @@ public class PaymentItems implements Serializable {
         this.appointmentId = appointmentId;
     }
 
+>>>>>>> b22e0c14 (fix api momopayment)
     public LabTests getLabTestId() {
         return labTestId;
     }
@@ -166,34 +229,6 @@ public class PaymentItems implements Serializable {
     @Override
     public String toString() {
         return "com.hb.pojo.PaymentItems[ id=" + id + " ]";
-    }
-
-    /**
-     * @return the status
-     */
-    public PaymentStatus getStatus() {
-        return status;
-    }
-
-    /**
-     * @param status the status to set
-     */
-    public void setStatus(PaymentStatus status) {
-        this.status = status;
-    }
-
-    /**
-     * @return the labTest
-     */
-    public LabTests getLabTest() {
-        return labTest;
-    }
-
-    /**
-     * @param labTest the labTest to set
-     */
-    public void setLabTest(LabTests labTest) {
-        this.labTest = labTest;
     }
     
 }

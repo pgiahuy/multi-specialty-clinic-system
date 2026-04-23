@@ -23,7 +23,7 @@ import java.util.Date;
 
 /**
  *
- * @author HUY
+ * @author DELL
  */
 @Entity
 @Table(name = "lab_results")
@@ -61,7 +61,7 @@ public class LabResults implements Serializable {
     private LabTests testId;
     @JoinColumn(name = "patient_id", referencedColumnName = "id")
     @ManyToOne
-    private Patient patientId;
+    private Patient patient;
 
     public LabResults() {
     }
@@ -126,12 +126,12 @@ public class LabResults implements Serializable {
         this.testId = testId;
     }
 
-    public Patient getPatientId() {
-        return patientId;
+    public Patient getPatient() {
+        return patient;
     }
 
-    public void setPatientId(Patient patientId) {
-        this.patientId = patientId;
+    public void setPatient(Patient patient) {
+        this.patient = patient;
     }
 
     @Override
