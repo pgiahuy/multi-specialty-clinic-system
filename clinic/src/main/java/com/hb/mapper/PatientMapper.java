@@ -8,6 +8,8 @@ import com.hb.dto.request.PatientCreateRequest;
 import com.hb.dto.response.PatientResponse;
 import com.hb.pojo.Patient;
 import com.hb.pojo.User;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.springframework.stereotype.Component;
 
 /**
@@ -17,7 +19,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PatientMapper {
 
-    public PatientResponse toResponse(Patient p) {
+      public PatientResponse toResponse(Patient p) {
         if (p == null) {
             return null;
         }
@@ -58,13 +60,4 @@ public class PatientMapper {
         return p;
     }
 
-<<<<<<< HEAD
-=======
-    @Mapping(source = "userId.email", target = "email")
-    @Mapping(source = "userId.secureUrl", target = "avatar")
-    @Mapping(source = "dob", target = "dob", dateFormat = "dd/MM/yyyy")
-    PatientResponse toResponse(Patient patient);
-    Patient toEntiy(PatientCreateRequest p);
-    void updateFromRequest(PatientCreateRequest prq, @MappingTarget Patient patient);
->>>>>>> b22e0c14 (fix api momopayment)
 }

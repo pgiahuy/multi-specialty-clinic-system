@@ -82,15 +82,10 @@ public class Patient implements Serializable {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @OneToOne
     private User userId;
-<<<<<<< HEAD
-    @OneToMany(mappedBy = "patientId")
-    private Collection<LabResults> labResultsCollection;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "patientId")
-=======
+
     @OneToMany(mappedBy = "patient")
     private Collection<LabResults> labResultsCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "patient")
->>>>>>> b22e0c14 (fix api momopayment)
     private Collection<Payment> paymentCollection;
 
     public Patient() {
