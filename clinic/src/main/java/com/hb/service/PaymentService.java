@@ -16,13 +16,13 @@ import java.util.Map;
  * @author HUY
  */
 public interface PaymentService {
-    
-    Payment addPayment(Map<String, String> params);
-    List<Payment> getPayments(Map<String, String> params);
-    List<Payment> getPaymentsByUserName(Map<String, String> params);
+//    List<Payment> getPayments(Map<String, String> params);
+//    List<Payment> getPaymentsByUserName(Map<String, String> params);
     Payment getPaymentById(Long id);
     void deletePayment(Long id);
     Payment createPayment(Long patientId, Long appId, List<Long> testIds, Long presId);
     void updateStatus(Long paymentId, PaymentStatus status);
-    void confirmPaymentSuccess(Long paymentId, String transId);
+    
+    Long calculateTotalFee(List<Long> itemIds);
+    void confirmPaymentSuccess(Long paymentId, String transId, String method, List<Long> itemIds);
 }

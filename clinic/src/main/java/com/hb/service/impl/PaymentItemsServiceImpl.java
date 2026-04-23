@@ -4,6 +4,7 @@
  */
 package com.hb.service.impl;
 
+import com.hb.enums.PaymentMethod;
 import com.hb.enums.PaymentStatus;
 import com.hb.pojo.Appointment;
 import com.hb.pojo.LabTests;
@@ -17,6 +18,7 @@ import com.hb.repository.PaymentItemRepository;
 import com.hb.repository.PrescriptionRepository;
 import com.hb.service.PaymentItemsService;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,7 +49,7 @@ public class PaymentItemsServiceImpl implements PaymentItemsService {
         item.setPaymentId(payment);
         item.setItemType("APPOINTMENT");
         item.setAmount(price);
-        item.setAppointment(app);
+        item.setAppointmentId(app);
         item.setStatus(PaymentStatus.PENDING);
         itemRepo.addOrUpdateItem(item);
     }
@@ -60,7 +62,7 @@ public class PaymentItemsServiceImpl implements PaymentItemsService {
             item.setPaymentId(payment);
             item.setItemType("TEST");
             item.setAmount(lt.getPrice());
-            item.setLabTest(lt);
+            item.setLabTestId(lt);
             item.setStatus(PaymentStatus.PENDING);
             itemRepo.addOrUpdateItem(item);
         }
@@ -84,5 +86,19 @@ public class PaymentItemsServiceImpl implements PaymentItemsService {
         item.setPrescriptionId(pres);
         item.setStatus(PaymentStatus.PENDING);
         itemRepo.addOrUpdateItem(item);
+    }
+
+    @Override
+    public void confirmItemsPaid(String transId, String method, List<Long> itemIds) {
+        for (Long id : itemIds) {
+            PaymentItems item = itemRepo.getItemById(id);
+            if (item != null) {
+                item.setStatus(PaymentStatus.SUCCESS);
+                item.setMethod(PaymentMethod.valueOf(method));
+                item.setTransactionId(transId);
+                item.setPaidAt(new Date());
+                itemRepo.addOrUpdateItem(item);
+            }
+        }
     }
 }

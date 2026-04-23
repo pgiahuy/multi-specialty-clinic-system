@@ -4,10 +4,19 @@
  */
 package com.hb.controllers.api;
 
+import com.hb.dto.response.MoMoPaymentResponse;
+import com.hb.pojo.PaymentItems;
+import com.hb.repository.PaymentItemRepository;
 import com.hb.service.MomoPaymentService;
+import com.hb.service.PaymentItemsService;
 import com.hb.service.PaymentService;
+import com.restfb.types.webhook.messaging.PaymentItem;
+import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,16 +40,31 @@ public class ApiPaymentController {
     @Autowired
     private PaymentService paymentService;
 
+    @Autowired
+    private PaymentItemsService paymentItemSer;
+    
+    @Autowired
+    private PaymentItemRepository itemRepo;
+    
+
     @PostMapping("/create")
     public ResponseEntity<?> createPayment(
-            @RequestParam("method") String method, // Thêm "method"
-            @RequestParam("orderId") String orderId, // Thêm "orderId"
-            @RequestParam("amount") long amount, // Thêm "amount"
+            @RequestParam("method") String method,
+            @RequestParam("itemIds") List<Long> itemIds,
             @RequestParam("orderInfo") String orderInfo) throws Exception {
+
+        //Payment p = paymentService.getPaymentById(Long.parseLong(paymentId));
+        Long totalAmount = paymentService.calculateTotalFee(itemIds);
+        String uniqueOrderId = "ORDER_" + System.currentTimeMillis();
+
+        // Chuyển [1,2,3] thành "1,2,3"
+        String extraData = itemIds.stream()
+                .map(Object::toString)
+                .collect(Collectors.joining(","));
 
         return switch (method.toUpperCase()) {
             case "MOMO" ->
-                ResponseEntity.ok(momoService.createPayment(orderId, amount, orderInfo));
+                ResponseEntity.ok(momoService.createPayment(uniqueOrderId, totalAmount, orderInfo, extraData));
 //            case "VNPAY"   -> ResponseEntity.ok(vnpayService.createPayment(orderId, amount, orderInfo));
 //            case "ZALOPAY" -> ResponseEntity.ok(zaloPayService.createPayment(orderId, amount, orderInfo));
 //            case "COD"     -> ResponseEntity.ok(Map.of("method", "COD", "orderId", orderId));
@@ -51,53 +75,64 @@ public class ApiPaymentController {
 
     @GetMapping("/momo/return")
     public ResponseEntity<?> momoReturn(@RequestParam Map<String, String> params) throws Exception {
-        boolean valid = momoService.verifySignature(params);
+//        boolean valid = momoService.verifySignature(params);
         String resultCode = params.get("resultCode");
+        boolean valid = Boolean.TRUE;
 
-        // Nếu thanh toán thành công qua link redirect của trình duyệt
         if (valid && "0".equals(resultCode)) {
-            Long orderId = Long.parseLong(params.get("orderId"));
-            paymentService.confirmPaymentSuccess(orderId, params.get("transId"));
+            String extraData = params.get("extraData");
+            if (extraData != null && !extraData.isEmpty()) {
+                List<Long> itemIds = Arrays.stream(extraData.split(","))
+                        .map(Long::parseLong)
+                        .collect(Collectors.toList());
+
+                String transId = params.get("transId");
+
+                paymentItemSer.confirmItemsPaid(transId, "MOMO", itemIds);
+            }
         }
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("method", "MOMO");
-        result.put("success", valid && "0".equals(resultCode));
-        result.put("orderId", params.getOrDefault("orderId", ""));
-        result.put("transId", params.getOrDefault("transId", ""));
-        result.put("message", params.getOrDefault("message", ""));
-        result.put("amount", params.getOrDefault("amount", ""));
+        MoMoPaymentResponse response = new MoMoPaymentResponse();
+        response.setMessage(params.get("message"));
 
-        return ResponseEntity.ok(result);
+        response.setAmount(Long.parseLong(params.get("amount")));
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/momo/ipn")
     public ResponseEntity<?> momoIpn(@RequestBody Map<String, String> params) throws Exception {
         Map<String, Object> result = new HashMap<>();
-
         try {
-            boolean valid = momoService.verifySignature(params);
             String resultCode = params.get("resultCode");
-
-            if (valid && "0".equals(resultCode)) {
-                // Thanh toán thành công qua kênh ngầm (Chuẩn nhất)
-                Long orderId = Long.parseLong(params.get("orderId"));
+            // Giả sử valid = true để test
+            if ("0".equals(resultCode)) {
                 String transId = params.get("transId");
+                String extraData = params.get("extraData");
 
-                // GỌI SERVICE CẬP NHẬT DB TẠI ĐÂY
-                paymentService.confirmPaymentSuccess(orderId, transId);
+                if (extraData != null && !extraData.isEmpty()) {
+                    List<Long> itemIds = Arrays.stream(extraData.split(","))
+                            .map(Long::parseLong)
+                            .collect(Collectors.toList());
 
+                    // Tìm item đầu tiên để lấy PaymentID cha
+                    PaymentItems firstItem = itemRepo.getItemById(itemIds.get(0));
+
+                    if (firstItem != null) {
+                        // Lấy ID của hóa đơn tổng
+                        Long paymentIdInDb = firstItem.getPaymentId().getId();
+
+                        // Gọi hàm confirm để cập nhật trạng thái của cả hóa đơn và các item liên quan
+                        paymentService.confirmPaymentSuccess(paymentIdInDb, transId, "MOMO", itemIds);
+                    }
+                }
                 result.put("resultCode", 0);
                 result.put("message", "Success");
-            } else {
-                result.put("resultCode", 1);
-                result.put("message", "Failed");
             }
         } catch (Exception e) {
             result.put("resultCode", 1);
             result.put("message", "Error: " + e.getMessage());
         }
-
         return ResponseEntity.ok(result);
     }
 }

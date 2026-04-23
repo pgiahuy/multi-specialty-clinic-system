@@ -27,7 +27,7 @@ import java.util.Date;
 
 /**
  *
- * @author HUY
+ * @author DELL
  */
 @Entity
 @Table(name = "appointment")
@@ -49,7 +49,11 @@ public class Appointment implements Serializable {
     private String status;
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
+<<<<<<< HEAD
     private LocalDateTime createdAt;
+=======
+    private Date createdAt;
+>>>>>>> b22e0c14 (fix api momopayment)
     @OneToOne(mappedBy = "appointmentId")
     private MedicalRecord medicalRecord;
     @OneToMany(mappedBy = "appointmentId")
@@ -114,16 +118,26 @@ public class Appointment implements Serializable {
         return patientId;
     }
 
+<<<<<<< HEAD
     public void setPatientId(Patient patientId) {
         this.patientId = patientId;
+=======
+    public void setDoctor(Doctor doctor) {
+        this.doctor = doctor;
+>>>>>>> b22e0c14 (fix api momopayment)
     }
 
     public Schedules getScheduleId() {
         return scheduleId;
     }
 
+<<<<<<< HEAD
     public void setScheduleId(Schedules scheduleId) {
         this.scheduleId = scheduleId;
+=======
+    public void setPatient(Patient patient) {
+        this.patient = patient;
+>>>>>>> b22e0c14 (fix api momopayment)
     }
 
     public Collection<LabResults> getLabResultsCollection() {

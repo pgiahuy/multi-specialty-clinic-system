@@ -24,7 +24,7 @@ import java.util.Collection;
 
 /**
  *
- * @author HUY
+ * @author DELL
  */
 @Entity
 @Table(name = "doctor")
@@ -59,7 +59,11 @@ public class Doctor implements Serializable {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @OneToOne
     private User userId;
+<<<<<<< HEAD
     @OneToMany(mappedBy = "doctorId")
+=======
+    @OneToMany(mappedBy = "doctor")
+>>>>>>> b22e0c14 (fix api momopayment)
     private Collection<Schedules> schedulesCollection;
 
     public Doctor() {
