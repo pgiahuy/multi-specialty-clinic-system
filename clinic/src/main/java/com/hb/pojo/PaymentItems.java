@@ -123,7 +123,6 @@ public class PaymentItems implements Serializable {
         this.amount = amount;
     }
 
-<<<<<<< HEAD
     public Appointment getAppointmentId() {
         return appointmentId;
     }
@@ -132,7 +131,7 @@ public class PaymentItems implements Serializable {
         this.appointmentId = appointmentId;
     }
 
-=======
+
     public Date getCreatedAt() {
         return createdAt;
     }
@@ -173,15 +172,7 @@ public class PaymentItems implements Serializable {
         this.transactionId = transactionId;
     }
 
-    public Appointment getAppointmentId() {
-        return appointmentId;
-    }
-
-    public void setAppointmentId(Appointment appointmentId) {
-        this.appointmentId = appointmentId;
-    }
-
->>>>>>> b22e0c14 (fix api momopayment)
+    
     public LabTests getLabTestId() {
         return labTestId;
     }

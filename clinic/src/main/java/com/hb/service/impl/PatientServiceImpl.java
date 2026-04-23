@@ -46,36 +46,25 @@ public class PatientServiceImpl implements PatientService {
     }
     
     @Override
-<<<<<<< HEAD
-    public PatientResponse addPatient(PatientCreateRequest prq, User u) {
-        
-        Patient p = patientMapper.toEntity(prq, u);
-        this.patientRepo.addPatient(p);
-        return this.patientMapper.toResponse(p);
-=======
     public Patient addPatient(PatientCreateRequest prq, User u) {
-        Patient p = patientMapper.toEntiy(prq);
+        Patient p = patientMapper.toEntity(prq, u);
         p.setUserId(u);
         return this.patientRepo.addPatient(p);
->>>>>>> b22e0c14 (fix api momopayment)
+
     }
     
-//    @Override
-//    @Transactional
-//    public void updateProfile(Long id, PatientCreateRequest prq) {
-//        Patient patient = patientRepo.getPatientById(id);
-//        patientMapper.toEntity(prq, patient);
-//        patientRepo.updatePatient(patient);
-//    }
+    @Override
+    public void updateProfile(Long id, PatientCreateRequest prq) {
+        Patient patient = patientRepo.getPatientById(id);
+        patientMapper.toEntity(prq, patient.getUserId());
+        patientRepo.updatePatient(patient);
+    }
 
     @Override
     public long countPatients(Map<String, String> params) {
         return patientRepo.count(params, Patient.class);
     }
 
-    @Override
-    public void updateProfile(Long id, PatientCreateRequest prq) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
+    
     
 }

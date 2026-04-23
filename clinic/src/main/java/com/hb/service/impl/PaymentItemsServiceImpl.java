@@ -43,7 +43,7 @@ public class PaymentItemsServiceImpl implements PaymentItemsService {
     public void addAppointmentItem(Payment payment, Long appointmentId) {
         Appointment app = appRepo.getAppointmentById(appointmentId);
 
-        BigDecimal price = app.getDoctor().getIdSpecailty().getPrice();
+        BigDecimal price = app.getScheduleId().getDoctorId().getIdSpecailty().getPrice();
 
         PaymentItems item = new PaymentItems();
         item.setPaymentId(payment);
