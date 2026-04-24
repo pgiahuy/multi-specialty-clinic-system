@@ -4,13 +4,9 @@
  */
 package com.hb.pojo;
 
-import com.hb.enums.PaymentStatus;
 import jakarta.persistence.Basic;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -18,29 +14,27 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.util.Collection;
 import java.util.Date;
 
 /**
  *
- * @author DELL
+ * @author HUY
  */
 @Entity
-@Table(name = "payment")
+@Table(name = "lab_results")
 @NamedQueries({
-    @NamedQuery(name = "Payment.findAll", query = "SELECT p FROM Payment p"),
-    @NamedQuery(name = "Payment.findById", query = "SELECT p FROM Payment p WHERE p.id = :id"),
-    @NamedQuery(name = "Payment.findByTotalAmount", query = "SELECT p FROM Payment p WHERE p.totalAmount = :totalAmount"),
-    @NamedQuery(name = "Payment.findByStatus", query = "SELECT p FROM Payment p WHERE p.status = :status"),
-    @NamedQuery(name = "Payment.findByCreatedAt", query = "SELECT p FROM Payment p WHERE p.createdAt = :createdAt")})
-public class Payment implements Serializable {
+    @NamedQuery(name = "LabResults.findAll", query = "SELECT l FROM LabResults l"),
+    @NamedQuery(name = "LabResults.findById", query = "SELECT l FROM LabResults l WHERE l.id = :id"),
+    @NamedQuery(name = "LabResults.findByResultValue", query = "SELECT l FROM LabResults l WHERE l.resultValue = :resultValue"),
+    @NamedQuery(name = "LabResults.findByIsAbnormal", query = "SELECT l FROM LabResults l WHERE l.isAbnormal = :isAbnormal"),
+    @NamedQuery(name = "LabResults.findByPdfUrl", query = "SELECT l FROM LabResults l WHERE l.pdfUrl = :pdfUrl"),
+    @NamedQuery(name = "LabResults.findByCreatedAt", query = "SELECT l FROM LabResults l WHERE l.createdAt = :createdAt")})
+public class LabResults implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -48,25 +42,31 @@ public class Payment implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
-    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
-    @Column(name = "total_amount")
-    private BigDecimal totalAmount;
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status")
-    private PaymentStatus status;
+    @Size(max = 50)
+    @Column(name = "result_value")
+    private String resultValue;
+    @Column(name = "is_abnormal")
+    private Boolean isAbnormal;
+    @Size(max = 255)
+    @Column(name = "pdf_url")
+    private String pdfUrl;
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "paymentId")
-    private Collection<PaymentItems> paymentItemsCollection;
+    @JoinColumn(name = "appointment_id", referencedColumnName = "id")
+    @ManyToOne
+    private Appointment appointmentId;
+    @JoinColumn(name = "test_id", referencedColumnName = "id")
+    @ManyToOne
+    private LabTests testId;
     @JoinColumn(name = "patient_id", referencedColumnName = "id")
-    @ManyToOne(optional = false)
+    @ManyToOne
     private Patient patientId;
 
-    public Payment() {
+    public LabResults() {
     }
 
-    public Payment(Long id) {
+    public LabResults(Long id) {
         this.id = id;
     }
 
@@ -78,20 +78,28 @@ public class Payment implements Serializable {
         this.id = id;
     }
 
-    public BigDecimal getTotalAmount() {
-        return totalAmount;
+    public String getResultValue() {
+        return resultValue;
     }
 
-    public void setTotalAmount(BigDecimal totalAmount) {
-        this.totalAmount = totalAmount;
+    public void setResultValue(String resultValue) {
+        this.resultValue = resultValue;
     }
 
-    public PaymentStatus getStatus() {
-        return status;
+    public Boolean getIsAbnormal() {
+        return isAbnormal;
     }
 
-    public void setStatus(PaymentStatus status) {
-        this.status = status;
+    public void setIsAbnormal(Boolean isAbnormal) {
+        this.isAbnormal = isAbnormal;
+    }
+
+    public String getPdfUrl() {
+        return pdfUrl;
+    }
+
+    public void setPdfUrl(String pdfUrl) {
+        this.pdfUrl = pdfUrl;
     }
 
     public Date getCreatedAt() {
@@ -102,12 +110,20 @@ public class Payment implements Serializable {
         this.createdAt = createdAt;
     }
 
-    public Collection<PaymentItems> getPaymentItemsCollection() {
-        return paymentItemsCollection;
+    public Appointment getAppointmentId() {
+        return appointmentId;
     }
 
-    public void setPaymentItemsCollection(Collection<PaymentItems> paymentItemsCollection) {
-        this.paymentItemsCollection = paymentItemsCollection;
+    public void setAppointmentId(Appointment appointmentId) {
+        this.appointmentId = appointmentId;
+    }
+
+    public LabTests getTestId() {
+        return testId;
+    }
+
+    public void setTestId(LabTests testId) {
+        this.testId = testId;
     }
 
     public Patient getPatientId() {
@@ -128,10 +144,10 @@ public class Payment implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Payment)) {
+        if (!(object instanceof LabResults)) {
             return false;
         }
-        Payment other = (Payment) object;
+        LabResults other = (LabResults) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -140,7 +156,7 @@ public class Payment implements Serializable {
 
     @Override
     public String toString() {
-        return "com.hb.pojo.Payment[ id=" + id + " ]";
+        return "com.hb.pojo.LabResults[ id=" + id + " ]";
     }
     
 }

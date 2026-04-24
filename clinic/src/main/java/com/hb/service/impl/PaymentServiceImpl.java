@@ -57,7 +57,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public Payment createPayment(Long patientId, Long appId, List<Long> testIds, Long presId) {
         Payment p = new Payment();
-        p.setPatient(new Patient(patientId));
+        p.setPatientId(new Patient(patientId));
         p.setStatus(PaymentStatus.PENDING);
         p.setCreatedAt(new Date());
         paymentRepo.addOrUpdatePayment(p);

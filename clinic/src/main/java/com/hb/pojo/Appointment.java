@@ -4,13 +4,9 @@
  */
 package com.hb.pojo;
 
-import com.hb.enums.PaymentStatus;
 import jakarta.persistence.Basic;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -19,28 +15,35 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
-import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
 
 /**
  *
- * @author DELL
+ * @author HUY
  */
 @Entity
-@Table(name = "payment")
+@Table(name = "appointment")
 @NamedQueries({
-    @NamedQuery(name = "Payment.findAll", query = "SELECT p FROM Payment p"),
-    @NamedQuery(name = "Payment.findById", query = "SELECT p FROM Payment p WHERE p.id = :id"),
-    @NamedQuery(name = "Payment.findByTotalAmount", query = "SELECT p FROM Payment p WHERE p.totalAmount = :totalAmount"),
-    @NamedQuery(name = "Payment.findByStatus", query = "SELECT p FROM Payment p WHERE p.status = :status"),
-    @NamedQuery(name = "Payment.findByCreatedAt", query = "SELECT p FROM Payment p WHERE p.createdAt = :createdAt")})
-public class Payment implements Serializable {
+    @NamedQuery(name = "Appointment.findAll", query = "SELECT a FROM Appointment a"),
+    @NamedQuery(name = "Appointment.findById", query = "SELECT a FROM Appointment a WHERE a.id = :id"),
+    @NamedQuery(name = "Appointment.findByStatus", query = "SELECT a FROM Appointment a WHERE a.status = :status"),
+    @NamedQuery(name = "Appointment.findByCreatedAt", query = "SELECT a FROM Appointment a WHERE a.createdAt = :createdAt")})
+public class Appointment implements Serializable {
+
+    @Size(max = 11)
+    @Column(name = "status")
+    private String status;
+    @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime createdAt;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -48,25 +51,23 @@ public class Payment implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
-    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
-    @Column(name = "total_amount")
-    private BigDecimal totalAmount;
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status")
-    private PaymentStatus status;
-    @Column(name = "created_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "paymentId")
+    @OneToOne(mappedBy = "appointmentId")
+    private MedicalRecord medicalRecord;
+    @OneToMany(mappedBy = "appointmentId")
     private Collection<PaymentItems> paymentItemsCollection;
     @JoinColumn(name = "patient_id", referencedColumnName = "id")
-    @ManyToOne(optional = false)
+    @ManyToOne
     private Patient patientId;
+    @JoinColumn(name = "schedule_id", referencedColumnName = "id")
+    @ManyToOne(optional = false)
+    private Schedules scheduleId;
+    @OneToMany(mappedBy = "appointmentId")
+    private Collection<LabResults> labResultsCollection;
 
-    public Payment() {
+    public Appointment() {
     }
 
-    public Payment(Long id) {
+    public Appointment(Long id) {
         this.id = id;
     }
 
@@ -78,28 +79,14 @@ public class Payment implements Serializable {
         this.id = id;
     }
 
-    public BigDecimal getTotalAmount() {
-        return totalAmount;
+
+
+    public MedicalRecord getMedicalRecord() {
+        return medicalRecord;
     }
 
-    public void setTotalAmount(BigDecimal totalAmount) {
-        this.totalAmount = totalAmount;
-    }
-
-    public PaymentStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(PaymentStatus status) {
-        this.status = status;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
+    public void setMedicalRecord(MedicalRecord medicalRecord) {
+        this.medicalRecord = medicalRecord;
     }
 
     public Collection<PaymentItems> getPaymentItemsCollection() {
@@ -118,6 +105,22 @@ public class Payment implements Serializable {
         this.patientId = patientId;
     }
 
+    public Schedules getScheduleId() {
+        return scheduleId;
+    }
+
+    public void setScheduleId(Schedules scheduleId) {
+        this.scheduleId = scheduleId;
+    }
+
+    public Collection<LabResults> getLabResultsCollection() {
+        return labResultsCollection;
+    }
+
+    public void setLabResultsCollection(Collection<LabResults> labResultsCollection) {
+        this.labResultsCollection = labResultsCollection;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -128,10 +131,10 @@ public class Payment implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Payment)) {
+        if (!(object instanceof Appointment)) {
             return false;
         }
-        Payment other = (Payment) object;
+        Appointment other = (Appointment) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -140,7 +143,23 @@ public class Payment implements Serializable {
 
     @Override
     public String toString() {
-        return "com.hb.pojo.Payment[ id=" + id + " ]";
+        return "com.hb.pojo.Appointment[ id=" + id + " ]";
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
     
 }
