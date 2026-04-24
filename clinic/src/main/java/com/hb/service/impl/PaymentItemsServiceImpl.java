@@ -95,7 +95,7 @@ public class PaymentItemsServiceImpl implements PaymentItemsService {
             if (item != null) {
                 item.setStatus(PaymentStatus.SUCCESS);
                 item.setMethod(PaymentMethod.valueOf(method));
-                item.setTransactionId(transId);
+                item.setTransId(transId);
                 item.setPaidAt(new Date());
                 itemRepo.addOrUpdateItem(item);
             }

@@ -41,8 +41,7 @@ import java.util.Date;
     @NamedQuery(name = "PaymentItems.findByCreatedAt", query = "SELECT p FROM PaymentItems p WHERE p.createdAt = :createdAt"),
     @NamedQuery(name = "PaymentItems.findByStatus", query = "SELECT p FROM PaymentItems p WHERE p.status = :status"),
     @NamedQuery(name = "PaymentItems.findByMethod", query = "SELECT p FROM PaymentItems p WHERE p.method = :method"),
-    @NamedQuery(name = "PaymentItems.findByPaidAt", query = "SELECT p FROM PaymentItems p WHERE p.paidAt = :paidAt"),
-    @NamedQuery(name = "PaymentItems.findByTransactionId", query = "SELECT p FROM PaymentItems p WHERE p.transactionId = :transactionId")})
+    @NamedQuery(name = "PaymentItems.findByPaidAt", query = "SELECT p FROM PaymentItems p WHERE p.paidAt = :paidAt")})
 public class PaymentItems implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -71,9 +70,6 @@ public class PaymentItems implements Serializable {
     @Column(name = "paid_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date paidAt;
-    @Size(max = 100)
-    @Column(name = "transaction_id")
-    private String transactionId;
     @JoinColumn(name = "appointment_id", referencedColumnName = "id")
     @ManyToOne
     private Appointment appointmentId;
@@ -86,6 +82,9 @@ public class PaymentItems implements Serializable {
     @JoinColumn(name = "prescription_id", referencedColumnName = "id")
     @ManyToOne
     private Prescription prescriptionId;
+    @Size(max = 100)
+    @Column(name = "trans_id", length = 100)
+    private String transId;
 
     public PaymentItems() {
     }
@@ -123,15 +122,6 @@ public class PaymentItems implements Serializable {
         this.amount = amount;
     }
 
-    public Appointment getAppointmentId() {
-        return appointmentId;
-    }
-
-    public void setAppointmentId(Appointment appointmentId) {
-        this.appointmentId = appointmentId;
-    }
-
-
     public Date getCreatedAt() {
         return createdAt;
     }
@@ -164,15 +154,14 @@ public class PaymentItems implements Serializable {
         this.paidAt = paidAt;
     }
 
-    public String getTransactionId() {
-        return transactionId;
+    public Appointment getAppointmentId() {
+        return appointmentId;
     }
 
-    public void setTransactionId(String transactionId) {
-        this.transactionId = transactionId;
+    public void setAppointmentId(Appointment appointmentId) {
+        this.appointmentId = appointmentId;
     }
 
-    
     public LabTests getLabTestId() {
         return labTestId;
     }
@@ -220,6 +209,20 @@ public class PaymentItems implements Serializable {
     @Override
     public String toString() {
         return "com.hb.pojo.PaymentItems[ id=" + id + " ]";
+    }
+
+    /**
+     * @return the transId
+     */
+    public String getTransId() {
+        return transId;
+    }
+
+    /**
+     * @param transId the transId to set
+     */
+    public void setTransId(String transId) {
+        this.transId = transId;
     }
     
 }
