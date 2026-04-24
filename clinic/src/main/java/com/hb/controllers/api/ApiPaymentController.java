@@ -10,8 +10,7 @@ import com.hb.repository.PaymentItemRepository;
 import com.hb.service.MomoPaymentService;
 import com.hb.service.PaymentItemsService;
 import com.hb.service.PaymentService;
-import com.restfb.types.webhook.messaging.PaymentItem;
-import java.math.BigDecimal;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -42,10 +41,9 @@ public class ApiPaymentController {
 
     @Autowired
     private PaymentItemsService paymentItemSer;
-    
+
     @Autowired
     private PaymentItemRepository itemRepo;
-    
 
     @PostMapping("/create")
     public ResponseEntity<?> createPayment(
@@ -75,9 +73,9 @@ public class ApiPaymentController {
 
     @GetMapping("/momo/return")
     public ResponseEntity<?> momoReturn(@RequestParam Map<String, String> params) throws Exception {
-//        boolean valid = momoService.verifySignature(params);
+        
+        boolean valid = momoService.verifySignature(params);
         String resultCode = params.get("resultCode");
-        boolean valid = Boolean.TRUE;
 
         if (valid && "0".equals(resultCode)) {
             String extraData = params.get("extraData");
@@ -90,7 +88,7 @@ public class ApiPaymentController {
 
                 paymentItemSer.confirmItemsPaid(transId, "MOMO", itemIds);
             }
-        }
+        } 
 
         MoMoPaymentResponse response = new MoMoPaymentResponse();
         response.setMessage(params.get("message"));
@@ -102,11 +100,13 @@ public class ApiPaymentController {
 
     @PostMapping("/momo/ipn")
     public ResponseEntity<?> momoIpn(@RequestBody Map<String, String> params) throws Exception {
+        
+        boolean valid = momoService.verifySignature(params);
         Map<String, Object> result = new HashMap<>();
         try {
             String resultCode = params.get("resultCode");
             // Giả sử valid = true để test
-            if ("0".equals(resultCode)) {
+            if (valid && "0".equals(resultCode)) {
                 String transId = params.get("transId");
                 String extraData = params.get("extraData");
 

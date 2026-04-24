@@ -34,11 +34,14 @@ public class MomoPaymentServiceImpl implements MomoPaymentService {
 
     @Override
     public MoMoPaymentResponse createPayment(String orderId, long amount, String orderInfo, String extraData) throws Exception {
-       
-//        String extraData = "";
+
+        if (extraData == null) {
+            extraData = "";
+        }
+        
         String uniqueOrderId = orderId + "_" + System.currentTimeMillis();
         String requestId = momoConfig.getPartnerCode() + System.currentTimeMillis();
-        String rawSignature = "accessKey=" + momoConfig.getAccessKey()
+         String rawSignature = "accessKey=" + momoConfig.getAccessKey()
                 + "&amount=" + amount
                 + "&extraData=" + extraData
                 + "&ipnUrl=" + momoConfig.getNotifyUrl()
@@ -99,4 +102,3 @@ public class MomoPaymentServiceImpl implements MomoPaymentService {
         return expectedSignature.equals(params.get("signature"));
     }
 }
-
