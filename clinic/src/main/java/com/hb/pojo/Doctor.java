@@ -35,12 +35,6 @@ import java.util.Collection;
     @NamedQuery(name = "Doctor.findByGender", query = "SELECT d FROM Doctor d WHERE d.gender = :gender")})
 public class Doctor implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "id")
-    private Long id;
     @Size(max = 255)
     @Column(name = "full_name")
     private String fullName;
@@ -51,17 +45,22 @@ public class Doctor implements Serializable {
     @Size(max = 3)
     @Column(name = "gender")
     private String gender;
+
+    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id")
+    private Long id;
     @OneToMany(mappedBy = "idHod")
     private Collection<Specialty> specialtyCollection;
-    @OneToMany(mappedBy = "doctor")
-    private Collection<Appointment> appointmentCollection;
     @JoinColumn(name = "id_specailty", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Specialty idSpecailty;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @OneToOne
-    private User user;
-    @OneToMany(mappedBy = "doctor")
+    private User userId;
+    @OneToMany(mappedBy = "doctorId")
     private Collection<Schedules> schedulesCollection;
 
     public Doctor() {
@@ -87,21 +86,6 @@ public class Doctor implements Serializable {
         this.fullName = fullName;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
 
     public Collection<Specialty> getSpecialtyCollection() {
         return specialtyCollection;
@@ -109,14 +93,6 @@ public class Doctor implements Serializable {
 
     public void setSpecialtyCollection(Collection<Specialty> specialtyCollection) {
         this.specialtyCollection = specialtyCollection;
-    }
-
-    public Collection<Appointment> getAppointmentCollection() {
-        return appointmentCollection;
-    }
-
-    public void setAppointmentCollection(Collection<Appointment> appointmentCollection) {
-        this.appointmentCollection = appointmentCollection;
     }
 
     public Specialty getIdSpecailty() {
@@ -127,12 +103,12 @@ public class Doctor implements Serializable {
         this.idSpecailty = idSpecailty;
     }
 
-    public User getUser() {
-        return user;
+    public User getUserId() {
+        return userId;
     }
 
-    public void setUser(User user) {
-        this.user= user;
+    public void setUserId(User userId) {
+        this.userId = userId;
     }
 
     public Collection<Schedules> getSchedulesCollection() {
@@ -166,6 +142,23 @@ public class Doctor implements Serializable {
     @Override
     public String toString() {
         return "com.hb.pojo.Doctor[ id=" + id + " ]";
+    }
+
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
     
 }

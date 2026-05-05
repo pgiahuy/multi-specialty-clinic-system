@@ -6,28 +6,77 @@ package com.hb.mapper;
 
 import com.hb.dto.request.AppointmentCreateRequest;
 import com.hb.dto.response.AppointmentResponse;
+import com.hb.enums.AppointmentStatus;
 import com.hb.pojo.Appointment;
+import com.hb.pojo.Patient;
+import com.hb.pojo.Schedules;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 
 /**
  *
  * @author HUY
  */
+import org.springframework.stereotype.Component;
 
+@Component
+public class AppointmentMapper {
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
+    public AppointmentResponse toResponse(Appointment a) {
+        if (a == null) {
+            return null;
+        }
 
+        AppointmentResponse res = new AppointmentResponse();
+        res.setId(a.getId());
+        res.setStatus(a.getStatus());
+        res.setCreatedAt(a.getCreatedAt());
 
-@Mapper(componentModel = "spring")
-public interface AppointmentMapper {
+        if (a.getPatientId() != null) {
+            res.setPatientFullName(a.getPatientId().getFullName());
+        }
 
-    @Mapping(source = "doctor.id", target = "doctorId")
-    @Mapping(source = "patient.id", target = "patientId")
-    AppointmentResponse toResponse(Appointment a);
+        if (a.getScheduleId() != null) {
+            var s = a.getScheduleId();
+            res.setAppointmentDate(new SimpleDateFormat("dd/MM/yyyy").format(s.getDate()));
 
-    Appointment toEntity(AppointmentCreateRequest request);
+            if (s.getDoctorId() != null) {
+                res.setDoctorFullName(s.getDoctorId().getFullName());
+            }
 
-    void updateFromRequest(AppointmentCreateRequest req,
-                           @MappingTarget Appointment appointment);
+            if (s.getShiftId() != null) {
+                var shift = s.getShiftId();
+                res.setSession(shift.getSession());
+                res.setTimeSlot(shift.getStartTime() + " - " + shift.getEndTime());
+            }
+
+            if (s.getRoomId() != null) {
+                var room = s.getRoomId();
+                res.setRoomName("Phòng " + room.getRoomNumber());
+
+                if (room.getAreaId() != null) {
+                    var area = room.getAreaId();
+                    res.setAreaName(area.getAreaName() + " - Tầng " + area.getLocationFloor());
+                }
+            }
+        }
+
+        return res;
+    }
+
+    public Appointment toEntity(AppointmentCreateRequest req, Patient patient, Schedules  schedule) {
+        if (req == null) {
+            return null;
+        }
+
+        Appointment a = new Appointment();
+
+        a.setPatientId(patient);   
+        a.setScheduleId(schedule);
+
+        a.setStatus(AppointmentStatus.PENDING.name()); 
+        a.setCreatedAt(LocalDateTime.now());
+
+        return a;
+    }
 }

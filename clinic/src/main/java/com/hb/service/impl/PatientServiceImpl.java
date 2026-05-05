@@ -5,6 +5,7 @@
 package com.hb.service.impl;
 
 import com.hb.dto.request.PatientCreateRequest;
+import com.hb.dto.response.PatientResponse;
 import com.hb.mapper.PatientMapper;
 import com.hb.pojo.Patient;
 import com.hb.pojo.User;
@@ -46,16 +47,16 @@ public class PatientServiceImpl implements PatientService {
     
     @Override
     public Patient addPatient(PatientCreateRequest prq, User u) {
-        Patient p = patientMapper.toEntiy(prq);
-        p.setUser(u);
+        Patient p = patientMapper.toEntity(prq, u);
+        p.setUserId(u);
         return this.patientRepo.addPatient(p);
+
     }
     
     @Override
-    @Transactional
     public void updateProfile(Long id, PatientCreateRequest prq) {
         Patient patient = patientRepo.getPatientById(id);
-        patientMapper.updateFromRequest(prq, patient);
+        patientMapper.toEntity(prq, patient.getUserId());
         patientRepo.updatePatient(patient);
     }
 
@@ -63,5 +64,7 @@ public class PatientServiceImpl implements PatientService {
     public long countPatients(Map<String, String> params) {
         return patientRepo.count(params, Patient.class);
     }
+
+    
     
 }
