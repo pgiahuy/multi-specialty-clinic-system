@@ -40,7 +40,7 @@ public class NotificationServiceImpl implements NotificationService {
         String userName = params.get("username");
         if (userName != null && !userName.isEmpty()) {
             User user = userRepo.getUserByUsername(userName);
-            n.setUser(user);
+            n.setUserId(user);
         }
 
         return this.notificationRepo.addNotification(n);

@@ -6,18 +6,23 @@ package com.hb.controllers.api;
 
 import com.hb.dto.request.PatientCreateRequest;
 import com.hb.dto.response.PatientResponse;
+import com.hb.mapper.PatientMapper;
 import com.hb.pojo.Patient;
 import com.hb.pojo.User;
 import com.hb.service.PatientService;
 import com.hb.service.UserService;
 import java.security.Principal;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,11 +37,22 @@ public class ApiPatientController {
 
     @Autowired
     private PatientService patientService;
+    
+    @Autowired
+    private PatientMapper patientMapper;
 
     @Autowired
     private UserService userService;
+    
+    
+    @PostMapping
+    public ResponseEntity<PatientResponse> create(@RequestBody PatientCreateRequest req ,Principal principal){
+        User u = this.userService.getUserByUsername(principal.getName());
+        PatientResponse p = patientService.addPatient(req, u);
+        return ResponseEntity.status(HttpStatus.CREATED).body(p);
+    }
 
-    @PutMapping(value = "/profile/{id}",
+    @PutMapping(value = "/secure/profile/{id}",
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateProfile(
             @PathVariable("id") Long id,
@@ -52,17 +68,8 @@ public class ApiPatientController {
     public ResponseEntity<PatientResponse> getProfile(Principal principal) {
         User u = this.userService.getUserByUsername(principal.getName());
         Patient p = u.getPatient();
-
-        PatientResponse res = new PatientResponse(
-                p.getCccd(),
-                p.getFullName(),
-                p.getPhone(),
-                p.getDob(),
-                p.getAddress(),
-                u.getEmail(),
-                u.getSecureUrl()
-        );
-        return ResponseEntity.ok(res);
+       
+        return ResponseEntity.ok(patientMapper.toResponse(p));
     }
 
 }

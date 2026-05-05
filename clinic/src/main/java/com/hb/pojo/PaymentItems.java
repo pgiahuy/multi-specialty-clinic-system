@@ -4,9 +4,13 @@
  */
 package com.hb.pojo;
 
+import com.hb.enums.PaymentMethod;
+import com.hb.enums.PaymentStatus;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -25,7 +29,7 @@ import java.util.Date;
 
 /**
  *
- * @author HUY
+ * @author DELL
  */
 @Entity
 @Table(name = "payment_items")
@@ -35,10 +39,12 @@ import java.util.Date;
     @NamedQuery(name = "PaymentItems.findByItemType", query = "SELECT p FROM PaymentItems p WHERE p.itemType = :itemType"),
     @NamedQuery(name = "PaymentItems.findByAmount", query = "SELECT p FROM PaymentItems p WHERE p.amount = :amount"),
     @NamedQuery(name = "PaymentItems.findByCreatedAt", query = "SELECT p FROM PaymentItems p WHERE p.createdAt = :createdAt"),
-    @NamedQuery(name = "PaymentItems.findByStatus", query = "SELECT p FROM PaymentItems p WHERE p.status = :status")})
+    @NamedQuery(name = "PaymentItems.findByStatus", query = "SELECT p FROM PaymentItems p WHERE p.status = :status"),
+    @NamedQuery(name = "PaymentItems.findByMethod", query = "SELECT p FROM PaymentItems p WHERE p.method = :method"),
+    @NamedQuery(name = "PaymentItems.findByPaidAt", query = "SELECT p FROM PaymentItems p WHERE p.paidAt = :paidAt")})
 public class PaymentItems implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
@@ -55,21 +61,30 @@ public class PaymentItems implements Serializable {
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
-    @Size(max = 7)
+    @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    private String status;
+    private PaymentStatus status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "method")
+    private PaymentMethod method;
+    @Column(name = "paid_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date paidAt;
     @JoinColumn(name = "appointment_id", referencedColumnName = "id")
     @ManyToOne
-    private Appointment appointment;
+    private Appointment appointmentId;
     @JoinColumn(name = "lab_test_id", referencedColumnName = "id")
     @ManyToOne
-    private LabResults labTestId;
+    private LabTests labTestId;
     @JoinColumn(name = "payment_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Payment paymentId;
     @JoinColumn(name = "prescription_id", referencedColumnName = "id")
     @ManyToOne
     private Prescription prescriptionId;
+    @Size(max = 100)
+    @Column(name = "trans_id", length = 100)
+    private String transId;
 
     public PaymentItems() {
     }
@@ -83,101 +98,131 @@ public class PaymentItems implements Serializable {
         this.amount = amount;
     }
 
+    /**
+     * @return the serialVersionUID
+     */
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+    /**
+     * @param aSerialVersionUID the serialVersionUID to set
+     */
+    public static void setSerialVersionUID(long aSerialVersionUID) {
+        serialVersionUID = aSerialVersionUID;
+    }
+
+    /**
+     * @return the id
+     */
     public Long getId() {
         return id;
     }
 
+    /**
+     * @param id the id to set
+     */
     public void setId(Long id) {
         this.id = id;
     }
 
+    /**
+     * @return the itemType
+     */
     public String getItemType() {
         return itemType;
     }
 
+    /**
+     * @param itemType the itemType to set
+     */
     public void setItemType(String itemType) {
         this.itemType = itemType;
     }
 
+    /**
+     * @return the amount
+     */
     public BigDecimal getAmount() {
         return amount;
     }
 
+    /**
+     * @param amount the amount to set
+     */
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public String getStatus() {
+    /**
+     * @return the status
+     */
+    public PaymentStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    /**
+     * @param status the status to set
+     */
+    public void setStatus(PaymentStatus status) {
         this.status = status;
     }
 
-    public Appointment getAppointment() {
-        return appointment;
+    /**
+     * @return the appointmentId
+     */
+    public Appointment getAppointmentId() {
+        return appointmentId;
     }
 
-    public void setAppointment(Appointment appointment) {
-        this.appointment = appointment;
+    /**
+     * @param appointmentId the appointmentId to set
+     */
+    public void setAppointmentId(Appointment appointmentId) {
+        this.appointmentId = appointmentId;
     }
 
-    public LabResults getLabTestId() {
+    /**
+     * @return the labTestId
+     */
+    public LabTests getLabTestId() {
         return labTestId;
     }
 
-    public void setLabTestId(LabResults labTestId) {
+    /**
+     * @param labTestId the labTestId to set
+     */
+    public void setLabTestId(LabTests labTestId) {
         this.labTestId = labTestId;
     }
 
+    /**
+     * @return the paymentId
+     */
     public Payment getPaymentId() {
         return paymentId;
     }
 
+    /**
+     * @param paymentId the paymentId to set
+     */
     public void setPaymentId(Payment paymentId) {
         this.paymentId = paymentId;
     }
 
+    /**
+     * @return the prescriptionId
+     */
     public Prescription getPrescriptionId() {
         return prescriptionId;
     }
 
+    /**
+     * @param prescriptionId the prescriptionId to set
+     */
     public void setPrescriptionId(Prescription prescriptionId) {
         this.prescriptionId = prescriptionId;
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof PaymentItems)) {
-            return false;
-        }
-        PaymentItems other = (PaymentItems) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "com.hb.pojo.PaymentItems[ id=" + id + " ]";
-    }
     
 }

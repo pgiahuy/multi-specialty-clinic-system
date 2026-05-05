@@ -38,7 +38,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
             try {
                 Long appointmentId = Long.parseLong(appointmentIdStr);
                 var appointment = appointmentRepo.getAppointmentById(appointmentId);
-                m.setAppointment(appointment);
+                m.setAppointmentId(appointment);
                 
             } catch (NumberFormatException e) {
                 throw new RuntimeException("Invalid appointment ID format");
