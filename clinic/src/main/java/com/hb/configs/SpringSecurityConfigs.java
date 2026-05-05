@@ -35,7 +35,8 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
         basePackages = {
             "com.hb.controllers",
             "com.hb.repository",
-            "com.hb.service"
+            "com.hb.service",
+            "com.hb.configs"
         }
 )
 public class SpringSecurityConfigs {

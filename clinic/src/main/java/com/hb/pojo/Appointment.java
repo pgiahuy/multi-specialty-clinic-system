@@ -21,6 +21,7 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
 
@@ -33,11 +34,16 @@ import java.util.Date;
 @NamedQueries({
     @NamedQuery(name = "Appointment.findAll", query = "SELECT a FROM Appointment a"),
     @NamedQuery(name = "Appointment.findById", query = "SELECT a FROM Appointment a WHERE a.id = :id"),
-    @NamedQuery(name = "Appointment.findByDate", query = "SELECT a FROM Appointment a WHERE a.date = :date"),
-    @NamedQuery(name = "Appointment.findByTimeSlot", query = "SELECT a FROM Appointment a WHERE a.timeSlot = :timeSlot"),
     @NamedQuery(name = "Appointment.findByStatus", query = "SELECT a FROM Appointment a WHERE a.status = :status"),
     @NamedQuery(name = "Appointment.findByCreatedAt", query = "SELECT a FROM Appointment a WHERE a.createdAt = :createdAt")})
 public class Appointment implements Serializable {
+
+    @Size(max = 11)
+    @Column(name = "status")
+    private String status;
+    @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime createdAt;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -45,29 +51,16 @@ public class Appointment implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
-    @Column(name = "date")
-    @Temporal(TemporalType.DATE)
-    private Date date;
-    @Size(max = 20)
-    @Column(name = "time_slot")
-    private String timeSlot;
-    @Size(max = 11)
-    @Column(name = "status")
-    private String status;
-    @Column(name = "created_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt;
-    @OneToOne(mappedBy = "appointment")
+    @OneToOne(mappedBy = "appointmentId")
     private MedicalRecord medicalRecord;
-    
-    @OneToMany(mappedBy = "appointment")
+    @OneToMany(mappedBy = "appointmentId")
     private Collection<PaymentItems> paymentItemsCollection;
-    @JoinColumn(name = "doctor_id", referencedColumnName = "id")
-    @ManyToOne
-    private Doctor doctor;
     @JoinColumn(name = "patient_id", referencedColumnName = "id")
     @ManyToOne
-    private Patient patient;
+    private Patient patientId;
+    @JoinColumn(name = "schedule_id", referencedColumnName = "id")
+    @ManyToOne(optional = false)
+    private Schedules scheduleId;
     @OneToMany(mappedBy = "appointmentId")
     private Collection<LabResults> labResultsCollection;
 
@@ -86,37 +79,7 @@ public class Appointment implements Serializable {
         this.id = id;
     }
 
-    public Date getDate() {
-        return date;
-    }
 
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
-    public String getTimeSlot() {
-        return timeSlot;
-    }
-
-    public void setTimeSlot(String timeSlot) {
-        this.timeSlot = timeSlot;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
 
     public MedicalRecord getMedicalRecord() {
         return medicalRecord;
@@ -134,20 +97,20 @@ public class Appointment implements Serializable {
         this.paymentItemsCollection = paymentItemsCollection;
     }
 
-    public Doctor getDoctor() {
-        return doctor;
+    public Patient getPatientId() {
+        return patientId;
     }
 
-    public void setDoctor(Doctor doctor) {
-        this.doctor= doctor;
+    public void setPatientId(Patient patientId) {
+        this.patientId = patientId;
     }
 
-    public Patient getPatient() {
-        return patient;
+    public Schedules getScheduleId() {
+        return scheduleId;
     }
 
-    public void setPatient(Patient patient) {
-        this.patient= patient;
+    public void setScheduleId(Schedules scheduleId) {
+        this.scheduleId = scheduleId;
     }
 
     public Collection<LabResults> getLabResultsCollection() {
@@ -181,6 +144,22 @@ public class Appointment implements Serializable {
     @Override
     public String toString() {
         return "com.hb.pojo.Appointment[ id=" + id + " ]";
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
     
 }

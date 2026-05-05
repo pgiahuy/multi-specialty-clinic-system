@@ -5,6 +5,7 @@
 package com.hb.service;
 
 import com.hb.dto.request.PatientCreateRequest;
+import com.hb.dto.response.PatientResponse;
 import com.hb.pojo.Patient;
 import com.hb.pojo.User;
 import java.util.List;

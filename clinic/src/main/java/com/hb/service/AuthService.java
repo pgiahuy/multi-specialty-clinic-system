@@ -4,16 +4,13 @@
  */
 package com.hb.service;
 
-import com.hb.dto.request.PatientCreateRequest;
 import com.hb.dto.request.UserCreateRequest;
-import java.util.Map;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
  * @author DELL
  */
 public interface AuthService {
-    void registerPatient(UserCreateRequest urq, PatientCreateRequest prq);
+    void registerPatient(UserCreateRequest urq);
     boolean authenticate(String username, String password);
 }
