@@ -60,9 +60,6 @@ private String email;
     @Size(max = 12)
     @Column(name = "role")
     private String role;
-    @Column(name = "created_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime createdAt;
     @Size(max = 255)
     @Column(name = "secure_url")
     private String secureUrl;
@@ -77,12 +74,15 @@ private String email;
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
+    @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime createdAt;
     @OneToOne(mappedBy = "userId")
     private Doctor doctor;
     @OneToMany(mappedBy = "userId")
     private Collection<Notification> notificationCollection;
-    @OneToOne(mappedBy = "userId")
-    private Patient patient;
+    @OneToMany(mappedBy = "userId")
+    private Collection<Patient> patientCollection;
     @OneToMany(mappedBy = "userId")
     private Collection<SocialAccount> socialAccountCollection;
 
@@ -148,12 +148,12 @@ private String email;
         this.notificationCollection = notificationCollection;
     }
 
-    public Patient getPatient() {
-        return patient;
+    public Collection<Patient> getPatientCollection() {
+        return patientCollection;
     }
 
-    public void setPatient(Patient patient) {
-        this.patient = patient;
+    public void setPatientCollection(Collection<Patient> patientCollection) {
+        this.patientCollection = patientCollection;
     }
 
     public Collection<SocialAccount> getSocialAccountCollection() {

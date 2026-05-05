@@ -9,8 +9,6 @@ import com.hb.enums.PaymentStatus;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -41,10 +39,11 @@ import java.util.Date;
     @NamedQuery(name = "PaymentItems.findByCreatedAt", query = "SELECT p FROM PaymentItems p WHERE p.createdAt = :createdAt"),
     @NamedQuery(name = "PaymentItems.findByStatus", query = "SELECT p FROM PaymentItems p WHERE p.status = :status"),
     @NamedQuery(name = "PaymentItems.findByMethod", query = "SELECT p FROM PaymentItems p WHERE p.method = :method"),
-    @NamedQuery(name = "PaymentItems.findByPaidAt", query = "SELECT p FROM PaymentItems p WHERE p.paidAt = :paidAt")})
+    @NamedQuery(name = "PaymentItems.findByPaidAt", query = "SELECT p FROM PaymentItems p WHERE p.paidAt = :paidAt"),
+    @NamedQuery(name = "PaymentItems.findByTransId", query = "SELECT p FROM PaymentItems p WHERE p.transId = :transId")})
 public class PaymentItems implements Serializable {
 
-    private static long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
@@ -61,15 +60,18 @@ public class PaymentItems implements Serializable {
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
-    @Enumerated(EnumType.STRING)
+    @Size(max = 7)
     @Column(name = "status")
     private PaymentStatus status;
-    @Enumerated(EnumType.STRING)
+    @Size(max = 5)
     @Column(name = "method")
-    private PaymentMethod method;
+    private String method;
     @Column(name = "paid_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date paidAt;
+    @Size(max = 100)
+    @Column(name = "trans_id")
+    private String transId;
     @JoinColumn(name = "appointment_id", referencedColumnName = "id")
     @ManyToOne
     private Appointment appointmentId;
@@ -98,131 +100,125 @@ public class PaymentItems implements Serializable {
         this.amount = amount;
     }
 
-    /**
-     * @return the serialVersionUID
-     */
-    public static long getSerialVersionUID() {
-        return serialVersionUID;
-    }
-
-    /**
-     * @param aSerialVersionUID the serialVersionUID to set
-     */
-    public static void setSerialVersionUID(long aSerialVersionUID) {
-        serialVersionUID = aSerialVersionUID;
-    }
-
-    /**
-     * @return the id
-     */
     public Long getId() {
         return id;
     }
 
-    /**
-     * @param id the id to set
-     */
     public void setId(Long id) {
         this.id = id;
     }
 
-    /**
-     * @return the itemType
-     */
     public String getItemType() {
         return itemType;
     }
 
-    /**
-     * @param itemType the itemType to set
-     */
     public void setItemType(String itemType) {
         this.itemType = itemType;
     }
 
-    /**
-     * @return the amount
-     */
     public BigDecimal getAmount() {
         return amount;
     }
 
-    /**
-     * @param amount the amount to set
-     */
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 
-    /**
-     * @return the status
-     */
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
     public PaymentStatus getStatus() {
         return status;
     }
 
-    /**
-     * @param status the status to set
-     */
     public void setStatus(PaymentStatus status) {
         this.status = status;
     }
 
-    /**
-     * @return the appointmentId
-     */
+    public String getMethod() {
+        return method;
+    }
+
+    public void setMethod(String method) {
+        this.method = method;
+    }
+
+    public Date getPaidAt() {
+        return paidAt;
+    }
+
+    public void setPaidAt(Date paidAt) {
+        this.paidAt = paidAt;
+    }
+
+    public String getTransId() {
+        return transId;
+    }
+
+    public void setTransId(String transId) {
+        this.transId = transId;
+    }
+
     public Appointment getAppointmentId() {
         return appointmentId;
     }
 
-    /**
-     * @param appointmentId the appointmentId to set
-     */
     public void setAppointmentId(Appointment appointmentId) {
         this.appointmentId = appointmentId;
     }
 
-    /**
-     * @return the labTestId
-     */
     public LabTests getLabTestId() {
         return labTestId;
     }
 
-    /**
-     * @param labTestId the labTestId to set
-     */
     public void setLabTestId(LabTests labTestId) {
         this.labTestId = labTestId;
     }
 
-    /**
-     * @return the paymentId
-     */
     public Payment getPaymentId() {
         return paymentId;
     }
 
-    /**
-     * @param paymentId the paymentId to set
-     */
     public void setPaymentId(Payment paymentId) {
         this.paymentId = paymentId;
     }
 
-    /**
-     * @return the prescriptionId
-     */
     public Prescription getPrescriptionId() {
         return prescriptionId;
     }
 
-    /**
-     * @param prescriptionId the prescriptionId to set
-     */
     public void setPrescriptionId(Prescription prescriptionId) {
         this.prescriptionId = prescriptionId;
     }
 
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof PaymentItems)) {
+            return false;
+        }
+        PaymentItems other = (PaymentItems) object;
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "com.hb.pojo.PaymentItems[ id=" + id + " ]";
+    }
     
 }
