@@ -4,7 +4,6 @@
  */
 package com.hb.pojo;
 
-import com.hb.enums.PaymentMethod;
 import com.hb.enums.PaymentStatus;
 import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
@@ -31,7 +30,7 @@ import java.util.Date;
 
 /**
  *
- * @author HUY
+ * @author DELL
  */
 @Entity
 @Table(name = "payment")
@@ -39,7 +38,6 @@ import java.util.Date;
     @NamedQuery(name = "Payment.findAll", query = "SELECT p FROM Payment p"),
     @NamedQuery(name = "Payment.findById", query = "SELECT p FROM Payment p WHERE p.id = :id"),
     @NamedQuery(name = "Payment.findByTotalAmount", query = "SELECT p FROM Payment p WHERE p.totalAmount = :totalAmount"),
-    @NamedQuery(name = "Payment.findByMethod", query = "SELECT p FROM Payment p WHERE p.method = :method"),
     @NamedQuery(name = "Payment.findByStatus", query = "SELECT p FROM Payment p WHERE p.status = :status"),
     @NamedQuery(name = "Payment.findByCreatedAt", query = "SELECT p FROM Payment p WHERE p.createdAt = :createdAt")})
 public class Payment implements Serializable {

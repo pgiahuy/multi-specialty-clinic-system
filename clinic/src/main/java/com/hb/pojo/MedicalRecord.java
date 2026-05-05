@@ -34,12 +34,6 @@ import java.util.Date;
     @NamedQuery(name = "MedicalRecord.findByCreatedAt", query = "SELECT m FROM MedicalRecord m WHERE m.createdAt = :createdAt")})
 public class MedicalRecord implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "id")
-    private Long id;
     @Lob
     @Size(max = 65535)
     @Column(name = "diagnosis")
@@ -48,6 +42,13 @@ public class MedicalRecord implements Serializable {
     @Size(max = 65535)
     @Column(name = "note")
     private String note;
+
+    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id")
+    private Long id;
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
@@ -72,21 +73,6 @@ public class MedicalRecord implements Serializable {
         this.id = id;
     }
 
-    public String getDiagnosis() {
-        return diagnosis;
-    }
-
-    public void setDiagnosis(String diagnosis) {
-        this.diagnosis = diagnosis;
-    }
-
-    public String getNote() {
-        return note;
-    }
-
-    public void setNote(String note) {
-        this.note = note;
-    }
 
     public Date getCreatedAt() {
         return createdAt;
@@ -135,6 +121,22 @@ public class MedicalRecord implements Serializable {
     @Override
     public String toString() {
         return "com.hb.pojo.MedicalRecord[ id=" + id + " ]";
+    }
+
+    public String getDiagnosis() {
+        return diagnosis;
+    }
+
+    public void setDiagnosis(String diagnosis) {
+        this.diagnosis = diagnosis;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
     }
     
 }
