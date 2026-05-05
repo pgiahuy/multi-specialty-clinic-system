@@ -103,6 +103,19 @@ public class LabTests implements Serializable {
         this.testName = testName;
     }
 
+    /**
+     * @return the unit
+     */
+    public String getUnit() {
+        return unit;
+    }
+
+    /**
+     * @param unit the unit to set
+     */
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
 
     /**
      * @return the normalRange
@@ -118,33 +131,19 @@ public class LabTests implements Serializable {
         this.normalRange = normalRange;
     }
 
-    /**
-     * @return the price
-     */
-    public BigDecimal getPrice() {
-        return price;
+    public String getUnit() {
+        return unit;
     }
 
-    /**
-     * @param price the price to set
-     */
-    public void setPrice(BigDecimal price) {
-        this.price = price;
+    public void setUnit(String unit) {
+        this.unit = unit;
     }
 
-    /**
-     * @return the paymentItemsCollection
-     */
-    public Collection<PaymentItems> getPaymentItemsCollection() {
-        return paymentItemsCollection;
-    }
+  
+    
+    
 
-    /**
-     * @param paymentItemsCollection the paymentItemsCollection to set
-     */
-    public void setPaymentItemsCollection(Collection<PaymentItems> paymentItemsCollection) {
-        this.paymentItemsCollection = paymentItemsCollection;
-    }
+    
 
     /**
      * @return the labResultsCollection
@@ -159,18 +158,6 @@ public class LabTests implements Serializable {
     public void setLabResultsCollection(Collection<LabResults> labResultsCollection) {
         this.labResultsCollection = labResultsCollection;
     }
-
-  
-
-    public String getUnit() {
-        return unit;
-    }
-
-    public void setUnit(String unit) {
-        this.unit = unit;
-    }
-
-  
     
     
 
