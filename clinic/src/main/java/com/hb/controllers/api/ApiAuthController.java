@@ -10,6 +10,7 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.hb.dto.request.PatientCreateRequest;
 import com.hb.dto.request.UserCreateRequest;
+import com.hb.dto.request.UserLogin;
 import com.hb.enums.AuthProvider;
 import com.hb.pojo.User;
 import com.hb.service.AuthService;
@@ -24,7 +25,6 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -56,13 +56,13 @@ public class ApiAuthController {
 
     @PostMapping(value = "/register",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> create(@ModelAttribute UserCreateRequest urq, @ModelAttribute PatientCreateRequest prq) {
-        authService.registerPatient(urq, prq);
+    public ResponseEntity<?> create(@ModelAttribute UserCreateRequest urq) {
+        authService.registerPatient(urq);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody User u) {
+    public ResponseEntity<?> login(@RequestBody UserLogin u) {
         if (this.authService.authenticate(u.getUsername(), u.getPassword())) {
             try {
                 String token = JwtUtils.generateToken(u.getUsername());

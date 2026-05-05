@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public interface LabTestRepository extends BaseRepository<LabTests>{
     List<LabTests> getLabTests(Map<String, String> params);
-    LabTests getLabTestById(Integer id);
+    LabTests getLabTestById(Long id);
     void addOrUpdateLabTest(LabTests test);
-    void deleteLabTest(Integer id);
+    void deleteLabTest(Long id);
 }

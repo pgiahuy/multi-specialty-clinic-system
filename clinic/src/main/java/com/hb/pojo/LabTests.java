@@ -16,13 +16,13 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Collection;
 
 /**
  *
  * @author HUY
  */
-
 @Entity
 @Table(name = "lab_tests")
 @NamedQueries({
@@ -30,15 +30,10 @@ import java.util.Collection;
     @NamedQuery(name = "LabTests.findById", query = "SELECT l FROM LabTests l WHERE l.id = :id"),
     @NamedQuery(name = "LabTests.findByTestName", query = "SELECT l FROM LabTests l WHERE l.testName = :testName"),
     @NamedQuery(name = "LabTests.findByUnit", query = "SELECT l FROM LabTests l WHERE l.unit = :unit"),
-    @NamedQuery(name = "LabTests.findByNormalRange", query = "SELECT l FROM LabTests l WHERE l.normalRange = :normalRange")})
+    @NamedQuery(name = "LabTests.findByNormalRange", query = "SELECT l FROM LabTests l WHERE l.normalRange = :normalRange"),
+    @NamedQuery(name = "LabTests.findByPrice", query = "SELECT l FROM LabTests l WHERE l.price = :price")})
 public class LabTests implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "id")
-    private Integer id;
     @Size(max = 255)
     @Column(name = "test_name")
     private String testName;
@@ -48,30 +43,92 @@ public class LabTests implements Serializable {
     @Size(max = 100)
     @Column(name = "normal_range")
     private String normalRange;
+
+    private static long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id")
+    private Integer id;
+    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    @Column(name = "price")
+    private BigDecimal price;
+    @OneToMany(mappedBy = "labTestId")
+    private Collection<PaymentItems> paymentItemsCollection;
     @OneToMany(mappedBy = "testId")
     private Collection<LabResults> labResultsCollection;
 
     public LabTests() {
     }
 
-    public LabTests(Integer id) {
-        this.id = id;
+    /**
+     * @return the serialVersionUID
+     */
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
     }
 
+    /**
+     * @param aSerialVersionUID the serialVersionUID to set
+     */
+    public static void setSerialVersionUID(long aSerialVersionUID) {
+        serialVersionUID = aSerialVersionUID;
+    }
+
+    /**
+     * @return the id
+     */
     public Integer getId() {
         return id;
     }
 
+    /**
+     * @param id the id to set
+     */
     public void setId(Integer id) {
         this.id = id;
     }
 
+    /**
+     * @return the testName
+     */
     public String getTestName() {
         return testName;
     }
 
+    /**
+     * @param testName the testName to set
+     */
     public void setTestName(String testName) {
         this.testName = testName;
+    }
+
+    /**
+     * @return the unit
+     */
+    public String getUnit() {
+        return unit;
+    }
+
+    /**
+     * @param unit the unit to set
+     */
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
+    /**
+     * @return the normalRange
+     */
+    public String getNormalRange() {
+        return normalRange;
+    }
+
+    /**
+     * @param normalRange the normalRange to set
+     */
+    public void setNormalRange(String normalRange) {
+        this.normalRange = normalRange;
     }
 
     public String getUnit() {
@@ -82,45 +139,28 @@ public class LabTests implements Serializable {
         this.unit = unit;
     }
 
-    public String getNormalRange() {
-        return normalRange;
-    }
+  
+    
+    
 
-    public void setNormalRange(String normalRange) {
-        this.normalRange = normalRange;
-    }
+    
 
+    /**
+     * @return the labResultsCollection
+     */
     public Collection<LabResults> getLabResultsCollection() {
         return labResultsCollection;
     }
 
+    /**
+     * @param labResultsCollection the labResultsCollection to set
+     */
     public void setLabResultsCollection(Collection<LabResults> labResultsCollection) {
         this.labResultsCollection = labResultsCollection;
     }
-
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof LabTests)) {
-            return false;
-        }
-        LabTests other = (LabTests) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "com.hb.pojo.LabTests[ id=" + id + " ]";
-    }
     
+    
+
+    
+
 }
