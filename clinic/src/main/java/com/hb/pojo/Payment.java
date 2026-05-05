@@ -4,7 +4,6 @@
  */
 package com.hb.pojo;
 
-import com.hb.enums.PaymentMethod;
 import com.hb.enums.PaymentStatus;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
@@ -26,7 +25,7 @@ import java.util.Date;
 
 /**
  *
- * @author HUY
+ * @author DELL
  */
 @Entity
 @Table(name = "payment")

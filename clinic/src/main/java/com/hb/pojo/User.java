@@ -45,14 +45,15 @@ public class User implements Serializable {
     // @Pattern(regexp="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", message="Invalid email")//if the field contains email address consider using this annotation to enforce field validation
     @Size(max = 100)
     @Column(name = "email")
-    private String email;
+private String email;
     @Basic(optional = false)
-    @NotNull
+    @NotNull()
     @Size(min = 1, max = 255)
     @Column(name = "password")
     private String password;
+    // @Pattern(regexp="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", message="Invalid email")//if the field contains email address consider using this annotation to enforce field validation
     @Basic(optional = false)
-    @NotNull
+    @NotNull()
     @Size(min = 1, max = 100)
     @Column(name = "username")
     private String username;
@@ -65,7 +66,8 @@ public class User implements Serializable {
     @Size(max = 255)
     @Column(name = "public_id")
     private String publicId;
-
+    @OneToMany(mappedBy = "userId")
+    private Collection<Patient> patientCollection;
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -220,4 +222,12 @@ public class User implements Serializable {
     }
 
 
+    public Collection<Patient> getPatientCollection() {
+        return patientCollection;
+    }
+
+    public void setPatientCollection(Collection<Patient> patientCollection) {
+        this.patientCollection = patientCollection;
+    }
+    
 }

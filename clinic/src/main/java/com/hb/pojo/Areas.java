@@ -32,17 +32,18 @@ import java.util.Collection;
     @NamedQuery(name = "Areas.findByLocationFloor", query = "SELECT a FROM Areas a WHERE a.locationFloor = :locationFloor")})
 public class Areas implements Serializable {
 
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 100)
+    @Column(name = "area_name")
+    private String areaName;
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 100)
-    @Column(name = "area_name")
-    private String areaName;
     @Column(name = "location_floor")
     private Integer locationFloor;
     @OneToMany(mappedBy = "areaId")
@@ -116,5 +117,7 @@ public class Areas implements Serializable {
     public String toString() {
         return "com.hb.pojo.Areas[ id=" + id + " ]";
     }
+
+ 
     
 }

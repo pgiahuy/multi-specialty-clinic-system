@@ -4,6 +4,7 @@
  */
 package com.hb.pojo;
 
+import com.hb.enums.PaymentMethod;
 import com.hb.enums.PaymentStatus;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
@@ -26,7 +27,7 @@ import java.util.Date;
 
 /**
  *
- * @author HUY
+ * @author DELL
  */
 @Entity
 @Table(name = "payment_items")
@@ -83,6 +84,9 @@ public class PaymentItems implements Serializable {
     @JoinColumn(name = "prescription_id", referencedColumnName = "id")
     @ManyToOne
     private Prescription prescriptionId;
+    @Size(max = 100)
+    @Column(name = "trans_id", length = 100)
+    private String transId;
 
     public PaymentItems() {
     }

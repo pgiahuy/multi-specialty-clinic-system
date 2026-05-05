@@ -19,6 +19,6 @@ public interface PatientService {
     List<Patient> getPatients(Map<String,String> params);
     Patient getPatientById(Long id);
     void updateProfile(Long id, PatientCreateRequest prq);
-    PatientResponse addPatient(PatientCreateRequest prq, User u);
+    Patient addPatient(PatientCreateRequest prq, User u);
     long countPatients(Map<String,String> params);
 }

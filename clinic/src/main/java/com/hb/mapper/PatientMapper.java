@@ -8,6 +8,8 @@ import com.hb.dto.request.PatientCreateRequest;
 import com.hb.dto.response.PatientResponse;
 import com.hb.pojo.Patient;
 import com.hb.pojo.User;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.springframework.stereotype.Component;
 
 /**
@@ -17,7 +19,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PatientMapper {
 
-    public PatientResponse toResponse(Patient p) {
+      public PatientResponse toResponse(Patient p) {
         if (p == null) {
             return null;
         }
