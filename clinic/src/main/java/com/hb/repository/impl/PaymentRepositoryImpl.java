@@ -112,7 +112,7 @@ public class PaymentRepositoryImpl implements PaymentRepository {
         Session s = this.factory.getObject().getCurrentSession();
         Payment p = this.getPaymentById(paymentId);
         if (p != null) {
-            p.setStatus(status.name());
+            p.setStatus(status);
             p.setMethod(method);
             s.merge(p);
         }
@@ -122,10 +122,8 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     public void addOrUpdatePayment(Payment p) {
         Session s = this.factory.getObject().getCurrentSession();
         if (p.getId() != null && p.getId() > 0) {
-            // Nếu đã có ID thì cập nhật (ví dụ cập nhật tổng tiền sau khi thêm items)
             s.merge(p);
         } else {
-            // Nếu chưa có ID thì tạo mới hoàn toàn
             s.persist(p);
         }
     }

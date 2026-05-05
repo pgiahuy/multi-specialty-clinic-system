@@ -10,8 +10,6 @@ import java.util.Map;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +31,7 @@ public class SpecialtyRepositoryImpl extends BaseRepositoryImpl<Specialty> imple
     @Override
     public List<Specialty> getSpecialties(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<Specialty> q = session.createNamedQuery("Specialty.findAllWithDoctors",Specialty.class);
+        Query<Specialty> q = session.createNamedQuery("Specialty.findAllWithHod",Specialty.class);
         
         if(params!= null){
             int pageSize = Integer.parseInt(params.get("pageSize"));
