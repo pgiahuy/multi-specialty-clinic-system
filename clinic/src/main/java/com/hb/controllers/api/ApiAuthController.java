@@ -57,8 +57,8 @@ public class ApiAuthController {
 
     @PostMapping(value = "/register",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> create(@ModelAttribute UserCreateRequest urq, @ModelAttribute PatientCreateRequest prq) {
-        authService.registerPatient(urq, prq);
+    public ResponseEntity<?> create(@ModelAttribute UserCreateRequest urq) {
+        authService.registerPatient(urq);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
