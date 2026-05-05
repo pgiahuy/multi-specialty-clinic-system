@@ -29,7 +29,7 @@ public class PaymentItemRepositoryImpl implements PaymentItemRepository{
     public List<PaymentItems> getItemsByPaymentId(Long paymentId) {
         Session session = this.factory.getObject().getCurrentSession();
         
-        Query<PaymentItems> q = session.createQuery("FROM PaymentItems WHERE payment.id = :paymentId", PaymentItems.class);
+        Query<PaymentItems> q = session.createQuery("FROM PaymentItems WHERE paymentId.id = :paymentId", PaymentItems.class);
         q.setParameter("paymentId", paymentId);
         return q.getResultList(); 
     }

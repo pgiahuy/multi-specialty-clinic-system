@@ -4,6 +4,7 @@
  */
 package com.hb.pojo;
 
+import com.hb.enums.PaymentMethod;
 import com.hb.enums.PaymentStatus;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
@@ -28,7 +29,7 @@ import java.util.Date;
 
 /**
  *
- * @author HUY
+ * @author DELL
  */
 @Entity
 @Table(name = "payment_items")
@@ -37,8 +38,10 @@ import java.util.Date;
     @NamedQuery(name = "PaymentItems.findById", query = "SELECT p FROM PaymentItems p WHERE p.id = :id"),
     @NamedQuery(name = "PaymentItems.findByItemType", query = "SELECT p FROM PaymentItems p WHERE p.itemType = :itemType"),
     @NamedQuery(name = "PaymentItems.findByAmount", query = "SELECT p FROM PaymentItems p WHERE p.amount = :amount"),
-    
-    @NamedQuery(name = "PaymentItems.findByStatus", query = "SELECT p FROM PaymentItems p WHERE p.status = :status")})
+    @NamedQuery(name = "PaymentItems.findByCreatedAt", query = "SELECT p FROM PaymentItems p WHERE p.createdAt = :createdAt"),
+    @NamedQuery(name = "PaymentItems.findByStatus", query = "SELECT p FROM PaymentItems p WHERE p.status = :status"),
+    @NamedQuery(name = "PaymentItems.findByMethod", query = "SELECT p FROM PaymentItems p WHERE p.method = :method"),
+    @NamedQuery(name = "PaymentItems.findByPaidAt", query = "SELECT p FROM PaymentItems p WHERE p.paidAt = :paidAt")})
 public class PaymentItems implements Serializable {
 
     private static long serialVersionUID = 1L;
@@ -55,12 +58,18 @@ public class PaymentItems implements Serializable {
     @NotNull
     @Column(name = "amount")
     private BigDecimal amount;
-    
-    @Size(max = 7)
+    @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private PaymentStatus status;
-    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "method")
+    private PaymentMethod method;
+    @Column(name = "paid_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date paidAt;
     @JoinColumn(name = "appointment_id", referencedColumnName = "id")
     @ManyToOne
     private Appointment appointmentId;
@@ -73,6 +82,9 @@ public class PaymentItems implements Serializable {
     @JoinColumn(name = "prescription_id", referencedColumnName = "id")
     @ManyToOne
     private Prescription prescriptionId;
+    @Size(max = 100)
+    @Column(name = "trans_id", length = 100)
+    private String transId;
 
     public PaymentItems() {
     }

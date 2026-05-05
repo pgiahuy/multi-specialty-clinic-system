@@ -9,11 +9,8 @@ import com.hb.enums.PaymentStatus;
 import com.hb.pojo.Patient;
 import com.hb.pojo.Payment;
 import com.hb.pojo.PaymentItems;
-import com.hb.repository.AppointmentRepository;
-import com.hb.repository.LabTestRepository;
 import com.hb.repository.PaymentItemRepository;
 import com.hb.repository.PaymentRepository;
-import com.hb.repository.PrescriptionRepository;
 import com.hb.service.PaymentItemsService;
 import com.hb.service.PaymentService;
 import java.math.BigDecimal;
@@ -34,67 +31,19 @@ public class PaymentServiceImpl implements PaymentService {
     private PaymentRepository paymentRepo;
 
     @Autowired
-    private LabTestRepository labRepo;
-
-    @Autowired
-    private AppointmentRepository appointmentRepo;
-
-    @Autowired
-    private PrescriptionRepository prescriptionRepo;
-
-    @Autowired
     private PaymentItemsService itemService;
 
     @Autowired
     private PaymentItemRepository itemRepo;
 
-    @Override
-    public Payment addPayment(Map<String, String> params) {
-        return null;
-//        Payment p = new Payment();
-//        
-//
-//        String amountStr = params.get("amount");
-//        if (amountStr != null && !amountStr.isEmpty()) {
-//            try {
-//                BigDecimal amount = new BigDecimal(amountStr);
-//                p.setAmount(amount);
-//            } catch (NumberFormatException e) {
-//                throw new RuntimeException("Invalid amount format");
-//            }
-//        } else {
-//            throw new ResourceNotFoundException("Amount is required");
-//        }
-//
-//        p.setMethod(params.getOrDefault("method", PaymentMethod.CASH.name()));
-//        p.setStatus(params.getOrDefault("status", PaymentStatus.PENDING.name()));
-//        p.setCreatedAt(new Date());
-//
-//        String appointmentIdStr = params.get("appointmentId");
-//        if (appointmentIdStr != null && !appointmentIdStr.isEmpty()) {
-//            try {
-//                Long appointmentId = Long.parseLong(appointmentIdStr);
-//                Appointment appointment = appointmentRepo.getAppointmentById(appointmentId);
-//                p.setAppointmentId(appointment);
-//                
-//            } catch (NumberFormatException e) {
-//                throw new RuntimeException("Invalid appointment ID format");
-//            }
-//        }
-//
-//        return this.paymentRepo.addPayment(p);
-    }
-
-    @Override
-    public List<Payment> getPayments(Map<String, String> params) {
-        return this.paymentRepo.getPayments(params);
-    }
-
-    @Override
-    public List<Payment> getPaymentsByUserName(Map<String, String> params) {
-        return this.paymentRepo.getPaymentsByUserName(params);
-    }
-
+//    @Override
+//    public List<Payment> getPayments(Map<String, String> params) {
+//        return this.paymentRepo.getPayments(params);
+//    }
+//    @Override
+//    public List<Payment> getPaymentsByUserName(Map<String, String> params) {
+//        return this.paymentRepo.getPaymentsByUserName(params);
+//    }
     @Override
     public Payment getPaymentById(Long id) {
         return this.paymentRepo.getPaymentById(id);
@@ -113,18 +62,18 @@ public class PaymentServiceImpl implements PaymentService {
         p.setCreatedAt(new Date());
         paymentRepo.addOrUpdatePayment(p);
 
-        // 2. Thêm các hạng mục thông qua ItemService (Tự động tính giá)
         if (appId != null) {
             itemService.addAppointmentItem(p, appId);
         }
+
         if (testIds != null) {
             itemService.addLabTestItems(p, testIds);
         }
+
         if (presId != null) {
             itemService.addPrescriptionItem(p, presId);
         }
 
-        // 3. Tính tổng tiền từ các Item vừa tạo để cập nhật lại Payment
         List<PaymentItems> items = itemRepo.getItemsByPaymentId(p.getId());
         BigDecimal finalTotal = items.stream()
                 .map(PaymentItems::getAmount)
@@ -152,11 +101,33 @@ public class PaymentServiceImpl implements PaymentService {
             p.setStatus(PaymentStatus.SUCCESS.name());
             p.setMethod(PaymentMethod.MOMO);
 
-            // Lưu mã giao dịch từ MoMo vào DB
-            p.setTransactionId(transId);
+        List<PaymentItems> allItems = itemRepo.getItemsByPaymentId(paymentId);
+        boolean isAllPaid = allItems.stream()
+                .allMatch(item -> PaymentStatus.SUCCESS.equals(item.getStatus()));
 
+        if (isAllPaid) {
+            Payment p = paymentRepo.getPaymentById(paymentId);
+            p.setStatus(PaymentStatus.SUCCESS);
             paymentRepo.addOrUpdatePayment(p);
         }
+    }
+
+    @Override
+    public Long calculateTotalFee(List<Long> itemIds) {
+        
+        long total = 0L;
+
+        for (Long itemId : itemIds) {
+            PaymentItems item = itemRepo.getItemById(itemId);
+
+            
+            if (item != null && item.getAmount() != null) {
+                
+                total += item.getAmount().longValue();
+            }
+        }
+
+        return total;
     }
 
 }

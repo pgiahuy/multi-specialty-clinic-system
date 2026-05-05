@@ -34,12 +34,6 @@ import java.util.Collection;
     @NamedQuery(name = "LabTests.findByPrice", query = "SELECT l FROM LabTests l WHERE l.price = :price")})
 public class LabTests implements Serializable {
 
-    private static long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "id")
-    private Integer id;
     @Size(max = 255)
     @Column(name = "test_name")
     private String testName;
@@ -49,6 +43,13 @@ public class LabTests implements Serializable {
     @Size(max = 100)
     @Column(name = "normal_range")
     private String normalRange;
+
+    private static long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id")
+    private Integer id;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "price")
     private BigDecimal price;
@@ -130,33 +131,19 @@ public class LabTests implements Serializable {
         this.normalRange = normalRange;
     }
 
-    /**
-     * @return the price
-     */
-    public BigDecimal getPrice() {
-        return price;
+    public String getUnit() {
+        return unit;
     }
 
-    /**
-     * @param price the price to set
-     */
-    public void setPrice(BigDecimal price) {
-        this.price = price;
+    public void setUnit(String unit) {
+        this.unit = unit;
     }
 
-    /**
-     * @return the paymentItemsCollection
-     */
-    public Collection<PaymentItems> getPaymentItemsCollection() {
-        return paymentItemsCollection;
-    }
+  
+    
+    
 
-    /**
-     * @param paymentItemsCollection the paymentItemsCollection to set
-     */
-    public void setPaymentItemsCollection(Collection<PaymentItems> paymentItemsCollection) {
-        this.paymentItemsCollection = paymentItemsCollection;
-    }
+    
 
     /**
      * @return the labResultsCollection

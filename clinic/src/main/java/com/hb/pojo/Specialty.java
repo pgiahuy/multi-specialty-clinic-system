@@ -34,12 +34,6 @@ import java.util.Collection;
     @NamedQuery(name = "Specialty.findByPrice", query = "SELECT s FROM Specialty s WHERE s.price = :price")})
 public class Specialty implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    @Id
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "id")
-    private Long id;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 100)
@@ -50,6 +44,13 @@ public class Specialty implements Serializable {
     @NotNull
     @Column(name = "price")
     private BigDecimal price;
+
+    private static final long serialVersionUID = 1L;
+    @Id
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "id")
+    private Long id;
     @JoinColumn(name = "id_hod", referencedColumnName = "id")
     @ManyToOne
     private Doctor idHod;
@@ -77,21 +78,6 @@ public class Specialty implements Serializable {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
 
     public Doctor getIdHod() {
         return idHod;
@@ -132,6 +118,22 @@ public class Specialty implements Serializable {
     @Override
     public String toString() {
         return "com.hb.pojo.Specialty[ id=" + id + " ]";
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
     
 }

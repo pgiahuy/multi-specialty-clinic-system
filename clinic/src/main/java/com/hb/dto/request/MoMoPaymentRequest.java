@@ -4,6 +4,8 @@
  */
 package com.hb.dto.request;
 
+import java.math.BigDecimal;
+
 /**
  *
  * @author DELL
