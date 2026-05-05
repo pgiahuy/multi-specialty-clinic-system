@@ -4,10 +4,14 @@
  */
 package com.hb.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.math.BigDecimal;
+
 /**
  *
  * @author DELL
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class MoMoPaymentResponse {
     private String partnerCode;
     private String requestId;
