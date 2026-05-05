@@ -32,6 +32,7 @@ import java.util.Collection;
     @NamedQuery(name = "Specialty.findById", query = "SELECT s FROM Specialty s WHERE s.id = :id"),
     @NamedQuery(name = "Specialty.findByName", query = "SELECT s FROM Specialty s WHERE s.name = :name"),
     @NamedQuery(name = "Specialty.findByPrice", query = "SELECT s FROM Specialty s WHERE s.price = :price")})
+//    @NamedQuery(name = "Specialty.findAllWithHod", query = "SELECT s FROM Specialty s WHERE s.price = :price")})
 public class Specialty implements Serializable {
 
     private static final long serialVersionUID = 1L;

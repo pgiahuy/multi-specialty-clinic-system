@@ -109,7 +109,7 @@ public class PaymentServiceImpl implements PaymentService {
     public Payment createPayment(Long patientId, Long appId, List<Long> testIds, Long presId) {
         Payment p = new Payment();
         p.setPatientId(new Patient(patientId));
-        p.setStatus(PaymentStatus.PENDING.name());
+        p.setStatus(PaymentStatus.PENDING);
         p.setCreatedAt(new Date());
         paymentRepo.addOrUpdatePayment(p);
 
@@ -140,7 +140,7 @@ public class PaymentServiceImpl implements PaymentService {
     public void updateStatus(Long paymentId, PaymentStatus status) {
         Payment p = paymentRepo.getPaymentById(paymentId);
         if (p != null) {
-            p.setStatus(status.name());
+            p.setStatus(status);
             paymentRepo.addOrUpdatePayment(p);
         }
     }
@@ -149,11 +149,11 @@ public class PaymentServiceImpl implements PaymentService {
     public void confirmPaymentSuccess(Long paymentId, String transId) {
         Payment p = paymentRepo.getPaymentById(paymentId);
         if (p != null) {
-            p.setStatus(PaymentStatus.SUCCESS.name());
+            p.setStatus(PaymentStatus.SUCCESS);
             p.setMethod(PaymentMethod.MOMO);
 
             // Lưu mã giao dịch từ MoMo vào DB
-            p.setTransactionId(transId);
+//            p.setTransactionId(transId);
 
             paymentRepo.addOrUpdatePayment(p);
         }
