@@ -69,9 +69,7 @@ public class PaymentItems implements Serializable {
     @Column(name = "paid_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date paidAt;
-    @Size(max = 100)
-    @Column(name = "trans_id")
-    private String transId;
+   
     @JoinColumn(name = "appointment_id", referencedColumnName = "id")
     @ManyToOne
     private Appointment appointmentId;
