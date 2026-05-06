@@ -68,9 +68,7 @@ private String email;
     @Column(name = "public_id")
     private String publicId;
     
-    @JsonIgnore
-    @OneToMany(mappedBy = "userId")
-    private Collection<Patient> patientCollection;
+  
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -231,12 +229,5 @@ private String email;
     }
 
 
-    public Collection<Patient> getPatientCollection() {
-        return patientCollection;
-    }
-
-    public void setPatientCollection(Collection<Patient> patientCollection) {
-        this.patientCollection = patientCollection;
-    }
     
 }

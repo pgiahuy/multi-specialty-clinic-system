@@ -35,9 +35,9 @@
             <tbody>
                 <tr th:each="d : ${specialties}">
                     <td th:text="${d.name}"></td>
-                    <td th:text="${d.price}"></td>
-                    <td th:text="${d.idHod.fullName}"></td>
-                    <td th:text="${d.doctorCollection != null ? d.doctorCollection.size() : 0}">0</td>
+                    <td th:text="${#numbers.formatDecimal(d.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></td>
+                    <td th:text="${d.idHod != null ? d.idHod.fullName : 'Chưa có'}"></td>
+                    <td th:text="${d.doctorCollection != null ? d.doctorCollection.size() : 0}"></td>
            
                     <td>
                         <button class="btn btn-warning btn-sm">Sửa</button>
