@@ -34,6 +34,12 @@ import java.util.Collection;
     @NamedQuery(name = "LabTests.findByPrice", query = "SELECT l FROM LabTests l WHERE l.price = :price")})
 public class LabTests implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id")
+    private Integer id;
     @Size(max = 255)
     @Column(name = "test_name")
     private String testName;
@@ -61,99 +67,82 @@ public class LabTests implements Serializable {
     public LabTests() {
     }
 
-    /**
-     * @return the serialVersionUID
-     */
-    public static long getSerialVersionUID() {
-        return serialVersionUID;
+    public LabTests(Integer id) {
+        this.id = id;
     }
 
-    /**
-     * @param aSerialVersionUID the serialVersionUID to set
-     */
-    public static void setSerialVersionUID(long aSerialVersionUID) {
-        serialVersionUID = aSerialVersionUID;
-    }
-
-    /**
-     * @return the id
-     */
     public Integer getId() {
         return id;
     }
 
-    /**
-     * @param id the id to set
-     */
     public void setId(Integer id) {
         this.id = id;
     }
 
-    /**
-     * @return the testName
-     */
     public String getTestName() {
         return testName;
     }
 
-    /**
-     * @param testName the testName to set
-     */
     public void setTestName(String testName) {
         this.testName = testName;
     }
 
-    /**
-     * @return the unit
-     */
     public String getUnit() {
         return unit;
     }
 
-    /**
-     * @param unit the unit to set
-     */
     public void setUnit(String unit) {
         this.unit = unit;
     }
 
-    /**
-     * @return the normalRange
-     */
     public String getNormalRange() {
         return normalRange;
     }
 
-    /**
-     * @param normalRange the normalRange to set
-     */
     public void setNormalRange(String normalRange) {
         this.normalRange = normalRange;
     }
 
 
-  
-    
-    
+    public Collection<PaymentItems> getPaymentItemsCollection() {
+        return paymentItemsCollection;
+    }
 
-    
+    public void setPaymentItemsCollection(Collection<PaymentItems> paymentItemsCollection) {
+        this.paymentItemsCollection = paymentItemsCollection;
+    }
 
-    /**
-     * @return the labResultsCollection
-     */
     public Collection<LabResults> getLabResultsCollection() {
         return labResultsCollection;
     }
 
-    /**
-     * @param labResultsCollection the labResultsCollection to set
-     */
     public void setLabResultsCollection(Collection<LabResults> labResultsCollection) {
         this.labResultsCollection = labResultsCollection;
     }
-    
-    
 
-    
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
+        return hash;
+    }
 
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof LabTests)) {
+            return false;
+        }
+        LabTests other = (LabTests) object;
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "com.hb.pojo.LabTests[ id=" + id + " ]";
+    }
+    
 }
