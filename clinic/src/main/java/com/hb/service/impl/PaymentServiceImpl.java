@@ -94,40 +94,50 @@ public class PaymentServiceImpl implements PaymentService {
         }
     }
 
-    @Override
-    public void confirmPaymentSuccess(Long paymentId, String transId) {
-        Payment p = paymentRepo.getPaymentById(paymentId);
-        if (p != null) {
-            p.setStatus(PaymentStatus.SUCCESS);
-            p.setMethod(PaymentMethod.MOMO);
-
-        List<PaymentItems> allItems = itemRepo.getItemsByPaymentId(paymentId);
-        boolean isAllPaid = allItems.stream()
-                .allMatch(item -> PaymentStatus.SUCCESS.equals(item.getStatus()));
-
-        if (isAllPaid) {
-            Payment p = paymentRepo.getPaymentById(paymentId);
-            p.setStatus(PaymentStatus.SUCCESS);
-            paymentRepo.addOrUpdatePayment(p);
-        }
-    }
+//    @Override
+//    public void confirmPaymentSuccess(Long paymentId, String transId) {
+//        Payment p = paymentRepo.getPaymentById(paymentId);
+//        if (p != null) {
+//            p.setStatus(PaymentStatus.SUCCESS.name());
+//            p.setMethod(PaymentMethod.MOMO);
+//
+//        List<PaymentItems> allItems = itemRepo.getItemsByPaymentId(paymentId);
+//        boolean isAllPaid = allItems.stream()
+//                .allMatch(item -> PaymentStatus.SUCCESS.equals(item.getStatus()));
+//
+//        if (isAllPaid) {
+//            Payment p = paymentRepo.getPaymentById(paymentId);
+//            p.setStatus(PaymentStatus.SUCCESS);
+//            paymentRepo.addOrUpdatePayment(p);
+//        }
+//    }
+//
+//    @Override
+//    public Long calculateTotalFee(List<Long> itemIds) {
+//        
+//        long total = 0L;
+//
+//        for (Long itemId : itemIds) {
+//            PaymentItems item = itemRepo.getItemById(itemId);
+//
+//            
+//            if (item != null && item.getAmount() != null) {
+//                
+//                total += item.getAmount().longValue();
+//            }
+//        }
+//
+//        return total;
+//    }
 
     @Override
     public Long calculateTotalFee(List<Long> itemIds) {
-        
-        long total = 0L;
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 
-        for (Long itemId : itemIds) {
-            PaymentItems item = itemRepo.getItemById(itemId);
-
-            
-            if (item != null && item.getAmount() != null) {
-                
-                total += item.getAmount().longValue();
-            }
-        }
-
-        return total;
+    @Override
+    public void confirmPaymentSuccess(Long paymentId, String transId, String method, List<Long> itemIds) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
 }

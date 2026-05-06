@@ -13,6 +13,7 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -20,39 +21,39 @@ import org.springframework.security.core.context.SecurityContextHolder;
  *
  * @author DELL
  */
-public class JwtFilter implements Filter{
+public class JwtFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        
+
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         System.out.println("URI: " + httpRequest.getRequestURI());
         System.out.println("Auth header: " + httpRequest.getHeader("Authorization"));
         if (httpRequest.getRequestURI().startsWith(String.format("%s/api/secure", httpRequest.getContextPath())) == true) {
-           
+
             String header = httpRequest.getHeader("Authorization");
-            
+
             if (header == null || !header.startsWith("Bearer ")) {
                 ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED, "Missing or invalid Authorization header.");
                 return;
-            }
-            else {
+            } else {
                 String token = header.substring(7);
-                
+
                 try {
                     String username = JwtUtils.validateTokenAndGetUsername(token);
                     if (username != null) {
+                        System.out.println("@@@@@@@@@@valid token@@@@@@@@@@@@@@@@");
                         httpRequest.setAttribute("username", username);
-                        UsernamePasswordAuthenticationToken auth =
-    new UsernamePasswordAuthenticationToken(
-        username,
-        null,
-        java.util.Collections.emptyList()
-    );
-
-SecurityContextHolder.getContext().setAuthentication(auth);
-                        System.out.println("OKKKKKKKKKKKKKKKKKKKKKKKKKKKOKKKKKKKKKKKK");
-                        chain.doFilter(request, response);
+                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, null, null);
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                        try {
+                            System.out.println("@@@@@@@@@@valid token - 2@@@@@@@@@@@@@@@@");
+                            chain.doFilter(request, response);
+                            System.out.println("@@@@@@@@@@valid token - 3@@@@@@@@@@@@@@@@");
+                        } catch (Exception e) {
+                            System.out.println("Lỗi xảy ra tại Filter Chain: " + e.getMessage());
+                            e.printStackTrace();
+                        }
                         return;
                     }
                 } catch (Exception e) {
@@ -60,13 +61,12 @@ SecurityContextHolder.getContext().setAuthentication(auth);
                 }
             }
 
-            ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED, 
+            ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED,
                     "Token không hợp lệ hoặc hết hạn");
-             return;
+            return;
         }
-        
-        
+
         chain.doFilter(request, response);
     }
-    
+
 }

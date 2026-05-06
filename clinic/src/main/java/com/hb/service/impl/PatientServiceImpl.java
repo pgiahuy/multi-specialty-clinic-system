@@ -46,11 +46,12 @@ public class PatientServiceImpl implements PatientService {
     }
     
     @Override
-    public Patient addPatient(PatientCreateRequest prq, User u) {
+    public PatientResponse addPatient(PatientCreateRequest prq, User u) {
         Patient p = patientMapper.toEntity(prq, u);
         p.setUserId(u);
-        return this.patientRepo.addPatient(p);
-
+        Patient patient =  this.patientRepo.addPatient(p);
+        return patientMapper.toResponse(patient);
+ 
     }
     
     @Override
