@@ -31,13 +31,13 @@
                     <th></th>
                 </tr>
             </thead>
-
+            
             <tbody>
                 <tr th:each="d : ${specialties}">
                     <td th:text="${d.name}"></td>
                     <td th:text="${d.price}"></td>
                     <td th:text="${d.idHod.fullName}"></td>
-                    <td th:text="${#lists.size(d.doctorCollection)}"></td>
+                    <td th:text="${d.doctorCollection != null ? d.doctorCollection.size() : 0}">0</td>
            
                     <td>
                         <button class="btn btn-warning btn-sm">Sửa</button>

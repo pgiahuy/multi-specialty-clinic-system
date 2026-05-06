@@ -4,7 +4,6 @@
  */
 package com.hb.service.impl;
 
-import com.hb.enums.PaymentMethod;
 import com.hb.enums.PaymentStatus;
 import com.hb.pojo.Appointment;
 import com.hb.pojo.LabTests;
@@ -18,7 +17,6 @@ import com.hb.repository.PaymentItemRepository;
 import com.hb.repository.PrescriptionRepository;
 import com.hb.service.PaymentItemsService;
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,7 +41,7 @@ public class PaymentItemsServiceImpl implements PaymentItemsService {
     public void addAppointmentItem(Payment payment, Long appointmentId) {
         Appointment app = appRepo.getAppointmentById(appointmentId);
 
-        BigDecimal price = app.getScheduleId().getDoctorId().getIdSpecailty().getPrice();
+        BigDecimal price = app.getScheduleId().getDoctorId().getIdSpecialty().getPrice();
 
         PaymentItems item = new PaymentItems();
         item.setPaymentId(payment);
@@ -61,7 +59,7 @@ public class PaymentItemsServiceImpl implements PaymentItemsService {
             PaymentItems item = new PaymentItems();
             item.setPaymentId(payment);
             item.setItemType("TEST");
-            item.setAmount(lt.getPrice());
+//            item.setAmount(lt.getPrice());
             item.setLabTestId(lt);
             item.setStatus(PaymentStatus.PENDING);
             itemRepo.addOrUpdateItem(item);
@@ -94,9 +92,9 @@ public class PaymentItemsServiceImpl implements PaymentItemsService {
             PaymentItems item = itemRepo.getItemById(id);
             if (item != null) {
                 item.setStatus(PaymentStatus.SUCCESS);
-                item.setMethod(PaymentMethod.valueOf(method));
-                item.setTransId(transId);
-                item.setPaidAt(new Date());
+//                item.setMethod(PaymentMethod.valueOf(method));
+//                item.setTransId(transId);
+//                item.setPaidAt(new Date());
                 itemRepo.addOrUpdateItem(item);
             }
         }

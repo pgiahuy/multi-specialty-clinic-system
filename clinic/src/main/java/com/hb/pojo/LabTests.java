@@ -103,13 +103,6 @@ public class LabTests implements Serializable {
         this.normalRange = normalRange;
     }
 
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
 
     public Collection<PaymentItems> getPaymentItemsCollection() {
         return paymentItemsCollection;

@@ -4,6 +4,7 @@
  */
 package com.hb.pojo;
 
+import com.hb.enums.PaymentMethod;
 import com.hb.enums.PaymentStatus;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
@@ -53,9 +54,20 @@ public class Payment implements Serializable {
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
-    @Size(max = 5)
+    
+    @Size(max = 100)
+    @Column(name = "transaction_id")
+    private String transactionId;
+
     @Column(name = "method")
     private PaymentMethod method;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private PaymentStatus status;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "paymentId")
+    private Collection<PaymentItems> paymentItemsCollection;
     @JoinColumn(name = "patient_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Patient patientId;
@@ -83,13 +95,7 @@ public class Payment implements Serializable {
         this.totalAmount = totalAmount;
     }
 
-    public PaymentStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(PaymentStatus status) {
-        this.status = status;
-    }
+ 
 
     public Date getCreatedAt() {
         return createdAt;
@@ -107,6 +113,37 @@ public class Payment implements Serializable {
         this.method = method;
     }
 
+    /**
+     * @return the status
+     */
+    public PaymentStatus getStatus() {
+        return status;
+    }
+
+    /**
+     * @param status the status to set
+     */
+    public void setStatus(PaymentStatus status) {
+        this.status = status;
+    }
+
+    /**
+     * @return the paymentItemsCollection
+     */
+    public Collection<PaymentItems> getPaymentItemsCollection() {
+        return paymentItemsCollection;
+    }
+
+    /**
+     * @param paymentItemsCollection the paymentItemsCollection to set
+     */
+    public void setPaymentItemsCollection(Collection<PaymentItems> paymentItemsCollection) {
+        this.paymentItemsCollection = paymentItemsCollection;
+    }
+
+    /**
+     * @return the patientId
+     */
     public Patient getPatientId() {
         return patientId;
     }
