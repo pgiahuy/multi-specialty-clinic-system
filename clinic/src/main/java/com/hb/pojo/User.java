@@ -4,6 +4,7 @@
  */
 package com.hb.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -69,6 +70,8 @@ private String email;
     @Size(max = 255)
     @Column(name = "public_id")
     private String publicId;
+    
+    @JsonIgnore
     @OneToMany(mappedBy = "userId")
     private Collection<Patient> patientCollection;
     private static final long serialVersionUID = 1L;
@@ -77,12 +80,16 @@ private String email;
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
+    
+    @JsonIgnore
     @OneToOne(mappedBy = "userId")
     private Doctor doctor;
+    
+    @JsonIgnore
     @OneToMany(mappedBy = "userId")
     private Collection<Notification> notificationCollection;
-    @OneToOne(mappedBy = "userId")
-    private Patient patient;
+    
+    @JsonIgnore
     @OneToMany(mappedBy = "userId")
     private Collection<SocialAccount> socialAccountCollection;
 
@@ -148,13 +155,6 @@ private String email;
         this.notificationCollection = notificationCollection;
     }
 
-    public Patient getPatient() {
-        return patient;
-    }
-
-    public void setPatient(Patient patient) {
-        this.patient = patient;
-    }
 
     public Collection<SocialAccount> getSocialAccountCollection() {
         return socialAccountCollection;
