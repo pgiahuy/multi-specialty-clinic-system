@@ -4,9 +4,12 @@
  */
 package com.hb.pojo;
 
+import com.hb.enums.SessionShift;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -18,6 +21,7 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
+import java.time.LocalTime;
 import java.util.Collection;
 import java.util.Date;
 
@@ -33,13 +37,14 @@ import java.util.Date;
     @NamedQuery(name = "Shifts.findByStartTime", query = "SELECT s FROM Shifts s WHERE s.startTime = :startTime"),
     @NamedQuery(name = "Shifts.findByEndTime", query = "SELECT s FROM Shifts s WHERE s.endTime = :endTime"),
     @NamedQuery(name = "Shifts.findBySession", query = "SELECT s FROM Shifts s WHERE s.session = :session"),
-    @NamedQuery(name = "Shifts.findByMaxPatinets", query = "SELECT s FROM Shifts s WHERE s.maxPatinets = :maxPatinets"),
+    @NamedQuery(name = "Shifts.findByMaxPatients", query = "SELECT s FROM Shifts s WHERE s.maxPatients = :maxPatients"),
     @NamedQuery(name = "Shifts.findByMinPatients", query = "SELECT s FROM Shifts s WHERE s.minPatients = :minPatients")})
 public class Shifts implements Serializable {
 
     @Size(max = 9)
     @Column(name = "session")
-    private String session;
+    @Enumerated(EnumType.STRING)
+    private SessionShift session;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -49,12 +54,12 @@ public class Shifts implements Serializable {
     private Long id;
     @Column(name = "start_time")
     @Temporal(TemporalType.TIME)
-    private Date startTime;
+    private LocalTime startTime;
     @Column(name = "end_time")
     @Temporal(TemporalType.TIME)
-    private Date endTime;
-    @Column(name = "max_patinets")
-    private Integer maxPatinets;
+    private LocalTime endTime;
+    @Column(name = "max_patients")
+    private Integer maxPatients;
     @Column(name = "min_patients")
     private Integer minPatients;
     @OneToMany(mappedBy = "shiftId")
@@ -75,29 +80,29 @@ public class Shifts implements Serializable {
         this.id = id;
     }
 
-    public Date getStartTime() {
+    public LocalTime getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(Date startTime) {
+    public void setStartTime(LocalTime startTime) {
         this.startTime = startTime;
     }
 
-    public Date getEndTime() {
+    public LocalTime getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(Date endTime) {
+    public void setEndTime(LocalTime endTime) {
         this.endTime = endTime;
     }
 
 
-    public Integer getMaxPatinets() {
-        return maxPatinets;
+    public Integer getMaxPatients() {
+        return maxPatients;
     }
 
-    public void setMaxPatinets(Integer maxPatinets) {
-        this.maxPatinets = maxPatinets;
+    public void setMaxPatients(Integer maxPatients) {
+        this.maxPatients = maxPatients;
     }
 
     public Integer getMinPatients() {
@@ -141,11 +146,11 @@ public class Shifts implements Serializable {
         return "com.hb.pojo.Shifts[ id=" + id + " ]";
     }
 
-    public String getSession() {
+    public SessionShift getSession() {
         return session;
     }
 
-    public void setSession(String session) {
+    public void setSession(SessionShift session) {
         this.session = session;
     }
     

@@ -36,10 +36,10 @@
             <tbody>
                 <tr th:each="d : ${doctors}">
                     <td th:text="${d.fullName}"></td>
-                    <td th:text="${d.idSpecailty.name}"></td>
+                    <td th:text="${d.idSpecialty.name}"></td>
                     <td th:text="${d.gender}"></td>
                     <td th:text="${d.description}"></td>
-                    <td th:text="${d.user.username}"></td>
+                    <td th:text="${d.userId.username}"></td>
            
                     <td>
                         <button class="btn btn-warning btn-sm">Sửa</button>
