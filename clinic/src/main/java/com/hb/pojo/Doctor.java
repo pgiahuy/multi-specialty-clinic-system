@@ -54,9 +54,9 @@ public class Doctor implements Serializable {
     private Long id;
     @OneToMany(mappedBy = "idHod")
     private Collection<Specialty> specialtyCollection;
-    @JoinColumn(name = "id_specailty", referencedColumnName = "id")
+    @JoinColumn(name = "id_specialty", referencedColumnName = "id")
     @ManyToOne(optional = false)
-    private Specialty idSpecailty;
+    private Specialty idSpecialty;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @OneToOne
     private User userId;
@@ -95,12 +95,12 @@ public class Doctor implements Serializable {
         this.specialtyCollection = specialtyCollection;
     }
 
-    public Specialty getIdSpecailty() {
-        return idSpecailty;
+    public Specialty getIdSpecialty() {
+        return idSpecialty;
     }
 
-    public void setIdSpecailty(Specialty idSpecailty) {
-        this.idSpecailty = idSpecailty;
+    public void getIdSpecialty(Specialty idSpecialty) {
+        this.idSpecialty = idSpecialty;
     }
 
     public User getUserId() {

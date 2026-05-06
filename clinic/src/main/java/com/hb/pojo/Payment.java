@@ -4,6 +4,7 @@
  */
 package com.hb.pojo;
 
+import com.hb.enums.PaymentMethod;
 import com.hb.enums.PaymentStatus;
 import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
@@ -54,7 +55,6 @@ public class Payment implements Serializable {
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
-    @Enumerated(EnumType.STRING)
     
     @Size(max = 100)
     @Column(name = "transaction_id")
@@ -65,7 +65,7 @@ public class Payment implements Serializable {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    private String status;
+    private PaymentStatus status;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "paymentId")
     private Collection<PaymentItems> paymentItemsCollection;
@@ -149,14 +149,14 @@ public class Payment implements Serializable {
     /**
      * @return the status
      */
-    public String getStatus() {
+    public PaymentStatus getStatus() {
         return status;
     }
 
     /**
      * @param status the status to set
      */
-    public void setStatus(String status) {
+    public void setStatus(PaymentStatus status) {
         this.status = status;
     }
 
