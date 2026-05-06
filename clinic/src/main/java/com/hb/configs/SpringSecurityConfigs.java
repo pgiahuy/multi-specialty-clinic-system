@@ -56,9 +56,11 @@ public class SpringSecurityConfigs {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(c -> c.disable()).authorizeHttpRequests((requests) -> requests
+        http.cors(cor -> cor.configurationSource(corsConfigurationSource()))
+                .csrf(c -> c.disable()).authorizeHttpRequests((requests) -> requests
                 .requestMatchers("/", "/admin").hasRole("ADMIN")
                 .requestMatchers("/css/**", "/js/**", "/api/**").permitAll()
+                .requestMatchers("/api/secure/**").authenticated()
                 .anyRequest().authenticated()
         )
         .addFilterBefore(new JwtFilter(), UsernamePasswordAuthenticationFilter.class)

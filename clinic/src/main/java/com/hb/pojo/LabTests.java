@@ -131,13 +131,6 @@ public class LabTests implements Serializable {
         this.normalRange = normalRange;
     }
 
-    public String getUnit() {
-        return unit;
-    }
-
-    public void setUnit(String unit) {
-        this.unit = unit;
-    }
 
   
     

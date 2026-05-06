@@ -7,16 +7,12 @@ package com.hb.repository.impl;
 import com.hb.enums.PaymentMethod;
 import com.hb.enums.PaymentStatus;
 import com.hb.pojo.Payment;
-import com.hb.pojo.PrescriptionItem;
 import com.hb.repository.PaymentRepository;
-import com.nimbusds.jose.Payload;
 import java.util.List;
 import java.util.Map;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -112,7 +108,7 @@ public class PaymentRepositoryImpl implements PaymentRepository {
         Session s = this.factory.getObject().getCurrentSession();
         Payment p = this.getPaymentById(paymentId);
         if (p != null) {
-            p.setStatus(status.name());
+            p.setStatus(status);
             p.setMethod(method);
             s.merge(p);
         }

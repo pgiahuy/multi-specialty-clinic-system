@@ -42,8 +42,7 @@ public class ApiAppointmentController {
     public ResponseEntity<AppointmentResponse> register(@RequestBody AppointmentCreateRequest req,
             Principal principal){
         User u = userService.getUserByUsername(principal.getName());
-        req.setPatientId(u.getPatient().getId());
-        AppointmentResponse a = this.appointmentService.addAppointment(req);
+                AppointmentResponse a = this.appointmentService.addAppointment(req);
         return new ResponseEntity<>(a, HttpStatus.CREATED);
     }
     
