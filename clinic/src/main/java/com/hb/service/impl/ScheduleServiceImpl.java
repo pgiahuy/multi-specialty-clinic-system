@@ -4,11 +4,16 @@
  */
 package com.hb.service.impl;
 
+import com.hb.dto.request.ScheduleCreateRequest;
+import com.hb.dto.response.ScheduleRepsonse;
+import com.hb.exception.ResourceNotFoundException;
+import com.hb.mapper.ScheduleMapper;
 import com.hb.pojo.Doctor;
 import com.hb.pojo.Rooms;
 import com.hb.pojo.Schedules;
 import com.hb.pojo.Shifts;
 import com.hb.repository.DoctorRepository;
+import com.hb.repository.RoomRepository;
 import com.hb.repository.ScheduleRepository;
 import com.hb.repository.ShiftRepository;
 import com.hb.service.ScheduleService;
@@ -34,8 +39,11 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Autowired
     private ShiftRepository shiftRepo;
     
-//    @Autowired
-//    private Rooms
+    @Autowired
+    private RoomRepository roomRepo;
+    
+    @Autowired
+    private ScheduleMapper scheduleMapper;
     
     @Override
     public List<Schedules> getSchedules(Map<String, String> params) {
@@ -43,48 +51,33 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public Schedules addSchedule(Map<String, String> params) {
+    public ScheduleRepsonse addSchedule(ScheduleCreateRequest req) {
         Schedules schedule = new Schedules();
 
-        String dateStr = params.get("date");
-        if (dateStr != null && !dateStr.isEmpty()) {
-            try {
-                java.util.Date date = new java.text.SimpleDateFormat("yyyy-MM-dd").parse(dateStr);
-                schedule.setDate(date);
-            } catch (Exception e) {
-                throw new RuntimeException("Invalid date format");
-            }
-        }
+        schedule.setDate(req.getDate());
+        
 
-        String maxPatientsStr = params.get("maxPatients");
-        if (maxPatientsStr != null && !maxPatientsStr.isEmpty()) {
-            schedule.setMaxPatients(Integer.valueOf(maxPatientsStr));
-        }
+        
+        schedule.setMaxPatients(req.getMaxPatients());
+        schedule.setCurrentPatients(0);
+        
+        Doctor doctor = doctorRepo.getDoctorById(req.getDoctorId());
+        if (doctor == null)
+            throw new ResourceNotFoundException("Không tìm thấy bác sĩ!");
+        Shifts shift = shiftRepo.getShiftById(req.getShiftId());
+        if (shift == null)
+            throw new ResourceNotFoundException("Không tìm thấy ca khám!");
+        Rooms room = roomRepo.getRoomById(req.getRoomId());
+        if (room == null)
+            throw new ResourceNotFoundException("Không tìm thấy phòng!");
 
-        String currentPatientsStr = params.get("currentPatients");
-        if (currentPatientsStr != null && !currentPatientsStr.isEmpty()) {
-            schedule.setCurrentPatients(Integer.valueOf(currentPatientsStr));
-        }
+        schedule.setDoctorId(doctor);
+        schedule.setShiftId(shift);
+        schedule.setRoomId(room);
+        
 
-        String doctorIdStr = params.get("doctorId");
-        if (doctorIdStr != null && !doctorIdStr.isEmpty()) {
-            Doctor doctor = doctorRepo.getDoctorById(Long.valueOf(doctorIdStr));
-            schedule.setDoctorId(doctor);
-        }
-
-        String shiftIdStr = params.get("shiftId");
-        if (shiftIdStr != null && !shiftIdStr.isEmpty()) {
-            Shifts shift = shiftRepo.getShiftById(Long.valueOf(shiftIdStr));
-            schedule.setShiftId(shift);
-        }
-
-//         String roomIdStr = params.get("roomId");
-//         if (roomIdStr != null && !roomIdStr.isEmpty()) {
-//             Rooms room = roomRepo.getRoomById(Long.valueOf(roomIdStr));
-//             schedule.setRoomId(room);
-//         }
-
-        return this.scheduleRepo.addSchedule(schedule);
+        Schedules s = this.scheduleRepo.addSchedule(schedule);
+        return scheduleMapper.toResponse(s);
     }
 
     @Override

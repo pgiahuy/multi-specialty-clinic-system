@@ -46,7 +46,7 @@ public class AppointmentMapper {
 
             if (s.getShiftId() != null) {
                 var shift = s.getShiftId();
-                res.setSession(shift.getSession());
+                res.setSession(shift.getSession().toString());
                 res.setTimeSlot(shift.getStartTime() + " - " + shift.getEndTime());
             }
 

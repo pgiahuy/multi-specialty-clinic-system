@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService {
         u.setEmail(urq.getEmail());
         u.setUsername(urq.getUsername());
         u.setPassword(passwordEncoder.encode(urq.getPassword()));
-        u.setRole("ROLE_USER");
+        u.setRole("ROLE_PATIENT");
         u.setCreatedAt(LocalDateTime.now());
 
         if (!urq.getAvatar().isEmpty()) {
