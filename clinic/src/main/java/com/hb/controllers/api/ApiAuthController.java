@@ -8,7 +8,6 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
-import com.hb.dto.request.PatientCreateRequest;
 import com.hb.dto.request.UserCreateRequest;
 import com.hb.dto.request.UserLogin;
 import com.hb.enums.AuthProvider;
