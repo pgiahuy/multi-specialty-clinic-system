@@ -5,6 +5,8 @@
 package com.hb.dto.response;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import java.time.LocalDate;
 import java.util.Date;
 
 /**
@@ -14,11 +16,13 @@ import java.util.Date;
 
 public class ScheduleRepsonse {
     private Long id;
-    private Date date;
+    @JsonFormat(pattern = "dd/MM/yyyy")
+    private LocalDate date;
     private Integer maxPatients;
     private Integer currentPatients;
     private String doctorName;
-//    private String doctorSpecialty;
+    private String specialtyName;
+    private String session;
     private String room;
     private String area;
     private String shiftStartTime;
@@ -26,21 +30,23 @@ public class ScheduleRepsonse {
 
     public ScheduleRepsonse() {
     }
-    
-    
 
-    public ScheduleRepsonse(Long id, Date date, Integer maxPatients, Integer currentPatients, String doctorName , String room, String area, String shiftStartTime, String shiftEndTime) {
+    public ScheduleRepsonse(Long id, LocalDate date, Integer maxPatients, Integer currentPatients, String doctorName, String specialtyName, String session, String room, String area, String shiftStartTime, String shiftEndTime) {
         this.id = id;
         this.date = date;
         this.maxPatients = maxPatients;
         this.currentPatients = currentPatients;
         this.doctorName = doctorName;
-//        this.doctorSpecialty = doctorSpecialty;
+        this.specialtyName = specialtyName;
+        this.session = session;
         this.room = room;
         this.area = area;
         this.shiftStartTime = shiftStartTime;
         this.shiftEndTime = shiftEndTime;
     }
+    
+    
+
 
     /**
      * @return the id
@@ -59,14 +65,14 @@ public class ScheduleRepsonse {
     /**
      * @return the date
      */
-    public Date getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
     /**
      * @param date the date to set
      */
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
@@ -113,18 +119,32 @@ public class ScheduleRepsonse {
     }
 
     /**
-     * @return the doctorSpecialty
+     * @return the specialtyName
      */
-//    public String getDoctorSpecialty() {
-//        return doctorSpecialty;
-//    }
-//
-//    /**
-//     * @param doctorSpecialty the doctorSpecialty to set
-//     */
-//    public void setDoctorSpecialty(String doctorSpecialty) {
-//        this.doctorSpecialty = doctorSpecialty;
-//    }
+    public String getSpecialtyName() {
+        return specialtyName;
+    }
+
+    /**
+     * @param specialtyName the specialtyName to set
+     */
+    public void setSpecialtyName(String specialtyName) {
+        this.specialtyName = specialtyName;
+    }
+
+    /**
+     * @return the session
+     */
+    public String getSession() {
+        return session;
+    }
+
+    /**
+     * @param session the session to set
+     */
+    public void setSession(String session) {
+        this.session = session;
+    }
 
     /**
      * @return the room
