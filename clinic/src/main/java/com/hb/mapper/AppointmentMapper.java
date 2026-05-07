@@ -29,7 +29,7 @@ public class AppointmentMapper {
 
         AppointmentResponse res = new AppointmentResponse();
         res.setId(a.getId());
-        res.setStatus(a.getStatus());
+        res.setStatus(a.getStatus().name());
         res.setCreatedAt(a.getCreatedAt());
 
         if (a.getPatientId() != null) {
@@ -75,7 +75,7 @@ public class AppointmentMapper {
         a.setPatientId(patient);   
         a.setScheduleId(schedule);
 
-        a.setStatus(AppointmentStatus.PENDING.name()); 
+        a.setStatus(AppointmentStatus.PENDING); 
         a.setCreatedAt(LocalDateTime.now());
 
         return a;

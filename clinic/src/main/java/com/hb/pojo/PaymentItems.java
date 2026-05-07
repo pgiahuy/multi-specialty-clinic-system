@@ -9,6 +9,8 @@ import com.hb.enums.PaymentStatus;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -27,7 +29,7 @@ import java.util.Date;
 
 /**
  *
- * @author DELL
+ * @author HUY
  */
 @Entity
 @Table(name = "payment_items")
@@ -62,14 +64,18 @@ public class PaymentItems implements Serializable {
     private Date createdAt;
     @Size(max = 7)
     @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     private PaymentStatus status;
     @Size(max = 5)
     @Column(name = "method")
-    private String method;
+    @Enumerated(EnumType.STRING)
+    private PaymentMethod method;
     @Column(name = "paid_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date paidAt;
-   
+    @Size(max = 100)
+    @Column(name = "trans_id")
+    private String transId;
     @JoinColumn(name = "appointment_id", referencedColumnName = "id")
     @ManyToOne
     private Appointment appointmentId;
@@ -82,9 +88,6 @@ public class PaymentItems implements Serializable {
     @JoinColumn(name = "prescription_id", referencedColumnName = "id")
     @ManyToOne
     private Prescription prescriptionId;
-    @Size(max = 100)
-    @Column(name = "trans_id", length = 100)
-    private String transId;
 
     public PaymentItems() {
     }
@@ -138,11 +141,11 @@ public class PaymentItems implements Serializable {
         this.status = status;
     }
 
-    public String getMethod() {
+    public PaymentMethod getMethod() {
         return method;
     }
 
-    public void setMethod(String method) {
+    public void setMethod(PaymentMethod method) {
         this.method = method;
     }
 

@@ -31,7 +31,7 @@ import java.util.Date;
 
 /**
  *
- * @author DELL
+ * @author HUY
  */
 @Entity
 @Table(name = "payment")
@@ -53,26 +53,19 @@ public class Payment implements Serializable {
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "total_amount")
     private BigDecimal totalAmount;
-
-    
+    @Size(max = 7)
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus status;
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
-    
-    @Size(max = 100)
-    @Column(name = "transaction_id")
-    private String transactionId;
-
+    @Size(max = 5)
     @Column(name = "method")
-    private PaymentMethod method;
-
     @Enumerated(EnumType.STRING)
-    @Column(name = "status")
-    private PaymentStatus  status;
-
+    private PaymentMethod method;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "paymentId")
     private Collection<PaymentItems> paymentItemsCollection;
-    
     @JoinColumn(name = "patient_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Patient patientId;
@@ -100,7 +93,13 @@ public class Payment implements Serializable {
         this.totalAmount = totalAmount;
     }
 
- 
+    public PaymentStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(PaymentStatus status) {
+        this.status = status;
+    }
 
     public Date getCreatedAt() {
         return createdAt;
@@ -118,37 +117,14 @@ public class Payment implements Serializable {
         this.method = method;
     }
 
-    /**
-     * @return the status
-     */
-    public PaymentStatus getStatus() {
-        return status;
-    }
-
-    /**
-     * @param status the status to set
-     */
-    public void setStatus(PaymentStatus status) {
-        this.status = status;
-    }
-
-    /**
-     * @return the paymentItemsCollection
-     */
     public Collection<PaymentItems> getPaymentItemsCollection() {
         return paymentItemsCollection;
     }
 
-    /**
-     * @param paymentItemsCollection the paymentItemsCollection to set
-     */
     public void setPaymentItemsCollection(Collection<PaymentItems> paymentItemsCollection) {
         this.paymentItemsCollection = paymentItemsCollection;
     }
 
-    /**
-     * @return the patientId
-     */
     public Patient getPatientId() {
         return patientId;
     }

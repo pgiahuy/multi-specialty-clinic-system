@@ -26,7 +26,7 @@
                     <th>Họ tên</th>
                     <th>Chuyên khoa</th>
                     <th>Giới tính</th>
-                    
+
                     <th>Thông tin</th>
                     <th>Tài khoản</th>
                     <th></th>
@@ -36,11 +36,19 @@
             <tbody>
                 <tr th:each="d : ${doctors}">
                     <td th:text="${d.fullName}"></td>
-                    <td th:text="${d.idSpecialty.name}"></td>
+
+
+                    <td>
+    <div th:each="s : ${d.specialtyCollection}">
+        <span class="badge bg-primary w-auto" th:text="${s.name}"></span>
+    </div>
+</td>
+
+
                     <td th:text="${d.gender}"></td>
                     <td th:text="${d.description}"></td>
                     <td th:text="${d.userId.username}"></td>
-           
+
                     <td>
                         <button class="btn btn-warning btn-sm">Sửa</button>
                         <button class="btn btn-danger btn-sm"
@@ -53,7 +61,7 @@
         </table>
 
     </div>
-    
+
     <div class="d-flex justify-content-center mt-4">
         <div th:replace="~{fragments :: pagination('/admin/doctors', ${totalPages}, ${currentPage})}"></div>
     </div>

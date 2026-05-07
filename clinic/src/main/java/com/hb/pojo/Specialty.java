@@ -5,15 +5,15 @@
 package com.hb.pojo;
 
 import jakarta.persistence.Basic;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -32,7 +32,6 @@ import java.util.Collection;
     @NamedQuery(name = "Specialty.findById", query = "SELECT s FROM Specialty s WHERE s.id = :id"),
     @NamedQuery(name = "Specialty.findByName", query = "SELECT s FROM Specialty s WHERE s.name = :name"),
     @NamedQuery(name = "Specialty.findByPrice", query = "SELECT s FROM Specialty s WHERE s.price = :price")})
-    @NamedQuery(name = "Specialty.findAllWithDoctors", query = "SELECT s FROM Specialty s LEFT JOIN FETCH s.doctorCollection")
 public class Specialty implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -51,10 +50,10 @@ public class Specialty implements Serializable {
     @NotNull
     @Column(name = "price")
     private BigDecimal price;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idSpecialty")
+    @ManyToMany(mappedBy = "specialtyCollection")
     private Collection<Doctor> doctorCollection;
     @JoinColumn(name = "id_hod", referencedColumnName = "id")
-    @ManyToOne
+    @OneToOne
     private Doctor idHod;
     @OneToMany(mappedBy = "specialtyId")
     private Collection<Schedules> schedulesCollection;
