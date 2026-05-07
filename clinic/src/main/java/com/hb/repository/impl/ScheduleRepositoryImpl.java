@@ -6,6 +6,7 @@ package com.hb.repository.impl;
 
 import com.hb.pojo.Schedules;
 import com.hb.repository.ScheduleRepository;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import org.hibernate.Session;
@@ -33,17 +34,18 @@ public class ScheduleRepositoryImpl extends BaseRepositoryImpl<Schedules> implem
         StringBuilder hql = new StringBuilder("SELECT DISTINCT s FROM Schedules s "
                 + "LEFT JOIN FETCH s.doctorId "
                 + "LEFT JOIN FETCH s.shiftId "
+                + "LEFT JOIN FETCH s.specialtyId "
                 + "LEFT JOIN FETCH s.roomId WHERE 1=1 ");
 
         if (params != null) {
             if (params.containsKey("doctorId") && !params.get("doctorId").isEmpty()) {
                 hql.append(" AND s.doctorId.id = :docId ");
             }
-            if (params.containsKey("date") && !params.get("date").isEmpty()) {
-                hql.append(" AND s.date = :date ");
-            }
             if (params.containsKey("specialtyId") && !params.get("specialtyId").isEmpty()) {
                 hql.append(" AND s.specialtyId.id = :specId ");
+            }
+            if (params.containsKey("date") && !params.get("date").isEmpty()) {
+                hql.append(" AND s.date = :date ");
             }
         }
 
@@ -53,12 +55,13 @@ public class ScheduleRepositoryImpl extends BaseRepositoryImpl<Schedules> implem
             if (params.containsKey("doctorId") && !params.get("doctorId").isEmpty()) {
                 q.setParameter("docId", Long.parseLong(params.get("doctorId")));
             }
-            if (params.containsKey("date") && !params.get("date").isEmpty()) {
-                q.setParameter("date", java.sql.Date.valueOf(params.get("date")));
-            }
             if (params.containsKey("specialtyId") && !params.get("specialtyId").isEmpty()) {
                 q.setParameter("specId", Long.parseLong(params.get("specialtyId")));
             }
+            if (params.containsKey("date") && !params.get("date").isEmpty()) {
+                q.setParameter("date", LocalDate.parse(params.get("date")));
+            }
+            
 
             if (params.containsKey("pageSize")) {
                 int pageSize = Integer.parseInt(params.get("pageSize"));
