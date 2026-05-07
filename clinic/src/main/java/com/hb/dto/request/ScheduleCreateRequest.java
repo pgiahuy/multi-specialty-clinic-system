@@ -7,7 +7,7 @@ package com.hb.dto.request;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.LocalDate;
 
 /**
  *
@@ -20,7 +20,7 @@ public class ScheduleCreateRequest {
     @JsonFormat(pattern = "yyyy-MM-dd")
     @NotNull(message = "Ngày khám không được để trống")
     @Future(message = "Ngày khám phải ở tương lai")
-    private Date date;
+    private LocalDate date;
     @NotNull
     private Integer maxPatients;
     @NotNull
@@ -33,8 +33,7 @@ public class ScheduleCreateRequest {
     public ScheduleCreateRequest() {
     }
 
-    
-    public ScheduleCreateRequest(Date date, Integer maxPatients, Long roomId, Long shiftId, Long doctorId) {
+    public ScheduleCreateRequest(LocalDate date, Integer maxPatients, Long roomId, Long shiftId, Long doctorId) {
         this.date = date;
         this.maxPatients = maxPatients;
         this.roomId = roomId;
@@ -42,17 +41,21 @@ public class ScheduleCreateRequest {
         this.doctorId = doctorId;
     }
 
+    
+    
+   
+
     /**
      * @return the date
      */
-    public Date getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
     /**
      * @param date the date to set
      */
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
