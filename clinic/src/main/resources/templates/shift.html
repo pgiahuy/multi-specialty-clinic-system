@@ -38,7 +38,7 @@
                 <tr th:each="d : ${shifts}">
                     <td th:text="${#temporals.format(d.startTime, 'HH:mm')}"></td>
                     <td th:text="${#temporals.format(d.endTime, 'HH:mm')}"></td>
-                    <td th:text="${d.session.label}"></td>
+                    <td th:text="${d.session}"></td>
                     <td th:text="${d.maxPatients}"></td>
                     <td th:text="${d.minPatients}"></td>
    
