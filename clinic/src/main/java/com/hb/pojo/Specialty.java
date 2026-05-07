@@ -31,10 +31,16 @@ import java.util.Collection;
     @NamedQuery(name = "Specialty.findAll", query = "SELECT s FROM Specialty s"),
     @NamedQuery(name = "Specialty.findById", query = "SELECT s FROM Specialty s WHERE s.id = :id"),
     @NamedQuery(name = "Specialty.findByName", query = "SELECT s FROM Specialty s WHERE s.name = :name"),
-    @NamedQuery(name = "Specialty.findByPrice", query = "SELECT s FROM Specialty s WHERE s.price = :price"),
-    @NamedQuery(name = "Specialty.findAllWithDoctors", query = "SELECT s FROM Specialty s LEFT JOIN FETCH s.doctorCollection")})
+    @NamedQuery(name = "Specialty.findByPrice", query = "SELECT s FROM Specialty s WHERE s.price = :price")})
+    @NamedQuery(name = "Specialty.findAllWithDoctors", query = "SELECT s FROM Specialty s LEFT JOIN FETCH s.doctorCollection")
 public class Specialty implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+    @Id
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "id")
+    private Long id;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 100)
@@ -45,19 +51,13 @@ public class Specialty implements Serializable {
     @NotNull
     @Column(name = "price")
     private BigDecimal price;
-
-    private static final long serialVersionUID = 1L;
-    @Id
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "id")
-    private Long id;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idSpecialty")
+    private Collection<Doctor> doctorCollection;
     @JoinColumn(name = "id_hod", referencedColumnName = "id")
     @ManyToOne
     private Doctor idHod;
-    
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idSpecialty")
-    private Collection<Doctor> doctorCollection;
+    @OneToMany(mappedBy = "specialtyId")
+    private Collection<Schedules> schedulesCollection;
 
     public Specialty() {
     }
@@ -80,6 +80,29 @@ public class Specialty implements Serializable {
         this.id = id;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public Collection<Doctor> getDoctorCollection() {
+        return doctorCollection;
+    }
+
+    public void setDoctorCollection(Collection<Doctor> doctorCollection) {
+        this.doctorCollection = doctorCollection;
+    }
 
     public Doctor getIdHod() {
         return idHod;
@@ -89,12 +112,12 @@ public class Specialty implements Serializable {
         this.idHod = idHod;
     }
 
-    public Collection<Doctor> getDoctorCollection() {
-        return doctorCollection;
+    public Collection<Schedules> getSchedulesCollection() {
+        return schedulesCollection;
     }
 
-    public void setDoctorCollection(Collection<Doctor> doctorCollection) {
-        this.doctorCollection = doctorCollection;
+    public void setSchedulesCollection(Collection<Schedules> schedulesCollection) {
+        this.schedulesCollection = schedulesCollection;
     }
 
     @Override
@@ -120,22 +143,6 @@ public class Specialty implements Serializable {
     @Override
     public String toString() {
         return "com.hb.pojo.Specialty[ id=" + id + " ]";
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
     }
     
 }

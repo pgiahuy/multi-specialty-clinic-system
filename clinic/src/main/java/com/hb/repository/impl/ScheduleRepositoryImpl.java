@@ -50,10 +50,15 @@ public class ScheduleRepositoryImpl extends BaseRepositoryImpl<Schedules> implem
     }
 
     @Override
-    public Schedules addSchedule(Schedules d) {
+    public Schedules addSchedule(Schedules s) {
         Session session = this.factory.getObject().getCurrentSession();
-        session.persist(d);
-        return d;
+        
+        if(s.getId() == null)
+            session.persist(s);
+        else 
+            session.merge(s);
+        
+        return s;
     }
 
     @Override

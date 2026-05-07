@@ -4,6 +4,7 @@
  */
 package com.hb.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -15,10 +16,11 @@ public class AppointmentResponse {
     
     private Long id;
     private String status;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime createdAt;
     private String patientFullName;
     private String doctorFullName;
-    private String specialtyName = " ";
+    private String specialtyName;
     private String appointmentDate;
     private String session;
     private String timeSlot;

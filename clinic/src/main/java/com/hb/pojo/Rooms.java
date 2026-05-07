@@ -112,6 +112,5 @@ public class Rooms implements Serializable {
         return "com.hb.pojo.Rooms[ id=" + id + " ]";
     }
 
-   
     
 }

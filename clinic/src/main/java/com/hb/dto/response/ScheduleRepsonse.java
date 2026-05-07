@@ -4,11 +4,8 @@
  */
 package com.hb.dto.response;
 
-import com.hb.pojo.Doctor;
-import com.hb.pojo.Rooms;
-import com.hb.pojo.Shifts;
+
 import java.util.Date;
-import org.mapstruct.Builder;
 
 /**
  *
