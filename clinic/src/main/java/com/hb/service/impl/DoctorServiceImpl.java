@@ -57,7 +57,7 @@ public class DoctorServiceImpl implements DoctorService {
             if (s == null) {
                 throw new ResourceNotFoundException("Specialty not found");
             }
-            d.getIdSpecialty(s);
+            d.setSpecialty(s);
         } else {
             throw new RuntimeException("Missing specialty");
         }
