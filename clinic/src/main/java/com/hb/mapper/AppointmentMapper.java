@@ -29,7 +29,7 @@ public class AppointmentMapper {
 
         AppointmentResponse res = new AppointmentResponse();
         res.setId(a.getId());
-        res.setStatus(a.getStatus().name());
+        res.setStatus(a.getStatus() != null ? a.getStatus().name() : null);
         res.setCreatedAt(a.getCreatedAt());
 
         if (a.getPatientId() != null) {
@@ -38,17 +38,23 @@ public class AppointmentMapper {
 
         if (a.getScheduleId() != null) {
             var s = a.getScheduleId();
-            res.setAppointmentDate(new SimpleDateFormat("dd/MM/yyyy").format(s.getDate()));
+            if (s.getDate() != null) {
+                res.setAppointmentDate(new SimpleDateFormat("dd/MM/yyyy").format(s.getDate()));
+            }
 
             if (s.getDoctorId() != null) {
                 res.setDoctorFullName(s.getDoctorId().getFullName());
-                res.setSpecialtyName(s.getSpecialtyId().getName());
+                if (s.getSpecialtyId() != null) {
+                    res.setSpecialtyName(s.getSpecialtyId().getName());
+                }
             }
 
             if (s.getShiftId() != null) {
                 var shift = s.getShiftId();
-                res.setSession(shift.getSession().toString());
-                res.setTimeSlot(shift.getStartTime() + " - " + shift.getEndTime());
+                if (shift.getSession() != null) {
+                    res.setSession(shift.getSession().toString());
+                }
+                res.setTimeSlot(String.valueOf(shift.getStartTime()) + " - " + String.valueOf(shift.getEndTime()));
             }
 
             if (s.getRoomId() != null) {

@@ -21,37 +21,67 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author HUY
  */
-
 @Repository
 @Transactional
-public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> implements AppointmentRepository{
+public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> implements AppointmentRepository {
 
     @Autowired
     private LocalSessionFactoryBean factory;
-    
 
     @Override
-    public List<Appointment> getAppointments(Map<String,String> params) {
-        
+    public List<Appointment> getAppointments(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<Appointment> q = session.createNamedQuery("Appointment.findAll", Appointment.class);
+
+        StringBuilder hql = new StringBuilder("SELECT DISTINCT a FROM Appointment a "
+                + "LEFT JOIN FETCH a.patientId p "
+                + "LEFT JOIN FETCH a.scheduleId s "
+                + "LEFT JOIN FETCH s.doctorId d " 
+                + "LEFT JOIN FETCH s.shiftId sh "
+                + "LEFT JOIN FETCH s.roomId r " 
+                + "LEFT JOIN FETCH r.areaId " 
+                + "LEFT JOIN FETCH a.medicalRecord "
+                + "WHERE 1=1 ");
         
-        
-        if (params!=null) {
+        if (params.containsKey("currentUserId") && params.containsKey("currentUserRole")) {
+            String role = params.get("currentUserRole");
+
+            if ("ROLE_PATIENT".equals(role)) {
+                System.out.println("HAAAAAAÂHAAAAAAAAAAAAAAAA");
+                hql.append(" AND p.userId.id = :userId ");
+
+            } else if ("ROLE_DOCTOR".equals(role)) {
+                System.out.println("HAAAAAAÂHAAAAAAAAAAAAAAAA");
+                hql.append(" AND d.userId.id = :userId ");
+            }
+        }
+
+        if (params.containsKey("date")) {
+            hql.append(" AND s.date = :date ");
+        }
+
+        Query<Appointment> q = session.createQuery(hql.toString(), Appointment.class);
+
+        if (params.containsKey("currentUserId")) {
+            q.setParameter("userId", Long.valueOf(params.get("currentUserId")));
+        }
+        if (params.containsKey("date")) {
+            q.setParameter("date", java.sql.Date.valueOf(params.get("date")));
+        }
+
+        if (params.containsKey("pageSize")) {
             int pageSize = Integer.parseInt(params.get("pageSize"));
             int page = Integer.parseInt(params.getOrDefault("page", "1"));
-            int start = (page-1)*pageSize;
-            
+            q.setFirstResult((page - 1) * pageSize);
             q.setMaxResults(pageSize);
-            q.setFirstResult(start);
         }
+
         return q.getResultList();
     }
 
     @Override
     public Appointment getAppointmentById(Long id) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<Appointment> q = session.createNamedQuery("Appointment.findById",Appointment.class);
+        Query<Appointment> q = session.createNamedQuery("Appointment.findById", Appointment.class);
         q.setParameter("id", id);
         return q.getSingleResult();
     }
@@ -63,6 +93,4 @@ public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> i
         return a;
     }
 
-
-    
 }

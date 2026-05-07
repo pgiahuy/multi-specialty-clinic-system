@@ -4,6 +4,7 @@
  */
 package com.hb.exception;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
 
 /**
@@ -17,6 +18,7 @@ public class ApiError {
     private String error;
     private String message;
     private String path;
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime timestamp;
 
     public ApiError(int status, String error, String message, String path, LocalDateTime timestamp) {

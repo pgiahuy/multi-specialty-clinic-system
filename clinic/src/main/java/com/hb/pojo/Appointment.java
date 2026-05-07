@@ -58,6 +58,7 @@ public class Appointment implements Serializable {
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime createdAt;
     @OneToOne(mappedBy = "appointmentId")
+    @JsonIgnore
     private MedicalRecord medicalRecord;
     
     @OneToMany(mappedBy = "appointmentId")
@@ -68,8 +69,10 @@ public class Appointment implements Serializable {
     private Patient patientId;
     @JoinColumn(name = "schedule_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
+    @JsonIgnore
     private Schedules scheduleId;
     @OneToMany(mappedBy = "appointmentId")
+    @JsonIgnore
     private Collection<LabResults> labResultsCollection;
 
     public Appointment() {

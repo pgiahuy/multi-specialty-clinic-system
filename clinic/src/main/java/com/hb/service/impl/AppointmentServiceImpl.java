@@ -6,6 +6,7 @@ package com.hb.service.impl;
 
 import com.hb.dto.request.AppointmentCreateRequest;
 import com.hb.dto.response.AppointmentResponse;
+import com.hb.exception.FullSlotException;
 import com.hb.exception.ResourceNotFoundException;
 import com.hb.mapper.AppointmentMapper;
 import com.hb.pojo.Appointment;
@@ -75,7 +76,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         
 
         if (schedule.getCurrentPatients() >= schedule.getMaxPatients()) {
-            throw new RuntimeException("Rất tiếc, ca khám này đã đủ số lượng người đăng ký!");
+            throw new FullSlotException("Rất tiếc, ca khám này đã đủ số lượng người đăng ký!");
         }
 
         schedule.setCurrentPatients(schedule.getCurrentPatients() + 1);
