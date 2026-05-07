@@ -5,9 +5,13 @@
 package com.hb.pojo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.hb.enums.AppointmentStatus;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -39,24 +43,25 @@ import java.util.Date;
     @NamedQuery(name = "Appointment.findByCreatedAt", query = "SELECT a FROM Appointment a WHERE a.createdAt = :createdAt")})
 public class Appointment implements Serializable {
 
-    @Size(max = 11)
-    @Column(name = "status")
-    private String status;
-    
-    @Column(name = "created_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
-    private LocalDateTime createdAt;
-
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
+    @Size(max = 11)
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private AppointmentStatus status;
+    @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
+    private LocalDateTime createdAt;
     @OneToOne(mappedBy = "appointmentId")
     private MedicalRecord medicalRecord;
+    
     @OneToMany(mappedBy = "appointmentId")
+    @JsonIgnore
     private Collection<PaymentItems> paymentItemsCollection;
     @JoinColumn(name = "patient_id", referencedColumnName = "id")
     @ManyToOne
@@ -82,7 +87,21 @@ public class Appointment implements Serializable {
         this.id = id;
     }
 
+    public AppointmentStatus getStatus() {
+        return status;
+    }
 
+    public void setStatus(AppointmentStatus status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 
     public MedicalRecord getMedicalRecord() {
         return medicalRecord;
@@ -147,22 +166,6 @@ public class Appointment implements Serializable {
     @Override
     public String toString() {
         return "com.hb.pojo.Appointment[ id=" + id + " ]";
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
     }
     
 }

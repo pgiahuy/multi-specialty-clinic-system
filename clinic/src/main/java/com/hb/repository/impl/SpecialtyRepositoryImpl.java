@@ -31,8 +31,8 @@ public class SpecialtyRepositoryImpl extends BaseRepositoryImpl<Specialty> imple
     @Override
     public List<Specialty> getSpecialties(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<Specialty> q = session.createNamedQuery("Specialty.findAllWithDoctors",Specialty.class);
         
+        Query<Specialty> q = session.createQuery("SELECT DISTINCT s FROM Specialty s LEFT JOIN FETCH s.doctorCollection",Specialty.class);
         if(params!= null){
             int pageSize = Integer.parseInt(params.get("pageSize"));
             System.out.println("===========" );
