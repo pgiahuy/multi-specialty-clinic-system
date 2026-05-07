@@ -72,6 +72,7 @@ public class ScheduleServiceImpl implements ScheduleService {
             throw new ResourceNotFoundException("Không tìm thấy phòng!");
 
         schedule.setDoctorId(doctor);
+        schedule.setSpecialtyId(doctor.getSpecialty());
         schedule.setShiftId(shift);
         schedule.setRoomId(room);
         

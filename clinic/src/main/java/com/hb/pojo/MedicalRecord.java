@@ -4,6 +4,7 @@
  */
 package com.hb.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -53,6 +54,7 @@ public class MedicalRecord implements Serializable {
     private Date createdAt;
     @JoinColumn(name = "appointment_id", referencedColumnName = "id")
     @OneToOne
+    @JsonIgnore
     private Appointment appointmentId;
     @OneToOne(mappedBy = "medicalRecordId")
     private Prescription prescription;
