@@ -32,7 +32,8 @@ public class DoctorRepositoryImpl extends BaseRepositoryImpl<Doctor> implements 
     @Override
     public List<Doctor> getDoctors(Map<String,String> params) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<Doctor> q = session.createNamedQuery("Doctor.findAll", Doctor.class);
+        Query<Doctor> q = session.createQuery("SELECT DISTINCT d FROM Doctor d LEFT JOIN FETCH d.specialtyCollection", Doctor.class);
+        
         
         if (params!=null) {
             int pageSize = Integer.parseInt(params.get("pageSize"));
