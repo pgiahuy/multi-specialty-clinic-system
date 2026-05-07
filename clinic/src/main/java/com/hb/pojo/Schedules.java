@@ -20,6 +20,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Date;
 
@@ -45,7 +46,7 @@ public class Schedules implements Serializable {
     private Long id;
     @Column(name = "date")
     @Temporal(TemporalType.DATE)
-    private Date date;
+    private LocalDate date;
     @Column(name = "max_patients")
     private Integer maxPatients;
     @Column(name = "current_patients")
@@ -68,6 +69,20 @@ public class Schedules implements Serializable {
     public Schedules() {
     }
 
+    public Schedules(Long id, LocalDate date, Integer maxPatients, Integer currentPatients, Collection<Appointment> appointmentCollection, Doctor doctorId, Rooms roomId, Shifts shiftId, Specialty specialtyId) {
+        this.id = id;
+        this.date = date;
+        this.maxPatients = maxPatients;
+        this.currentPatients = currentPatients;
+        this.appointmentCollection = appointmentCollection;
+        this.doctorId = doctorId;
+        this.roomId = roomId;
+        this.shiftId = shiftId;
+        this.specialtyId = specialtyId;
+    }
+    
+    
+
     public Schedules(Long id) {
         this.id = id;
     }
@@ -80,11 +95,11 @@ public class Schedules implements Serializable {
         this.id = id;
     }
 
-    public Date getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
