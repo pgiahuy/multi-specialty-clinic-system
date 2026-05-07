@@ -42,6 +42,7 @@ public class AppointmentMapper {
 
             if (s.getDoctorId() != null) {
                 res.setDoctorFullName(s.getDoctorId().getFullName());
+                res.setSpecialtyName(s.getSpecialtyId().getName());
             }
 
             if (s.getShiftId() != null) {

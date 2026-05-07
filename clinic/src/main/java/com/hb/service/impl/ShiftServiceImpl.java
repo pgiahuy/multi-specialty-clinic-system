@@ -4,6 +4,8 @@
  */
 package com.hb.service.impl;
 
+import com.hb.dto.response.ShiftResponse;
+import com.hb.mapper.ShiftMapper;
 import com.hb.pojo.Shifts;
 import com.hb.repository.ShiftRepository;
 import com.hb.service.ShiftService;
@@ -24,8 +26,9 @@ public class ShiftServiceImpl implements ShiftService {
     private ShiftRepository shiftRepo;
 
     @Override
-    public List<Shifts> getShifts(Map<String, String> params) {
-        return this.shiftRepo.getShifts(params);
+    public List<ShiftResponse> getShifts(Map<String, String> params) {
+        List<Shifts> res =  this.shiftRepo.getShifts(params);
+        return res.stream().map(ShiftMapper.INSTANCE::toResponse).toList();
     }
 
     @Override
@@ -35,8 +38,9 @@ public class ShiftServiceImpl implements ShiftService {
     }
 
     @Override
-    public Shifts getShiftById(Long id) {
-        return this.shiftRepo.getShiftById(id);
+    public ShiftResponse getShiftById(Long id) {
+        Shifts s = this.shiftRepo.getShiftById(id);
+        return ShiftMapper.INSTANCE.toResponse(s);
     }
 
     @Override
