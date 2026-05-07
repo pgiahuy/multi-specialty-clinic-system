@@ -19,45 +19,68 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author HUY
  */
-
 @Repository
 @Transactional
-public class ScheduleRepositoryImpl extends BaseRepositoryImpl<Schedules> implements ScheduleRepository{
+public class ScheduleRepositoryImpl extends BaseRepositoryImpl<Schedules> implements ScheduleRepository {
+
     @Autowired
     private LocalSessionFactoryBean factory;
-    
-
 
     @Override
     public List<Schedules> getSchedules(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<Schedules> q = session.createNamedQuery("Schedules.findAll",Schedules.class);
-        
-        
-        if(params!= null){
-            int pageSize = Integer.parseInt(params.get("pageSize"));
-            int page = Integer.parseInt( params.getOrDefault("page", "1"));
-            int start = (page-1)*pageSize;
-            
-            q.setMaxResults(pageSize);
-            q.setFirstResult(start);
-            
+
+        StringBuilder hql = new StringBuilder("SELECT DISTINCT s FROM Schedules s "
+                + "LEFT JOIN FETCH s.doctorId "
+                + "LEFT JOIN FETCH s.shiftId "
+                + "LEFT JOIN FETCH s.roomId WHERE 1=1 ");
+
+        if (params != null) {
+            if (params.containsKey("doctorId") && !params.get("doctorId").isEmpty()) {
+                hql.append(" AND s.doctorId.id = :docId ");
+            }
+            if (params.containsKey("date") && !params.get("date").isEmpty()) {
+                hql.append(" AND s.date = :date ");
+            }
+            if (params.containsKey("specialtyId") && !params.get("specialtyId").isEmpty()) {
+                hql.append(" AND s.specialtyId.id = :specId ");
+            }
         }
-        System.out.println("============");
-        System.out.println(q.getResultList());
-        System.out.println("============");
+
+        Query<Schedules> q = session.createQuery(hql.toString(), Schedules.class);
+
+        if (params != null) {
+            if (params.containsKey("doctorId") && !params.get("doctorId").isEmpty()) {
+                q.setParameter("docId", Long.parseLong(params.get("doctorId")));
+            }
+            if (params.containsKey("date") && !params.get("date").isEmpty()) {
+                q.setParameter("date", java.sql.Date.valueOf(params.get("date")));
+            }
+            if (params.containsKey("specialtyId") && !params.get("specialtyId").isEmpty()) {
+                q.setParameter("specId", Long.parseLong(params.get("specialtyId")));
+            }
+
+            if (params.containsKey("pageSize")) {
+                int pageSize = Integer.parseInt(params.get("pageSize"));
+                int page = Integer.parseInt(params.getOrDefault("page", "1"));
+                q.setMaxResults(pageSize);
+                q.setFirstResult((page - 1) * pageSize);
+            }
+        }
+
         return q.getResultList();
     }
 
     @Override
     public Schedules addSchedule(Schedules s) {
         Session session = this.factory.getObject().getCurrentSession();
-        
-        if(s.getId() == null)
+
+        if (s.getId() == null) {
             session.persist(s);
-        else 
+        } else {
             session.merge(s);
-        
+        }
+
         return s;
     }
 
@@ -75,5 +98,5 @@ public class ScheduleRepositoryImpl extends BaseRepositoryImpl<Schedules> implem
             session.remove(s);
         }
     }
-    
+
 }

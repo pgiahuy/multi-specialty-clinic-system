@@ -35,6 +35,7 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
         basePackages = {
             "com.hb.controllers",
             "com.hb.repository",
+            "com.hb.exception",
             "com.hb.service",
             "com.hb.configs"
         }
