@@ -4,6 +4,7 @@
  */
 package com.hb.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hb.enums.SessionShift;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
@@ -41,6 +42,12 @@ import java.util.Date;
     @NamedQuery(name = "Shifts.findByMinPatients", query = "SELECT s FROM Shifts s WHERE s.minPatients = :minPatients")})
 public class Shifts implements Serializable {
 
+    @Column(name = "start_time")
+    @Temporal(TemporalType.TIME)
+    private LocalTime startTime;
+    @Column(name = "end_time")
+    @Temporal(TemporalType.TIME)
+    private LocalTime endTime;
     @Size(max = 9)
     @Column(name = "session")
     @Enumerated(EnumType.STRING)
@@ -52,16 +59,12 @@ public class Shifts implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
-    @Column(name = "start_time")
-    @Temporal(TemporalType.TIME)
-    private LocalTime startTime;
-    @Column(name = "end_time")
-    @Temporal(TemporalType.TIME)
-    private LocalTime endTime;
     @Column(name = "max_patients")
     private Integer maxPatients;
     @Column(name = "min_patients")
     private Integer minPatients;
+    
+    @JsonIgnore
     @OneToMany(mappedBy = "shiftId")
     private Collection<Schedules> schedulesCollection;
 
@@ -145,6 +148,7 @@ public class Shifts implements Serializable {
     public String toString() {
         return "com.hb.pojo.Shifts[ id=" + id + " ]";
     }
+
 
     public SessionShift getSession() {
         return session;

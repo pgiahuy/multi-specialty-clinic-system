@@ -118,6 +118,7 @@ public class Areas implements Serializable {
         return "com.hb.pojo.Areas[ id=" + id + " ]";
     }
 
+
  
     
 }
