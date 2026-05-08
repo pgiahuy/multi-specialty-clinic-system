@@ -4,6 +4,7 @@
  */
 package com.hb.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -44,11 +45,15 @@ public class Prescription implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
     @OneToMany(mappedBy = "prescriptionId")
+    @JsonIgnore
     private Collection<PaymentItems> paymentItemsCollection;
     @JoinColumn(name = "medical_record_id", referencedColumnName = "id")
     @OneToOne
+    @JsonIgnore
     private MedicalRecord medicalRecordId;
+    
     @OneToMany(mappedBy = "prescriptionId")
+    @JsonIgnore
     private Collection<PrescriptionItem> prescriptionItemCollection;
 
     public Prescription() {
