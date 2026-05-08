@@ -60,8 +60,8 @@ public class ApiScheduleController {
     public ResponseEntity<ScheduleRepsonse> register(Principal principal,@RequestBody ScheduleCreateRequest req){
         User u = this.userService.getUserByUsername(principal.getName());
         if (u.getDoctor() == null) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-    }
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         Long doctorId = u.getDoctor().getId();
         
         req.setDoctorId(doctorId);

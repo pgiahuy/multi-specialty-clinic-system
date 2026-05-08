@@ -4,6 +4,9 @@
  */
 package com.hb.dto.response;
 
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -16,9 +19,12 @@ public class PrescriptionResponse {
     private String patientName;
     private String note;
     private List<PrescriptionItemResponse> items;
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
+    private LocalDateTime createdAt;
 
     public PrescriptionResponse() {
     }
+    
 
     /**
      * @return the id
@@ -90,6 +96,21 @@ public class PrescriptionResponse {
         this.items = items;
     }
 
-   
+    /**
+     * @return the createdAt
+     */
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    /**
+     * @param createdAt the createdAt to set
+     */
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
     
+    
+    
+
 }

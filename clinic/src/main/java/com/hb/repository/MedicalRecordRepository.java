@@ -16,6 +16,7 @@ public interface MedicalRecordRepository extends BaseRepository<MedicalRecord>{
     List<MedicalRecord> getMedicalRecords(Map<String,String> params);
     MedicalRecord addMedicalRecord(MedicalRecord m);
     MedicalRecord getMedicalRecordById(Long id);
+    List<MedicalRecord> getMedicalRecordsByPatientId(Long patientId);
     void deleteMedicalRecord(Long id);
     
 }
