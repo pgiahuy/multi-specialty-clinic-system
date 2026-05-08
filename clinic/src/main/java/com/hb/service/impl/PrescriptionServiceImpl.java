@@ -44,6 +44,27 @@ public class PrescriptionServiceImpl implements PrescriptionService {
 
     @Autowired
     private MedicineRepository medicineRepo;
+    
+    @Override
+    @Transactional(readOnly = true)
+    public List<Prescription> getPrescriptions(Map<String, String> params) {
+        List<Prescription> prescriptions = this.prescriptionRepo.getPrescriptions(params);
+
+        for (Prescription prescription : prescriptions) {
+            if (prescription.getPrescriptionItemCollection() != null) {
+                prescription.getPrescriptionItemCollection().size();
+
+                for (PrescriptionItem item : prescription.getPrescriptionItemCollection()) {
+                    if (item.getMedicineId() != null) {
+                        item.getMedicineId().getName();
+                        item.getMedicineId().getSecureUrl();
+                    }
+                }
+            }
+        }
+
+        return prescriptions;
+    }
 
     @Override
     @Transactional
@@ -195,26 +216,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
     }
    
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<Prescription> getPrescriptions(Map<String, String> params) {
-        List<Prescription> prescriptions = this.prescriptionRepo.getPrescriptions(params);
-
-        for (Prescription prescription : prescriptions) {
-            if (prescription.getPrescriptionItemCollection() != null) {
-                prescription.getPrescriptionItemCollection().size();
-
-                for (PrescriptionItem item : prescription.getPrescriptionItemCollection()) {
-                    if (item.getMedicineId() != null) {
-                        item.getMedicineId().getName();
-                        item.getMedicineId().getSecureUrl();
-                    }
-                }
-            }
-        }
-
-        return prescriptions;
-    }
+    
 
     @Override
     @Transactional(readOnly = true)

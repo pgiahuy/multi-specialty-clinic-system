@@ -38,15 +38,16 @@ import java.util.Date;
     @NamedQuery(name = "Schedules.findByCurrentPatients", query = "SELECT s FROM Schedules s WHERE s.currentPatients = :currentPatients")})
 public class Schedules implements Serializable {
 
+    @Column(name = "date")
+    @Temporal(TemporalType.DATE)
+    private LocalDate date;
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
-    @Column(name = "date")
-    @Temporal(TemporalType.DATE)
-    private LocalDate date;
     @Column(name = "max_patients")
     private Integer maxPatients;
     @Column(name = "current_patients")
@@ -82,6 +83,9 @@ public class Schedules implements Serializable {
     }
     
     
+    
+    
+    
 
     public Schedules(Long id) {
         this.id = id;
@@ -95,13 +99,6 @@ public class Schedules implements Serializable {
         this.id = id;
     }
 
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
 
     public Integer getMaxPatients() {
         return maxPatients;
@@ -183,5 +180,20 @@ public class Schedules implements Serializable {
     public String toString() {
         return "com.hb.pojo.Schedules[ id=" + id + " ]";
     }
-    
+
+    /**
+     * @return the date
+     */
+    public LocalDate getDate() {
+        return date;
+    }
+
+    /**
+     * @param date the date to set
+     */
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+
+
 }

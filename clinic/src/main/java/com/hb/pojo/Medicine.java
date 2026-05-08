@@ -41,20 +41,9 @@ import java.util.Date;
     @NamedQuery(name = "Medicine.findByPrice", query = "SELECT m FROM Medicine m WHERE m.price = :price")})
 public class Medicine implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "id")
-    private Long id;
     @Size(max = 100)
     @Column(name = "name")
     private String name;
-    @Column(name = "stock")
-    private Integer stock;
-    @Column(name = "expiration_date")
-    @Temporal(TemporalType.DATE)
-    private Date expirationDate;
     @Size(max = 255)
     @Column(name = "secure_url")
     private String secureUrl;
@@ -71,6 +60,18 @@ public class Medicine implements Serializable {
     @NotNull
     @Column(name = "price")
     private BigDecimal price;
+
+    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id")
+    private Long id;
+    @Column(name = "stock")
+    private Integer stock;
+    @Column(name = "expiration_date")
+    @Temporal(TemporalType.DATE)
+    private Date expirationDate;
     @OneToMany(mappedBy = "medicineId")
     private Collection<InventoryLog> inventoryLogCollection;
     @OneToMany(mappedBy = "medicineId")
@@ -97,13 +98,6 @@ public class Medicine implements Serializable {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public Integer getStock() {
         return stock;
@@ -137,21 +131,6 @@ public class Medicine implements Serializable {
         this.publicId = publicId;
     }
 
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
 
     public Collection<InventoryLog> getInventoryLogCollection() {
         return inventoryLogCollection;
@@ -192,6 +171,31 @@ public class Medicine implements Serializable {
     @Override
     public String toString() {
         return "com.hb.pojo.Medicine[ id=" + id + " ]";
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
     
 }

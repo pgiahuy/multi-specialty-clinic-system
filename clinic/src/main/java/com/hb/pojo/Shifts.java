@@ -42,24 +42,24 @@ import java.util.Date;
     @NamedQuery(name = "Shifts.findByMinPatients", query = "SELECT s FROM Shifts s WHERE s.minPatients = :minPatients")})
 public class Shifts implements Serializable {
 
+    @Size(max = 9)
+    @Column(name = "session")
+    @Enumerated(EnumType.STRING)
+    private SessionShift session;
+
+    @Column(name = "start_time")
+    @Temporal(TemporalType.TIME)
+    private LocalTime startTime;
+    @Column(name = "end_time")
+    @Temporal(TemporalType.TIME)
+    private LocalTime endTime;
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
-    @Column(name = "start_time")
-    @Temporal(TemporalType.TIME)
-    @JsonFormat(pattern = "HH:mm:ss")
-    private LocalTime startTime;
-    @Column(name = "end_time")
-    @Temporal(TemporalType.TIME)
-    @JsonFormat(pattern = "HH:mm:ss")
-    private LocalTime endTime;
-    @Size(max = 9)
-    @Column(name = "session")
-    @Enumerated(EnumType.STRING)
-    private SessionShift session;
     @Column(name = "max_patients")
     private Integer maxPatients;
     @Column(name = "min_patients")
@@ -82,29 +82,7 @@ public class Shifts implements Serializable {
         this.id = id;
     }
 
-    public LocalTime getStartTime() {
-        return startTime;
-    }
 
-    public void setStartTime(LocalTime startTime) {
-        this.startTime = startTime;
-    }
-
-    public LocalTime getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(LocalTime endTime) {
-        this.endTime = endTime;
-    }
-
-    public SessionShift getSession() {
-        return session;
-    }
-
-    public void setSession(SessionShift session) {
-        this.session = session;
-    }
 
     public Integer getMaxPatients() {
         return maxPatients;
@@ -153,6 +131,30 @@ public class Shifts implements Serializable {
     @Override
     public String toString() {
         return "com.hb.pojo.Shifts[ id=" + id + " ]";
+    }
+
+    public LocalTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalTime endTime) {
+        this.endTime = endTime;
+    }
+
+    public SessionShift getSession() {
+        return session;
+    }
+
+    public void setSession(SessionShift session) {
+        this.session = session;
     }
     
 }
