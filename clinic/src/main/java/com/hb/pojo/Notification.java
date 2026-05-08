@@ -35,16 +35,21 @@ import java.util.Date;
     @NamedQuery(name = "Notification.findByCreatedAt", query = "SELECT n FROM Notification n WHERE n.createdAt = :createdAt")})
 public class Notification implements Serializable {
 
+    @Lob
+    @Size(max = 65535)
+    @Column(name = "title")
+    private String title;
+    @Lob
+    @Size(max = 65535)
+    @Column(name = "content")
+    private String content;
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
-    @Lob
-    @Size(max = 65535)
-    @Column(name = "content")
-    private String content;
     @Column(name = "is_read")
     private Boolean isRead;
     @Column(name = "created_at")
@@ -69,13 +74,6 @@ public class Notification implements Serializable {
         this.id = id;
     }
 
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
 
     public Boolean getIsRead() {
         return isRead;
@@ -124,6 +122,22 @@ public class Notification implements Serializable {
     @Override
     public String toString() {
         return "com.hb.pojo.Notification[ id=" + id + " ]";
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
     
 }

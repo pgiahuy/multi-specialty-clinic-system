@@ -11,6 +11,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
@@ -45,6 +46,7 @@ public class User implements Serializable {
 
     // @Pattern(regexp="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", message="Invalid email")//if the field contains email address consider using this annotation to enforce field validation
     // @Pattern(regexp="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", message="Invalid email")//if the field contains email address consider using this annotation to enforce field validation
+    // @Pattern(regexp="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", message="Invalid email")//if the field contains email address consider using this annotation to enforce field validation
     @Size(max = 100)
     @Column(name = "email")
     private String email;
@@ -73,8 +75,12 @@ public class User implements Serializable {
     @Size(max = 255)
     @Column(name ="public_id")
     private String publicId;
+    @Lob
+    @Size(max = 65535)
+    @Column(name = "fcm_token")
+    private String fcmToken;
     
-    private static final long serialVersionUID = 1L;
+    private static long serialVersionUID = 1L;
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -106,75 +112,11 @@ public class User implements Serializable {
         this.username = username;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public String getSecureUrl() {
-        return secureUrl;
-    }
-
-    public void setSecureUrl(String secureUrl) {
-        this.secureUrl = secureUrl;
-    }
-
-    public String getPublicId() {
-        return publicId;
-    }
-
-    public void setPublicId(String publicId) {
-        this.publicId = publicId;
-    }
-
-    public Doctor getDoctor() {
-        return doctor;
-    }
-
-    public void setDoctor(Doctor doctor) {
-        this.doctor = doctor;
-    }
-
-    public Collection<Notification> getNotificationCollection() {
-        return notificationCollection;
-    }
-
-    public void setNotificationCollection(Collection<Notification> notificationCollection) {
-        this.notificationCollection = notificationCollection;
-    }
-
-    public Collection<Patient> getPatientCollection() {
-        return patientCollection;
-    }
-
-    public void setPatientCollection(Collection<Patient> patientCollection) {
-        this.patientCollection = patientCollection;
-    }
-
-    public Collection<SocialAccount> getSocialAccountCollection() {
-        return socialAccountCollection;
-    }
-
-    public void setSocialAccountCollection(Collection<SocialAccount> socialAccountCollection) {
-        this.socialAccountCollection = socialAccountCollection;
-    }
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
+        hash += (getId() != null ? getId().hashCode() : 0);
         return hash;
     }
 
@@ -185,7 +127,7 @@ public class User implements Serializable {
             return false;
         }
         User other = (User) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.getId() == null && other.getId() != null) || (this.getId() != null && !this.id.equals(other.id))) {
             return false;
         }
         return true;
@@ -193,42 +135,206 @@ public class User implements Serializable {
 
     @Override
     public String toString() {
-        return "com.hb.pojo.User[ id=" + id + " ]";
+        return "com.hb.pojo.User[ id=" + getId() + " ]";
     }
 
+    /**
+     * @return the email
+     */
     public String getEmail() {
         return email;
     }
 
+    /**
+     * @param email the email to set
+     */
     public void setEmail(String email) {
         this.email = email;
     }
 
+    /**
+     * @return the password
+     */
     public String getPassword() {
         return password;
     }
 
+    /**
+     * @param password the password to set
+     */
     public void setPassword(String password) {
         this.password = password;
     }
 
+    /**
+     * @return the username
+     */
     public String getUsername() {
         return username;
     }
 
+    /**
+     * @param username the username to set
+     */
     public void setUsername(String username) {
         this.username = username;
     }
 
+    /**
+     * @return the role
+     */
     public String getRole() {
         return role;
     }
 
+    /**
+     * @param role the role to set
+     */
     public void setRole(String role) {
         this.role = role;
     }
 
+    /**
+     * @return the createdAt
+     */
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
 
+    /**
+     * @param createdAt the createdAt to set
+     */
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    /**
+     * @return the secureUrl
+     */
+    public String getSecureUrl() {
+        return secureUrl;
+    }
+
+    /**
+     * @param secureUrl the secureUrl to set
+     */
+    public void setSecureUrl(String secureUrl) {
+        this.secureUrl = secureUrl;
+    }
+
+    /**
+     * @return the publicId
+     */
+    public String getPublicId() {
+        return publicId;
+    }
+
+    /**
+     * @param publicId the publicId to set
+     */
+    public void setPublicId(String publicId) {
+        this.publicId = publicId;
+    }
+
+    /**
+     * @return the fcmToken
+     */
+    public String getFcmToken() {
+        return fcmToken;
+    }
+
+    /**
+     * @param fcmToken the fcmToken to set
+     */
+    public void setFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
+    }
+
+    /**
+     * @return the serialVersionUID
+     */
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+    /**
+     * @param aSerialVersionUID the serialVersionUID to set
+     */
+    public static void setSerialVersionUID(long aSerialVersionUID) {
+        serialVersionUID = aSerialVersionUID;
+    }
+
+    /**
+     * @return the id
+     */
+    public Long getId() {
+        return id;
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    /**
+     * @return the doctor
+     */
+    public Doctor getDoctor() {
+        return doctor;
+    }
+
+    /**
+     * @param doctor the doctor to set
+     */
+    public void setDoctor(Doctor doctor) {
+        this.doctor = doctor;
+    }
+
+    /**
+     * @return the notificationCollection
+     */
+    public Collection<Notification> getNotificationCollection() {
+        return notificationCollection;
+    }
+
+    /**
+     * @param notificationCollection the notificationCollection to set
+     */
+    public void setNotificationCollection(Collection<Notification> notificationCollection) {
+        this.notificationCollection = notificationCollection;
+    }
+
+    /**
+     * @return the patientCollection
+     */
+    public Collection<Patient> getPatientCollection() {
+        return patientCollection;
+    }
+
+    /**
+     * @param patientCollection the patientCollection to set
+     */
+    public void setPatientCollection(Collection<Patient> patientCollection) {
+        this.patientCollection = patientCollection;
+    }
+
+    /**
+     * @return the socialAccountCollection
+     */
+    public Collection<SocialAccount> getSocialAccountCollection() {
+        return socialAccountCollection;
+    }
+
+    /**
+     * @param socialAccountCollection the socialAccountCollection to set
+     */
+    public void setSocialAccountCollection(Collection<SocialAccount> socialAccountCollection) {
+        this.socialAccountCollection = socialAccountCollection;
+    }
     
+    
+
 
 }
