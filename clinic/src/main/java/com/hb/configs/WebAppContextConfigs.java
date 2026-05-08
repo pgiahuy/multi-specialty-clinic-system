@@ -25,6 +25,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
             "com.hb.controllers",
             "com.hb.repository",
             "com.hb.service",
+            "com.hb.configs",
             "com.hb.mapper"
         }
 )

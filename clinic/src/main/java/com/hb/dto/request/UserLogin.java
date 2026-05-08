@@ -11,6 +11,18 @@ package com.hb.dto.request;
 public class UserLogin {
     private String username;
     private String password;
+    private String fcmToken;
+
+    public UserLogin(String username, String password, String fcmToken) {
+        this.username = username;
+        this.password = password;
+        this.fcmToken = fcmToken;
+    }
+    
+    
+    
+    public UserLogin() {
+    }
 
     /**
      * @return the username
@@ -39,6 +51,22 @@ public class UserLogin {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    /**
+     * @return the fcmToken
+     */
+    public String getFcmToken() {
+        return fcmToken;
+    }
+
+    /**
+     * @param fcmToken the fcmToken to set
+     */
+    public void setFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
+    }
+    
+    
     
     
 }

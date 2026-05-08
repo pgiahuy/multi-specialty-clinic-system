@@ -24,4 +24,6 @@ public interface UserService extends UserDetailsService {
     void deleteUser(Long id);
     User processSocialLogin(String email, String name, String providerId, String providerName);
     long countUsers(Map<String, String> params);
+
+    void updateFcmToken(String username, String fcmToken);
 }

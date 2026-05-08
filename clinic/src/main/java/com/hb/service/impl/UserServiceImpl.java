@@ -104,5 +104,14 @@ public class UserServiceImpl implements UserService {
         return userRepo.getUserByEmail(email);
     }
 
+    @Override
+    @Transactional
+    public void updateFcmToken(String username, String fcmToken) {
+        User user = this.userRepo.getUserByUsername(username);
+        if (user != null) {
+            user.setFcmToken(fcmToken);
+        }
+    }
+
 
 }
