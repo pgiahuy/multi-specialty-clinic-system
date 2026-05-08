@@ -113,5 +113,11 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public String getRoleByUsername(String username) {
+        User user = this.userRepo.getUserByUsername(username);
+        return user != null ? user.getRole() : null;
+    }
+
 
 }
