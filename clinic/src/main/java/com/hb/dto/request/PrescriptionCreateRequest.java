@@ -14,6 +14,9 @@ public class PrescriptionCreateRequest {
     private Long medicalRecordId; 
     private List<PrescriptionItemCreateRequest> items;
 
+    public PrescriptionCreateRequest() {
+    }
+
     public PrescriptionCreateRequest(Long medicalRecordId, List<PrescriptionItemCreateRequest> items) {
         this.medicalRecordId = medicalRecordId;
         this.items = items;

@@ -29,11 +29,15 @@ public class PrescriptionItemRepositoryImpl implements PrescriptionItemRepositor
     @Override
     public PrescriptionItem save(PrescriptionItem item) {
         Session session = factory.getObject().getCurrentSession();
-        
-        if (session.find(PrescriptionItem.class, item.getId()) == null) {
-            session.persist(item); 
+        if (item.getId() == null) {
+            session.persist(item);
         } else {
-            session.merge(item); 
+            // id not null -> decide between persist/merge by checking existence
+            if (session.find(PrescriptionItem.class, item.getId()) == null) {
+                session.persist(item);
+            } else {
+                session.merge(item);
+            }
         }
         return item;
     }
