@@ -11,8 +11,7 @@ import java.util.Map;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
+
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,8 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Repository
 @Transactional
-public class PrescriptionRepositoryImpl extends BaseRepositoryImpl<Prescription>  implements PrescriptionRepository {
-
+public class PrescriptionRepositoryImpl extends BaseRepositoryImpl<Prescription> implements PrescriptionRepository {
 
     @Autowired
     private LocalSessionFactoryBean factory;
@@ -32,14 +30,32 @@ public class PrescriptionRepositoryImpl extends BaseRepositoryImpl<Prescription>
     @Override
     public List<Prescription> getPrescriptions(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<Prescription> q = session.createNamedQuery("Prescription.findAll", Prescription.class);
 
-        if (params != null) {
+        StringBuilder hql = new StringBuilder("SELECT p FROM Prescription p "
+                + "JOIN FETCH p.medicalRecordId mr "
+                + "JOIN mr.appointmentId a "
+                + "WHERE 1=1");
+
+        String role = params.get("currentUserRole");
+        String userId = params.get("currentUserId");
+
+        if ("ROLE_PATIENT".equals(role)) {
+            hql.append(" AND a.patientId.id = :userId AND p.status = 'PUBLIC'");
+        } else if ("ROLE_DOCTOR".equals(role)) {
+            hql.append(" AND a.scheduleId.doctorId.id = :userId");
+        }
+
+        Query q = session.createQuery(hql.toString(), Prescription.class);
+
+        if (role != null && userId != null) {
+            q.setParameter("userId", Long.parseLong(userId));
+        }
+
+        if (params.containsKey("pageSize")) {
             int pageSize = Integer.parseInt(params.get("pageSize"));
             int page = Integer.parseInt(params.getOrDefault("page", "1"));
-            int start = (page - 1) * pageSize;
             q.setMaxResults(pageSize);
-            q.setFirstResult(start);
+            q.setFirstResult((page - 1) * pageSize);
         }
 
         return q.getResultList();
