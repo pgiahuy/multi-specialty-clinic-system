@@ -5,6 +5,7 @@
 package com.hb.service.impl;
 
 import com.hb.dto.request.PrescriptionCreateRequest;
+import com.hb.exception.BadRequestException;
 import com.hb.exception.InsufficientStockException;
 import com.hb.exception.ResourceNotFoundException;
 import com.hb.pojo.MedicalRecord;
@@ -47,18 +48,51 @@ public class PrescriptionServiceImpl implements PrescriptionService {
     @Override
     @Transactional
     public Prescription addPrescription(PrescriptionCreateRequest req) {
+        if (req == null) {
+            throw new BadRequestException("Request body is required");
+        }
+
+        if (req.getMedicalRecordId() == null) {
+            throw new BadRequestException("medicalRecordId is required");
+        }
+
+        if (req.getItems() == null || req.getItems().isEmpty()) {
+            throw new BadRequestException("At least one prescription item is required");
+        }
 
         Prescription p = new Prescription();
         p.setCreatedAt(new Date());
 
         MedicalRecord mr = medicalRecordRepo.getMedicalRecordById(req.getMedicalRecordId());
+        if (mr == null) {
+            throw new ResourceNotFoundException("Medical record not found!");
+        }
+        
+        if (mr.getPrescription() != null) {
+            throw new BadRequestException("Đã có đơn thuốc cho hồ sơ này!");
+        }
+
         p.setMedicalRecordId(mr);
 
         List<PrescriptionItem> items = new ArrayList<>();
 
         for (var i : req.getItems()) {
+            if (i == null) {
+                throw new BadRequestException("Prescription item is required");
+            }
+
+            if (i.getMedicineId() == null) {
+                throw new BadRequestException("medicineId is required");
+            }
+
+            if (i.getQuantity() <= 0) {
+                throw new BadRequestException("quantity > 0");
+            }
 
             Medicine m = medicineRepo.getMedicineById(i.getMedicineId());
+            if (m == null) {
+                throw new ResourceNotFoundException("Medicine not found!");
+            }
 
             if (m.getStock() < i.getQuantity()) {
                 throw new InsufficientStockException("Không đủ thuốc: " + m.getName());
@@ -74,9 +108,16 @@ public class PrescriptionServiceImpl implements PrescriptionService {
             items.add(item);
         }
 
-        p.setPrescriptionItemCollection(items);
+        Prescription saved = prescriptionRepo.addPrescription(p);
 
-        return prescriptionRepo.addPrescription(p);
+        for (PrescriptionItem it : items) {
+            it.setPrescriptionId(saved);
+            prescriptionItemRepo.save(it);
+        }
+
+        saved.setPrescriptionItemCollection(items);
+
+        return saved;
     }
     
 
@@ -155,13 +196,43 @@ public class PrescriptionServiceImpl implements PrescriptionService {
    
 
     @Override
+    @Transactional(readOnly = true)
     public List<Prescription> getPrescriptions(Map<String, String> params) {
-        return this.prescriptionRepo.getPrescriptions(params);
+        List<Prescription> prescriptions = this.prescriptionRepo.getPrescriptions(params);
+
+        for (Prescription prescription : prescriptions) {
+            if (prescription.getPrescriptionItemCollection() != null) {
+                prescription.getPrescriptionItemCollection().size();
+
+                for (PrescriptionItem item : prescription.getPrescriptionItemCollection()) {
+                    if (item.getMedicineId() != null) {
+                        item.getMedicineId().getName();
+                        item.getMedicineId().getSecureUrl();
+                    }
+                }
+            }
+        }
+
+        return prescriptions;
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Prescription getPrescriptionById(Long id) {
-        return this.prescriptionRepo.getPrescriptionById(id);
+        Prescription prescription = this.prescriptionRepo.getPrescriptionById(id);
+
+        if (prescription != null && prescription.getPrescriptionItemCollection() != null) {
+            prescription.getPrescriptionItemCollection().size();
+
+            for (PrescriptionItem item : prescription.getPrescriptionItemCollection()) {
+                if (item.getMedicineId() != null) {
+                    item.getMedicineId().getName();
+                    item.getMedicineId().getSecureUrl();
+                }
+            }
+        }
+
+        return prescription;
     }
 
     @Override

@@ -12,6 +12,9 @@ public class PrescriptionItemCreateRequest {
     private Long medicineId;
     private int quantity;
 
+    public PrescriptionItemCreateRequest() {
+    }
+
     public PrescriptionItemCreateRequest(Long medicineId, int quantity) {
         this.medicineId = medicineId;
         this.quantity = quantity;
