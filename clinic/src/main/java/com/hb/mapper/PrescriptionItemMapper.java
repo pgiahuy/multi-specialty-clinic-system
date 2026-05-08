@@ -5,7 +5,6 @@
 package com.hb.mapper;
 
 import com.hb.dto.response.PrescriptionItemResponse;
-import com.hb.pojo.Prescription;
 import com.hb.pojo.PrescriptionItem;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -15,6 +14,7 @@ import org.mapstruct.factory.Mappers;
  *
  * @author HUY
  */
+
 @Mapper
 public interface PrescriptionItemMapper {
     PrescriptionItemMapper INSTANCE = Mappers.getMapper(PrescriptionItemMapper.class);

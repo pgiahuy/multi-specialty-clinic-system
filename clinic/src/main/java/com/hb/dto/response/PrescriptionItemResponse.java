@@ -10,19 +10,11 @@ package com.hb.dto.response;
  */
 public class PrescriptionItemResponse {
     private Long id;
-    
     private String medicineName;
     private String medicineImage;
     private Integer quantity;
 
     public PrescriptionItemResponse() {
-    }
-
-    public PrescriptionItemResponse(Long id, String medicineName, String medicineImage, Integer quantity) {
-        this.id = id;
-        this.medicineName = medicineName;
-        this.medicineImage = medicineImage;
-        this.quantity = quantity;
     }
 
     /**
