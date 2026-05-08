@@ -8,7 +8,10 @@ import com.hb.dto.request.PrescriptionCreateRequest;
 import com.hb.dto.response.PrescriptionResponse;
 import com.hb.mapper.PrescriptionMapper;
 import com.hb.pojo.Prescription;
+import com.hb.pojo.User;
 import com.hb.service.PrescriptionService;
+import com.hb.service.UserService;
+import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +40,9 @@ public class ApiPrescriptionController {
     private PrescriptionService prescriptionService;
     
     @Autowired
+    private UserService userService;
+    
+    @Autowired
     private Environment env;
     
     @PostMapping("/prescriptions")
@@ -48,7 +54,12 @@ public class ApiPrescriptionController {
     }
     
     @GetMapping("/prescriptions")
-    public ResponseEntity<List<PrescriptionResponse>> list(@RequestParam Map<String,String> params){
+    public ResponseEntity<List<PrescriptionResponse>> list(@RequestParam Map<String,String> params, Principal principal){
+        User u = userService.getUserByUsername(principal.getName());
+        
+        params.put("currentUserId", String.valueOf(u.getId()));
+        params.put("currentUserRole", String.valueOf(u.getRole()));
+        
         int page = params.containsKey("page") ? Integer.parseInt(params.get("page")) : 1;
 
         int pageSize = this.env.getProperty("admin.page_size", Integer.class);

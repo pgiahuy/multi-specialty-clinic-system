@@ -4,10 +4,12 @@
  */
 package com.hb.pojo;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.hb.enums.PrescriptionStatus;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -19,6 +21,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
@@ -32,7 +35,8 @@ import java.util.Date;
 @NamedQueries({
     @NamedQuery(name = "Prescription.findAll", query = "SELECT p FROM Prescription p"),
     @NamedQuery(name = "Prescription.findById", query = "SELECT p FROM Prescription p WHERE p.id = :id"),
-    @NamedQuery(name = "Prescription.findByCreatedAt", query = "SELECT p FROM Prescription p WHERE p.createdAt = :createdAt")})
+    @NamedQuery(name = "Prescription.findByCreatedAt", query = "SELECT p FROM Prescription p WHERE p.createdAt = :createdAt"),
+    @NamedQuery(name = "Prescription.findByStatus", query = "SELECT p FROM Prescription p WHERE p.status = :status")})
 public class Prescription implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -44,16 +48,14 @@ public class Prescription implements Serializable {
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
-    @OneToMany(mappedBy = "prescriptionId")
-    @JsonIgnore
-    private Collection<PaymentItems> paymentItemsCollection;
+    @Size(max = 9)
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private PrescriptionStatus status;
     @JoinColumn(name = "medical_record_id", referencedColumnName = "id")
     @OneToOne
-    @JsonIgnore
     private MedicalRecord medicalRecordId;
-    
     @OneToMany(mappedBy = "prescriptionId")
-    @JsonIgnore
     private Collection<PrescriptionItem> prescriptionItemCollection;
 
     public Prescription() {
@@ -79,12 +81,12 @@ public class Prescription implements Serializable {
         this.createdAt = createdAt;
     }
 
-    public Collection<PaymentItems> getPaymentItemsCollection() {
-        return paymentItemsCollection;
+    public PrescriptionStatus getStatus() {
+        return status;
     }
 
-    public void setPaymentItemsCollection(Collection<PaymentItems> paymentItemsCollection) {
-        this.paymentItemsCollection = paymentItemsCollection;
+    public void setStatus(PrescriptionStatus status) {
+        this.status = status;
     }
 
     public MedicalRecord getMedicalRecordId() {

@@ -4,7 +4,6 @@
  */
 package com.hb.pojo;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -40,11 +39,9 @@ public class PrescriptionItem implements Serializable {
     private Integer quantity;
     @JoinColumn(name = "medicine_id", referencedColumnName = "id")
     @ManyToOne
-    @JsonIgnore
     private Medicine medicineId;
     @JoinColumn(name = "prescription_id", referencedColumnName = "id")
     @ManyToOne
-    @JsonIgnore
     private Prescription prescriptionId;
 
     public PrescriptionItem() {
