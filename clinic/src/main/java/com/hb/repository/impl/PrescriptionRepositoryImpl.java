@@ -40,9 +40,9 @@ public class PrescriptionRepositoryImpl extends BaseRepositoryImpl<Prescription>
         String userId = params.get("currentUserId");
 
         if ("ROLE_PATIENT".equals(role)) {
-            hql.append(" AND a.patientId.id = :userId AND p.status = 'PUBLIC'");
+            hql.append(" AND a.patientId.userId.id = :userId AND p.status = 'PUBLIC'");
         } else if ("ROLE_DOCTOR".equals(role)) {
-            hql.append(" AND a.scheduleId.doctorId.id = :userId");
+            hql.append(" AND a.scheduleId.doctorId.userId.id = :userId");
         }
 
         Query q = session.createQuery(hql.toString(), Prescription.class);

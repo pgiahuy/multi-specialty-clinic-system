@@ -14,7 +14,6 @@ import org.mapstruct.factory.Mappers;
  *
  * @author HUY
  */
-
 @Mapper(uses = PrescriptionItemMapper.class)
 public interface PrescriptionMapper {
     

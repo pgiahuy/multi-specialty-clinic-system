@@ -4,9 +4,13 @@
  */
 package com.hb.service.impl;
 
+import com.hb.exception.ResourceNotFoundException;
+import com.hb.pojo.Appointment;
 import com.hb.pojo.MedicalRecord;
+import com.hb.pojo.Patient;
 import com.hb.repository.AppointmentRepository;
 import com.hb.repository.MedicalRecordRepository;
+import com.hb.repository.PatientRepository;
 import com.hb.service.MedicalRecordService;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +26,12 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 
     @Autowired
     private MedicalRecordRepository medicalRecordRepo;
+    
+    @Autowired
+    private PatientRepository patientRepo;
+    
+    @Autowired
+    private MedicalRecordRepository medRepo;
     
     @Autowired
     private AppointmentRepository appointmentRepo;
@@ -66,5 +76,26 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
     @Override
     public long countMedicalRecords(Map<String, String> params) {
         return medicalRecordRepo.count(params, MedicalRecord.class);
+    }
+
+    @Override
+    public boolean checkAccessControll(String username, Long patientId) {
+        Patient p = patientRepo.getPatientById(patientId);
+        if (p == null) {
+            throw new ResourceNotFoundException("Patient not found!");
+        }
+        
+        return p.getUserId().getUsername().equals(username);
+    }
+
+    @Override
+    public List<MedicalRecord> getMedicalRecordsByPatientId(Long patientId) {
+        Patient p = patientRepo.getPatientById(patientId);
+        if (p == null) {
+            throw new ResourceNotFoundException("Patient not found!");
+        }
+        
+        List<MedicalRecord> res = medRepo.getMedicalRecordsByPatientId(patientId);
+        return res;
     }
 }
