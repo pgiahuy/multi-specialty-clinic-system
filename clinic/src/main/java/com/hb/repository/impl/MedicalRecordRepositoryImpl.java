@@ -70,4 +70,12 @@ public class MedicalRecordRepositoryImpl extends BaseRepositoryImpl<MedicalRecor
             throw new RuntimeException("Medical record not found!");
         }
     }
+
+    @Override
+    public List<MedicalRecord> getMedicalRecordsByPatientId(Long patientId) {
+        Session session = this.factory.getObject().getCurrentSession();
+        Query<MedicalRecord> q = session.createQuery("SELECT m FROM MedicalRecord m WHERE m.appointmentId.patientId.id = :patientId", MedicalRecord.class);
+        q.setParameter("patientId", patientId);
+        return q.getResultList();
+    }
 }
