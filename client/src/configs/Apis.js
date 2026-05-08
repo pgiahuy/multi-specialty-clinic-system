@@ -1,9 +1,29 @@
 import axios from "axios";
 
-export const endpoints = {
+import cookies from 'react-cookies'
 
-}
-
-export default axios.creat({
+const API = axios.create({
     baseURL: "http://localhost:8080/clinic/api/"
 })
+
+
+export const getProducts = () => API.get("/products");
+export const getCategories = () => API.get("/categories");
+
+export const endpoint = {
+    'register': 'auth/register',
+    'login': 'auth/login',
+    'patientProfile': '/secure/profiles',
+
+};
+
+export const authApis = () => {
+    return axios.create({
+        baseURL: "http://localhost:8080/clinic/api/",
+        headers: {
+            'Authorization': `Bearer ${cookies.load("token")}`
+    }
+    });
+}
+
+export default API;

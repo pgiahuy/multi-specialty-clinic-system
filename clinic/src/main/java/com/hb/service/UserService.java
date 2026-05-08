@@ -26,4 +26,5 @@ public interface UserService extends UserDetailsService {
     long countUsers(Map<String, String> params);
 
     void updateFcmToken(String username, String fcmToken);
+    String getRoleByUsername(String username);
 }
