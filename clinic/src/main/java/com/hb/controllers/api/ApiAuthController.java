@@ -61,17 +61,24 @@ public class ApiAuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserLogin u) {
-        if (this.authService.authenticate(u.getUsername(), u.getPassword())) {
-            try {
-                String token = JwtUtils.generateToken(u.getUsername());
-                return ResponseEntity.ok().body(Collections.singletonMap("token", token));
-            } catch (Exception e) {
-                return ResponseEntity.status(500).body("Lỗi khi tạo JWT");
+public ResponseEntity<?> login(@RequestBody UserLogin u) {
+    if (this.authService.authenticate(u.getUsername(), u.getPassword())) {
+        try {
+
+            if (u.getFcmToken() != null && !u.getFcmToken().isEmpty()) {
+                this.userService.updateFcmToken(u.getUsername(), u.getFcmToken());
             }
+
+
+            String token = JwtUtils.generateToken(u.getUsername());
+            
+            return ResponseEntity.ok().body(Collections.singletonMap("token", token));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Lỗi hệ thống khi xử lý đăng nhập");
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Sai thông tin đăng nhập");
     }
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Sai thông tin đăng nhập");
+}
 
     @PostMapping("/google")
     public ResponseEntity<?> loginWithGoogle(@RequestBody Map<String, String> params) {

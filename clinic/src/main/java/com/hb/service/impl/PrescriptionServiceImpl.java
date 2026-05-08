@@ -12,13 +12,16 @@ import com.hb.pojo.MedicalRecord;
 import com.hb.pojo.Medicine;
 import com.hb.pojo.Prescription;
 import com.hb.pojo.PrescriptionItem;
+import com.hb.pojo.User;
 import com.hb.repository.MedicalRecordRepository;
 import com.hb.repository.MedicineRepository;
 import com.hb.repository.PrescriptionItemRepository;
 import com.hb.repository.PrescriptionRepository;
+import com.hb.service.NotificationService;
 import com.hb.service.PrescriptionService;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +40,9 @@ public class PrescriptionServiceImpl implements PrescriptionService {
     
     @Autowired
     private PrescriptionItemRepository prescriptionItemRepo;
+
+    @Autowired
+    private NotificationService notificationService;
 
 
     @Autowired
@@ -137,6 +143,23 @@ public class PrescriptionServiceImpl implements PrescriptionService {
         }
 
         saved.setPrescriptionItemCollection(items);
+
+        // 
+        try {
+            User patientUser = mr.getAppointmentId().getPatientId().getUserId(); 
+
+            if (patientUser != null) {
+                Map<String, String> notiParams = new HashMap<>();
+                notiParams.put("username", patientUser.getUsername());
+                notiParams.put("title", "Đơn thuốc mới");
+                notiParams.put("content", "Bác sĩ vừa kê đơn thuốc mới cho bạn. Vui lòng kiểm tra!");
+                notiParams.put("path", "/prescriptions/" + saved.getId());
+
+                this.notificationService.addNotification(notiParams);
+            }
+        } catch (Exception e) {
+            System.err.println("Lỗi gửi thông báo: " + e.getMessage());
+        }
 
         return saved;
     }

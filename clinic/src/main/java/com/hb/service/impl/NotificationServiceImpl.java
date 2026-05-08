@@ -4,10 +4,12 @@
  */
 package com.hb.service.impl;
 
+
 import com.hb.pojo.Notification;
 import com.hb.pojo.User;
 import com.hb.repository.NotificationRepository;
 import com.hb.repository.UserRepository;
+import com.hb.service.FcmService;
 import com.hb.service.NotificationService;
 import java.util.Date;
 import java.util.List;
@@ -25,26 +27,42 @@ public class NotificationServiceImpl implements NotificationService {
     @Autowired
     private NotificationRepository notificationRepo;
     
-        @Autowired
+    @Autowired
     private UserRepository userRepo;
+    
+    
+    @Autowired
+    private FcmService fcmService;
 
     @Override
     public Notification addNotification(Map<String, String> params) {
         Notification n = new Notification();
-        
+        String title = params.getOrDefault("title", "Thông báo mới");
+        String content = params.getOrDefault("content", "");
+        String userName = params.get("username");
+        String path = params.get("path");
 
-        n.setContent(params.getOrDefault("content", ""));
+        n.setTitle(title);
+        n.setContent(content);
         n.setIsRead(false);
         n.setCreatedAt(new Date());
 
-        String userName = params.get("username");
         if (userName != null && !userName.isEmpty()) {
             User user = userRepo.getUserByUsername(userName);
             n.setUserId(user);
+            
+            Notification savedNoti = this.notificationRepo.addNotification(n);
+            
+            if (user.getFcmToken() != null) {
+                fcmService.sendPushNotification(user.getFcmToken(), title, content, path);
+            }
+            
+            return savedNoti;
         }
 
         return this.notificationRepo.addNotification(n);
     }
+
 
     @Override
     public List<Notification> getNotificationsByUserId(Map<String, String> params) {
