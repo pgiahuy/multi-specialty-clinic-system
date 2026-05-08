@@ -25,4 +25,4 @@ replay_pid*
 /clinic/target/
 
 
-src/main/resources/serviceAccountKey.json
+**/serviceAccountKey.json
