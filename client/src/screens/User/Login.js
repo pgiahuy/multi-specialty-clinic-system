@@ -1,7 +1,60 @@
-import { Button, Card, Form } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Button, Card, Form, Alert } from "react-bootstrap";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from 'react';
+import { jwtDecode } from "jwt-decode";
+import cookies from 'react-cookies'
+
+import Apis, { authApis, endpoint } from "../../configs/Apis";
+
+import MySpinner from '../../components/MySpinner';
 
 const Login = () => {
+    const [user, setUser] = useState({});
+    const [err, setErr] = useState("");
+    const [loading, setLoading] = useState(false);
+    const nav = useNavigate();
+
+    const validate = () => {
+        if (!user.username || !user.password) {
+            setErr("Vui lòng điền đầy đủ tên đăng nhập và mật khẩu!");
+            return false;
+        }
+        setErr("");
+        return true;
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setUser({ ...user, [name]: value });
+    };
+
+    const login = async (e) => {
+        e.preventDefault();
+
+        if (validate()) {
+            try {
+                setLoading(true);
+                const res = await Apis.post(endpoint['login'], { ...user });
+                const decoded = jwtDecode(res.data.token);
+                const role = decoded.role;
+                cookies.save("token", res.data.token);
+
+                setTimeout(async () => {
+
+                    if (role === 'ROLE_DOCTOR') {
+                        nav('/doctor/dashboard');
+                    } else if (role === 'ROLE_PATIENT') {
+                        nav('/patient/dashboard');
+                    }
+                }, 500);
+            } catch (ex) {
+                setErr(ex.message || "Lỗi đăng nhập");
+            } finally {
+                setLoading(false);
+            }
+        }
+    };
+
     return (
         <div className="login-page">
             <div className="login-card-container">
@@ -17,25 +70,37 @@ const Login = () => {
                             <div className="login-header text-center mb-4">
                                 <h3>Đăng nhập</h3>
                             </div>
-                            <Form>
+                            {err && <Alert variant="danger">{err}</Alert>}
+                            <Form onSubmit={login}>
                                 <Form.Floating className="mb-3">
-                                    <Form.Control
-                                        id="loginEmail"
-                                        type="text"
+                                    <Form.Control 
+                                        id="loginEmail" 
+                                        type="text" 
                                         placeholder="Tên tài khoản"
+                                        name="username"
+                                        value={user.username || ''}
+                                        onChange={handleInputChange}
                                     />
                                     <Form.Label htmlFor="loginEmail">Tên tài khoản</Form.Label>
                                 </Form.Floating>
                                 <Form.Floating className="mb-3">
-                                    <Form.Control
-                                        id="loginPassword"
-                                        type="password"
+                                    <Form.Control 
+                                        id="loginPassword" 
+                                        type="password" 
                                         placeholder="Mật khẩu"
+                                        name="password"
+                                        value={user.password || ''}
+                                        onChange={handleInputChange}
                                     />
                                     <Form.Label htmlFor="loginPassword">Mật khẩu</Form.Label>
                                 </Form.Floating>
-                                <Button variant="primary" type="submit" className="w-100 login-button">
-                                    Đăng nhập
+                                <Button 
+                                    variant="primary" 
+                                    type="submit" 
+                                    className="w-100 login-button"
+                                    disabled={loading}
+                                >
+                                    {loading ? <MySpinner /> : 'Đăng nhập'}
                                 </Button>
                             </Form>
                             <div className="login-footer text-center mt-4">
