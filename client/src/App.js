@@ -7,7 +7,8 @@ import Home from './screens/Home/Home';
 import { Container } from "react-bootstrap";
 import Login from "./screens/User/Login";
 import Register from "./screens/User/Register";
-
+import DoctorDashboard from "./screens/Doctor/DoctorDashboard";
+import PatientDashboard from "./screens/Patient/PatientDashboard";
 
 function App() {
   return (
@@ -25,6 +26,8 @@ function App() {
           } />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register/>}/>
+          <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
+          <Route path="/patient/dashboard" element={<PatientDashboard />} />
         </Routes>
         
       </Container>

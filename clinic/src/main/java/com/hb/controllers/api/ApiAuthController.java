@@ -27,6 +27,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,10 +39,9 @@ import org.springframework.web.bind.annotation.RestController;
  * @author DELL
  */
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api")
 @PropertySource("classpath:configs.properties")
 public class ApiAuthController {
-
 
     @Autowired
     private AuthService authService;
@@ -49,94 +49,93 @@ public class ApiAuthController {
     @Autowired
     private UserService userService;
 
- 
     @Value("${CLIENT_ID}")
     private String clientId;
 
-    @PostMapping(value = "/register",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/auth/register",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> create(@ModelAttribute UserCreateRequest urq) {
         authService.registerPatient(urq);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PostMapping("/login")
-public ResponseEntity<?> login(@RequestBody UserLogin u) {
-    if (this.authService.authenticate(u.getUsername(), u.getPassword())) {
-        try {
 
-            if (u.getFcmToken() != null && !u.getFcmToken().isEmpty()) {
-                this.userService.updateFcmToken(u.getUsername(), u.getFcmToken());
-            }
+    @PostMapping("/auth/login")
+    public ResponseEntity<?> login(@RequestBody UserLogin u) {
+        if (this.authService.authenticate(u.getUsername(), u.getPassword())) {
+            try {
 
-
-            String token = JwtUtils.generateToken(u.getUsername());
-            
-            return ResponseEntity.ok().body(Collections.singletonMap("token", token));
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Lỗi hệ thống khi xử lý đăng nhập");
-        }
-    }
-    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Sai thông tin đăng nhập");
-}
-
-    @PostMapping("/google")
-    public ResponseEntity<?> loginWithGoogle(@RequestBody Map<String, String> params) {
-        String idTokenString = params.get("token");
-
-        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
-                .setAudience(Collections.singletonList(clientId))
-                .build();
-
-        try {
-            GoogleIdToken idToken = verifier.verify(idTokenString);
-            if (idToken != null) {
-                GoogleIdToken.Payload payload = idToken.getPayload();
-
-                String email = payload.getEmail();
-                String name = (String) payload.get("name");
-                String googleId = payload.getSubject();
-
-                User user = userService.processSocialLogin(email, name, googleId, AuthProvider.GOOGLE.name());
-
-                String token = JwtUtils.generateToken(user.getUsername());
-                return ResponseEntity.ok().body(Collections.singletonMap("token", token));
-
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token không hợp lệ");
-        }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-    }
-
-    @PostMapping("/facebook")
-    public ResponseEntity<?> loginWithFacebook(@RequestBody Map<String, String> body) {
-        String accessToken = body.get("token");
-
-        try {
-            FacebookClient facebookClient = new DefaultFacebookClient(accessToken, Version.LATEST);
-
-            com.restfb.types.User fbUser = facebookClient.fetchObject("me", com.restfb.types.User.class,
-                    Parameter.with("fields", "id,name,email"));
-
-            if (fbUser != null) {
-                String email = fbUser.getEmail();
-                String name = fbUser.getName();
-                String fbId = fbUser.getId();
-
-                if (email == null) {
-                    email = fbId + "@facebook.com";
+                if (u.getFcmToken() != null && !u.getFcmToken().isEmpty()) {
+                    this.userService.updateFcmToken(u.getUsername(), u.getFcmToken());
                 }
 
-                User user = userService.processSocialLogin(email, name, fbId, AuthProvider.FACEBOOK.name());
+                String role = this.userService.getRoleByUsername(u.getUsername());
+                String token = JwtUtils.generateToken(u.getUsername(), role);
 
-                String token = JwtUtils.generateToken(user.getUsername());
                 return ResponseEntity.ok().body(Collections.singletonMap("token", token));
+            } catch (Exception e) {
+                return ResponseEntity.status(500).body("Lỗi hệ thống khi xử lý đăng nhập");
             }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Facebook Token không hợp lệ");
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Sai thông tin đăng nhập");
     }
+
+//    @PostMapping("/google")
+//    public ResponseEntity<?> loginWithGoogle(@RequestBody Map<String, String> params) {
+//        String idTokenString = params.get("token");
+//
+//        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
+//                .setAudience(Collections.singletonList(clientId))
+//                .build();
+//
+//        try {
+//            GoogleIdToken idToken = verifier.verify(idTokenString);
+//            if (idToken != null) {
+//                GoogleIdToken.Payload payload = idToken.getPayload();
+//
+//                String email = payload.getEmail();
+//                String name = (String) payload.get("name");
+//                String googleId = payload.getSubject();
+//
+//                User user = userService.processSocialLogin(email, name, googleId, AuthProvider.GOOGLE.name());
+//
+//                String token = JwtUtils.generateToken(user.getUsername());
+//                return ResponseEntity.ok().body(Collections.singletonMap("token", token));
+//
+//            }
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token không hợp lệ");
+//        }
+//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+//    }
+//
+//    @PostMapping("/facebook")
+//    public ResponseEntity<?> loginWithFacebook(@RequestBody Map<String, String> body) {
+//        String accessToken = body.get("token");
+//
+//        try {
+//            FacebookClient facebookClient = new DefaultFacebookClient(accessToken, Version.LATEST);
+//
+//            com.restfb.types.User fbUser = facebookClient.fetchObject("me", com.restfb.types.User.class,
+//                    Parameter.with("fields", "id,name,email"));
+//
+//            if (fbUser != null) {
+//                String email = fbUser.getEmail();
+//                String name = fbUser.getName();
+//                String fbId = fbUser.getId();
+//
+//                if (email == null) {
+//                    email = fbId + "@facebook.com";
+//                }
+//
+//                User user = userService.processSocialLogin(email, name, fbId, AuthProvider.FACEBOOK.name());
+//
+//                String token = JwtUtils.generateToken(user.getUsername());
+//                return ResponseEntity.ok().body(Collections.singletonMap("token", token));
+//            }
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Facebook Token không hợp lệ");
+//        }
+//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+//    }
 
 }
