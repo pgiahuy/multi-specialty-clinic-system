@@ -2,15 +2,14 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.hb.enums;
+package com.hb.service.impl;
+
+import com.hb.service.LabTestResultService;
 
 /**
  *
- * @author HUY
+ * @author DELL
  */
-public enum AppointmentStatus {
-    PENDING,
-    CONFIRMED,
-    COMPLETED,
-    CANCELLED
+public class LabTestResultServiceImpl implements LabTestResultService {
+    
 }

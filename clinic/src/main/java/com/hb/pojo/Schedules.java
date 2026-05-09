@@ -35,7 +35,9 @@ import java.util.Date;
     @NamedQuery(name = "Schedules.findById", query = "SELECT s FROM Schedules s WHERE s.id = :id"),
     @NamedQuery(name = "Schedules.findByDate", query = "SELECT s FROM Schedules s WHERE s.date = :date"),
     @NamedQuery(name = "Schedules.findByMaxPatients", query = "SELECT s FROM Schedules s WHERE s.maxPatients = :maxPatients"),
-    @NamedQuery(name = "Schedules.findByCurrentPatients", query = "SELECT s FROM Schedules s WHERE s.currentPatients = :currentPatients")})
+    @NamedQuery(name = "Schedules.findByCurrentPatients", query = "SELECT s FROM Schedules s WHERE s.currentPatients = :currentPatients"),
+    })
+    
 public class Schedules implements Serializable {
 
     @Column(name = "date")

@@ -89,4 +89,11 @@ public class DoctorServiceImpl implements DoctorService {
         return doctorRepo.count(params, Doctor.class);
     }
 
+    @Override
+    public Doctor getDoctorByUsername(String username) {
+        User u = userRepo.getUserByUsername(username);
+        Doctor dr = u.getDoctor();
+        return dr;
+    }
+
 }
