@@ -12,6 +12,7 @@ import com.hb.pojo.Patient;
 import com.hb.pojo.Schedules;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  *
@@ -39,7 +40,8 @@ public class AppointmentMapper {
         if (a.getScheduleId() != null) {
             var s = a.getScheduleId();
             if (s.getDate() != null) {
-                res.setAppointmentDate(new SimpleDateFormat("dd/MM/yyyy").format(s.getDate()));
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                res.setAppointmentDate(s.getDate().format(formatter));
             }
 
             if (s.getDoctorId() != null) {
@@ -71,17 +73,17 @@ public class AppointmentMapper {
         return res;
     }
 
-    public Appointment toEntity(AppointmentCreateRequest req, Patient patient, Schedules  schedule) {
+    public Appointment toEntity(AppointmentCreateRequest req, Patient patient, Schedules schedule) {
         if (req == null) {
             return null;
         }
 
         Appointment a = new Appointment();
 
-        a.setPatientId(patient);   
+        a.setPatientId(patient);
         a.setScheduleId(schedule);
 
-        a.setStatus(AppointmentStatus.PENDING); 
+        a.setStatus(AppointmentStatus.PENDING);
         a.setCreatedAt(LocalDateTime.now());
 
         return a;

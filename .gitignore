@@ -33,3 +33,4 @@ client/dist/
 **/serviceAccountKey*.json
 
 **/configs.properties
+!/clinic/src/main/resources/configs.properties

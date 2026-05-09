@@ -54,7 +54,7 @@ public class NotificationServiceImpl implements NotificationService {
             Notification savedNoti = this.notificationRepo.addNotification(n);
             
             if (user.getFcmToken() != null) {
-                fcmService.sendPushNotification(user.getFcmToken(), title, content, path);
+//                fcmService.sendPushNotification(user.getFcmToken(), title, content, path);
             }
             
             return savedNoti;

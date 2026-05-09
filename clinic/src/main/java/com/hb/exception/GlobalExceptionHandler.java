@@ -135,7 +135,7 @@ public class GlobalExceptionHandler {
         ApiError error = new ApiError(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                "Unexpected error occurred",
+                ex.getMessage(),
                 request.getRequestURI(),
                 LocalDateTime.now()
         );

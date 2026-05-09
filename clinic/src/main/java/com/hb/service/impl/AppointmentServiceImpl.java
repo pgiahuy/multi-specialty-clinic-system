@@ -13,7 +13,6 @@ import com.hb.pojo.Appointment;
 import com.hb.pojo.Patient;
 import com.hb.pojo.Schedules;
 import com.hb.repository.AppointmentRepository;
-import com.hb.repository.DoctorRepository;
 import com.hb.repository.PatientRepository;
 import com.hb.repository.ScheduleRepository;
 import com.hb.service.AppointmentService;
@@ -29,19 +28,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class AppointmentServiceImpl implements AppointmentService {
 
-    
     @Autowired
     private AppointmentRepository appointmentRepo;
 
     @Autowired
     private ScheduleRepository scheduleRepo;
-    
-    @Autowired
-    private DoctorRepository doctorRepo;
 
     @Autowired
     private PatientRepository patientRepo;
-    
+
     @Autowired
     private AppointmentMapper appointmentMapper;
 
@@ -60,38 +55,45 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
-    public AppointmentResponse addAppointment(AppointmentCreateRequest req) {
+    public AppointmentResponse addOrUpdateAppointment(AppointmentCreateRequest req) {
 
         Appointment a = new Appointment();
 
-      
-        Patient patient = patientRepo.getPatientById(req.getPatientId());
-        if (patient == null){
-            throw new ResourceNotFoundException("Patient not found!");
+        if (req.getAppId() != null) {
+            a = appointmentRepo.getAppointmentById(req.getAppId());
+            if (a == null) {
+                throw new ResourceNotFoundException("Appointment not found!");
+            }
+
+            if (req.getStatus() != null) {
+
+                a.setStatus(req.getStatus());
+            }
+        } else {
+            Patient patient = patientRepo.getPatientById(req.getPatientId());
+            if (patient == null) {
+                throw new ResourceNotFoundException("Patient not found!");
+            }
+            Schedules schedule = scheduleRepo.getScheduleById(req.getScheduleId());
+            if (schedule == null) {
+                throw new ResourceNotFoundException("Schedule not found!");
+            }
+
+            if (schedule.getCurrentPatients() >= schedule.getMaxPatients()) {
+                throw new FullSlotException("Rất tiếc, ca khám này đã đủ số lượng người đăng ký!");
+            }
+
+            schedule.setCurrentPatients(schedule.getCurrentPatients() + 1);
+            scheduleRepo.addSchedule(schedule);
+
+            a = appointmentMapper.toEntity(req, patient, schedule);
         }
-        Schedules schedule = scheduleRepo.getScheduleById(req.getScheduleId());
-        if (schedule == null){
-            throw new ResourceNotFoundException("Schedule not found!");
-        }
-        
 
-        if (schedule.getCurrentPatients() >= schedule.getMaxPatients()) {
-            throw new FullSlotException("Rất tiếc, ca khám này đã đủ số lượng người đăng ký!");
-        }
+        appointmentRepo.addOrUpdateAppointment(a);
 
-        schedule.setCurrentPatients(schedule.getCurrentPatients() + 1);
-        scheduleRepo.addSchedule(schedule);
+        return appointmentMapper.toResponse(a);
 
-
-        Appointment appointment = appointmentMapper.toEntity(req, patient, schedule);
-
-
-        Appointment savedApp = appointmentRepo.addAppointment(appointment);
-
-
-        return appointmentMapper.toResponse(savedApp);
-        
-}
+    }
 
     @Override
     public long countAppointments(Map<String, String> params) {
