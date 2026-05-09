@@ -11,8 +11,7 @@ import java.util.Map;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
+
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,11 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Repository
 @Transactional
-@PropertySource("classpath:configs.properties")
 public class NotificationRepositoryImpl implements NotificationRepository {
 
-    @Autowired
-    private Environment env;
 
     @Autowired
     private LocalSessionFactoryBean factory;
@@ -35,13 +31,13 @@ public class NotificationRepositoryImpl implements NotificationRepository {
     @Override
     public List<Notification> getNotificationsByUserId(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<Notification> q = session.createNamedQuery("Notification.findByUserId", Notification.class);
+        Query<Notification> q = session.createQuery("SELECT n FROM Notification n WHERE n.userId.id = :userId", Notification.class);
 
         if (params != null) {
             Long userId = Long.valueOf(params.get("userId"));
             q.setParameter("userId", userId);
 
-            int pageSize = this.env.getProperty("notifications.page_size", Integer.class, 1);
+            int pageSize = Integer.valueOf(params.get("pageSize"));
             int page = Integer.parseInt(params.getOrDefault("page", "1"));
             int start = (page - 1) * pageSize;
             q.setMaxResults(pageSize);
@@ -75,5 +71,16 @@ public class NotificationRepositoryImpl implements NotificationRepository {
         } else {
             throw new RuntimeException("Notification not found!");
         }
+    }
+
+    @Override
+    public void markAsRead(Long id) {
+        System.out.println("heheheheh-1");
+        Session session = this.factory.getObject().getCurrentSession();
+        Query<Notification> q = session.createQuery("UPDATE Notification n SET n.isRead = true WHERE n.id = :id");
+        q.setParameter("id", id);
+        System.out.println("heheheheh-2");
+        q.executeUpdate();
+        System.out.println("heheheheh-OK");
     }
 }

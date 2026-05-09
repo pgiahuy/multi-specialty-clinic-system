@@ -46,6 +46,7 @@ public class NotificationServiceImpl implements NotificationService {
         n.setContent(content);
         n.setIsRead(false);
         n.setCreatedAt(new Date());
+        n.setPath(path);
 
         if (userName != null && !userName.isEmpty()) {
             User user = userRepo.getUserByUsername(userName);
@@ -54,7 +55,7 @@ public class NotificationServiceImpl implements NotificationService {
             Notification savedNoti = this.notificationRepo.addNotification(n);
             
             if (user.getFcmToken() != null) {
-//                fcmService.sendPushNotification(user.getFcmToken(), title, content, path);
+                fcmService.sendPushNotification(user.getFcmToken(),savedNoti.getId().toString(), title, content, path);
             }
             
             return savedNoti;
@@ -77,5 +78,11 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public void deleteNotification(Long id) {
         this.notificationRepo.deleteNotification(id);
+    }
+
+    @Override
+    public void markAsRead(Long id) {
+        this.notificationRepo.markAsRead(id);
+        System.out.println("heheh-service-1");
     }
 }
