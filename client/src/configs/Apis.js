@@ -13,7 +13,8 @@ export const getCategories = () => API.get("/categories");
 export const endpoint = {
     'register': 'auth/register',
     'login': 'auth/login',
-    'patientProfile': '/secure/profiles',
+    'patientProfiles': '/secure/profiles',
+    'notifications': '/secure/users/notifications',
 
 };
 
@@ -22,7 +23,7 @@ export const authApis = () => {
         baseURL: "http://localhost:8080/clinic/api/",
         headers: {
             'Authorization': `Bearer ${cookies.load("token")}`
-    }
+        }
     });
 }
 
