@@ -164,3 +164,29 @@
 .login-footer a:hover {
   text-decoration: underline;
 }
+
+
+
+.hide-toggle-icon .dropdown-toggle::after {
+    display: none !important;
+}
+
+
+
+.hide-toggle-icon .nav-link {
+    color: #6c757d;
+    transition: all 0.3s ease; 
+    padding: 8px !important;
+    border-radius: 50%; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hide-toggle-icon .nav-link:hover {
+    background-color: rgba(16, 32, 75, 0.08); 
+}
+
+.hide-toggle-icon .dropdown-toggle::after {
+    display: none !important;
+}
