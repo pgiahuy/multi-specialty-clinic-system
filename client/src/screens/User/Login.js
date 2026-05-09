@@ -36,13 +36,9 @@ const Login = () => {
             try {
                 setLoading(true);
 
-                // 2. Lấy FCM Token trước khi gọi API login
-                // Nếu user chặn thông báo, hàm này trả về null, 
-                // nhưng logic đăng nhập chính vẫn tiếp tục bình thường.
+
                 const fcmToken = await requestForToken();
 
-                // 3. Gửi kèm fcmToken vào body của request
-                // {...user} sẽ chứa username, password. Ta thêm fcmToken vào.
                 const res = await Apis.post(endpoint['login'], {
                     ...user,
                     fcmToken: fcmToken
@@ -59,9 +55,17 @@ const Login = () => {
                         nav('/patient/dashboard');
                     }
                 }, 500);
+
+
+
             } catch (ex) {
-                // Xử lý lỗi từ server (ví dụ: sai username/password)
-                setErr(ex.response?.data || ex.message || "Lỗi đăng nhập");
+
+                if (ex.response && ex.response.status === 401) {
+                    setErr("Tên đăng nhập hoặc mật khẩu không đúng!");
+                } else {
+                    setErr("Đã có lỗi xảy ra. Vui lòng thử lại sau!");
+                }
+                console.error("Server error:", ex);
             } finally {
                 setLoading(false);
             }

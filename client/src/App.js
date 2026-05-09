@@ -12,6 +12,7 @@ import PatientDashboard from "./screens/Patient/PatientDashboard";
 import PatientProfile from "./screens/Patient/PatientProfile";
 import Prescriptions from "./screens/Patient/Prescriptions";
 import AllNotifications from "./screens/User/AllNotifications";
+import BookingPage from "./screens/Patient/Booking";
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
           <Route path="/patient/notifications" element={<AllNotifications />} />
           <Route path="/patient/prescriptions" element={<Prescriptions />} />
           <Route path="/patient/profiles" element={<PatientProfile />} />
+          <Route path="/patient/booking" element={<BookingPage />} />
         </Routes>
 
       </Container>
