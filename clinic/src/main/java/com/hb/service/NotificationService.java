@@ -17,4 +17,5 @@ public interface NotificationService {
     List<Notification> getNotificationsByUserId(Map<String, String> params);
     Notification getNotificationById(Long id);
     void deleteNotification(Long id);
+    void markAsRead(Long id);
 }
