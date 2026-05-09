@@ -59,7 +59,7 @@ const PatientProfile = () => {
                             ))
                         ) : (
                             <div className="text-center py-5 bg-light rounded-3 border-dashed">
-                                <p className="text-muted mb-0">Hiện chưa có dữ liệu hồ sơ nào được tạo.</p>
+                                <p className="text-muted mb-0">Hiện chưa có hồ sơ nào.</p>
                             </div>
                         )}
                     </Col>

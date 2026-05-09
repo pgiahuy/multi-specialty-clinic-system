@@ -1,19 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import { NavDropdown, Badge, ListGroup, Stack } from 'react-bootstrap';
 import { Bell, CircleFill, Check2All, Trash2 } from 'react-bootstrap-icons';
 import './NotificationBox.css';
 import { onMessageListener, requestForToken } from '../configs/firebaseConfig';
 import { authApis, endpoint } from '../configs/Apis';
 import cookies from 'react-cookies';
+import { useNavigate } from 'react-router-dom';
 
 const NotificationBox = ({ onNavigate }) => {
     const [notifications, setNotifications] = useState([]);
     const [fcmToken, setFcmToken] = useState(null);
 
+    const navigate = useNavigate();
+
     const unreadCount = notifications?.filter(n => !n.isRead).length || 0;
 
     const markAllAsRead = () => {
         setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+        // notifications.filter(n => !n.isRead).forEach(noti => {
+        //     authApis.patch(`secure/notifications/${noti.id}/read`);
+        // });
         console.log("Đánh dấu tất cả là đã đọc");
     };
 
@@ -32,8 +38,8 @@ const NotificationBox = ({ onNavigate }) => {
     };
 
     const addNotificationToState = (payload) => {
-        const notificationId = payload.data?.notificationId || payload.notification?.id || Date.now().toString();
-        const path = payload.data?.path || payload.data?.url || payload.data?.link || null;
+        const notificationId = payload.data?.id || Date.now().toString();
+        const path = payload.data?.path || null;
         const newNoti = {
             id: notificationId,
             content: payload.notification?.body,
@@ -70,18 +76,29 @@ const NotificationBox = ({ onNavigate }) => {
         }
     };
 
-    const handleNotificationClick = (noti) => {
+
+    const handleNotificationClick = async (noti) => {
         try {
+
             setNotifications(prev => prev.map(n => n.id === noti.id ? { ...n, isRead: true } : n));
-            if (noti.path) {
-                if (onNavigate) { onNavigate(noti.path); return; }
-                if (noti.path.startsWith('http://') || noti.path.startsWith('https://')) { window.open(noti.path, '_blank'); return; }
-                try { window.location.href = noti.path; } catch (e) { window.open(noti.path, '_blank'); }
-                return;
-            }
-            const url = noti.url || noti.data?.url || null;
-            if (url) window.open(url, '_blank');
+
+
+            const token = cookies.load('token');
+            await authApis(token).patch(`secure/notifications/${noti.id}/read`);
+
+
+            const targetPath = noti.path || noti.click_action || noti.data?.click_action;
+            // noti.path: "/api/secure/prescriptions/1"
+            navigate('/patient/prescriptions')
+
+            // if (targetPath) {
+            //     navigate(targetPath);
+            // } else {
+            //     console.warn("Không tìm thấy đường dẫn cho thông báo này!");
+            // }
+
         } catch (err) {
+
             console.error('Error handling notification click:', err);
         }
     };
@@ -93,7 +110,7 @@ const NotificationBox = ({ onNavigate }) => {
 
         onMessageListener()
             .then(payload => addNotificationToState(payload))
-            .catch(err => console.log('Lỗi FCM (foreground):', err));
+            .catch(err => console.log('Lỗi FCM:', err));
 
         const bc = new BroadcastChannel('fcm_notifications');
         bc.onmessage = (event) => addNotificationToState(event.data);
@@ -147,9 +164,17 @@ const NotificationBox = ({ onNavigate }) => {
                         notifications.map((noti) => (
                             <ListGroup.Item
                                 key={noti.id}
+                                as="div"
+                                role="button"
+                                tabIndex={0}
                                 className={`notification-item ${!noti.isRead ? 'unread' : ''}`}
-                                action
                                 onClick={() => handleNotificationClick(noti)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault();
+                                        handleNotificationClick(noti);
+                                    }
+                                }}
                             >
                                 <Stack direction="horizontal" gap={3} className="align-items-start notification-content">
 
