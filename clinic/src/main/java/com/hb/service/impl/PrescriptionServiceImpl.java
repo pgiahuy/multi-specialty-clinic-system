@@ -153,7 +153,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
                 notiParams.put("username", patientUser.getUsername());
                 notiParams.put("title", "Đơn thuốc mới");
                 notiParams.put("content", "Bác sĩ vừa kê đơn thuốc mới cho bạn. Vui lòng kiểm tra!");
-                notiParams.put("path", "/prescriptions/" + saved.getId());
+                notiParams.put("path", "/api/secure/prescriptions/" + saved.getId());
 
                 this.notificationService.addNotification(notiParams);
             }

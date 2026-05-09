@@ -7,7 +7,7 @@ const ControlCard = () => {
 
 
   const navItems = [
-    { title: 'Đặt lịch hẹn', icon: <CalendarPlus size={30} className="text-primary mb-2" />, path: '/dat-lich' },
+    { title: 'Đặt lịch hẹn', icon: <CalendarPlus size={30} className="text-primary mb-2" />, path: '/patient/booking' },
     { title: 'Hồ sơ sức khoẻ', icon: <PersonBadge size={30} className="text-success mb-2" />, path: '/patient/profiles' },
     { title: 'Hoá đơn', icon: <Receipt size={30} className="text-success mb-2" />, path: '/ho-so' },
     { title: 'Chuyên khoa', icon: <FileEarmarkMedical size={30} className="text-info mb-2" />, path: '/chuyen-khoa' },
@@ -19,7 +19,7 @@ const ControlCard = () => {
     transition: 'all 0.2s ease-in-out',
     borderRadius: '12px',
     border: '1px solid rgb(102, 109, 192)',
-    height: '100%', 
+    height: '100%',
     backgroundColor: '#fff'
   };
 
@@ -30,8 +30,8 @@ const ControlCard = () => {
 
           {navItems.map((item, index) => (
             <Col xs={6} md={3} key={index}>
-              <div 
-                className="p-3 nav-item-hover" 
+              <div
+                className="p-3 nav-item-hover"
                 style={navItemStyle}
                 onClick={() => navigate(item.path)}
               >

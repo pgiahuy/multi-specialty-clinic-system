@@ -4,6 +4,7 @@
  */
 package com.hb.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -43,6 +44,10 @@ public class Notification implements Serializable {
     @Size(max = 65535)
     @Column(name = "content")
     private String content;
+    @Lob
+    @Size(max = 65535)
+    @Column(name = "path")
+    private String path;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -57,6 +62,7 @@ public class Notification implements Serializable {
     private Date createdAt;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @ManyToOne
+    @JsonIgnore
     private User userId;
 
     public Notification() {
@@ -138,6 +144,14 @@ public class Notification implements Serializable {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
     
 }
