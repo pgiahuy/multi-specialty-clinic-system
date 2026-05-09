@@ -70,5 +70,6 @@ public class DoctorRepositoryImpl extends BaseRepositoryImpl<Doctor> implements 
             throw new ResourceNotFoundException("Doctor not found!");
         }
     }
+
     
 }
