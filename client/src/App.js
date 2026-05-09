@@ -10,6 +10,8 @@ import Register from "./screens/User/Register";
 import DoctorDashboard from "./screens/Doctor/DoctorDashboard";
 import PatientDashboard from "./screens/Patient/PatientDashboard";
 import PatientProfile from "./screens/Patient/PatientProfile";
+import Prescriptions from "./screens/Patient/Prescriptions";
+import AllNotifications from "./screens/User/AllNotifications";
 
 function App() {
   return (
@@ -31,6 +33,8 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
           <Route path="/patient/dashboard" element={<PatientDashboard />} />
+          <Route path="/patient/notifications" element={<AllNotifications />} />
+          <Route path="/patient/prescriptions" element={<Prescriptions />} />
           <Route path="/patient/profiles" element={<PatientProfile />} />
         </Routes>
 

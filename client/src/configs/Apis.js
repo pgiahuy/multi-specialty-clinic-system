@@ -13,7 +13,7 @@ export const getCategories = () => API.get("/categories");
 export const endpoint = {
     'register': 'auth/register',
     'login': 'auth/login',
-    'patientProfile': '/secure/profiles',
+    'patientProfiles': '/secure/profiles',
     'notifications': '/secure/users/notifications',
 
 };
