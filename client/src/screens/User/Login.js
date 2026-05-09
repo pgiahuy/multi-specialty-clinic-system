@@ -7,6 +7,7 @@ import cookies from 'react-cookies'
 import Apis, { authApis, endpoint } from "../../configs/Apis";
 
 import MySpinner from '../../components/MySpinner';
+import { requestForToken } from "../../configs/firebaseConfig";
 
 const Login = () => {
     const [user, setUser] = useState({});
@@ -34,13 +35,24 @@ const Login = () => {
         if (validate()) {
             try {
                 setLoading(true);
-                const res = await Apis.post(endpoint['login'], { ...user });
+
+                // 2. Lấy FCM Token trước khi gọi API login
+                // Nếu user chặn thông báo, hàm này trả về null, 
+                // nhưng logic đăng nhập chính vẫn tiếp tục bình thường.
+                const fcmToken = await requestForToken();
+
+                // 3. Gửi kèm fcmToken vào body của request
+                // {...user} sẽ chứa username, password. Ta thêm fcmToken vào.
+                const res = await Apis.post(endpoint['login'], {
+                    ...user,
+                    fcmToken: fcmToken
+                });
+
                 const decoded = jwtDecode(res.data.token);
                 const role = decoded.role;
                 cookies.save("token", res.data.token);
 
                 setTimeout(async () => {
-
                     if (role === 'ROLE_DOCTOR') {
                         nav('/doctor/dashboard');
                     } else if (role === 'ROLE_PATIENT') {
@@ -48,7 +60,8 @@ const Login = () => {
                     }
                 }, 500);
             } catch (ex) {
-                setErr(ex.message || "Lỗi đăng nhập");
+                // Xử lý lỗi từ server (ví dụ: sai username/password)
+                setErr(ex.response?.data || ex.message || "Lỗi đăng nhập");
             } finally {
                 setLoading(false);
             }
@@ -73,9 +86,9 @@ const Login = () => {
                             {err && <Alert variant="danger">{err}</Alert>}
                             <Form onSubmit={login}>
                                 <Form.Floating className="mb-3">
-                                    <Form.Control 
-                                        id="loginEmail" 
-                                        type="text" 
+                                    <Form.Control
+                                        id="loginEmail"
+                                        type="text"
                                         placeholder="Tên tài khoản"
                                         name="username"
                                         value={user.username || ''}
@@ -84,9 +97,9 @@ const Login = () => {
                                     <Form.Label htmlFor="loginEmail">Tên tài khoản</Form.Label>
                                 </Form.Floating>
                                 <Form.Floating className="mb-3">
-                                    <Form.Control 
-                                        id="loginPassword" 
-                                        type="password" 
+                                    <Form.Control
+                                        id="loginPassword"
+                                        type="password"
                                         placeholder="Mật khẩu"
                                         name="password"
                                         value={user.password || ''}
@@ -94,9 +107,9 @@ const Login = () => {
                                     />
                                     <Form.Label htmlFor="loginPassword">Mật khẩu</Form.Label>
                                 </Form.Floating>
-                                <Button 
-                                    variant="primary" 
-                                    type="submit" 
+                                <Button
+                                    variant="primary"
+                                    type="submit"
                                     className="w-100 login-button"
                                     disabled={loading}
                                 >
