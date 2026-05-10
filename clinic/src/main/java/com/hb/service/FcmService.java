@@ -4,6 +4,12 @@
  */
 package com.hb.service;
 
+//import com.google.firebase.messaging.FirebaseMessaging;
+//import com.google.firebase.messaging.Message;
+//import com.google.firebase.messaging.Notification;
+//import com.google.protobuf.Message;
+//import com.hb.pojo.Notification;
+//import org.springframework.scheduling.annotation.Async;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
@@ -18,7 +24,7 @@ import org.springframework.stereotype.Service;
 public class FcmService {
 
     @Async("taskExecutor")
-    public void sendPushNotification(String token, String title, String content, String path) {
+    public void sendPushNotification(String token, String notiId, String title, String content, String path) {
         if (token == null || token.isEmpty()) {
             return;
         }
@@ -33,8 +39,10 @@ public class FcmService {
                 .setNotification(notification);
 
         if (path != null && !path.isEmpty()) {
-            messageBuilder.putData("click_action", path);
+            messageBuilder.putData("path", path);
         }
+        
+        messageBuilder.putData("id", notiId);
 
         Message message = messageBuilder.build();
 

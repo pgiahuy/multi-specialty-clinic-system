@@ -7,13 +7,19 @@ const API = axios.create({
 })
 
 
-export const getProducts = () => API.get("/products");
-export const getCategories = () => API.get("/categories");
+export const getDoctors = () => API.get("/products");
+export const getSpecialties = () => API.get("/specialties");
+export const getSchedule = () => API.get("/schedules");
+
+
 
 export const endpoint = {
     'register': 'auth/register',
     'login': 'auth/login',
-    'patientProfile': '/secure/profiles',
+    'patientProfiles': '/secure/profiles',
+    'doctors': '/doctors',
+    'schedules': '/schedules',
+    'notifications': '/secure/users/notifications',
 
 };
 
@@ -22,7 +28,7 @@ export const authApis = () => {
         baseURL: "http://localhost:8080/clinic/api/",
         headers: {
             'Authorization': `Bearer ${cookies.load("token")}`
-    }
+        }
     });
 }
 

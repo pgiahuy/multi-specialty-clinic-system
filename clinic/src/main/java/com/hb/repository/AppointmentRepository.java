@@ -16,7 +16,5 @@ public interface AppointmentRepository extends BaseRepository<Appointment>{
     
     List<Appointment> getAppointments(Map<String,String> params);
     Appointment getAppointmentById(Long id);
-    Appointment addAppointment(Appointment a);
-    
-    
+    void addOrUpdateAppointment(Appointment a);
 }

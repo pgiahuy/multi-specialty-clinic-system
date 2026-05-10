@@ -7,6 +7,7 @@ import cookies from 'react-cookies'
 import Apis, { authApis, endpoint } from "../../configs/Apis";
 
 import MySpinner from '../../components/MySpinner';
+import { requestForToken } from "../../configs/firebaseConfig";
 
 const Login = () => {
     const [user, setUser] = useState({});
@@ -34,21 +35,37 @@ const Login = () => {
         if (validate()) {
             try {
                 setLoading(true);
-                const res = await Apis.post(endpoint['login'], { ...user });
+
+
+                const fcmToken = await requestForToken();
+
+                const res = await Apis.post(endpoint['login'], {
+                    ...user,
+                    fcmToken: fcmToken
+                });
+
                 const decoded = jwtDecode(res.data.token);
                 const role = decoded.role;
                 cookies.save("token", res.data.token);
 
                 setTimeout(async () => {
-
                     if (role === 'ROLE_DOCTOR') {
                         nav('/doctor/dashboard');
                     } else if (role === 'ROLE_PATIENT') {
                         nav('/patient/dashboard');
                     }
                 }, 500);
+
+
+
             } catch (ex) {
-                setErr(ex.message || "Lỗi đăng nhập");
+
+                if (ex.response && ex.response.status === 401) {
+                    setErr("Tên đăng nhập hoặc mật khẩu không đúng!");
+                } else {
+                    setErr("Đã có lỗi xảy ra. Vui lòng thử lại sau!");
+                }
+                console.error("Server error:", ex);
             } finally {
                 setLoading(false);
             }
@@ -73,9 +90,9 @@ const Login = () => {
                             {err && <Alert variant="danger">{err}</Alert>}
                             <Form onSubmit={login}>
                                 <Form.Floating className="mb-3">
-                                    <Form.Control 
-                                        id="loginEmail" 
-                                        type="text" 
+                                    <Form.Control
+                                        id="loginEmail"
+                                        type="text"
                                         placeholder="Tên tài khoản"
                                         name="username"
                                         value={user.username || ''}
@@ -84,9 +101,9 @@ const Login = () => {
                                     <Form.Label htmlFor="loginEmail">Tên tài khoản</Form.Label>
                                 </Form.Floating>
                                 <Form.Floating className="mb-3">
-                                    <Form.Control 
-                                        id="loginPassword" 
-                                        type="password" 
+                                    <Form.Control
+                                        id="loginPassword"
+                                        type="password"
                                         placeholder="Mật khẩu"
                                         name="password"
                                         value={user.password || ''}
@@ -94,9 +111,9 @@ const Login = () => {
                                     />
                                     <Form.Label htmlFor="loginPassword">Mật khẩu</Form.Label>
                                 </Form.Floating>
-                                <Button 
-                                    variant="primary" 
-                                    type="submit" 
+                                <Button
+                                    variant="primary"
+                                    type="submit"
                                     className="w-100 login-button"
                                     disabled={loading}
                                 >

@@ -40,14 +40,24 @@ public class ApiScheduleController {
 
     @Autowired
     private ScheduleService scheduleService;
+
     @Autowired
     private UserService userService;
 
     @Autowired
     private ScheduleMapper scheduleMapper;
 
-    @GetMapping("/schedules")
-    public ResponseEntity<List<ScheduleRepsonse>> list(@RequestParam Map<String, String> params) {
+    @GetMapping("/secure/schedules")
+    public ResponseEntity<List<ScheduleRepsonse>> list(@RequestParam Map<String, String> params, Principal principal) {
+
+        User u = userService.getUserByUsername(principal.getName());
+        
+        if ("ROLE_DOCTOR".equals(u.getRole())) {
+            if (u.getDoctor() != null) {
+                params.put("doctorId", String.valueOf(u.getDoctor().getId()));
+            }
+        }
+
         int page = params.containsKey("page") ? Integer.parseInt(params.get("page")) : 1;
 
         int pageSize = this.env.getProperty("admin.page_size", Integer.class);
@@ -55,15 +65,15 @@ public class ApiScheduleController {
         List<Schedules> s = scheduleService.getSchedules(params);
         return ResponseEntity.ok(s.stream().map(scheduleMapper::toResponse).toList());
     }
-    
+
     @PostMapping("secure/schedules")
-    public ResponseEntity<ScheduleRepsonse> register(Principal principal,@RequestBody ScheduleCreateRequest req){
+    public ResponseEntity<ScheduleRepsonse> register(Principal principal, @RequestBody ScheduleCreateRequest req) {
         User u = this.userService.getUserByUsername(principal.getName());
         if (u.getDoctor() == null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         Long doctorId = u.getDoctor().getId();
-        
+
         req.setDoctorId(doctorId);
         ScheduleRepsonse s = scheduleService.addSchedule(req);
         return ResponseEntity.status(HttpStatus.CREATED).body(s);

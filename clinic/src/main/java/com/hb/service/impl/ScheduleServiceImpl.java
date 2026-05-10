@@ -17,6 +17,8 @@ import com.hb.repository.RoomRepository;
 import com.hb.repository.ScheduleRepository;
 import com.hb.repository.ShiftRepository;
 import com.hb.service.ScheduleService;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,8 +58,6 @@ public class ScheduleServiceImpl implements ScheduleService {
 
         schedule.setDate(req.getDate());
         
-
-        
         schedule.setMaxPatients(req.getMaxPatients());
         schedule.setCurrentPatients(0);
         
@@ -95,5 +95,6 @@ public class ScheduleServiceImpl implements ScheduleService {
     public long countSchedules(Map<String, String> params) {
         return scheduleRepo.count(params, Schedules.class);
     }
+
     
 }
