@@ -11,6 +11,5 @@ import java.util.Map;
  * @author HUY
  */
 public interface BaseRepository<T> {
-
     long count(Map<String, String> params, Class<T> clazz);
 }
