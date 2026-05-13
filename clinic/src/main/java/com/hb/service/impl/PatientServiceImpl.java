@@ -11,6 +11,7 @@ import com.hb.pojo.Patient;
 import com.hb.pojo.User;
 import com.hb.repository.PatientRepository;
 import com.hb.service.PatientService;
+import com.hb.service.UserService;
 
 import java.util.List;
 import java.util.Map;
@@ -25,35 +26,38 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 public class PatientServiceImpl implements PatientService {
-    
+
     @Autowired
     private PatientRepository patientRepo;
-    
+
     @Autowired
     private CloudinaryService cloudinaryService;
-    
+
     @Autowired
     private PatientMapper patientMapper;
-    
+
+    @Autowired
+    private UserService userService;
+
     @Override
     public List<Patient> getPatients(Map<String, String> params) {
         return patientRepo.getPatients(params);
     }
-    
+
     @Override
     public Patient getPatientById(Long id) {
         return this.patientRepo.getPatientById(id);
     }
-    
+
     @Override
     public PatientResponse addPatient(PatientCreateRequest prq, User u) {
         Patient p = patientMapper.toEntity(prq, u);
         p.setUserId(u);
-        Patient patient =  this.patientRepo.addPatient(p);
+        Patient patient = this.patientRepo.addPatient(p);
         return patientMapper.toResponse(patient);
- 
+
     }
-    
+
     @Override
     public void updateProfile(Long id, PatientCreateRequest prq) {
         Patient patient = patientRepo.getPatientById(id);
@@ -66,6 +70,12 @@ public class PatientServiceImpl implements PatientService {
         return patientRepo.count(params, Patient.class);
     }
 
-    
-    
+    @Override
+    @Transactional
+    public void createEmptyPatient(User user) {
+        Patient p = new Patient();
+        p.setUserId(user);
+        this.patientRepo.addPatient(p);
+    }
+
 }

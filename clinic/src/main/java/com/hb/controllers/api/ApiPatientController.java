@@ -42,7 +42,6 @@ public class ApiPatientController {
     @Autowired
     private UserService userService;
     
-
     
     @PostMapping(value = "/secure/profiles")
     @Transactional
@@ -51,6 +50,8 @@ public class ApiPatientController {
         PatientResponse p = patientService.addPatient(req, u);
         return ResponseEntity.status(HttpStatus.CREATED).body(p);
     }
+    
+    
     
 
 //    @PutMapping(value = "/secure/profile/{id}",

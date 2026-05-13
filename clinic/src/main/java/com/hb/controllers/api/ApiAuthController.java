@@ -11,6 +11,7 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.hb.dto.request.UserCreateRequest;
 import com.hb.dto.request.UserLogin;
 import com.hb.enums.AuthProvider;
+import com.hb.exception.DuplicateResourceException;
 import com.hb.pojo.User;
 import com.hb.service.AuthService;
 import com.hb.service.UserService;
@@ -24,9 +25,11 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,6 +44,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api")
 @PropertySource("classpath:configs.properties")
+@CrossOrigin
 public class ApiAuthController {
 
     @Autowired
@@ -52,12 +56,17 @@ public class ApiAuthController {
     @Value("${CLIENT_ID}")
     private String clientId;
 
-    @PostMapping(value = "/auth/register",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/auth/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> create(@ModelAttribute UserCreateRequest urq) {
-        authService.registerPatient(urq);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        try {
+            authService.registerPatient(urq);
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        } catch (DuplicateResourceException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi hệ thống: " + e.getMessage());
+        }
     }
-
 
     @PostMapping("/auth/login")
     public ResponseEntity<?> login(@RequestBody UserLogin u) {
@@ -137,5 +146,4 @@ public class ApiAuthController {
 //        }
 //        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 //    }
-
 }
