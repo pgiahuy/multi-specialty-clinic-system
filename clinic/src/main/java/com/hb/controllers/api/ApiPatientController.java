@@ -44,7 +44,7 @@ public class ApiPatientController {
     
 
     
-    @PostMapping(value = "/secure/profiles")
+    @PostMapping("/secure/profiles")
     @Transactional
     public ResponseEntity<PatientResponse> create(@ModelAttribute PatientCreateRequest req ,Principal principal){
         User u = this.userService.getUserByUsername(principal.getName());
