@@ -1,84 +1,141 @@
-import { Button, Card, Form } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { field } from "firebase/firestore/pipelines";
+import { useRef, useState } from "react";
+import { Button, Card, Container, Form, Alert } from "react-bootstrap";
+import { Link, useNavigate } from "react-router-dom";
+import MySpinner from "../../components/MySpinner";
+import API, { endpoint } from "../../configs/Apis";
+import { formCardStyle } from "./UserStyle";
 
 const Register = () => {
+
+    const userInfo = [{
+        field: "username",
+        title: "Tên tài khoản",
+        type: "text",
+    }, {
+        field: "password",
+        title: "Mật khẩu",
+        type: "password",
+    }, {
+        field: "confirm",
+        title: "Xác nhận mật khẩu",
+        type: "password",
+    }, {
+        field: "email",
+        title: "Email",
+        type: "email",
+    }];
+
+    const [user, setUser] = useState({});
+    const avatar = useRef();
+    const [err, setErr] = useState();
+    const nav = useNavigate();
+    const [loading, setLoading] = useState(false);
+    
+    
+
+    const validate = () => {
+        for (let u of userInfo)
+            if (!(u.field in user) || !user[u.field]) {
+                setErr(`Vui lòng nhập ${u.title}!`);
+                return false;
+            }
+
+        if (user.password !== user.confirm) {
+            setErr('Mật khẩu không khớp!');
+            return false;
+        }
+
+        return true;
+    };
+
+    const register = async (e) => {
+        e.preventDefault();
+
+        if (validate()) {
+            let form = new FormData();
+            for (let key of Object.keys(user)) {
+                if (key !== "confirm")
+                    form.append(key, user[key]);
+            }
+
+            if (avatar.current.files.length > 0) {
+                form.append("avatar", avatar.current.files[0]);
+            }
+
+            try {
+                setLoading(true);
+                let res = await API.post(endpoint['register'], form, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+
+                if (res.status === 201) {
+                    nav("/login");
+                }
+
+
+                else
+                    alert("Hệ thống bị lỗi!");
+
+            } catch (error) {
+                if (error.response) {
+                    if (error.response.status === 409) {
+                        setErr(error.response.data);
+                    } else {
+                        setErr("Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.");
+                    }
+                } else {
+                    setErr("Không thể kết nối đến máy chủ.");
+                }
+            } finally {
+                setLoading(false);
+            }
+        }
+    };
+
     return (
-        <div className="login-page">
-            <div className="login-card-container">
-                <div className="login-grid">
-                    <div className="login-illustration">
-                        <div className="login-illustration-content">
-                            <div className="login-hero-dot" />
-                            <div className="login-hero-dot small" />
-                        </div>
-                    </div>
+        <Container fluid className="d-flex justify-content-center align-items-center" style={formCardStyle.container}>
+            <Card style={formCardStyle.card}>
+                <Card.Body>
+                    <h3 className="text-center mt-1">Đăng ký</h3>
 
-                    <Card className="login-card shadow-lg">
-                        <Card.Body>
-                            <div className="login-header text-center mb-4">
-                                <h3>Đăng ký</h3>
-                                <p>Tạo tài khoản mới để quản lý lịch khám và hồ sơ cá nhân.</p>
-                            </div>
+                    {err && <Alert variant="danger">{err}</Alert>}
 
-                            <Form>
-                                <Form.Floating className="mb-3">
-                                    <Form.Control
-                                        id="registerUsername"
-                                        type="text"
-                                        placeholder="Tên tài khoản"
-                                    />
-                                    <Form.Label htmlFor="registerUsername">Tên tài khoản</Form.Label>
-                                </Form.Floating>
+                    <Form onSubmit={register}>
+                        {userInfo.map(u => <Form.Floating key={u.field} className="mb-3" controlId={u.field}>
 
-                                <Form.Floating className="mb-3">
-                                    <Form.Control
-                                        id="registerPassword"
-                                        type="password"
-                                        placeholder="Mật khẩu"
-                                    />
-                                    <Form.Label htmlFor="registerPassword">Mật khẩu</Form.Label>
-                                </Form.Floating>
+                            <Form.Control id="userInfo"
+                                style={formCardStyle.input}
+                                type={u.type}
+                                placeholder={u.title}
+                                value={user[u.field]}
+                                onChange={e => setUser({ ...user, [u.field]: e.target.value })
+                                } />
+                            <Form.Label htmlFor="userInfo">{u.title}</Form.Label>
+                        </Form.Floating>)}
 
-                                <Form.Floating className="mb-3">
-                                    <Form.Control
-                                        id="registerFullname"
-                                        type="text"
-                                        placeholder="Họ tên"
-                                    />
-                                    <Form.Label htmlFor="registerFullname">Họ tên</Form.Label>
-                                </Form.Floating>
+                        <Form.Floating className="mb-3" controlId="avatar">
 
-                                <Form.Floating className="mb-3">
-                                    <Form.Control
-                                        id="registerEmail"
-                                        type="email"
-                                        placeholder="email@gmail.com"
-                                    />
-                                    <Form.Label htmlFor="registerEmail">Email</Form.Label>
-                                </Form.Floating>
+                            <Form.Control id="avatar" type="file" ref={avatar} style={formCardStyle.input} />
+                            <Form.Label htmlFor="avatar">
+                                Ảnh đại diện
+                            </Form.Label>
+                        </Form.Floating>
 
-                                <Form.Floating className="mb-3">
-                                    <Form.Select id="registerGender" defaultValue="Nam">
-                                        <option value="Nam">Nam</option>
-                                        <option value="Nữ">Nữ</option>
-                                    </Form.Select>
-                                    <Form.Label htmlFor="registerGender">Giới tính</Form.Label>
-                                </Form.Floating>
-
-                                <Button variant="primary" type="submit" className="w-100 login-button">
-                                    Đăng ký
-                                </Button>
-                            </Form>
-
+                        <Form.Group className="mb-3 text-center" controlId="button">
+                            {loading === true ? <MySpinner /> : <Button variant="primary" type="submit" className="w-100" style={formCardStyle.button}>
+                                Đăng ký
+                            </Button>}
                             <div className="login-footer text-center mt-4">
-                                Đã có tài khoản? <Link to="/login">Đăng nhập</Link>
+                                Đã có tài khoản? <Link to="/login">Đăng nhập ngay</Link>
                             </div>
-                        </Card.Body>
-                    </Card>
-                </div>
-            </div>
-        </div>
-
+                        </Form.Group>
+                    </Form>
+                </Card.Body>
+            </Card>
+        </Container>
     );
 }
 

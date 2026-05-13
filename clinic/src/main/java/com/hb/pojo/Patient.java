@@ -42,29 +42,23 @@ import java.util.Date;
     @NamedQuery(name = "Patient.findByPhone", query = "SELECT p FROM Patient p WHERE p.phone = :phone")})
 public class Patient implements Serializable {
 
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 12)
+    @Size(max = 12)
     @Column(name = "cccd")
     private String cccd;
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 255)
+
+    @Size(max = 255)
     @Column(name = "full_name")
     private String fullName;
-    @Basic(optional = false)
-    @NotNull
+
     @Column(name = "dob")
     @Temporal(TemporalType.DATE)
     private Date dob;
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 10)
+
+    @Size(max = 10)
     @Column(name = "gender")
     private String gender;
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 255)
+
+    @Size(max = 255)
     @Column(name = "address")
     private String address;
     // @Pattern(regexp="^\\(?(\\d{3})\\)?[- ]?(\\d{3})[- ]?(\\d{4})$", message="Invalid phone/fax format, should be as xxx-xxx-xxxx")//if the field contains phone or fax number consider using this annotation to enforce field validation
@@ -113,7 +107,6 @@ public class Patient implements Serializable {
         this.id = id;
     }
 
-
     public String getFullName() {
         return fullName;
     }
@@ -121,7 +114,6 @@ public class Patient implements Serializable {
     public void setFullName(String fullName) {
         this.fullName = fullName;
     }
-
 
     public Collection<Appointment> getAppointmentCollection() {
         return appointmentCollection;
@@ -188,8 +180,6 @@ public class Patient implements Serializable {
         this.cccd = cccd;
     }
 
-
-
     public Date getDob() {
         return dob;
     }
@@ -221,5 +211,5 @@ public class Patient implements Serializable {
     public void setPhone(String phone) {
         this.phone = phone;
     }
-    
+
 }
