@@ -22,7 +22,7 @@ public class DoctorMapper {
 
         DoctorResponse res = new DoctorResponse();
         
-        
+        res.setId(d.getId());
         res.setFullName(d.getFullName());
         res.setDescription(d.getDescription());
         res.setGender(d.getGender());
