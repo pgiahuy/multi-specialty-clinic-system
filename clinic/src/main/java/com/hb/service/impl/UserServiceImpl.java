@@ -76,11 +76,7 @@ public class UserServiceImpl implements UserService {
                 u.setPublicId(res.get("publicId").toString());
             }
             
-            User user = this.userRepo.addUser(u);
-            
-            this.patientService.createEmptyPatient(user);
-            
-            return user;
+            return this.userRepo.addUser(u);
         }
     }
 

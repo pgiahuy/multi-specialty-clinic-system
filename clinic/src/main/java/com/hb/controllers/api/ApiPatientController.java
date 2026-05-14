@@ -41,18 +41,14 @@ public class ApiPatientController {
 
     @Autowired
     private UserService userService;
-    
-    
+
     @PostMapping("/secure/profiles")
     @Transactional
-    public ResponseEntity<PatientResponse> create(@ModelAttribute PatientCreateRequest req ,Principal principal){
+    public ResponseEntity<PatientResponse> create(@ModelAttribute PatientCreateRequest req, Principal principal) {
         User u = this.userService.getUserByUsername(principal.getName());
         PatientResponse p = patientService.addPatient(req, u);
         return ResponseEntity.status(HttpStatus.CREATED).body(p);
     }
-    
-    
-    
 
 //    @PutMapping(value = "/secure/profile/{id}",
 //        consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -63,15 +59,13 @@ public class ApiPatientController {
 //        patientService.updateProfile(id, prq);
 //        return ResponseEntity.ok().build();
 //    }
- 
-
     @GetMapping("/secure/profiles")
     @Transactional
     public ResponseEntity<List<PatientResponse>> getProfile(Principal principal) {
         User u = this.userService.getUserByUsername(principal.getName());
         System.out.printf("=============%s==============", principal.getName());
         List<Patient> patients = (List<Patient>) u.getPatientCollection();
-        patients.forEach(s-> System.out.println(s.getFullName()));
+        patients.forEach(s -> System.out.println(s.getFullName()));
         return ResponseEntity.ok(patients.stream().map(patientMapper::toResponse).toList());
     }
 

@@ -30,14 +30,10 @@ public class PatientServiceImpl implements PatientService {
     @Autowired
     private PatientRepository patientRepo;
 
-    @Autowired
-    private CloudinaryService cloudinaryService;
 
     @Autowired
     private PatientMapper patientMapper;
 
-    @Autowired
-    private UserService userService;
 
     @Override
     public List<Patient> getPatients(Map<String, String> params) {
@@ -70,12 +66,5 @@ public class PatientServiceImpl implements PatientService {
         return patientRepo.count(params, Patient.class);
     }
 
-    @Override
-    @Transactional
-    public void createEmptyPatient(User user) {
-        Patient p = new Patient();
-        p.setUserId(user);
-        this.patientRepo.addPatient(p);
-    }
-
+    
 }

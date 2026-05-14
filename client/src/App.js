@@ -16,6 +16,7 @@ import BookingPage from "./screens/Patient/Booking";
 import { MyUserContext } from "./configs/Contexts";
 import { useReducer } from "react";
 import MyUserReducers from "./reducers/MyUserReducers";
+import RegisterRecord from "./screens/Patient/RegisterRecord";
 
 function App() {
   const [user, dispatch] = useReducer(MyUserReducers, null);
@@ -42,6 +43,7 @@ function App() {
             <Route path="/patient/notifications" element={<AllNotifications />} />
             <Route path="/patient/prescriptions" element={<Prescriptions />} />
             <Route path="/patient/profiles" element={<PatientProfile />} />
+            <Route path="/patient/register-record" element={<RegisterRecord />} />
             <Route path="/patient/booking" element={<BookingPage />} />
           </Routes>
 

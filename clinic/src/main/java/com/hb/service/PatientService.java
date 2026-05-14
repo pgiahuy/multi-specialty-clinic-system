@@ -21,6 +21,6 @@ public interface PatientService {
     void updateProfile(Long id, PatientCreateRequest prq);
     PatientResponse addPatient(PatientCreateRequest prq, User u);
     long countPatients(Map<String,String> params);
-    void createEmptyPatient(User user);
+    
     
 }
