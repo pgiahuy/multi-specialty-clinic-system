@@ -17,6 +17,7 @@ public class UserCreateRequest {
     private MultipartFile avatar;
     
     public UserCreateRequest() {
+        
     }
     
     public UserCreateRequest(String username, String password, String email, MultipartFile avatar) {

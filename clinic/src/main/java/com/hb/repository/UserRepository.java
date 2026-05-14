@@ -19,4 +19,6 @@ public interface UserRepository extends BaseRepository<User>{
     User addUser(User u);
     void deleteUser(Long id);
     boolean authenticate(String username, String password);
+    User existsByUsername(String username);
+    User existsByEmail(String email);
 }

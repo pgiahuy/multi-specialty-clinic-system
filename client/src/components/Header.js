@@ -10,10 +10,13 @@ import { Bell } from "react-bootstrap-icons";
 import { Link, useNavigate } from "react-router-dom";
 import NotificationBox from "./NotificationBox";
 import { endpoint } from "../configs/Apis";
+import { useContext } from "react";
+import { MyUserContext } from "../configs/Contexts";
 
 
 const Header = () => {
     const navigate = useNavigate();
+    const [user, dispatch] = useContext(MyUserContext);
 
 
     return (
@@ -59,15 +62,20 @@ const Header = () => {
                             try { navigate(path); } catch (e) { window.open(path, '_blank'); }
                         }} />
                     </Nav>
-                    <Button variant="outline-success" className="m-2">
-                        Đăng xuất
-                    </Button>
-                    <Button variant="outline-primary" className="m-2">
-                        Đăng ký
-                    </Button>
-                    <Button variant="primary" className="m-2" as={Link} to="/login">
-                        Đăng nhập
-                    </Button>
+                    {user === null ? <>
+                        <Button variant="outline-primary" className="m-2" as={Link} to="/login">
+                            Đăng ký
+                        </Button>
+                        <Button variant="primary" className="m-2" as={Link} to="/login">
+                            Đăng nhập
+                        </Button>
+                    </> : <>
+                        <img src={user.avatar} width="30" className="rounded-circle" />
+                        <Button variant="outline-success" className="m-2"
+                            onClick={() => { dispatch({ type: "LOGOUT" }) }}>
+                            Đăng xuất
+                        </Button>
+                    </>}
                 </Navbar.Collapse>
             </Container>
         </Navbar>

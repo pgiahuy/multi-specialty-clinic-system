@@ -31,11 +31,11 @@ public class PatientMapper {
         res.setPhone(p.getPhone());
         res.setDob(p.getDob());
         res.setAddress(p.getAddress());
-
-        if (p.getUserId() != null) {
-            res.setEmail(p.getUserId().getEmail());
-            res.setAvatar(p.getUserId().getSecureUrl());
-        }
+//
+//        if (p.getUserId() != null) {
+//            res.setEmail(p.getUserId().getEmail());
+//            res.setAvatar(p.getUserId().getSecureUrl());
+//        }
 
         return res;
     }
@@ -48,7 +48,7 @@ public class PatientMapper {
         Patient p = new Patient();
 
         p.setUserId(user);
-        
+    
         p.setCccd(req.getCccd());
         p.setFullName(req.getFullName());
         p.setPhone(req.getPhone());
