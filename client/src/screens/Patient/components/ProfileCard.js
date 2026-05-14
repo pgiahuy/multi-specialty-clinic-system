@@ -41,12 +41,12 @@ const PatientProfileCard = ({ patient }) => {
                   <div className="small fw-semibold">{patient.dob}</div>
                 </Col>
                 
-                <Col md={4}>
+                {/* <Col md={4}>
                   <div className="text-muted small d-flex align-items-center gap-1 text-nowrap">
                     <Envelope size={12} /> Email
                   </div>
                   <div className="small text-truncate" title={patient.email}>{patient.email}</div>
-                </Col>
+                </Col> */}
 
                 <Col md={4}>
                   <div className="text-muted small d-flex align-items-center gap-1 text-nowrap">

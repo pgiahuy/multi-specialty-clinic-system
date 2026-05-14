@@ -5,7 +5,10 @@
 package com.hb.service.impl;
 
 import com.hb.dto.request.UserCreateRequest;
+import com.hb.exception.DuplicateResourceException;
+import com.hb.pojo.Patient;
 import com.hb.pojo.User;
+import com.hb.repository.PatientRepository;
 import com.hb.service.UserService;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import com.hb.repository.UserRepository;
+import com.hb.service.PatientService;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
@@ -39,7 +43,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
-
+    
+    @Autowired
+    private PatientService patientService;
     @Override
     public User getUserByUsername(String username) {
         return userRepo.getUserByUsername(username);
@@ -47,22 +53,31 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User addUser(UserCreateRequest urq) {
-        User u = new User();
-
-        u.setEmail(urq.getEmail());
-        u.setUsername(urq.getUsername());
-        u.setPassword(passwordEncoder.encode(urq.getPassword()));
-        u.setRole("ROLE_PATIENT");
-        u.setCreatedAt(LocalDateTime.now());
-
-        if (!urq.getAvatar().isEmpty()) {
-            Map res = this.cloudinaryService.uploadFile(urq.getAvatar(), "avatar");
-
-            u.setSecureUrl(res.get("secureUrl").toString());
-            u.setPublicId(res.get("publicId").toString());
+        User checkUser = userRepo.existsByUsername(urq.getUsername());
+        if (checkUser != null) {
+            throw new DuplicateResourceException("Tên tài khoản đã tồn tại!");
         }
 
-        return this.userRepo.addUser(u);
+        User checkEmail = userRepo.existsByEmail(urq.getEmail());
+        if (checkEmail != null) {
+            throw new DuplicateResourceException("Email này đã được sử dụng!");
+        } else {
+            User u = new User();
+            u.setEmail(urq.getEmail());
+            u.setUsername(urq.getUsername());
+            u.setPassword(passwordEncoder.encode(urq.getPassword()));
+            u.setRole("ROLE_PATIENT");
+            u.setCreatedAt(LocalDateTime.now());
+
+            if (!urq.getAvatar().isEmpty()) {
+                Map res = this.cloudinaryService.uploadFile(urq.getAvatar(), "avatar");
+
+                u.setSecureUrl(res.get("secureUrl").toString());
+                u.setPublicId(res.get("publicId").toString());
+            }
+            
+            return this.userRepo.addUser(u);
+        }
     }
 
     @Override
@@ -80,33 +95,40 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getUsers(Map<String, String> params) {
+    public List<User> getUsers(Map<String, String> params
+    ) {
         return this.userRepo.getUsers(params);
     }
 
     @Override
-    public void deleteUser(Long id) {
+    public void deleteUser(Long id
+    ) {
         this.userRepo.deleteUser(id);
     }
 
     @Override
-    public User processSocialLogin(String email, String name, String providerId, String providerName) {
+    public User processSocialLogin(String email, String name,
+            String providerId, String providerName
+    ) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public long countUsers(Map<String, String> params) {
+    public long countUsers(Map<String, String> params
+    ) {
         return userRepo.count(params, User.class);
     }
 
     @Override
-    public User getUserByEmail(String email) {
+    public User getUserByEmail(String email
+    ) {
         return userRepo.getUserByEmail(email);
     }
 
     @Override
     @Transactional
-    public void updateFcmToken(String username, String fcmToken) {
+    public void updateFcmToken(String username, String fcmToken
+    ) {
         User user = this.userRepo.getUserByUsername(username);
         if (user != null) {
             user.setFcmToken(fcmToken);
@@ -114,10 +136,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String getRoleByUsername(String username) {
+    public String getRoleByUsername(String username
+    ) {
         User user = this.userRepo.getUserByUsername(username);
         return user != null ? user.getRole() : null;
     }
-
 
 }

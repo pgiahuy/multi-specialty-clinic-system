@@ -113,7 +113,6 @@ public class Patient implements Serializable {
         this.id = id;
     }
 
-
     public String getFullName() {
         return fullName;
     }
@@ -121,7 +120,6 @@ public class Patient implements Serializable {
     public void setFullName(String fullName) {
         this.fullName = fullName;
     }
-
 
     public Collection<Appointment> getAppointmentCollection() {
         return appointmentCollection;
@@ -188,8 +186,6 @@ public class Patient implements Serializable {
         this.cccd = cccd;
     }
 
-
-
     public Date getDob() {
         return dob;
     }
@@ -221,5 +217,5 @@ public class Patient implements Serializable {
     public void setPhone(String phone) {
         this.phone = phone;
     }
-    
+
 }
