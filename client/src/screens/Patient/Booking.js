@@ -1,4 +1,4 @@
-import { Container, Stack, Row, Col, Card } from "react-bootstrap";
+import { Container, Row, Col, Card } from "react-bootstrap";
 import Header from "../../components/Header";
 import { useEffect, useState } from "react";
 import { authApis, endpoint } from "../../configs/Apis";
@@ -75,6 +75,7 @@ const BookingPage = () => {
 
 
     const handleFilterChange = (field, value) => {
+        console.log(`Filter changed: ${field} = ${value}`);
         setBookingData(prev => ({
             ...prev,
             ...(field === 'doctor' || field === 'date' ? { time: null } : {}),
@@ -92,6 +93,19 @@ const BookingPage = () => {
         return doctor?.name || doctorId;
     };
 
+    const schedulesBySession = schedules.reduce((grouped, schedule) => {
+        if (!schedule.session) {
+            return grouped;
+        }
+
+        if (!grouped[schedule.session]) {
+            grouped[schedule.session] = [];
+        }
+
+        grouped[schedule.session].push(schedule);
+        return grouped;
+    }, {});
+
     return (
         <>
             <Header />
@@ -102,7 +116,7 @@ const BookingPage = () => {
                 <Row className="gap-3" className="d-flex flex-row">
 
                     <Col lg={8} className="d-flex flex-column gap-3">
-                        <Card className="p-4 shadow-sm">
+                        <Card className="p-4 shadow-sm mb-4">
                             <Card.Title className="fw-bold mb-3">Thông tin đặt lịch</Card.Title>
                             <div className="mb-3">
                                 <label className="form-label">Chọn hồ sơ</label>
@@ -119,7 +133,7 @@ const BookingPage = () => {
                                 <select className="form-select" onChange={(e) => handleFilterChange('doctor', e.target.value)}>
                                     <option value="">-- Chọn bác sĩ --</option>
                                     {doctors.map(doc => (
-                                        <option key={doc.id} value={doc.id}>{doc.name}</option>
+                                        <option key={doc.id} value={doc.id}>{doc.fullName}</option>
                                     ))}
                                 </select>
                             </div>
@@ -131,12 +145,48 @@ const BookingPage = () => {
 
                             <div className="mb-3">
                                 <label className="form-label">Chọn ca khám</label>
-                                <select className="form-select" onChange={(e) => handleFilterChange('time', e.target.value)}>
-                                    <option value="">-- Chọn ca khám --</option>
-                                    {schedules.map(schedule => (
-                                        <option key={schedule.id} value={schedule.time}>{schedule.time}</option>
+
+                                <div className="d-flex flex-column gap-3">
+                                    {Object.entries(schedulesBySession).map(([sessionName, sessionSchedules]) => (
+                                        <div key={sessionName} className="mb-2">
+                                            <div className="fw-semibold text-dark mb-2">{sessionName}</div>
+
+                                            <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-5 g-2 border rounded-3 p-2">
+                                                {sessionSchedules.map(schedule => {
+                                                    const timeLabel = `${schedule.shiftStartTime || ""}${schedule.shiftStartTime && schedule.shiftEndTime ? " - " : ""}${schedule.shiftEndTime || ""}`;
+                                                    const selected = bookingData.time === timeLabel;
+                                                    const remainingSlots = (schedule.maxPatients || 0) - (schedule.currentPatients || 0);
+                                                    const isFull = remainingSlots <= 0;
+
+                                                    return (
+                                                        <div className="col" key={schedule.id}>
+                                                            <button
+                                                                type="button"
+                                                                className={`w-100 text-start p-2 rounded-3 border bg-white ${selected ? 'border-success shadow-sm' : 'border-default'} `}
+                                                                onClick={() => !isFull && handleFilterChange('time', timeLabel)}
+                                                                disabled={isFull}
+                                                                style={{ minHeight: '58px', transition: 'all 0.2s ease', opacity: isFull ? 0.55 : 1 }}
+                                                            >
+                                                                <div className="d-flex flex-column align-items-start gap-1">
+                                                                    <div className="fw-semibold text-dark small">{timeLabel || "Chưa có thời gian"}</div>
+                                                                    <div className={` ${isFull ? 'text-danger' : ''} ${selected ? 'text-success' : ''}`} style={{ fontSize: '12px', lineHeight: 1 }}>
+                                                                        {isFull ? 'Hết chỗ' : (selected ? 'Đã chọn' : 'Chọn ca')}
+                                                                    </div>
+                                                                </div>
+                                                            </button>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
                                     ))}
-                                </select>
+
+                                    {Object.keys(schedulesBySession).length === 0 && (
+                                        <div className="text-muted small fst-italic">
+                                            Chưa có ca khám phù hợp.
+                                        </div>
+                                    )}
+                                </div>
                             </div>
 
 

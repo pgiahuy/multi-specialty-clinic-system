@@ -9,6 +9,7 @@ package com.hb.dto.response;
  * @author DELL
  */
 public class DoctorResponse {
+    private Long id;
     private String fullName;
     private String description;
     private String specialty;
@@ -19,15 +20,7 @@ public class DoctorResponse {
     public DoctorResponse() {
     }
 
-    public DoctorResponse(String fullName, String description, String specialty, String email, String gender) {
-        this.fullName = fullName;
-        this.description = description;
-        this.specialty = specialty;
-        this.email = email;
-        this.gender = gender;
-        
-    }
-    
+   
     
     
     /**
@@ -98,6 +91,20 @@ public class DoctorResponse {
      */
     public void setGender(String gender) {
         this.gender = gender;
+    }
+
+    /**
+     * @return the id
+     */
+    public Long getId() {
+        return id;
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(Long id) {
+        this.id = id;
     }
 
    

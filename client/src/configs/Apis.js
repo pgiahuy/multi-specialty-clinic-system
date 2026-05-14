@@ -18,7 +18,7 @@ export const endpoint = {
     'login': 'auth/login',
     'patientProfiles': '/secure/profiles',
     'doctors': '/doctors',
-    'schedules': '/schedules',
+    'schedules': '/secure/schedules',
     'notifications': '/secure/users/notifications',
 
 };
