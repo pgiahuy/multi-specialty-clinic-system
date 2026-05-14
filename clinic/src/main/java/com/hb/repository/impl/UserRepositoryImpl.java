@@ -23,12 +23,11 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Repository
 @Transactional
-public class UserRepositoryImpl extends BaseRepositoryImpl<User> implements UserRepository  {
-
+public class UserRepositoryImpl extends BaseRepositoryImpl<User> implements UserRepository {
 
     @Autowired
     private LocalSessionFactoryBean factory;
-    
+
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
@@ -61,6 +60,7 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<User> implements User
     public User addUser(User u) {
         Session session = this.factory.getObject().getCurrentSession();
         session.persist(u);
+        session.flush();
         return u;
     }
 
@@ -90,5 +90,23 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<User> implements User
         Query<User> q = session.createNamedQuery("User.findByEmail", User.class);
         q.setParameter("email", email);
         return q.getSingleResult();
+    }
+
+    @Override
+    public User existsByUsername(String username) {
+        Session session = this.factory.getObject().getCurrentSession();
+        Query<User> q = session.createNamedQuery("User.findByUsername", User.class);
+        q.setParameter("username", username);
+
+        return q.uniqueResultOptional().orElse(null);
+    }
+
+    @Override
+    public User existsByEmail(String email) {
+        Session session = this.factory.getObject().getCurrentSession();
+        Query<User> q = session.createNamedQuery("User.findByEmail", User.class);
+        q.setParameter("email", email);
+
+        return q.uniqueResultOptional().orElse(null);
     }
 }

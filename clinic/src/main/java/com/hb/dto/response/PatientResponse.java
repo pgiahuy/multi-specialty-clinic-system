@@ -18,22 +18,18 @@ public class PatientResponse {
     private String phone;
     @JsonFormat(pattern = "dd/MM/yyyy")
     private Date dob;
-    private String email;
     private String address;
-    private String avatar;
 
     public PatientResponse() {
     }
 
-    public PatientResponse(Long id, String cccd, String fullName, String phone, Date dob, String email, String address, String avatar) {
+    public PatientResponse(Long id, String cccd, String fullName, String phone, Date dob, String address) {
         this.id = id;
         this.cccd = cccd;
         this.fullName = fullName;
         this.phone = phone;
         this.dob = dob;
-        this.email = email;
         this.address = address;
-        this.avatar = avatar;
     }
 
     /**
@@ -107,20 +103,6 @@ public class PatientResponse {
     }
 
     /**
-     * @return the email
-     */
-    public String getEmail() {
-        return email;
-    }
-
-    /**
-     * @param email the email to set
-     */
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    /**
      * @return the address
      */
     public String getAddress() {
@@ -133,21 +115,9 @@ public class PatientResponse {
     public void setAddress(String address) {
         this.address = address;
     }
-
-    /**
-     * @return the avatar
-     */
-    public String getAvatar() {
-        return avatar;
-    }
-
-    /**
-     * @param avatar the avatar to set
-     */
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
+   
     
+
     
     
 }

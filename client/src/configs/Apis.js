@@ -7,7 +7,7 @@ const API = axios.create({
 })
 
 
-export const getDoctors = () => API.get("/products");
+export const getDoctors = () => API.get("/z");
 export const getSpecialties = () => API.get("/specialties");
 export const getSchedule = () => API.get("/schedules");
 
@@ -20,7 +20,7 @@ export const endpoint = {
     'doctors': '/doctors',
     'schedules': '/secure/schedules',
     'notifications': '/secure/users/notifications',
-
+    'current-user': '/secure/users/profile',
 };
 
 export const authApis = () => {

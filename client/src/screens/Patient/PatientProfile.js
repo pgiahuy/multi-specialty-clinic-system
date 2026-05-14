@@ -4,11 +4,13 @@ import { useEffect, useState } from "react";
 import Header from "../../components/Header";
 import ControlCard from "./components/ControlCard";
 import ProfileCard from "./components/ProfileCard";
-import { PlusLg } from 'react-bootstrap-icons';
+import { Link, PlusLg } from 'react-bootstrap-icons';
+import { Navigate, useNavigate } from "react-router-dom";
 const PatientProfile = () => {
 
 
     const [patientProfiles, setPatientProfiles] = useState([]);
+    const navigate = useNavigate();
 
     const loadPatientProfiles = async () => {
         try {
@@ -19,6 +21,7 @@ const PatientProfile = () => {
         }
     };
 
+    
 
     useEffect(() => {
         loadPatientProfiles();
@@ -44,7 +47,7 @@ const PatientProfile = () => {
                         variant="primary"
                         className="ms-auto d-flex align-items-center gap-2 shadow-sm py-2 px-3"
                         style={{ borderRadius: '10px' }}
-                        onClick={() => { "Thêm hồ sơ mới" }}
+                        onClick={() => navigate('/patient/register-record')}
                     >
                         <PlusLg /> <span>Thêm hồ sơ mới</span>
                     </Button>
