@@ -4,13 +4,19 @@
  */
 package com.hb.service;
 
+import com.hb.dto.request.LabTestResultRequest;
+import com.hb.dto.response.LabTestResultResponse;
+import com.hb.pojo.LabResults;
+import java.util.List;
+import java.util.Map;
 import org.springframework.stereotype.Service;
 
 /**
  *
  * @author DELL
  */
-@Service
+
 public interface LabTestResultService {
-    
+    LabResults addOrUpdateTestResult(LabTestResultRequest request);
+    List<LabResults> addMutipleTest(List<LabTestResultRequest> req);
 }

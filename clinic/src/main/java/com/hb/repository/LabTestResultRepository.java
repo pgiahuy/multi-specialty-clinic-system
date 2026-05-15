@@ -4,10 +4,13 @@
  */
 package com.hb.repository;
 
+import com.hb.pojo.LabResults;
+
 /**
  *
  * @author DELL
  */
 public interface LabTestResultRepository {
-    
+    LabResults getLabResultById(Long id);
+    void addOrUpdateTestResult(LabResults lr);
 }

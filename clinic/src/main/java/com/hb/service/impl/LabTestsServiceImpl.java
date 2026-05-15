@@ -58,6 +58,4 @@ public class LabTestsServiceImpl implements LabTestService {
         return labTestRepo.count(params, LabTests.class);
     }
 
-  
-
 }
