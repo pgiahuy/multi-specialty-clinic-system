@@ -4,7 +4,6 @@
  */
 package com.hb.pojo;
 
-import com.hb.enums.PaymentMethod;
 import com.hb.enums.PaymentStatus;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
@@ -68,8 +67,7 @@ public class PaymentItems implements Serializable {
     private PaymentStatus status;
     @Size(max = 5)
     @Column(name = "method")
-    @Enumerated(EnumType.STRING)
-    private PaymentMethod method;
+    private String method;
     @Column(name = "paid_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date paidAt;
@@ -141,11 +139,11 @@ public class PaymentItems implements Serializable {
         this.status = status;
     }
 
-    public PaymentMethod getMethod() {
+    public String getMethod() {
         return method;
     }
 
-    public void setMethod(PaymentMethod method) {
+    public void setMethod(String method) {
         this.method = method;
     }
 
