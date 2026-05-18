@@ -9,7 +9,6 @@ import com.hb.dto.response.LabTestResultResponse;
 import com.hb.pojo.LabResults;
 import java.util.List;
 import java.util.Map;
-import org.springframework.stereotype.Service;
 
 /**
  *
@@ -19,4 +18,5 @@ import org.springframework.stereotype.Service;
 public interface LabTestResultService {
     LabResults addOrUpdateTestResult(LabTestResultRequest request);
     List<LabResults> addMutipleTest(List<LabTestResultRequest> req);
+    List<LabTestResultResponse> getTestResults(Long patientId, Map<String, String> params);
 }

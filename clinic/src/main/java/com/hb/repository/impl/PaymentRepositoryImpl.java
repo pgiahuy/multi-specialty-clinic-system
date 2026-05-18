@@ -7,6 +7,7 @@ package com.hb.repository.impl;
 import com.hb.enums.PaymentMethod;
 import com.hb.enums.PaymentStatus;
 import com.hb.pojo.Payment;
+import com.hb.pojo.PaymentItems;
 import com.hb.repository.PaymentRepository;
 import java.util.List;
 import java.util.Map;
@@ -25,10 +26,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class PaymentRepositoryImpl implements PaymentRepository {
 
-  
-
     @Autowired
     private LocalSessionFactoryBean factory;
+    
 
     @Override
     public List<Payment> getPaymentsByUserName(Map<String, String> params) {
@@ -123,4 +123,16 @@ public class PaymentRepositoryImpl implements PaymentRepository {
             s.persist(p);
         }
     }
+//
+//    @Override
+//    public Payment getPaymentByItemId(Long Id) {
+//        Session session = this.factory.getObject().getCurrentSession();
+//        
+//        Query<Payment> q = session.createQuery("FROM Payment p WHERE p.id = :id", Payment.class);
+//        q.setParameter("id", Id);
+//        
+//        
+//    }
+
+   
 }

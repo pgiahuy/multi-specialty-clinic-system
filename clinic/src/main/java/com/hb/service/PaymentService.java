@@ -4,12 +4,9 @@
  */
 package com.hb.service;
 
-import com.hb.enums.PaymentMethod;
-import com.hb.enums.PaymentStatus;
+import com.hb.pojo.Appointment;
 import com.hb.pojo.Payment;
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 
 /**
  *
@@ -18,11 +15,20 @@ import java.util.Map;
 public interface PaymentService {
 //    List<Payment> getPayments(Map<String, String> params);
 //    List<Payment> getPaymentsByUserName(Map<String, String> params);
+
     Payment getPaymentById(Long id);
+
+    Payment getPaymentByAppoint(Appointment appoint);
+
     void deletePayment(Long id);
-    Payment createPayment(Long patientId, Long appId, List<Long> testIds, Long presId);
-    void updateStatus(Long paymentId, PaymentStatus status);
-    
+
+    Payment createPayment(Long patientId);
+
+//    void updateStatus(Long paymentId, PaymentStatus status);
+
     Long calculateTotalFee(List<Long> itemIds);
-    void confirmPaymentSuccess(Long paymentId, String transId, String method, List<Long> itemIds);
+
+    void updateStatusPayment(Long paymentId);
+
+    void updatePaymentTotalAmount(Payment payment);
 }

@@ -44,6 +44,7 @@ public class LabTestResultMapper {
         if (labResult.getTestId() != null) {
             res.setTestName(labResult.getTestId().getTestName());
             res.setUnit(labResult.getTestId().getUnit());
+            res.setNormalRange(labResult.getTestId().getNormalRange());
         }
         
         if (labResult.getAppointmentId() != null) {

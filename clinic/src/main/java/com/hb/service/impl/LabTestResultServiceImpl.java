@@ -10,11 +10,13 @@ import com.hb.mapper.LabTestResultMapper;
 import com.hb.pojo.Appointment;
 import com.hb.pojo.LabResults;
 import com.hb.pojo.LabTests;
-import com.hb.repository.AppointmentRepository;
+import com.hb.pojo.Payment;
 import com.hb.repository.LabTestResultRepository;
 import com.hb.service.AppointmentService;
 import com.hb.service.LabTestResultService;
 import com.hb.service.LabTestService;
+import com.hb.service.PaymentItemsService;
+import com.hb.service.PaymentService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +42,12 @@ public class LabTestResultServiceImpl implements LabTestResultService {
     
     @Autowired
     private LabTestResultMapper resultMapper;
+    
+    @Autowired
+    private PaymentService payService;
+    
+    @Autowired
+    private PaymentItemsService itemService;
   
 
     @Override
@@ -58,6 +66,10 @@ public class LabTestResultServiceImpl implements LabTestResultService {
         LabTests test = testService.getLabTestById(request.getTestId());
         if (a != null && test != null) {
             labResult = resultMapper.toEntity(request, a, test);
+            
+            Payment payment = payService.getPaymentByAppoint(a);
+        
+            itemService.addLabTestItems(payment, test.getId());
         }
         
        labResultRepo.addOrUpdateTestResult(labResult);
@@ -74,5 +86,13 @@ public class LabTestResultServiceImpl implements LabTestResultService {
         }
         return savedResults;
     }
+
+    @Override
+    public List<LabTestResultResponse> getTestResults(Long patientId, Map<String, String> params) {
+        List<LabResults> res = labResultRepo.getTestResults(patientId, params);
+        return res.stream().map(resultMapper::toResponse).toList();
+    }
+
+    
     
 }

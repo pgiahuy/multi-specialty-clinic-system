@@ -21,19 +21,23 @@ public class LabTestResultResponse {
     private Boolean isNormal;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private LocalDateTime createAt;
+    private String normalRange;
 
     public LabTestResultResponse() {
     }
 
-    public LabTestResultResponse(Long id,String testName, String patientName, String result, Boolean isNormal,LocalDateTime createAt, String unit) {
+    public LabTestResultResponse(Long id, String testName, String patientName, String result, String unit, Boolean isNormal, LocalDateTime createAt, String normalRange) {
         this.id = id;
         this.testName = testName;
         this.patientName = patientName;
         this.result = result;
-        this.isNormal = isNormal;
-        this.createAt=createAt;
         this.unit = unit;
+        this.isNormal = isNormal;
+        this.createAt = createAt;
+        this.normalRange = normalRange;
     }
+
+    
 
     /**
      * @return the id
@@ -131,6 +135,20 @@ public class LabTestResultResponse {
      */
     public void setUnit(String unit) {
         this.unit = unit;
+    }
+
+    /**
+     * @return the normalRange
+     */
+    public String getNormalRange() {
+        return normalRange;
+    }
+
+    /**
+     * @param normalRange the normalRange to set
+     */
+    public void setNormalRange(String normalRange) {
+        this.normalRange = normalRange;
     }
     
     
