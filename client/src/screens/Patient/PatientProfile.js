@@ -1,14 +1,15 @@
 import { Alert, Button, Container, Nav, Stack, Row, Col } from "react-bootstrap";
 import API, { authApis, endpoint } from "../../configs/Apis";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import Header from "../../components/Header";
 import ControlCard from "./components/ControlCard";
 import ProfileCard from "./components/ProfileCard";
-import { Link, PlusLg } from 'react-bootstrap-icons';
+import { Link, PlusLg, PencilSquare, Trash } from 'react-bootstrap-icons';
 import { Navigate, useNavigate } from "react-router-dom";
+import { MyUserContext } from "../../configs/Contexts";
+
 const PatientProfile = () => {
-
-
+    const [user] = useContext(MyUserContext);
     const [patientProfiles, setPatientProfiles] = useState([]);
     const navigate = useNavigate();
 
@@ -21,13 +22,26 @@ const PatientProfile = () => {
         }
     };
 
-    
+    const handleEdit = (profile) => {
+        // TODO: Implement edit functionality
+        console.log("Edit profile:", profile);
+        navigate(`/patient/register-record/${profile.id}`);
+    };
+
+    const handleDelete = (profile) => {
+        if (window.confirm(`Bạn có chắc chắn muốn xóa hồ sơ của ${profile.fullName} không?`)) {
+            // TODO: Implement delete functionality via API
+            console.log("Delete profile:", profile);
+        }
+    };
 
     useEffect(() => {
         loadPatientProfiles();
     }, []);
 
-
+    if (!user) {
+        return <Navigate to="/login" />;
+    }
 
     return (
         <>
@@ -58,8 +72,31 @@ const PatientProfile = () => {
                     <Col>
                         {patientProfiles.length > 0 ? (
                             patientProfiles.map((profile) => (
-                                <ProfileCard key={profile.id} patient={profile} />
+                                <div key={profile.id} className="mb-3">
+                                    <ProfileCard patient={profile} />
+                                    <Stack direction="horizontal" gap={1} style={{ justifyContent: 'flex-end', paddingRight: '12px' }}>
+                                        <Button
+                                            variant="outline-primary"
+                                            size="sm"
+                                            onClick={() => handleEdit(profile)}
+                                            style={{ borderRadius: '4px', padding: '4px 8px', border: 'none' }}
+                                            title="Sửa"
+                                        >
+                                            <PencilSquare size={16} />
+                                        </Button>
+                                        <Button
+                                            variant="outline-danger"
+                                            size="sm"
+                                            onClick={() => handleDelete(profile)}
+                                            style={{ borderRadius: '4px', padding: '4px 8px', border: 'none' }}
+                                            title="Xóa"
+                                        >
+                                            <Trash size={16} />
+                                        </Button>
+                                    </Stack>
+                                </div>
                             ))
+                            
                         ) : (
                             <div className="text-center py-5 bg-light rounded-3 border-dashed">
                                 <p className="text-muted mb-0">Hiện chưa có hồ sơ nào.</p>

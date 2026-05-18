@@ -4,13 +4,19 @@
  */
 package com.hb.service;
 
-import org.springframework.stereotype.Service;
+import com.hb.dto.request.LabTestResultRequest;
+import com.hb.dto.response.LabTestResultResponse;
+import com.hb.pojo.LabResults;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
  * @author DELL
  */
-@Service
+
 public interface LabTestResultService {
-    
+    LabResults addOrUpdateTestResult(LabTestResultRequest request);
+    List<LabResults> addMutipleTest(List<LabTestResultRequest> req);
+    List<LabTestResultResponse> getTestResults(Long patientId, Map<String, String> params);
 }

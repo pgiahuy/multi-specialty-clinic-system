@@ -4,6 +4,7 @@
  */
 package com.hb.service;
 
+import com.hb.pojo.Appointment;
 import com.hb.pojo.Payment;
 import com.hb.pojo.PaymentItems;
 import java.util.List;
@@ -16,9 +17,11 @@ public interface PaymentItemsService {
    
     void addAppointmentItem(Payment payment, Long appointmentId);
     
-    void addLabTestItems(Payment payment, List<Long> testIds);
+    void addLabTestItems(Payment payment, Long testId);
     
     void addPrescriptionItem(Payment payment, Long prescriptionId);
     
     void confirmItemsPaid(String transId, String method, List<Long> itemIds);
+    
+    PaymentItems getPaymentItemByAppointment(Appointment appoint);
 }

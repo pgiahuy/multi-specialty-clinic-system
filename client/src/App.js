@@ -17,6 +17,9 @@ import { MyUserContext } from "./configs/Contexts";
 import { useReducer } from "react";
 import MyUserReducers from "./reducers/MyUserReducers";
 import RegisterRecord from "./screens/Patient/RegisterRecord";
+import TestResults from "./screens/Patient/TestResults";
+import TestResultDetail from "./screens/Patient/TestResultDetail";
+
 
 function App() {
   const [user, dispatch] = useReducer(MyUserReducers, null);
@@ -45,6 +48,9 @@ function App() {
             <Route path="/patient/profiles" element={<PatientProfile />} />
             <Route path="/patient/register-record" element={<RegisterRecord />} />
             <Route path="/patient/booking" element={<BookingPage />} />
+            <Route path="/patient/test-results" element={<TestResults />} />
+            <Route path="/patient/test-results/:patientId" element={<TestResultDetail />} />
+
           </Routes>
 
         </Container>
