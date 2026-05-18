@@ -10,7 +10,6 @@ import com.hb.repository.PaymentItemRepository;
 import com.hb.service.MomoPaymentService;
 import com.hb.service.PaymentItemsService;
 import com.hb.service.PaymentService;
-import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -51,11 +50,9 @@ public class ApiPaymentController {
             @RequestParam("itemIds") List<Long> itemIds,
             @RequestParam("orderInfo") String orderInfo) throws Exception {
 
-        //Payment p = paymentService.getPaymentById(Long.parseLong(paymentId));
         Long totalAmount = paymentService.calculateTotalFee(itemIds);
         String uniqueOrderId = "ORDER_" + System.currentTimeMillis();
 
-        // Chuyển [1,2,3] thành "1,2,3"
         String extraData = itemIds.stream()
                 .map(Object::toString)
                 .collect(Collectors.joining(","));
@@ -73,7 +70,7 @@ public class ApiPaymentController {
 
     @GetMapping("/momo/return")
     public ResponseEntity<?> momoReturn(@RequestParam Map<String, String> params) throws Exception {
-        
+
         boolean valid = momoService.verifySignature(params);
         String resultCode = params.get("resultCode");
 
@@ -88,24 +85,22 @@ public class ApiPaymentController {
 
                 paymentItemSer.confirmItemsPaid(transId, "MOMO", itemIds);
             }
-        } 
+        }
 
         MoMoPaymentResponse response = new MoMoPaymentResponse();
         response.setMessage(params.get("message"));
-
         response.setAmount(Long.parseLong(params.get("amount")));
-
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/momo/ipn")
     public ResponseEntity<?> momoIpn(@RequestBody Map<String, String> params) throws Exception {
-        
+
         boolean valid = momoService.verifySignature(params);
         Map<String, Object> result = new HashMap<>();
         try {
             String resultCode = params.get("resultCode");
-            // Giả sử valid = true để test
+
             if (valid && "0".equals(resultCode)) {
                 String transId = params.get("transId");
                 String extraData = params.get("extraData");
@@ -115,15 +110,15 @@ public class ApiPaymentController {
                             .map(Long::parseLong)
                             .collect(Collectors.toList());
 
-                    // Tìm item đầu tiên để lấy PaymentID cha
+                    paymentItemSer.confirmItemsPaid(transId, "MOMO", itemIds);
+
                     PaymentItems firstItem = itemRepo.getItemById(itemIds.get(0));
 
                     if (firstItem != null) {
-                        // Lấy ID của hóa đơn tổng
+
                         Long paymentIdInDb = firstItem.getPaymentId().getId();
 
-                        // Gọi hàm confirm để cập nhật trạng thái của cả hóa đơn và các item liên quan
-                        paymentService.confirmPaymentSuccess(paymentIdInDb, transId, "MOMO", itemIds);
+                        paymentService.updateStatusPayment(paymentIdInDb);
                     }
                 }
                 result.put("resultCode", 0);

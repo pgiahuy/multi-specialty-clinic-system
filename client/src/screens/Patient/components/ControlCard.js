@@ -1,5 +1,5 @@
 import { Card, Row, Col } from 'react-bootstrap';
-import { CalendarPlus, FileEarmarkMedical, PersonCircle, ClockHistory, Receipt, PersonBadge } from 'react-bootstrap-icons';
+import { CalendarPlus, FileEarmarkMedical, PersonCircle, ClockHistory, Receipt, PersonBadge, Droplet, Clipboard2Pulse, DropletHalf } from 'react-bootstrap-icons';
 import { useNavigate } from 'react-router-dom';
 
 const ControlCard = () => {
@@ -12,6 +12,7 @@ const ControlCard = () => {
     { title: 'Hoá đơn', icon: <Receipt size={30} className="text-success mb-2" />, path: '/ho-so' },
     { title: 'Chuyên khoa', icon: <FileEarmarkMedical size={30} className="text-info mb-2" />, path: '/chuyen-khoa' },
     { title: 'Lịch hẹn', icon: <ClockHistory size={30} className="text-warning mb-2" />, path: '/lich-hen' },
+    { title: 'Kết quả xét nghiệm', icon: <DropletHalf size={30} className="text-danger mb-2" />, path: '/patient/test-results' },
   ];
 
   const navItemStyle = {

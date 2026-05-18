@@ -19,19 +19,23 @@ public class PatientResponse {
     @JsonFormat(pattern = "dd/MM/yyyy")
     private Date dob;
     private String address;
+    private String gender;
 
     public PatientResponse() {
     }
 
-    public PatientResponse(Long id, String cccd, String fullName, String phone, Date dob, String address) {
+    public PatientResponse(Long id, String cccd, String fullName, String phone, Date dob, String address, String gender) {
         this.id = id;
         this.cccd = cccd;
         this.fullName = fullName;
         this.phone = phone;
         this.dob = dob;
         this.address = address;
+        this.gender = gender;
     }
-
+    
+    
+    
     /**
      * @return the id
      */
@@ -114,6 +118,20 @@ public class PatientResponse {
      */
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    /**
+     * @return the gender
+     */
+    public String getGender() {
+        return gender;
+    }
+
+    /**
+     * @param gender the gender to set
+     */
+    public void setGender(String gender) {
+        this.gender = gender;
     }
    
     

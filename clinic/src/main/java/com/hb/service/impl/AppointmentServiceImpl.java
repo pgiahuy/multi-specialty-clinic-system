@@ -11,11 +11,14 @@ import com.hb.exception.ResourceNotFoundException;
 import com.hb.mapper.AppointmentMapper;
 import com.hb.pojo.Appointment;
 import com.hb.pojo.Patient;
+import com.hb.pojo.Payment;
 import com.hb.pojo.Schedules;
 import com.hb.repository.AppointmentRepository;
 import com.hb.repository.PatientRepository;
 import com.hb.repository.ScheduleRepository;
 import com.hb.service.AppointmentService;
+import com.hb.service.PaymentItemsService;
+import com.hb.service.PaymentService;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +42,12 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Autowired
     private AppointmentMapper appointmentMapper;
+
+    @Autowired
+    private PaymentItemsService itemService;
+
+    @Autowired
+    private PaymentService paymentService;
 
     @Override
     public List<Appointment> getAppointments(Map<String, String> params) {
@@ -87,10 +96,13 @@ public class AppointmentServiceImpl implements AppointmentService {
             scheduleRepo.addSchedule(schedule);
 
             a = appointmentMapper.toEntity(req, patient, schedule);
+
         }
 
         appointmentRepo.addOrUpdateAppointment(a);
-
+        Payment p = paymentService.createPayment(req.getPatientId());
+        itemService.addAppointmentItem(p, a.getId());
+        
         return appointmentMapper.toResponse(a);
 
     }
