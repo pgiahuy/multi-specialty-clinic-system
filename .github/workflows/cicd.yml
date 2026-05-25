@@ -46,16 +46,13 @@ jobs:
       - name: Configure SSH Tunnel Client
         run: |
           mkdir -p ~/.ssh
-          echo -e "Host ${{ secrets.SERVER_HOST }}\n\tProxyCommand cloudflared access ssh --hostname %h" > ~/.ssh/config
+          echo -e "Host myserver\n\tHostName ${{ secrets.SERVER_HOST }}\n\tUser ${{ secrets.SERVER_USER }}\n\tProxyCommand cloudflared access ssh --hostname %h" > ~/.ssh/config
           chmod 600 ~/.ssh/config
 
-      - name: Deploy Backend to Server via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          password: ${{ secrets.SERVER_PASSWORD }}
-          script: |
+      - name: Deploy Backend to Server via Native SSH
+        run: |
+          sudo apt-get update && sudo apt-get install -y sshpass
+          sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no myserver << 'EOF'
             echo "1. Kéo Docker Image Backend mới về..."
             docker pull ${{ secrets.DOCKER_USERNAME }}/clinic-backend:latest
             echo "2. Xóa Container Backend cũ nếu đang chạy..."
@@ -64,6 +61,7 @@ jobs:
             docker run -d --network="host" --name=my-clinic-tomcat --restart=always ${{ secrets.DOCKER_USERNAME }}/clinic-backend:latest
             docker image prune -f
             echo "BACKEND ĐÃ CẬP NHẬT THÀNH CÔNG!"
+          EOF
 
   frontend-pipeline:
     runs-on: ubuntu-latest
@@ -106,16 +104,13 @@ jobs:
       - name: Configure SSH Tunnel Client
         run: |
           mkdir -p ~/.ssh
-          echo -e "Host ${{ secrets.SERVER_HOST }}\n\tProxyCommand cloudflared access ssh --hostname %h" > ~/.ssh/config
+          echo -e "Host myserver\n\tHostName ${{ secrets.SERVER_HOST }}\n\tUser ${{ secrets.SERVER_USER }}\n\tProxyCommand cloudflared access ssh --hostname %h" > ~/.ssh/config
           chmod 600 ~/.ssh/config
 
-      - name: Deploy Frontend to Server via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          password: ${{ secrets.SERVER_PASSWORD }}
-          script: |
+      - name: Deploy Frontend to Server via Native SSH
+        run: |
+          sudo apt-get update && sudo apt-get install -y sshpass
+          sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no myserver << 'EOF'
             echo "1. Kéo Docker Image Frontend mới về..."
             docker pull ${{ secrets.DOCKER_USERNAME }}/clinic-frontend:latest
             echo "2. Xóa Container Frontend cũ nếu đang chạy..."
@@ -124,3 +119,4 @@ jobs:
             docker run -d --network="host" --name=my-clinic-frontend --restart=always ${{ secrets.DOCKER_USERNAME }}/clinic-frontend:latest
             docker image prune -f
             echo "FRONTEND REACT ĐÃ CẬP NHẬT THÀNH CÔNG!"
+          EOF
