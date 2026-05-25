@@ -80,18 +80,20 @@ public class User implements Serializable {
     @Size(max = 65535)
     @Column(name = "fcm_token")
     private String fcmToken;
-    
-    @OneToOne(mappedBy = "userId",cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "senderId")
+    private Collection<ChatMessage> chatMessageCollection;
+    @OneToOne(mappedBy = "userId")
     private Doctor doctor;
-    
-    @OneToMany(mappedBy = "userId",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "userId")
     private Collection<Notification> notificationCollection;
-    
-    @OneToMany(mappedBy = "userId",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "userId")
     private Collection<Patient> patientCollection;
-    
-    @OneToMany(mappedBy = "userId",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "userId")
     private Collection<SocialAccount> socialAccountCollection;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "patientId")
+    private Collection<Conversation> conversationCollection;
+    @OneToMany(mappedBy = "receiverId")
+    private Collection<Conversation> conversationCollection1;
 
     public User() {
     }
@@ -178,6 +180,14 @@ public class User implements Serializable {
         this.fcmToken = fcmToken;
     }
 
+    public Collection<ChatMessage> getChatMessageCollection() {
+        return chatMessageCollection;
+    }
+
+    public void setChatMessageCollection(Collection<ChatMessage> chatMessageCollection) {
+        this.chatMessageCollection = chatMessageCollection;
+    }
+
     public Doctor getDoctor() {
         return doctor;
     }
@@ -208,6 +218,22 @@ public class User implements Serializable {
 
     public void setSocialAccountCollection(Collection<SocialAccount> socialAccountCollection) {
         this.socialAccountCollection = socialAccountCollection;
+    }
+
+    public Collection<Conversation> getConversationCollection() {
+        return conversationCollection;
+    }
+
+    public void setConversationCollection(Collection<Conversation> conversationCollection) {
+        this.conversationCollection = conversationCollection;
+    }
+
+    public Collection<Conversation> getConversationCollection1() {
+        return conversationCollection1;
+    }
+
+    public void setConversationCollection1(Collection<Conversation> conversationCollection1) {
+        this.conversationCollection1 = conversationCollection1;
     }
 
     @Override

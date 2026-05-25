@@ -26,6 +26,7 @@ import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
 
@@ -59,10 +60,9 @@ public class Payment implements Serializable {
     private PaymentStatus status;
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt;
+    private LocalDateTime createdAt;
     @Size(max = 5)
     @Column(name = "method")
-    @Enumerated(EnumType.STRING)
     private PaymentMethod method;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "paymentId")
     private Collection<PaymentItems> paymentItemsCollection;
@@ -101,11 +101,11 @@ public class Payment implements Serializable {
         this.status = status;
     }
 
-    public Date getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 

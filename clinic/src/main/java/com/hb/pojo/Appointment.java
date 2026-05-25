@@ -66,6 +66,8 @@ public class Appointment implements Serializable {
     private Schedules scheduleId;
     @OneToMany(mappedBy = "appointmentId")
     private Collection<LabResults> labResultsCollection;
+    @OneToOne(mappedBy = "appointmentId")
+    private Conversation conversation;
 
     public Appointment() {
     }
@@ -136,6 +138,14 @@ public class Appointment implements Serializable {
 
     public void setLabResultsCollection(Collection<LabResults> labResultsCollection) {
         this.labResultsCollection = labResultsCollection;
+    }
+
+    public Conversation getConversation() {
+        return conversation;
+    }
+
+    public void setConversation(Conversation conversation) {
+        this.conversation = conversation;
     }
 
     @Override

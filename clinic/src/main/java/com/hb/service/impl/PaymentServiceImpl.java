@@ -14,6 +14,7 @@ import com.hb.repository.PaymentRepository;
 import com.hb.service.PaymentItemsService;
 import com.hb.service.PaymentService;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +60,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         p.setPatientId(new Patient(patientId));
         p.setStatus(PaymentStatus.PENDING);
-        p.setCreatedAt(new Date());
+        p.setCreatedAt(LocalDateTime.now());
         paymentRepo.addOrUpdatePayment(p);
 
         return p;

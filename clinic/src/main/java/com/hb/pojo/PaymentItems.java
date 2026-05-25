@@ -4,8 +4,8 @@
  */
 package com.hb.pojo;
 
-
 import com.hb.enums.PaymentItemType;
+
 import com.hb.enums.PaymentMethod;
 import com.hb.enums.PaymentStatus;
 import jakarta.persistence.Basic;
@@ -73,6 +73,7 @@ public class PaymentItems implements Serializable {
     private PaymentStatus status;
     @Size(max = 5)
     @Column(name = "method")
+    @Enumerated(EnumType.STRING)
     private PaymentMethod method;
     @Column(name = "paid_at")
     @Temporal(TemporalType.TIMESTAMP)

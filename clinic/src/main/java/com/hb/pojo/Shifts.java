@@ -4,6 +4,7 @@
  */
 package com.hb.pojo;
 
+import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
 import com.hb.enums.SessionShift;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;

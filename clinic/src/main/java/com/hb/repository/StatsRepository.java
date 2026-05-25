@@ -22,7 +22,7 @@ public interface StatsRepository {
     List<Object[]> serviceUsageStats(LocalDate fromDate, LocalDate toDate);
 
 
-    List<Object[]> topDiseasesStats(int limit);
+    List<Object[]> topDiseasesStats(LocalDate fromDate, LocalDate toDate,int limit);
 
 
     List<Object[]> revenueStats(int year);
