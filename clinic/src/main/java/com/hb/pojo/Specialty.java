@@ -34,24 +34,22 @@ import java.util.Collection;
     @NamedQuery(name = "Specialty.findByPrice", query = "SELECT s FROM Specialty s WHERE s.price = :price")})
 public class Specialty implements Serializable {
 
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 100)
-    @Column(name = "name")
-    private String name;
-    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
-    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "price")
-    private BigDecimal price;
-
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
     @NotNull
     @Column(name = "id")
     private Long id;
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 100)
+    @Column(name = "name")
+    private String name;
+    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "price")
+    private BigDecimal price;
     @ManyToMany(mappedBy = "specialtyCollection")
     private Collection<Doctor> doctorCollection;
     @JoinColumn(name = "id_hod", referencedColumnName = "id")
@@ -81,6 +79,21 @@ public class Specialty implements Serializable {
         this.id = id;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
 
     public Collection<Doctor> getDoctorCollection() {
         return doctorCollection;
@@ -129,22 +142,6 @@ public class Specialty implements Serializable {
     @Override
     public String toString() {
         return "com.hb.pojo.Specialty[ id=" + id + " ]";
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
     }
     
 }

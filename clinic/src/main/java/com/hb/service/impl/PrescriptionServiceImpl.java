@@ -121,11 +121,11 @@ public class PrescriptionServiceImpl implements PrescriptionService {
                 throw new ResourceNotFoundException("Medicine not found!");
             }
 
-            if (m.getStock() < i.getQuantity()) {
-                throw new InsufficientStockException("Không đủ thuốc: " + m.getName());
-            }
-
-            m.setStock(m.getStock() - i.getQuantity());
+//            if (m.getStock() < i.getQuantity()) {
+//                throw new InsufficientStockException("Không đủ thuốc: " + m.getName());
+//            }
+//
+//            m.setStock(m.getStock() - i.getQuantity());
 
             PrescriptionItem item = new PrescriptionItem();
             item.setMedicineId(m);
@@ -182,11 +182,11 @@ public class PrescriptionServiceImpl implements PrescriptionService {
             throw new ResourceNotFoundException("Medicine not found!");
         }
         
-        if (m.getStock() < qty) {
-            throw new InsufficientStockException("Không đủ thuốc: " + m.getName());
-        }
-
-        m.setStock(m.getStock() - qty);
+//        if (m.getStock() < qty) {
+//            throw new InsufficientStockException("Không đủ thuốc: " + m.getName());
+//        }
+//
+//        m.setStock(m.getStock() - qty);
 
         PrescriptionItem item = new PrescriptionItem();
         item.setPrescriptionId(p);
@@ -209,13 +209,13 @@ public class PrescriptionServiceImpl implements PrescriptionService {
 
         int oldQty = item.getQuantity();
 
-        m.setStock(m.getStock() + oldQty);
-
-        if (m.getStock() < newQty) {
-            throw new InsufficientStockException("Không đủ thuốc: " + m.getName());
-        }
-
-        m.setStock(m.getStock() - newQty);
+//        m.setStock(m.getStock() + oldQty);
+//
+//        if (m.getStock() < newQty) {
+//            throw new InsufficientStockException("Không đủ thuốc: " + m.getName());
+//        }
+//
+//        m.setStock(m.getStock() - newQty);
 
         item.setQuantity(newQty);
 
@@ -233,7 +233,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
 
         Medicine m = item.getMedicineId();
 
-        m.setStock(m.getStock() + item.getQuantity());
+//        m.setStock(m.getStock() + item.getQuantity());
 
         prescriptionItemRepo.delete(item);
     }

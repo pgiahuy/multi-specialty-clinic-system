@@ -32,7 +32,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public void registerPatient(UserCreateRequest urq) {
-        User u = userService.addUser(urq);     
+        User u = userService.saveOrUpdateUser(urq);     
     }
 
     @Override

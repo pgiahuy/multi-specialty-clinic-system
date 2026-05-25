@@ -1,94 +1,120 @@
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
+
     <head>
         <title>Quản lý người dùng</title>
-
     <th:block th:replace="base :: css"></th:block>
     <th:block th:replace="base :: js"></th:block>
+    <script th:inline="javascript">
+        window.__OPEN_USER_FORM__ = /*[[${openForm}]]*/ false;
+    </script>
     <script th:src="@{/js/user.js}"></script>
 </head>
 
 <body>
-
     <div th:replace="base :: header('QUẢN LÝ TÀI KHOẢN')"></div>
-
     <div th:replace="base :: sidebar"></div>
 
-    <div class="content">
+    <div class="content mt-6">
 
+        <th:block th:with="hasError=${errorMsg}, hasSuccess=${successMsg}">
+            <div th:if="${hasError}" class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                <span th:text="${errorMsg}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
 
-        <form class="card-body p-4" method="post" th:action="@{/admin/users}" enctype="multipart/form-data">
+            <div th:if="${hasSuccess}" class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+                <i class="bi bi-check-circle me-2"></i>
+                <span th:text="${successMsg}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </th:block>
+
+        <div class="d-flex justify-content-end mb-3">
+            <button type="button" id="toggleUserFormBtn" class="btn btn-success" onclick="toggleUserForm()">
+                <i class="bi bi-plus-circle me-2"></i>Thêm tài khoản
+            </button>
+        </div>
+
+        <form id="userForm" th:class="${openForm} ? 'card p-4 mb-4' : 'card p-4 mb-4 d-none'" method="post"
+              th:object="${user}" th:action="@{/admin/users}" enctype="multipart/form-data">
+            <h4 id="formTitle" class="mb-3 text-uppercase fw-bold text-primary">Tạo tài khoản mới</h4>
+
+            <input type="hidden" th:field="*{id}" id="userId" />
 
             <div class="mb-3">
                 <label for="username" class="form-label fw-bold">Tên đăng nhập:</label>
-                <input type="text" name="username" class="form-control" id="username" placeholder="Nhập tên đăng nhập..." required>
+                <input type="text" th:field="*{username}" class="form-control" id="username"
+                       placeholder="Nhập tên đăng nhập..." required />
             </div>
 
             <div class="mb-3">
                 <label for="email" class="form-label fw-bold">Email:</label>
-                <input type="email" name="email" class="form-control" id="email" placeholder="example@gmail.com" required>
+                <input type="email" th:field="*{email}" class="form-control" id="email" placeholder="example@gmail.com"
+                       required />
             </div>
 
-            <div class="mb-3">
+            <div class="mb-3" id="passwordGroup">
                 <label for="password" class="form-label fw-bold">Mật khẩu:</label>
-                <input type="password" name="password" class="form-control" id="password" placeholder="********" required>
+                <input type="password" th:field="*{password}" class="form-control" id="password" placeholder="********"
+                       required />
             </div>
 
             <div class="mb-4">
-                <label for="avatar" class="form-label fw-bold">Ảnh đại diện:</label>
-                <input type="file" name="avatar" class="form-control" id="avatar" accept="image/*">
-                <div class="form-text">Định dạng hỗ trợ: JPG, PNG, GIF.</div>
+                <label for="avatarFile" class="form-label fw-bold">Ảnh đại diện:</label>
+                <input type="file" name="avatar" class="form-control" id="avatar" accept="image/*" />
+                <div class="form-text">Định dạng hỗ trợ: JPG, PNG, GIF. (Để trống nếu giữ nguyên ảnh cũ)</div>
             </div>
 
-            <div class="d-grid m-auto">
-                <button type="submit" class="btn btn-primary">
+            <div class="d-flex gap-2 justify-content-end">
+                <button type="button" class="btn btn-secondary" onclick="resetAndCloseForm()">Hủy</button>
+                <button type="submit" id="submitFormBtn" class="btn btn-primary">
                     <i class="bi bi-person-plus-fill me-2"></i>Tạo tài khoản
                 </button>
             </div>
-
         </form>
 
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle shadow-sm">
+                <thead class="table-primary text-center">
+                    <tr>
+                        <th>Tên tài khoản</th>
+                        <th>Email</th>
+                        <th>Vai trò</th>
+                        <th>Avatar</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
 
-
-
-        <table class="table table-bordered table-hover align-middle">
-            <thead class="table-primary">
-                <tr>
-                    <th>Tên tài khoản</th>
-                    <th>Email</th>
-                    <th>Vai trò</th>
-                    <th>Avatar</th>
-                    <th>Hành động</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                <tr th:each="u : ${users}">
-                    <td th:text="${u.username}"></td>
-                    <td th:text="${u.email}"></td>
-                    <td th:text="${u.role}"></td>
-                    <td>
-                        <img th:src="${u.secureUrl}" alt="avatar" width="50" height="50"/>
-                    </td>
-                    <td>
-                        <button class="btn btn-warning btn-sm">Sửa</button>
-                        <button class="btn btn-danger btn-sm"
-                                th:onclick="'deleteUser(' + ${u.id} + ')'">
-                            Xóa
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-
-
+                <tbody>
+                    <tr th:each="u : ${users}">
+                        <td th:id="'name-' + ${u.id}" th:text="${u.username}"></td>
+                        <td th:id="'email-' + ${u.id}" th:text="${u.email}"></td>
+                        <td th:id="'role-' + ${u.id}" th:text="${u.role}" class="text-center"></td>
+                        <td class="text-center">
+                            <img th:src="${u.secureUrl != null ? u.secureUrl : '/images/default-avatar.png'}"
+                                 alt="avatar" class="rounded-circle object-fit-cover" width="45" height="45" />
+                        </td>
+                        <td class="text-center">
+                            <button class="btn btn-warning btn-sm me-1" th:onclick="|editUser(${u.id})|">
+                                <i class="bi bi-pencil-square"></i> Sửa
+                            </button>
+                            <button class="btn btn-danger btn-sm" th:onclick="|deleteUser(${u.id})|">
+                                <i class="bi bi-trash-fill"></i> Xóa
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <div class="d-flex justify-content-center mt-1">
         <div th:replace="~{fragments :: pagination('/admin/users', ${totalPages}, ${currentPage})}"></div>
     </div>
 
-
     <div th:replace="base :: footer"></div>
 </body>
+
 </html>

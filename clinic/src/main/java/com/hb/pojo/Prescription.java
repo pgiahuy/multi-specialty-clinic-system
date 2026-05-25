@@ -4,12 +4,9 @@
  */
 package com.hb.pojo;
 
-import com.hb.enums.PrescriptionStatus;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -50,8 +47,9 @@ public class Prescription implements Serializable {
     private Date createdAt;
     @Size(max = 9)
     @Column(name = "status")
-    @Enumerated(EnumType.STRING)
-    private PrescriptionStatus status;
+    private String status;
+    @OneToMany(mappedBy = "prescriptionId")
+    private Collection<PaymentItems> paymentItemsCollection;
     @JoinColumn(name = "medical_record_id", referencedColumnName = "id")
     @OneToOne
     private MedicalRecord medicalRecordId;
@@ -81,12 +79,20 @@ public class Prescription implements Serializable {
         this.createdAt = createdAt;
     }
 
-    public PrescriptionStatus getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(PrescriptionStatus status) {
+    public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Collection<PaymentItems> getPaymentItemsCollection() {
+        return paymentItemsCollection;
+    }
+
+    public void setPaymentItemsCollection(Collection<PaymentItems> paymentItemsCollection) {
+        this.paymentItemsCollection = paymentItemsCollection;
     }
 
     public MedicalRecord getMedicalRecordId() {
