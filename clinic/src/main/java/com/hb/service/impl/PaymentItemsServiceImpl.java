@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -117,6 +118,11 @@ public class PaymentItemsServiceImpl implements PaymentItemsService {
     @Override
     public PaymentItems getPaymentItemByAppointment(Appointment appoint) {
         return this.itemRepo.getItemByAppointment(appoint);
+    }
+
+    @Override
+    public List<PaymentItems> getPaymentItemsByPaymentId(Long paymentId, Map<String, String> params) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
 }

@@ -5,19 +5,28 @@
 package com.hb.controllers.api;
 
 import com.hb.dto.response.MoMoPaymentResponse;
+import com.hb.mapper.PaymentMapper;
+import com.hb.pojo.Patient;
+import com.hb.pojo.Payment;
 import com.hb.pojo.PaymentItems;
+import com.hb.pojo.User;
 import com.hb.repository.PaymentItemRepository;
 import com.hb.service.MomoPaymentService;
 import com.hb.service.PaymentItemsService;
 import com.hb.service.PaymentService;
+import com.hb.service.UserService;
+import java.security.Principal;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,7 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author DELL
  */
 @RestController
-@RequestMapping("/api/payment")
+@RequestMapping("/api/secure")
 public class ApiPaymentController {
 
     @Autowired
@@ -43,8 +52,14 @@ public class ApiPaymentController {
 
     @Autowired
     private PaymentItemRepository itemRepo;
+    
+    @Autowired
+    private UserService userService;
+    
+    @Autowired
+    private PaymentMapper payMapper;
 
-    @PostMapping("/create")
+    @PostMapping("/payments/create")
     public ResponseEntity<?> createPayment(
             @RequestParam("method") String method,
             @RequestParam("itemIds") List<Long> itemIds,
@@ -68,7 +83,7 @@ public class ApiPaymentController {
         };
     }
 
-    @GetMapping("/momo/return")
+    @GetMapping("/payments/momo/return")
     public ResponseEntity<?> momoReturn(@RequestParam Map<String, String> params) throws Exception {
 
         boolean valid = momoService.verifySignature(params);
@@ -93,7 +108,7 @@ public class ApiPaymentController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/momo/ipn")
+    @PostMapping("/payments/momo/ipn")
     public ResponseEntity<?> momoIpn(@RequestBody Map<String, String> params) throws Exception {
 
         boolean valid = momoService.verifySignature(params);
@@ -129,5 +144,30 @@ public class ApiPaymentController {
             result.put("message", "Error: " + e.getMessage());
         }
         return ResponseEntity.ok(result);
+    }
+    
+    @GetMapping("/payments/{patientId}")
+    public ResponseEntity<?> list(Principal principal, @PathVariable(value="patientId") Long patientId,
+                                    @RequestParam Map<String, String> params) {
+        User u = userService.getUserByUsername(principal.getName());
+        if (u == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        
+        Collection<Patient> patients = u.getPatientCollection();
+
+        List<Long> patientIds = patients.stream()
+                .map(Patient::getId)
+                .collect(Collectors.toList());
+        
+        if (!patientIds.contains(patientId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        
+        List<Payment> payments = this.paymentService.getPaymentByPatientId(patientId, params);
+        
+        
+        return ResponseEntity.ok(payments.stream().map(payMapper::toResponse).toList());
+        
     }
 }
