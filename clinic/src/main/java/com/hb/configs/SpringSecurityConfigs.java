@@ -46,6 +46,7 @@ public class SpringSecurityConfigs {
     private UserDetailsService userDetailsService;
 
     @Bean
+    @Lazy
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
