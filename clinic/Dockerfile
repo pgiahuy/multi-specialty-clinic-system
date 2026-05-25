@@ -1,4 +1,5 @@
-FROM tomcat:9.0-jdk17-openjdk-slim
+FROM tomcat:11.0-jdk17-openjdk-slim
+
 RUN rm -rf /usr/local/tomcat/webapps/*
 
 COPY target/*.war /usr/local/tomcat/webapps/clinic.war
