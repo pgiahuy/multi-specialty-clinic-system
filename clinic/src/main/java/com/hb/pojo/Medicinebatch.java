@@ -66,7 +66,7 @@ public class Medicinebatch implements Serializable {
     @ManyToOne
     private Medicine medicineId;
     @OneToMany(mappedBy = "batchId")
-    private Collection<Inventorylog> inventorylogCollection;
+    private Collection<InventoryLog> inventorylogCollection;
 
     public Medicinebatch() {
     }
@@ -130,11 +130,11 @@ public class Medicinebatch implements Serializable {
         this.medicineId = medicineId;
     }
 
-    public Collection<Inventorylog> getInventorylogCollection() {
+    public Collection<InventoryLog> getInventorylogCollection() {
         return inventorylogCollection;
     }
 
-    public void setInventorylogCollection(Collection<Inventorylog> inventorylogCollection) {
+    public void setInventorylogCollection(Collection<InventoryLog> inventorylogCollection) {
         this.inventorylogCollection = inventorylogCollection;
     }
 
