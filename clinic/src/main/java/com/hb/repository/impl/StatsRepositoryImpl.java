@@ -5,6 +5,7 @@
 package com.hb.repository.impl;
 
 import com.hb.repository.StatsRepository;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import org.springframework.stereotype.Repository;
@@ -18,22 +19,22 @@ import org.springframework.stereotype.Repository;
 public class StatsRepositoryImpl implements StatsRepository{
 
     @Override
-    public List<Object[]> countPatientsByGender() {
+    public List<Object[]> countPatientsByGender(LocalDate fromDate, LocalDate toDate) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public List<Object[]> countPatientsByAgeGroup() {
+    public List<Object[]> countPatientsByAgeGroup(LocalDate fromDate, LocalDate toDate) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public List<Object[]> countPatientsBySpecialty() {
+    public List<Object[]> countPatientsBySpecialty(LocalDate fromDate, LocalDate toDate) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public List<Object[]> serviceUsageStats(Date fromDate, Date toDate) {
+    public List<Object[]> serviceUsageStats(LocalDate fromDate, LocalDate toDate) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
@@ -48,7 +49,7 @@ public class StatsRepositoryImpl implements StatsRepository{
     }
 
     @Override
-    public List<Object[]> revenueDetailsStats(Date fromDate, Date toDate) {
+    public List<Object[]> revenueDetailsStats(LocalDate fromDate, LocalDate toDate) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
     

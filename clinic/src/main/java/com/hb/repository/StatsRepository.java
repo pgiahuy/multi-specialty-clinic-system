@@ -4,6 +4,7 @@
  */
 package com.hb.repository;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -13,17 +14,17 @@ import java.util.List;
  */
 public interface StatsRepository {
     
-    List<Object[]> countPatientsByGender();
-    List<Object[]> countPatientsByAgeGroup();
-    List<Object[]> countPatientsBySpecialty();
+    List<Object[]> countPatientsByGender(LocalDate fromDate, LocalDate toDate);
+    List<Object[]> countPatientsByAgeGroup(LocalDate fromDate, LocalDate toDate);
+    List<Object[]> countPatientsBySpecialty(LocalDate fromDate, LocalDate toDate);
 
 
-    List<Object[]> serviceUsageStats(Date fromDate, Date toDate);
+    List<Object[]> serviceUsageStats(LocalDate fromDate, LocalDate toDate);
 
 
     List<Object[]> topDiseasesStats(int limit);
 
 
     List<Object[]> revenueStats(int year);
-    List<Object[]> revenueDetailsStats(Date fromDate, Date toDate);
+    List<Object[]> revenueDetailsStats(LocalDate fromDate, LocalDate toDate);
 }
