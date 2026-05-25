@@ -19,6 +19,8 @@ import MyUserReducers from "./reducers/MyUserReducers";
 import RegisterRecord from "./screens/Patient/RegisterRecord";
 import TestResults from "./screens/Patient/TestResults";
 import TestResultDetail from "./screens/Patient/TestResultDetail";
+import Payment from "./screens/Patient/Payment";
+import PaymentDetail from "./screens/Patient/PaymentDetail";
 
 
 function App() {
@@ -50,7 +52,8 @@ function App() {
             <Route path="/patient/booking" element={<BookingPage />} />
             <Route path="/patient/test-results" element={<TestResults />} />
             <Route path="/patient/test-results/:patientId" element={<TestResultDetail />} />
-
+            <Route path="/patient/payment" element={<Payment />} />
+            <Route path="/patient/payment/:patientId" element={<PaymentDetail />} />
           </Routes>
 
         </Container>

@@ -71,7 +71,7 @@ public class Medicine implements Serializable {
     @OneToMany(mappedBy = "medicineId")
     private Collection<Medicinebatch> medicinebatchCollection;
     @OneToMany(mappedBy = "medicineId")
-    private Collection<Inventorylog> inventorylogCollection;
+    private Collection<InventoryLog> inventorylogCollection;
     @OneToMany(mappedBy = "medicineId")
     private Collection<PrescriptionItem> prescriptionItemCollection;
 
@@ -129,11 +129,11 @@ public class Medicine implements Serializable {
         this.medicinebatchCollection = medicinebatchCollection;
     }
 
-    public Collection<Inventorylog> getInventorylogCollection() {
+    public Collection<InventoryLog> getInventorylogCollection() {
         return inventorylogCollection;
     }
 
-    public void setInventorylogCollection(Collection<Inventorylog> inventorylogCollection) {
+    public void setInventorylogCollection(Collection<InventoryLog> inventorylogCollection) {
         this.inventorylogCollection = inventorylogCollection;
     }
 
