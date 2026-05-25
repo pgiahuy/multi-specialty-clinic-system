@@ -2,11 +2,16 @@ import axios from "axios";
 
 import cookies from 'react-cookies'
 
+const getBaseURL = () => {
+    if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+        return "http://localhost:8080/clinic/api/";
+    }
+    return "https://admin.triplehstorage.site/clinic/api/";
+};
+
 const API = axios.create({
-    baseURL: "http://localhost:8080/clinic/api/"
-})
-
-
+    baseURL: getBaseURL()
+});
 
 
 export const getDoctors = () => API.get("/z");
@@ -31,7 +36,7 @@ export const endpoint = {
 
 export const authApis = () => {
     return axios.create({
-        baseURL: "http://localhost:8080/clinic/api/",
+        baseURL: getBaseURL(),
         headers: {
             'Authorization': `Bearer ${cookies.load("token")}`
         }
