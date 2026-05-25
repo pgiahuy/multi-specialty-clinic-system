@@ -8,9 +8,6 @@ on:
 jobs:
   backend-pipeline:
     runs-on: ubuntu-latest
-
-    if: github.ref == 'refs/heads/main' && contains(github.event.head_commit.modified, 'clinic/')
-
     steps:
       - name: Checkout source code
         uses: actions/checkout@v3
@@ -54,20 +51,14 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           proxy_command: cloudflared access ssh --hostname %h
           script: |
-            echo "1. Kéo Docker Image Backend mới về..."
             docker pull ${{ secrets.DOCKER_USERNAME }}/clinic-backend:latest
-            echo "2. Xóa Container Backend cũ..."
             docker rm -f my-clinic-tomcat || true
-            echo "3. Chạy Container Backend mới..."
             docker run -d --network="host" --name=my-clinic-tomcat --restart=always ${{ secrets.DOCKER_USERNAME }}/clinic-backend:latest
             docker image prune -f
-            echo "BACKEND ĐÃ CẬP NHẬT TỰ ĐỘNG!"
+            echo "BACKEND ĐÃ CẬP NHẬT THÀNH CÔNG!"
 
   frontend-pipeline:
     runs-on: ubuntu-latest
-
-    if: github.ref == 'refs/heads/main' && contains(github.event.head_commit.modified, 'client/')
-
     steps:
       - name: Checkout source code
         uses: actions/checkout@v3
@@ -111,11 +102,8 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           proxy_command: cloudflared access ssh --hostname %h
           script: |
-            echo "1. Kéo Docker Image Frontend mới về..."
             docker pull ${{ secrets.DOCKER_USERNAME }}/clinic-frontend:latest
-            echo "2. Xóa Container Frontend Nginx cũ..."
             docker rm -f my-clinic-frontend || true
-            echo "3. Chạy Container Frontend mới (Chạy cổng 80 hoặc cổng bạn muốn)..."
             docker run -d -p 80:80 --name=my-clinic-frontend --restart=always ${{ secrets.DOCKER_USERNAME }}/clinic-frontend:latest
             docker image prune -f
-            echo "FRONTEND REACT ĐÃ CẬP NHẬT TỰ ĐỘNG!"
+            echo "FRONTEND REACT ĐÃ CẬP NHẬT THÀNH CÔNG!"
