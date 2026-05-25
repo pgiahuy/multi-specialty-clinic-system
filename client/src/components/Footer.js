@@ -2,7 +2,7 @@ import { Alert } from "react-bootstrap"
 
 const Footer = () => {
     return (
-        <footer className="page-footer font-small blue pt-4" style={{ backgroundColor: 'oklch(0.93 0.05 221.06)' }}>
+        <footer className="page-footer font-small blue pt-4 mt-auto" style={{ backgroundColor: 'oklch(0.93 0.05 221.06)' }}>
             <div className="container-fluid text-center text-md-left">
                 <div className="row">
                     <div className="col-md-6 mt-md-0 mt-3">
