@@ -4,6 +4,7 @@
  */
 package com.hb.repository.impl;
 
+import com.hb.pojo.Patient;
 import com.hb.pojo.User;
 import com.hb.repository.UserRepository;
 import java.util.List;
@@ -23,12 +24,11 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Repository
 @Transactional
-public class UserRepositoryImpl extends BaseRepositoryImpl<User> implements UserRepository  {
-
+public class UserRepositoryImpl extends BaseRepositoryImpl<User> implements UserRepository {
 
     @Autowired
     private LocalSessionFactoryBean factory;
-    
+
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
@@ -49,31 +49,51 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<User> implements User
     }
 
     @Override
-    public User getUserByUsername(String username) {
+    public User getUserById(Long id) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<User> q = session.createNamedQuery("User.findByUsername", User.class);
-        q.setParameter("username", username);
-        return q.getSingleResult();
+        User user = session.get(User.class, id);
+        return user;
 
     }
 
     @Override
-    public User addUser(User u) {
+    public User getUserByUsername(String username) {
         Session session = this.factory.getObject().getCurrentSession();
-        session.persist(u);
+        String hql = "SELECT u FROM User u LEFT JOIN FETCH u.patientCollection WHERE u.username = :username";
+        Query<User> query = session.createQuery(hql, User.class);
+        query.setParameter("username", username);
+        return query.getSingleResult();
+
+    }
+
+    @Override
+    public User saveOrUpdate(User u) {
+        Session session = this.factory.getObject().getCurrentSession();
+        if (u.getId() == null) {
+            session.persist(u);
+        } else {
+            session.merge(u);
+        }
         return u;
     }
 
     @Override
     public void deleteUser(Long id) {
         Session session = this.factory.getObject().getCurrentSession();
-
         User u = session.get(User.class, id);
 
         if (u != null) {
+            if (u.getPatientCollection() != null) {
+                for (Patient p : u.getPatientCollection()) {
+                    p.setUserId(null);
+                }
+            }
+            
+            if (u.getDoctor() != null) {
+                u.getDoctor().setUserId(null);
+            }
+
             session.remove(u);
-        } else {
-            throw new RuntimeException("User not found!");
         }
     }
 
@@ -91,4 +111,23 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<User> implements User
         q.setParameter("email", email);
         return q.getSingleResult();
     }
+
+    @Override
+    public User existsByUsername(String username) {
+        Session session = this.factory.getObject().getCurrentSession();
+        Query<User> q = session.createNamedQuery("User.findByUsername", User.class);
+        q.setParameter("username", username);
+
+        return q.uniqueResultOptional().orElse(null);
+    }
+
+    @Override
+    public User existsByEmail(String email) {
+        Session session = this.factory.getObject().getCurrentSession();
+        Query<User> q = session.createNamedQuery("User.findByEmail", User.class);
+        q.setParameter("email", email);
+
+        return q.uniqueResultOptional().orElse(null);
+    }
+
 }

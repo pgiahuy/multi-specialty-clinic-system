@@ -19,7 +19,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 public interface UserService extends UserDetailsService {
     User getUserByUsername(String username);
     User getUserByEmail(String email);
-    User addUser(UserCreateRequest urq);
+    User saveOrUpdateUser(UserCreateRequest urq);
     List<User> getUsers(Map<String,String> params);
     void deleteUser(Long id);
     User processSocialLogin(String email, String name, String providerId, String providerName);

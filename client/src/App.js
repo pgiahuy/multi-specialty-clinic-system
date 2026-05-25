@@ -13,35 +13,50 @@ import PatientProfile from "./screens/Patient/PatientProfile";
 import Prescriptions from "./screens/Patient/Prescriptions";
 import AllNotifications from "./screens/User/AllNotifications";
 import BookingPage from "./screens/Patient/Booking";
+import { MyUserContext } from "./configs/Contexts";
+import { useReducer } from "react";
+import MyUserReducers from "./reducers/MyUserReducers";
+import RegisterRecord from "./screens/Patient/RegisterRecord";
+import TestResults from "./screens/Patient/TestResults";
+import TestResultDetail from "./screens/Patient/TestResultDetail";
+
 
 function App() {
+  const [user, dispatch] = useReducer(MyUserReducers, null);
   return (
-    <BrowserRouter>
-      <Container fluid className="m-0 p-0">
-        <Routes>
-          <Route path="/" element={
-            <>
-              <Header />
+    <MyUserContext.Provider value={[user, dispatch]}>
+      <BrowserRouter>
+        <Container fluid className="m-0 p-0">
+          <Routes>
+            <Route path="/" element={
+              <>
+                <Header />
 
-              <Container>
-                <Home />
-              </Container>
+                <Container>
+                  <Home />
+                </Container>
 
-              <Footer />
-            </>
-          } />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
-          <Route path="/patient/dashboard" element={<PatientDashboard />} />
-          <Route path="/patient/notifications" element={<AllNotifications />} />
-          <Route path="/patient/prescriptions" element={<Prescriptions />} />
-          <Route path="/patient/profiles" element={<PatientProfile />} />
-          <Route path="/patient/booking" element={<BookingPage />} />
-        </Routes>
+                <Footer />
+              </>
+            } />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
+            <Route path="/patient/dashboard" element={<PatientDashboard />} />
+            <Route path="/patient/notifications" element={<AllNotifications />} />
+            <Route path="/patient/prescriptions" element={<Prescriptions />} />
+            <Route path="/patient/profiles" element={<PatientProfile />} />
+            <Route path="/patient/register-record" element={<RegisterRecord />} />
+            <Route path="/patient/booking" element={<BookingPage />} />
+            <Route path="/patient/test-results" element={<TestResults />} />
+            <Route path="/patient/test-results/:patientId" element={<TestResultDetail />} />
 
-      </Container>
-    </BrowserRouter>
+          </Routes>
+
+        </Container>
+      </BrowserRouter>
+    </MyUserContext.Provider>
+
   );
 }
 

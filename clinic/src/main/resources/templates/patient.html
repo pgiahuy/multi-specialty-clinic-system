@@ -8,7 +8,29 @@
 
     <th:block th:replace="base :: css"></th:block>
     <th:block th:replace="base :: js"></th:block>
-    <script th:src="@{/js/patient.js}"></script>
+    <script th:src="@{/js/admin-forms.js}"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        initAdminForm('userForm', {
+            toggleBtnId: 'toggleUserFormBtn',
+            submitBtnId: 'submitFormBtn',
+            passwordGroupId: 'passwordGroup',
+            idField: 'userId',
+            fields: ['username','email','password','avatar'],
+            tableFieldMap: {'username':'name-','email':'email-'},
+            open: /*[[${openForm}]]*/ false,
+            serverData: /*[[${user}]]*/ {}
+        });
+
+        function toggleUserForm() {
+            var f = document.getElementById('userForm');
+            if (!f) return;
+            if (f.classList.contains('d-none')) openForCreate_userForm(); else resetAndClose_userForm();
+        }
+
+        function resetAndCloseForm() { resetAndClose_userForm(); }
+        /*]]>*/
+    </script>
 </head>
 
 <body>
@@ -18,32 +40,65 @@
     <div th:replace="base :: sidebar"></div>
 
     <div class="content">
-
-
-<!--        <form method="post" th:action="@{/admin/doctors}" enctype="multipart/form-data">
-
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" name="username" class="form-control" id="username">
+        
+         <th:block th:with="hasError=${errorMsg}, hasSuccess=${successMsg}">
+            <div th:if="${hasError}" class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                <span th:text="${errorMsg}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
 
-            <div class="form-group">
-                <label for="email">Email address:</label>
-                <input type="email" name="email" class="form-control" id="email">
+            <div th:if="${hasSuccess}" class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+                <i class="bi bi-check-circle me-2"></i>
+                <span th:text="${successMsg}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </th:block>
+        
+<!--        <div class="d-flex justify-content-end mb-3">
+            <button type="button" id="toggleUserFormBtn" class="btn btn-success" onclick="toggleUserForm()">
+                <i class="bi bi-plus-circle me-2"></i>Thêm bệnh nhân
+            </button>
+        </div>
+
+        <form id="userForm" th:class="${openForm} ? 'card p-4 mb-4' : 'card p-4 mb-4 d-none'" method="post"
+              th:object="${user}" th:action="@{/admin/users}" enctype="multipart/form-data">
+            <h4 id="formTitle" class="mb-3 text-uppercase fw-bold text-primary">Tạo tài khoản mới</h4>
+
+            <input type="hidden" th:field="*{id}" id="userId" />
+
+            <div class="mb-3">
+                <label for="username" class="form-label fw-bold">Tên đăng nhập:</label>
+                <input type="text" th:field="*{username}" class="form-control" id="username"
+                       placeholder="Nhập tên đăng nhập..." required />
             </div>
 
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" name="password" class="form-control" id="password">
+            <div class="mb-3">
+                <label for="email" class="form-label fw-bold">Email:</label>
+                <input type="email" th:field="*{email}" class="form-control" id="email" placeholder="example@gmail.com"
+                       required />
             </div>
 
-            <div class="form-group">
-                <label for="avatar">Avatar</label>
-                <input type="file" name="avatar" class="form-control mb-2">
+            <div class="mb-3" id="passwordGroup">
+                <label for="password" class="form-label fw-bold">Mật khẩu:</label>
+                <input type="password" th:field="*{password}" class="form-control" id="password" placeholder="********"
+                       required />
             </div>
 
-            <button type="submit" class="btn btn-primary mb-3">Submit</button>
+            <div class="mb-4">
+                <label for="avatarFile" class="form-label fw-bold">Ảnh đại diện:</label>
+                <input type="file" name="avatar" class="form-control" id="avatar" accept="image/*" />
+                <div class="form-text">Định dạng hỗ trợ: JPG, PNG, GIF. (Để trống nếu giữ nguyên ảnh cũ)</div>
+            </div>
+
+            <div class="d-flex gap-2 justify-content-end">
+                <button type="button" class="btn btn-secondary" onclick="resetAndCloseForm()">Hủy</button>
+                <button type="submit" id="submitFormBtn" class="btn btn-primary">
+                    <i class="bi bi-person-plus-fill me-2"></i>Tạo tài khoản
+                </button>
+            </div>
         </form>-->
+
 
 
 

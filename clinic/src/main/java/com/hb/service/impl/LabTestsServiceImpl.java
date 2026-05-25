@@ -43,7 +43,7 @@ public class LabTestsServiceImpl implements LabTestService {
         LabTests t = new LabTests();
         String id = params.get("id");
         if (id != null && !id.isEmpty()) {
-            t.setId(Integer.parseInt(id));
+            t.setId(Long.parseLong(id));
         }
 
         t.setTestName(params.get("test_name"));
@@ -57,7 +57,5 @@ public class LabTestsServiceImpl implements LabTestService {
     public long countLabTests(Map<String, String> params) {
         return labTestRepo.count(params, LabTests.class);
     }
-
-  
 
 }

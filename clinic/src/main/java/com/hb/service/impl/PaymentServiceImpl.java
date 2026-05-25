@@ -4,8 +4,8 @@
  */
 package com.hb.service.impl;
 
-import com.hb.enums.PaymentMethod;
 import com.hb.enums.PaymentStatus;
+import com.hb.pojo.Appointment;
 import com.hb.pojo.Patient;
 import com.hb.pojo.Payment;
 import com.hb.pojo.PaymentItems;
@@ -14,9 +14,8 @@ import com.hb.repository.PaymentRepository;
 import com.hb.service.PaymentItemsService;
 import com.hb.service.PaymentService;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -55,89 +54,73 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public Payment createPayment(Long patientId, Long appId, List<Long> testIds, Long presId) {
+    public Payment createPayment(Long patientId) {
         Payment p = new Payment();
+
         p.setPatientId(new Patient(patientId));
         p.setStatus(PaymentStatus.PENDING);
-        p.setCreatedAt(new Date());
-        paymentRepo.addOrUpdatePayment(p);
-
-        if (appId != null) {
-            itemService.addAppointmentItem(p, appId);
-        }
-
-        if (testIds != null) {
-            itemService.addLabTestItems(p, testIds);
-        }
-
-        if (presId != null) {
-            itemService.addPrescriptionItem(p, presId);
-        }
-
-        List<PaymentItems> items = itemRepo.getItemsByPaymentId(p.getId());
-        BigDecimal finalTotal = items.stream()
-                .map(PaymentItems::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        p.setTotalAmount(finalTotal);
+        p.setCreatedAt(LocalDateTime.now());
         paymentRepo.addOrUpdatePayment(p);
 
         return p;
     }
 
     @Override
-    public void updateStatus(Long paymentId, PaymentStatus status) {
+    public void updateStatusPayment(Long paymentId) {
+
         Payment p = paymentRepo.getPaymentById(paymentId);
         if (p != null) {
-            p.setStatus(status);
-            paymentRepo.addOrUpdatePayment(p);
+
+            List<PaymentItems> allItems = itemRepo.getItemsByPaymentId(paymentId);
+            boolean isAllPaid = allItems.stream()
+                    .allMatch(item -> PaymentStatus.SUCCESS.equals(item.getStatus()));
+
+            if (isAllPaid) {
+                p = paymentRepo.getPaymentById(paymentId);
+                p.setStatus(PaymentStatus.SUCCESS);
+                paymentRepo.addOrUpdatePayment(p);
+            }
         }
     }
 
-//    @Override
-//    public void confirmPaymentSuccess(Long paymentId, String transId) {
-//        Payment p = paymentRepo.getPaymentById(paymentId);
-//        if (p != null) {
-//            p.setStatus(PaymentStatus.SUCCESS.name());
-//            p.setMethod(PaymentMethod.MOMO);
-//
-//        List<PaymentItems> allItems = itemRepo.getItemsByPaymentId(paymentId);
-//        boolean isAllPaid = allItems.stream()
-//                .allMatch(item -> PaymentStatus.SUCCESS.equals(item.getStatus()));
-//
-//        if (isAllPaid) {
-//            Payment p = paymentRepo.getPaymentById(paymentId);
-//            p.setStatus(PaymentStatus.SUCCESS);
-//            paymentRepo.addOrUpdatePayment(p);
-//        }
-//    }
-//
-//    @Override
-//    public Long calculateTotalFee(List<Long> itemIds) {
-//        
-//        long total = 0L;
-//
-//        for (Long itemId : itemIds) {
-//            PaymentItems item = itemRepo.getItemById(itemId);
-//
-//            
-//            if (item != null && item.getAmount() != null) {
-//                
-//                total += item.getAmount().longValue();
-//            }
-//        }
-//
-//        return total;
-//    }
-
     @Override
     public Long calculateTotalFee(List<Long> itemIds) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+
+        long total = 0L;
+
+        for (Long itemId : itemIds) {
+            PaymentItems item = itemRepo.getItemById(itemId);
+
+            if (item != null && item.getAmount() != null) {
+
+                total += item.getAmount().longValue();
+            }
+        }
+
+        return total;
     }
 
     @Override
-    public void confirmPaymentSuccess(Long paymentId, String transId, String method, List<Long> itemIds) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public Payment getPaymentByAppoint(Appointment appoint) {
+        PaymentItems item = itemService.getPaymentItemByAppointment(appoint);
+        return this.paymentRepo.getPaymentById(item.getPaymentId().getId());
+    }
+
+    @Override
+    public void updatePaymentTotalAmount(Payment payment) {
+        List<PaymentItems> items = itemRepo.getItemsByPayment(payment);
+
+        BigDecimal total = BigDecimal.ZERO;
+        if (items != null && !items.isEmpty()) {
+            for (PaymentItems item : items) {
+                if (item.getAmount() != null) {
+                    total = total.add(item.getAmount());
+                }
+            }
+        }
+
+        payment.setTotalAmount(total);
+        paymentRepo.addOrUpdatePayment(payment);
     }
 
 }

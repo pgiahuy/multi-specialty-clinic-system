@@ -15,8 +15,11 @@ import java.util.Map;
 public interface UserRepository extends BaseRepository<User>{
     List<User> getUsers(Map<String, String> params);
     User getUserByUsername(String username);
+    User getUserById(Long id);
     User getUserByEmail(String email);
-    User addUser(User u);
+    User saveOrUpdate(User u);
     void deleteUser(Long id);
     boolean authenticate(String username, String password);
+    User existsByUsername(String username);
+    User existsByEmail(String email);
 }

@@ -4,6 +4,8 @@
  */
 package com.hb.pojo;
 
+import com.hb.enums.PaymentItemType;
+
 import com.hb.enums.PaymentMethod;
 import com.hb.enums.PaymentStatus;
 import jakarta.persistence.Basic;
@@ -25,7 +27,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  *
@@ -53,7 +55,8 @@ public class PaymentItems implements Serializable {
     private Long id;
     @Size(max = 12)
     @Column(name = "item_type")
-    private String itemType;
+    @Enumerated(EnumType.STRING)
+    private PaymentItemType itemType;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Basic(optional = false)
     @NotNull
@@ -61,7 +64,7 @@ public class PaymentItems implements Serializable {
     private BigDecimal amount;
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt;
+    private LocalDateTime createdAt;
     @Size(max = 7)
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
@@ -72,7 +75,7 @@ public class PaymentItems implements Serializable {
     private PaymentMethod method;
     @Column(name = "paid_at")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date paidAt;
+    private LocalDateTime paidAt;
     @Size(max = 100)
     @Column(name = "trans_id")
     private String transId;
@@ -109,11 +112,11 @@ public class PaymentItems implements Serializable {
         this.id = id;
     }
 
-    public String getItemType() {
+    public PaymentItemType getItemType() {
         return itemType;
     }
 
-    public void setItemType(String itemType) {
+    public void setItemType(PaymentItemType itemType) {
         this.itemType = itemType;
     }
 
@@ -125,11 +128,11 @@ public class PaymentItems implements Serializable {
         this.amount = amount;
     }
 
-    public Date getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
@@ -149,11 +152,11 @@ public class PaymentItems implements Serializable {
         this.method = method;
     }
 
-    public Date getPaidAt() {
+    public LocalDateTime getPaidAt() {
         return paidAt;
     }
 
-    public void setPaidAt(Date paidAt) {
+    public void setPaidAt(LocalDateTime paidAt) {
         this.paidAt = paidAt;
     }
 

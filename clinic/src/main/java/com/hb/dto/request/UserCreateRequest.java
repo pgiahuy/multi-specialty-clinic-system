@@ -11,15 +11,18 @@ import org.springframework.web.multipart.MultipartFile;
  * @author DELL
  */
 public class UserCreateRequest {
+    private Long id;
     private String username;
     private String password;
     private String email;
     private MultipartFile avatar;
     
     public UserCreateRequest() {
+        
     }
-    
-    public UserCreateRequest(String username, String password, String email, MultipartFile avatar) {
+
+    public UserCreateRequest(Long id, String username, String password, String email, MultipartFile avatar) {
+        this.id = id;
         this.username = username;
         this.password = password;
         this.email = email;
@@ -81,6 +84,20 @@ public class UserCreateRequest {
      */
     public void setAvatar(MultipartFile avatar) {
         this.avatar = avatar;
+    }
+
+    /**
+     * @return the id
+     */
+    public Long getId() {
+        return id;
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(Long id) {
+        this.id = id;
     }
     
 }

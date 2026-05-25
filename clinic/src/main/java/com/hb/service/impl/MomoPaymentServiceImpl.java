@@ -39,7 +39,7 @@ public class MomoPaymentServiceImpl implements MomoPaymentService {
             extraData = "";
         }
         
-        String uniqueOrderId = orderId + "_" + System.currentTimeMillis();
+        String uniqueOrderId = orderId;
         String requestId = momoConfig.getPartnerCode() + System.currentTimeMillis();
          String rawSignature = "accessKey=" + momoConfig.getAccessKey()
                 + "&amount=" + amount

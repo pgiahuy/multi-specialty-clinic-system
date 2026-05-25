@@ -35,14 +35,8 @@ import java.util.Date;
     @NamedQuery(name = "Schedules.findById", query = "SELECT s FROM Schedules s WHERE s.id = :id"),
     @NamedQuery(name = "Schedules.findByDate", query = "SELECT s FROM Schedules s WHERE s.date = :date"),
     @NamedQuery(name = "Schedules.findByMaxPatients", query = "SELECT s FROM Schedules s WHERE s.maxPatients = :maxPatients"),
-    @NamedQuery(name = "Schedules.findByCurrentPatients", query = "SELECT s FROM Schedules s WHERE s.currentPatients = :currentPatients"),
-    })
-    
+    @NamedQuery(name = "Schedules.findByCurrentPatients", query = "SELECT s FROM Schedules s WHERE s.currentPatients = :currentPatients")})
 public class Schedules implements Serializable {
-
-    @Column(name = "date")
-    @Temporal(TemporalType.DATE)
-    private LocalDate date;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -50,6 +44,9 @@ public class Schedules implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
+    @Column(name = "date")
+    @Temporal(TemporalType.DATE)
+    private LocalDate date;
     @Column(name = "max_patients")
     private Integer maxPatients;
     @Column(name = "current_patients")
@@ -72,23 +69,6 @@ public class Schedules implements Serializable {
     public Schedules() {
     }
 
-    public Schedules(Long id, LocalDate date, Integer maxPatients, Integer currentPatients, Collection<Appointment> appointmentCollection, Doctor doctorId, Rooms roomId, Shifts shiftId, Specialty specialtyId) {
-        this.id = id;
-        this.date = date;
-        this.maxPatients = maxPatients;
-        this.currentPatients = currentPatients;
-        this.appointmentCollection = appointmentCollection;
-        this.doctorId = doctorId;
-        this.roomId = roomId;
-        this.shiftId = shiftId;
-        this.specialtyId = specialtyId;
-    }
-    
-    
-    
-    
-    
-
     public Schedules(Long id) {
         this.id = id;
     }
@@ -101,6 +81,13 @@ public class Schedules implements Serializable {
         this.id = id;
     }
 
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
 
     public Integer getMaxPatients() {
         return maxPatients;
@@ -182,20 +169,5 @@ public class Schedules implements Serializable {
     public String toString() {
         return "com.hb.pojo.Schedules[ id=" + id + " ]";
     }
-
-    /**
-     * @return the date
-     */
-    public LocalDate getDate() {
-        return date;
-    }
-
-    /**
-     * @param date the date to set
-     */
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
-
+    
 }
