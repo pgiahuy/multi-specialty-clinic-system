@@ -5,6 +5,7 @@
 package com.hb.controllers;
 
 import com.hb.dto.request.UserCreateRequest;
+import com.hb.pojo.User;
 import com.hb.service.UserService;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
  *
@@ -29,7 +31,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/admin")
 @PropertySource("classpath:configs.properties")
 public class UserController {
-    
+
     @Autowired
     private Environment env;
 
@@ -41,8 +43,11 @@ public class UserController {
         int page = params.containsKey("page") ? Integer.parseInt(params.get("page")) : 1;
         int pageSize = this.env.getProperty("admin.page_size", Integer.class);
         params.put("pageSize", String.valueOf(pageSize));
-        
+
         model.addAttribute("users", userService.getUsers(params));
+        if (!model.containsAttribute("user")) {
+            model.addAttribute("user", new UserCreateRequest());
+        }
 
         long totalUsers = userService.countUsers(params);
         int totalPages = (int) Math.ceil((double) totalUsers / pageSize);
@@ -54,17 +59,24 @@ public class UserController {
     }
 
     @PostMapping("/users")
-    public String create(@ModelAttribute UserCreateRequest urq) {
-
-        userService.addUser(urq);
+    public String create(@ModelAttribute("user") UserCreateRequest urq, RedirectAttributes redirectAttributes) {
+        try {
+            userService.saveOrUpdateUser(urq);
+            redirectAttributes.addFlashAttribute("successMsg", "Thao tác dữ liệu thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
+            redirectAttributes.addFlashAttribute("user", urq);
+            redirectAttributes.addFlashAttribute("openForm", true);
+        }
 
         return "redirect:/admin/users";
     }
 
     @DeleteMapping("/users/{id}")
-    public String delete(@PathVariable("id") Long id) {
+    public void delete(@PathVariable("id") Long id) {
+        System.out.println("Controller xoa thanh congggggggggggggg 1");
         userService.deleteUser(id);
-        return "redirect:/admin/users";
+        System.out.println("Controller xoa thanh congggggggggggggg 2");
     }
 
 }

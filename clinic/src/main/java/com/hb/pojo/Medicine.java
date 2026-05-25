@@ -14,14 +14,11 @@ import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Collection;
-import java.util.Date;
 
 /**
  *
@@ -32,34 +29,36 @@ import java.util.Date;
 @NamedQueries({
     @NamedQuery(name = "Medicine.findAll", query = "SELECT m FROM Medicine m"),
     @NamedQuery(name = "Medicine.findById", query = "SELECT m FROM Medicine m WHERE m.id = :id"),
+    @NamedQuery(name = "Medicine.findByCode", query = "SELECT m FROM Medicine m WHERE m.code = :code"),
     @NamedQuery(name = "Medicine.findByName", query = "SELECT m FROM Medicine m WHERE m.name = :name"),
-    @NamedQuery(name = "Medicine.findByStock", query = "SELECT m FROM Medicine m WHERE m.stock = :stock"),
-    @NamedQuery(name = "Medicine.findByExpirationDate", query = "SELECT m FROM Medicine m WHERE m.expirationDate = :expirationDate"),
+    @NamedQuery(name = "Medicine.findByPrice", query = "SELECT m FROM Medicine m WHERE m.price = :price"),
     @NamedQuery(name = "Medicine.findBySecureUrl", query = "SELECT m FROM Medicine m WHERE m.secureUrl = :secureUrl"),
     @NamedQuery(name = "Medicine.findByPublicId", query = "SELECT m FROM Medicine m WHERE m.publicId = :publicId"),
-    @NamedQuery(name = "Medicine.findByCode", query = "SELECT m FROM Medicine m WHERE m.code = :code"),
-    @NamedQuery(name = "Medicine.findByPrice", query = "SELECT m FROM Medicine m WHERE m.price = :price")})
+    @NamedQuery(name = "Medicine.findByMinStockAlert", query = "SELECT m FROM Medicine m WHERE m.minStockAlert = :minStockAlert")})
 public class Medicine implements Serializable {
 
-    @Size(max = 100)
-    @Column(name = "name")
-    private String name;
-    @Size(max = 255)
-    @Column(name = "secure_url")
-    private String secureUrl;
-    @Size(max = 255)
-    @Column(name = "public_id")
-    private String publicId;
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 45)
+    @Size(max = 50)
     @Column(name = "code")
     private String code;
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 255)
+    @Column(name = "name")
+    private String name;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Basic(optional = false)
     @NotNull
     @Column(name = "price")
     private BigDecimal price;
+    @Size(max = 500)
+    @Column(name = "secure_url")
+    private String secureUrl;
+    @Size(max = 255)
+    @Column(name = "public_id")
+    private String publicId;
+    @Size(max = 50)
+    @Column(name = "unit")
+    private String unit;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -67,13 +66,12 @@ public class Medicine implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
-    @Column(name = "stock")
-    private Integer stock;
-    @Column(name = "expiration_date")
-    @Temporal(TemporalType.DATE)
-    private Date expirationDate;
+    @Column(name = "min_stock_alert")
+    private Integer minStockAlert;
     @OneToMany(mappedBy = "medicineId")
-    private Collection<InventoryLog> inventoryLogCollection;
+    private Collection<Medicinebatch> medicinebatchCollection;
+    @OneToMany(mappedBy = "medicineId")
+    private Collection<Inventorylog> inventorylogCollection;
     @OneToMany(mappedBy = "medicineId")
     private Collection<PrescriptionItem> prescriptionItemCollection;
 
@@ -84,9 +82,9 @@ public class Medicine implements Serializable {
         this.id = id;
     }
 
-    public Medicine(Long id, String code, BigDecimal price) {
+    public Medicine(Long id, String name, BigDecimal price) {
         this.id = id;
-        this.code = code;
+        this.name = name;
         this.price = price;
     }
 
@@ -98,22 +96,6 @@ public class Medicine implements Serializable {
         this.id = id;
     }
 
-
-    public Integer getStock() {
-        return stock;
-    }
-
-    public void setStock(Integer stock) {
-        this.stock = stock;
-    }
-
-    public Date getExpirationDate() {
-        return expirationDate;
-    }
-
-    public void setExpirationDate(Date expirationDate) {
-        this.expirationDate = expirationDate;
-    }
 
     public String getSecureUrl() {
         return secureUrl;
@@ -131,13 +113,28 @@ public class Medicine implements Serializable {
         this.publicId = publicId;
     }
 
-
-    public Collection<InventoryLog> getInventoryLogCollection() {
-        return inventoryLogCollection;
+    public Integer getMinStockAlert() {
+        return minStockAlert;
     }
 
-    public void setInventoryLogCollection(Collection<InventoryLog> inventoryLogCollection) {
-        this.inventoryLogCollection = inventoryLogCollection;
+    public void setMinStockAlert(Integer minStockAlert) {
+        this.minStockAlert = minStockAlert;
+    }
+
+    public Collection<Medicinebatch> getMedicinebatchCollection() {
+        return medicinebatchCollection;
+    }
+
+    public void setMedicinebatchCollection(Collection<Medicinebatch> medicinebatchCollection) {
+        this.medicinebatchCollection = medicinebatchCollection;
+    }
+
+    public Collection<Inventorylog> getInventorylogCollection() {
+        return inventorylogCollection;
+    }
+
+    public void setInventorylogCollection(Collection<Inventorylog> inventorylogCollection) {
+        this.inventorylogCollection = inventorylogCollection;
     }
 
     public Collection<PrescriptionItem> getPrescriptionItemCollection() {
@@ -173,15 +170,6 @@ public class Medicine implements Serializable {
         return "com.hb.pojo.Medicine[ id=" + id + " ]";
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-
     public String getCode() {
         return code;
     }
@@ -190,12 +178,29 @@ public class Medicine implements Serializable {
         this.code = code;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public BigDecimal getPrice() {
         return price;
     }
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
     }
     
 }

@@ -4,6 +4,7 @@
  */
 package com.hb.repository.impl;
 
+import com.hb.pojo.Patient;
 import com.hb.pojo.User;
 import com.hb.repository.UserRepository;
 import java.util.List;
@@ -48,6 +49,14 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<User> implements User
     }
 
     @Override
+    public User getUserById(Long id) {
+        Session session = this.factory.getObject().getCurrentSession();
+        User user = session.get(User.class, id);
+        return user;
+
+    }
+
+    @Override
     public User getUserByUsername(String username) {
         Session session = this.factory.getObject().getCurrentSession();
         String hql = "SELECT u FROM User u LEFT JOIN FETCH u.patientCollection WHERE u.username = :username";
@@ -58,23 +67,33 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<User> implements User
     }
 
     @Override
-    public User addUser(User u) {
+    public User saveOrUpdate(User u) {
         Session session = this.factory.getObject().getCurrentSession();
-        session.persist(u);
-        session.flush();
+        if (u.getId() == null) {
+            session.persist(u);
+        } else {
+            session.merge(u);
+        }
         return u;
     }
 
     @Override
     public void deleteUser(Long id) {
         Session session = this.factory.getObject().getCurrentSession();
-
         User u = session.get(User.class, id);
 
         if (u != null) {
+            if (u.getPatientCollection() != null) {
+                for (Patient p : u.getPatientCollection()) {
+                    p.setUserId(null);
+                }
+            }
+            
+            if (u.getDoctor() != null) {
+                u.getDoctor().setUserId(null);
+            }
+
             session.remove(u);
-        } else {
-            throw new RuntimeException("User not found!");
         }
     }
 
@@ -110,4 +129,5 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<User> implements User
 
         return q.uniqueResultOptional().orElse(null);
     }
+
 }

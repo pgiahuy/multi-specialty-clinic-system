@@ -6,6 +6,7 @@ package com.hb.service.impl;
 
 import com.hb.dto.request.UserCreateRequest;
 import com.hb.exception.DuplicateResourceException;
+import com.hb.exception.ResourceNotFoundException;
 import com.hb.pojo.Patient;
 import com.hb.pojo.User;
 import com.hb.repository.PatientRepository;
@@ -21,6 +22,8 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -33,7 +36,11 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
+@PropertySource("classpath:configs.properties")
 public class UserServiceImpl implements UserService {
+    
+    @Autowired
+    private Environment env;
 
     @Autowired
     private UserRepository userRepo;
@@ -43,41 +50,81 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
-    
+
     @Autowired
     private PatientService patientService;
+
     @Override
     public User getUserByUsername(String username) {
         return userRepo.getUserByUsername(username);
     }
 
     @Override
-    public User addUser(UserCreateRequest urq) {
-        User checkUser = userRepo.existsByUsername(urq.getUsername());
-        if (checkUser != null) {
-            throw new DuplicateResourceException("Tên tài khoản đã tồn tại!");
-        }
+    public User saveOrUpdateUser(UserCreateRequest urq) {
+        User u;
 
-        User checkEmail = userRepo.existsByEmail(urq.getEmail());
-        if (checkEmail != null) {
-            throw new DuplicateResourceException("Email này đã được sử dụng!");
+        if (urq.getId() != null) {
+            u = userRepo.getUserById(urq.getId());
+            if (u == null) {
+                throw new ResourceNotFoundException("Không tìm thấy người dùng với ID: " + urq.getId());
+            }
+
+            if (!u.getUsername().equals(urq.getUsername())) {
+                User checkUser = userRepo.existsByUsername(urq.getUsername());
+                if (checkUser != null) {
+                    throw new DuplicateResourceException("Tên tài khoản đã tồn tại!");
+                }
+                u.setUsername(urq.getUsername());
+            }
+
+            if (!u.getEmail().equals(urq.getEmail())) {
+                User checkEmail = userRepo.existsByEmail(urq.getEmail());
+                if (checkEmail != null) {
+                    throw new DuplicateResourceException("Email này đã được sử dụng!");
+                }
+                u.setEmail(urq.getEmail());
+            }
+
+            if (urq.getPassword() != null && !urq.getPassword().trim().isEmpty()) {
+                u.setPassword(passwordEncoder.encode(urq.getPassword()));
+            }
+
+
         } else {
-            User u = new User();
-            u.setEmail(urq.getEmail());
+            User checkUser = userRepo.existsByUsername(urq.getUsername());
+            if (checkUser != null) {
+                throw new DuplicateResourceException("Tên tài khoản đã tồn tại!");
+            }
+
+            User checkEmail = userRepo.existsByEmail(urq.getEmail());
+            if (checkEmail != null) {
+                throw new DuplicateResourceException("Email này đã được sử dụng!");
+            }
+
+            u = new User();
             u.setUsername(urq.getUsername());
+            u.setEmail(urq.getEmail());
             u.setPassword(passwordEncoder.encode(urq.getPassword()));
             u.setRole("ROLE_PATIENT");
             u.setCreatedAt(LocalDateTime.now());
-
-            if (!urq.getAvatar().isEmpty()) {
-                Map res = this.cloudinaryService.uploadFile(urq.getAvatar(), "avatar");
-
-                u.setSecureUrl(res.get("secureUrl").toString());
-                u.setPublicId(res.get("publicId").toString());
-            }
-            
-            return this.userRepo.addUser(u);
         }
+
+
+        if (urq.getAvatar() != null && !urq.getAvatar().isEmpty()) {
+
+            if (u.getPublicId()!= null) { 
+                this.cloudinaryService.deleteFile(u.getPublicId()); 
+            }
+            Map res = this.cloudinaryService.uploadFile(urq.getAvatar(), "avatar");
+            u.setSecureUrl(res.get("secureUrl").toString());
+            u.setPublicId(res.get("publicId").toString());
+        }
+        else{
+            String url = this.env.getProperty("avatar.default", String.class);
+            u.setSecureUrl(url);
+        }
+
+        return this.userRepo.saveOrUpdate(u);
     }
 
     @Override
@@ -101,9 +148,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUser(Long id
-    ) {
+    public void deleteUser(Long id) {
+//        User u = userRepo.getUserById(id);
+//        if (u == null) {
+//            throw new ResourceNotFoundException("User not found!");
+//        }
+//        if (u.getPublicId()!= null) { 
+//                this.cloudinaryService.deleteFile(u.getPublicId()); 
+//        }
         this.userRepo.deleteUser(id);
+        System.out.println("Xoa thanh congggggggggggggggggggggggggggg");
     }
 
     @Override
