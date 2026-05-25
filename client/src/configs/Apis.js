@@ -21,7 +21,9 @@ export const endpoint = {
     'schedules': '/secure/schedules',
     'notifications': '/secure/users/notifications',
     'current-user': '/secure/users/profile',
+    'appointments': '/secure/appointments',
     'test-results': (patientId) => `/secure/test/${patientId}`,
+    'patient-profile': (patientId) => `/secure/profile/${patientId}`,
 };
 
 export const authApis = () => {
