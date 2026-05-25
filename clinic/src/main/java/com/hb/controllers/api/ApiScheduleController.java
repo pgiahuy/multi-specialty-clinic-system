@@ -66,7 +66,7 @@ public class ApiScheduleController {
         return ResponseEntity.ok(s.stream().map(scheduleMapper::toResponse).toList());
     }
 
-    @PostMapping("secure/schedules")
+    @PostMapping("/secure/schedules")
     public ResponseEntity<ScheduleRepsonse> register(Principal principal, @RequestBody ScheduleCreateRequest req) {
         User u = this.userService.getUserByUsername(principal.getName());
         if (u.getDoctor() == null) {

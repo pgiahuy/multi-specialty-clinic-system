@@ -7,13 +7,14 @@ package com.hb.service;
 import com.hb.pojo.Appointment;
 import com.hb.pojo.Payment;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
  * @author HUY
  */
 public interface PaymentService {
-//    List<Payment> getPayments(Map<String, String> params);
+    List<Payment> getPayments(Map<String, String> params);
 //    List<Payment> getPaymentsByUserName(Map<String, String> params);
 
     Payment getPaymentById(Long id);
@@ -31,4 +32,6 @@ public interface PaymentService {
     void updateStatusPayment(Long paymentId);
 
     void updatePaymentTotalAmount(Payment payment);
+    
+    List<Payment> getPaymentByPatientId(Long patientId, Map<String, String> params);
 }
