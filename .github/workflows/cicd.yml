@@ -67,24 +67,25 @@ jobs:
             echo "1. Kiểm tra và khởi chạy Container MySQL..."
             if [ ! "$(docker ps -q -f name=clinic-mysql)" ]; then
                 if [ "$(docker ps -aq -f name=clinic-mysql)" ]; then
-                    docker rm clinic-mysql
+                    docker rm -f clinic-mysql
                 fi
                 docker run -d \
                   --network="host" \
                   --name=clinic-mysql \
                   --restart=always \
                   -v /home/giahuy/mysql_data:/var/lib/mysql \
-                  -e MYSQL_ROOT_PASSWORD="638217" \
+                  -e MYSQL_ROOT_PASSWORD="root" \
                   mysql:8.0
                 echo "Chờ 15 giây cho MySQL khởi động hoàn toàn..."
                 sleep 15
             fi
 
             echo "2. Thực hiện chiến thuật Database First: Đập đi xây lại Database sạch..."
-            docker exec -i clinic-mysql mysql -u root -p"638217" -e "DROP DATABASE IF EXISTS clinicdb; CREATE DATABASE clinicdb;"
+            # LƯU Ý: Không dùng dấu cách sau thuộc tính -p (viết liền -proot) để tránh lỗi cú pháp MySQL CLI
+            docker exec -i clinic-mysql mysql -u root -proot -e "DROP DATABASE IF EXISTS clinicdb; CREATE DATABASE clinicdb;"
 
             echo "3. Import file SQL mới tinh từ Repo vào DB..."
-            docker exec -i clinic-mysql mysql -u root -p"638217" clinicdb < /home/giahuy/mysql_init/init.sql
+            docker exec -i clinic-mysql mysql -u root -proot clinicdb < /home/giahuy/mysql_init/init.sql
 
             echo "4. Làm mới Container Backend Spring Boot (Tomcat 11)..."
             docker pull ${{ secrets.DOCKER_USERNAME }}/clinic-backend:latest
@@ -93,7 +94,7 @@ jobs:
             docker run -d \
               --network="host" \
               --name=my-clinic-tomcat \
-              -e DB_PASSWORD="638217" \
+              -e DB_PASSWORD="root" \
               --restart=always \
               ${{ secrets.DOCKER_USERNAME }}/clinic-backend:latest
             
