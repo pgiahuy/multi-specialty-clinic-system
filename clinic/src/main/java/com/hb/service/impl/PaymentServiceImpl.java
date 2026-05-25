@@ -16,6 +16,7 @@ import com.hb.service.PaymentService;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,14 +36,15 @@ public class PaymentServiceImpl implements PaymentService {
     @Autowired
     private PaymentItemRepository itemRepo;
 
-//    @Override
-//    public List<Payment> getPayments(Map<String, String> params) {
-//        return this.paymentRepo.getPayments(params);
-//    }
+    @Override
+    public List<Payment> getPayments(Map<String, String> params) {
+        return this.paymentRepo.getPayments(params);
+    }
 //    @Override
 //    public List<Payment> getPaymentsByUserName(Map<String, String> params) {
 //        return this.paymentRepo.getPaymentsByUserName(params);
 //    }
+    
     @Override
     public Payment getPaymentById(Long id) {
         return this.paymentRepo.getPaymentById(id);
@@ -121,6 +123,11 @@ public class PaymentServiceImpl implements PaymentService {
 
         payment.setTotalAmount(total);
         paymentRepo.addOrUpdatePayment(payment);
+    }
+
+    @Override
+    public List<Payment> getPaymentByPatientId(Long patientId, Map<String, String> params) {
+        return this.paymentRepo.getPaymentByPatientId(patientId, params);
     }
 
 }
