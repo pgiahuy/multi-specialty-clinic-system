@@ -27,16 +27,16 @@ import java.util.Date;
  * @author HUY
  */
 @Entity
-@Table(name = "inventorylog")
+@Table(name = "inventory_log")
 @NamedQueries({
-    @NamedQuery(name = "Inventorylog.findAll", query = "SELECT i FROM Inventorylog i"),
-    @NamedQuery(name = "Inventorylog.findById", query = "SELECT i FROM Inventorylog i WHERE i.id = :id"),
-    @NamedQuery(name = "Inventorylog.findByChangeAmount", query = "SELECT i FROM Inventorylog i WHERE i.changeAmount = :changeAmount"),
-    @NamedQuery(name = "Inventorylog.findByReason", query = "SELECT i FROM Inventorylog i WHERE i.reason = :reason"),
-    @NamedQuery(name = "Inventorylog.findByReferenceId", query = "SELECT i FROM Inventorylog i WHERE i.referenceId = :referenceId"),
-    @NamedQuery(name = "Inventorylog.findByCreatedAt", query = "SELECT i FROM Inventorylog i WHERE i.createdAt = :createdAt"),
-    @NamedQuery(name = "Inventorylog.findByCreatedBy", query = "SELECT i FROM Inventorylog i WHERE i.createdBy = :createdBy")})
-public class Inventorylog implements Serializable {
+    @NamedQuery(name = "InventoryLog.findAll", query = "SELECT i FROM InventoryLog i"),
+    @NamedQuery(name = "InventoryLog.findById", query = "SELECT i FROM InventoryLog i WHERE i.id = :id"),
+    @NamedQuery(name = "InventoryLog.findByChangeAmount", query = "SELECT i FROM InventoryLog i WHERE i.changeAmount = :changeAmount"),
+    @NamedQuery(name = "InventoryLog.findByReason", query = "SELECT i FROM InventoryLog i WHERE i.reason = :reason"),
+    @NamedQuery(name = "InventoryLog.findByReferenceId", query = "SELECT i FROM InventoryLog i WHERE i.referenceId = :referenceId"),
+    @NamedQuery(name = "InventoryLog.findByCreatedAt", query = "SELECT i FROM InventoryLog i WHERE i.createdAt = :createdAt"),
+    @NamedQuery(name = "InventoryLog.findByCreatedBy", query = "SELECT i FROM InventoryLog i WHERE i.createdBy = :createdBy")})
+public class InventoryLog implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -67,14 +67,14 @@ public class Inventorylog implements Serializable {
     @ManyToOne
     private Medicinebatch batchId;
 
-    public Inventorylog() {
+    public InventoryLog() {
     }
 
-    public Inventorylog(Long id) {
+    public InventoryLog(Long id) {
         this.id = id;
     }
 
-    public Inventorylog(Long id, int changeAmount, String reason) {
+    public InventoryLog(Long id, int changeAmount, String reason) {
         this.id = id;
         this.changeAmount = changeAmount;
         this.reason = reason;
@@ -154,10 +154,10 @@ public class Inventorylog implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Inventorylog)) {
+        if (!(object instanceof InventoryLog)) {
             return false;
         }
-        Inventorylog other = (Inventorylog) object;
+        InventoryLog other = (InventoryLog) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
