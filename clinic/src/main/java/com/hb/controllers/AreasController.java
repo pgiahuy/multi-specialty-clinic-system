@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class AreasController {
     @Autowired
     private AreasService areaService;
+    
     @Autowired
     private Environment env;
     @GetMapping("/areas")

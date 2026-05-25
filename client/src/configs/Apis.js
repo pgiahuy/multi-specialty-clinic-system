@@ -7,6 +7,8 @@ const API = axios.create({
 })
 
 
+
+
 export const getDoctors = () => API.get("/z");
 export const getSpecialties = () => API.get("/specialties");
 export const getSchedule = () => API.get("/schedules");
