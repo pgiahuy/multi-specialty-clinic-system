@@ -23,5 +23,9 @@
     <class>com.hb.pojo.Schedules</class>
     <class>com.hb.pojo.Shifts</class>
     <class>com.hb.pojo.Rooms</class>
+    <class>com.hb.pojo.Medicinebatch</class>
+    <class>com.hb.pojo.Inventorylog</class>
+    <class>com.hb.pojo.Conversation</class>
+    <class>com.hb.pojo.ChatMessage</class>
   </persistence-unit>
 </persistence>

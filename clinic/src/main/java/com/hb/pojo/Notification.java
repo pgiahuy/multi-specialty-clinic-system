@@ -4,7 +4,6 @@
  */
 package com.hb.pojo;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,6 +20,7 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -36,6 +36,12 @@ import java.util.Date;
     @NamedQuery(name = "Notification.findByCreatedAt", query = "SELECT n FROM Notification n WHERE n.createdAt = :createdAt")})
 public class Notification implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id")
+    private Long id;
     @Lob
     @Size(max = 65535)
     @Column(name = "title")
@@ -44,25 +50,17 @@ public class Notification implements Serializable {
     @Size(max = 65535)
     @Column(name = "content")
     private String content;
-    @Lob
-    @Size(max = 65535)
-    @Column(name = "path")
-    private String path;
-
-    private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "id")
-    private Long id;
     @Column(name = "is_read")
     private Boolean isRead;
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt;
+    private LocalDateTime createdAt;
+    @Lob
+    @Size(max = 65535)
+    @Column(name = "path")
+    private String path;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @ManyToOne
-    @JsonIgnore
     private User userId;
 
     public Notification() {
@@ -80,6 +78,21 @@ public class Notification implements Serializable {
         this.id = id;
     }
 
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
 
     public Boolean getIsRead() {
         return isRead;
@@ -89,12 +102,20 @@ public class Notification implements Serializable {
         this.isRead = isRead;
     }
 
-    public Date getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 
     public User getUserId() {
@@ -128,30 +149,6 @@ public class Notification implements Serializable {
     @Override
     public String toString() {
         return "com.hb.pojo.Notification[ id=" + id + " ]";
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
     }
     
 }

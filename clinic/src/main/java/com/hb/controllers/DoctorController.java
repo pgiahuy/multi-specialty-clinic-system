@@ -4,6 +4,7 @@
  */
 package com.hb.controllers;
 
+import com.hb.pojo.Doctor;
 import com.hb.service.DoctorService;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,8 @@ public class DoctorController {
         
         params.put("pageSize", String.valueOf(pageSize));
         model.addAttribute("doctors", doctorService.getDoctors(params));
+        model.addAttribute("doctor", new Doctor());
+
 
         long totalDoctors = doctorService.countDoctors(params);
         int totalPages = (int) Math.ceil((double) totalDoctors / pageSize);

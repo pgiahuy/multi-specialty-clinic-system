@@ -4,6 +4,7 @@
  */
 package com.hb.controllers;
 
+import com.hb.dto.request.form.MedicineForm;
 import com.hb.service.MedicineService;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,6 +35,7 @@ public class MedicineController {
     private MedicineService medicineService;
     @Autowired
     private Environment env;
+    
     @GetMapping("")
     public String list(Model model, @RequestParam Map<String, String> params) {
         int page = params.containsKey("page") ? Integer.parseInt(params.get("page")) : 1;
@@ -40,6 +43,7 @@ public class MedicineController {
         int pageSize = this.env.getProperty("admin.page_size", Integer.class);
         params.put("pageSize", String.valueOf(pageSize));
         model.addAttribute("medicines", this.medicineService.getMedicines(params));
+        model.addAttribute("medicineForm", new MedicineForm());
 
         long totalMedicines = medicineService.countMedicines(params);
         int totalPages = (int) Math.ceil((double) totalMedicines / pageSize);
@@ -51,9 +55,8 @@ public class MedicineController {
     }
 
     @PostMapping("")
-    public String create(@RequestParam Map<String, String> params,
-            @RequestParam("image") MultipartFile avatar) {
-        medicineService.addMedicine(params, avatar);
+    public String create(@ModelAttribute("medicineForm") MedicineForm form) {
+        medicineService.addOrUpdateMedicine(form);
         return "redirect:/admin/medicines";
     }
 

@@ -191,7 +191,9 @@ const NotificationBox = ({ onNavigate }) => {
                                             {noti.content || noti.body || 'Bạn có một thông báo mới'}
                                         </div>
                                         <div className="notification-text-time">
-                                            {noti.createdAt ? new Date(noti.createdAt).toLocaleString('vi-VN') : noti.time || 'Vừa xong'}
+                                            {noti.createdAt
+                                                ? (typeof noti.createdAt === 'string' ? noti.createdAt.slice(0, -3) : noti.createdAt)
+                                                : 'Vừa xong'}
                                         </div>
                                     </div>
 

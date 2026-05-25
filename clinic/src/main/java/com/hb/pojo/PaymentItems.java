@@ -5,6 +5,7 @@
 package com.hb.pojo;
 
 import com.hb.enums.PaymentItemType;
+
 import com.hb.enums.PaymentMethod;
 import com.hb.enums.PaymentStatus;
 import jakarta.persistence.Basic;
@@ -27,7 +28,6 @@ import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 /**
  *
@@ -75,7 +75,7 @@ public class PaymentItems implements Serializable {
     private PaymentMethod method;
     @Column(name = "paid_at")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date paidAt;
+    private LocalDateTime paidAt;
     @Size(max = 100)
     @Column(name = "trans_id")
     private String transId;
@@ -152,11 +152,11 @@ public class PaymentItems implements Serializable {
         this.method = method;
     }
 
-    public Date getPaidAt() {
+    public LocalDateTime getPaidAt() {
         return paidAt;
     }
 
-    public void setPaidAt(Date paidAt) {
+    public void setPaidAt(LocalDateTime paidAt) {
         this.paidAt = paidAt;
     }
 

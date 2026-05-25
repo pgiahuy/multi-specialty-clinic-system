@@ -1,0 +1,204 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Thống kê và Báo cáo</title>
+    <th:block th:replace="base :: css"></th:block>
+    <th:block th:replace="base :: js"></th:block>
+    <script th:src="@{/js/admin-forms.js}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+    <div th:replace="base :: header('Thống kê và Báo cáo')"></div>
+
+    <div th:replace="base :: sidebar"></div>
+
+    <div class="content">
+
+        <div class="container bg-white p-4 rounded shadow-sm">
+
+            <form th:action="@{/admin/stats/{type}(type=${#strings.toLowerCase(reportType)})}" method="get"
+                class="row g-3 mb-4 card p-3 bg-light">
+                <label class="form-label fw-bold text-secondary">Loại báo cáo:</label>
+                <div class="d-flex flex-row">
+                    <div class="col-md-3">
+
+                        <select id="reportType" name="reportType" class="form-select bg-primary text-white fw-bold"
+                            onchange="changeReportUrl()">
+                            <option value="patient" th:selected="${reportType == 'PATIENT'}">Số lượng Bệnh nhân</option>
+                            <option value="service" th:selected="${reportType == 'SERVICE'}">Dịch vụ y tế sử dụng
+                            </option>
+                            <option value="disease" th:selected="${reportType == 'DISEASE'}">Tình hình bệnh phổ biến
+                            </option>
+                            <option value="revenue" th:selected="${reportType == 'REVENUE'}">Doanh thu phòng khám
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3" id="subReportGroup"
+                        th:style="${reportType == 'PATIENT' ? 'display:block' : 'display:none'}">
+                        <select id="subType" name="subType" class="form-select fw-bold border-danger">
+                            <option value="GENDER" th:selected="${subType == 'GENDER'}">Thống kê theo Giới tính</option>
+                            <option value="AGE" th:selected="${subType == 'AGE'}">Thống kê theo Nhóm tuổi</option>
+                            <option value="SPECIALTY" th:selected="${subType == 'SPECIALTY'}">Thống kê theo Chuyên khoa
+                            </option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="d-flex flex-row">
+                    <div class="col-md-2">
+                        <label class="form-label">Thời gian:</label>
+                        <select id="dateType" name="dateType" class="form-select" onchange="toggleDateInputs()">
+                            <option value="CUSTOM" th:selected="${dateType == 'CUSTOM'}">Khoảng ngày tự chọn</option>
+                            <option value="MONTH" th:selected="${dateType == 'MONTH'}">Xem theo Tháng</option>
+                            <option value="YEAR" th:selected="${dateType == 'YEAR'}">Xem theo Năm</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2 date-group" id="fromDateGroup">
+                        <label class="form-label">Từ ngày:</label>
+                        <input type="date" name="fromDate" th:value="${fromDate}" class="form-control">
+                    </div>
+                    <div class="col-md-2 date-group" id="toDateGroup">
+                        <label class="form-label">Đến ngày:</label>
+                        <input type="date" name="toDate" th:value="${toDate}" class="form-control">
+                    </div>
+
+
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-success w-100 fw-bold">Xem báo cáo</button>
+                </div>
+            </form>
+            <hr class="my-4">
+
+            <div class="report-content-section card p-3 bg-light">
+
+                <div th:if="${reportType == 'PATIENT'}" id="patientInPage">
+                    <h3 class="text-secondary mb-3"><i class="fas fa-users"></i> Báo cáo số lượng bệnh nhân</h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card p-3 mb-3">
+                                <h5 class="card-title">Phân bố giới tính</h5>
+                                <canvas id="genderPieChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card p-3 mb-3">
+                                <h5 class="card-title">Nhóm tuổi</h5>
+                                <canvas id="ageBarChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="card p-3 mb-3">
+                                <h5 class="card-title">Chuyên khoa</h5>
+                                <canvas id="specialtyBarChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${reportType == 'SERVICE'}" id="serviceInPage">
+                    <h3 class="text-secondary mb-3"><i class="fas fa-stethoscope"></i> Thống kê dịch vụ y tế sử dụng
+                    </h3>
+                </div>
+
+                <div th:if="${reportType == 'DISEASE'}" id="diseaseInPage">
+                    <h3 class="text-secondary mb-3"><i class="fas fa-procedures"></i> Tình hình bệnh phổ biến trong cộng
+                        đồng</h3>
+                </div>
+
+                <div th:if="${reportType == 'REVENUE'}" id="revenueInPage">
+                    <h3 class="text-secondary mb-3"><i class="fas fa-wallet"></i> Báo cáo doanh thu tổng hợp và chi tiết
+                    </h3>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="d-flex justify-content-center mt-4">
+        <div
+            th:replace="~{fragments :: pagination('/admin/stats/' + ${#strings.toLowerCase(reportType)}, ${totalPages}, ${currentPage})}">
+        </div>
+    </div>
+
+    <div th:replace="base :: footer"></div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        // Prepare data arrays from server-side model (Thymeleaf inlining)
+        var genderLabels = /*[[${genderStats.*.gender}]]*/[];
+        var genderValues = /*[[${genderStats.*.count}]]*/[];
+        /*]]>*/
+
+        function changeReportUrl() {
+            var report = document.getElementById("reportType").value;
+            window.location.href = "/admin/stats/" + report;
+        }
+
+        function toggleDateInputs() {
+            var dateType = document.getElementById("dateType").value;
+
+            document.getElementById("fromDateGroup").style.display = "none";
+            document.getElementById("toDateGroup").style.display = "none";
+            document.getElementById("monthGroup").style.display = "none";
+            document.getElementById("yearGroup").style.display = "none";
+
+            if (dateType === "CUSTOM") {
+                document.getElementById("fromDateGroup").style.display = "block";
+                document.getElementById("toDateGroup").style.display = "block";
+            } else if (dateType === "MONTH") {
+                document.getElementById("monthGroup").style.display = "block";
+            } else if (dateType === "YEAR") {
+                document.getElementById("yearGroup").style.display = "block";
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", toggleDateInputs);
+
+        document.addEventListener("DOMContentLoaded", function () {
+            if (document.getElementById('genderPieChart')) {
+                var ctx = document.getElementById('genderPieChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: genderLabels,
+                        datasets: [{
+                            data: genderValues,
+                            backgroundColor: ['#36A2EB', '#FF6384', '#FFCE56', '#4BC0C0']
+                        }]
+                    }
+                });
+            }
+
+            if (document.getElementById('ageBarChart')) {
+                var ctx2 = document.getElementById('ageBarChart').getContext('2d');
+                new Chart(ctx2, {
+                    type: 'bar',
+                    data: {
+                        labels: [],
+                        datasets: [{ label: 'Số lượng', data: [], backgroundColor: '#6c757d' }]
+                    },
+                    options: { scales: { y: { beginAtZero: true } } }
+                });
+            }
+
+            if (document.getElementById('specialtyBarChart')) {
+                var ctx3 = document.getElementById('specialtyBarChart').getContext('2d');
+                new Chart(ctx3, {
+                    type: 'bar',
+                    data: { labels: [], datasets: [{ label: 'Số lượng', data: [], backgroundColor: '#198754' }] },
+                    options: { indexAxis: 'y', scales: { x: { beginAtZero: true } } }
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -63,7 +63,6 @@ public class Payment implements Serializable {
     private LocalDateTime createdAt;
     @Size(max = 5)
     @Column(name = "method")
-    @Enumerated(EnumType.STRING)
     private PaymentMethod method;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "paymentId")
     private Collection<PaymentItems> paymentItemsCollection;

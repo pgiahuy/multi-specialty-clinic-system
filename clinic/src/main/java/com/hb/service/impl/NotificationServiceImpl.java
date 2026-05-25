@@ -11,6 +11,7 @@ import com.hb.repository.NotificationRepository;
 import com.hb.repository.UserRepository;
 import com.hb.service.FcmService;
 import com.hb.service.NotificationService;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +46,7 @@ public class NotificationServiceImpl implements NotificationService {
         n.setTitle(title);
         n.setContent(content);
         n.setIsRead(false);
-        n.setCreatedAt(new Date());
+        n.setCreatedAt(LocalDateTime.now());
         n.setPath(path);
 
         if (userName != null && !userName.isEmpty()) {
