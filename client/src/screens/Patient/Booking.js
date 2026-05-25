@@ -1,20 +1,27 @@
-import { Container, Row, Col, Card } from "react-bootstrap";
+import { Container, Row, Col, Card, Modal, Button } from "react-bootstrap";
 import Header from "../../components/Header";
 import { useEffect, useState } from "react";
 import { authApis, endpoint } from "../../configs/Apis";
+import MySpinner from "../../components/MySpinner";
+import { useNavigate } from "react-router-dom";
 
 
 const BookingPage = () => {
+    const [loading, setLoading] = useState(false);
     const [bookingData, setBookingData] = useState({
+        profile: null,
         doctor: null,
         date: null,
         time: null,
+        scheduleId: null,
         reason: ""
     });
 
+    const [showModal, setShowModal] = useState(false);
     const [patientProfiles, setPatientProfiles] = useState([]);
     const [doctors, setDoctors] = useState([]);
     const [schedules, setSchedules] = useState([]);
+    const nav = useNavigate();
 
     const loadPatientProfiles = async () => {
         try {
@@ -40,6 +47,22 @@ const BookingPage = () => {
             setSchedules(res.data);
         } catch (err) {
             console.log(err);
+        }
+    };
+
+    const registerAppointment = async () => {
+        try {
+            setLoading(true);
+            const res = await authApis().post(endpoint['appointments'], {
+                patientId: bookingData.profile,
+                scheduleId: bookingData.scheduleId,
+            });
+            setShowModal(true);
+            console.log("Appointment registered:", res.data);
+        } catch (err) {
+            console.log(err);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -78,7 +101,7 @@ const BookingPage = () => {
         console.log(`Filter changed: ${field} = ${value}`);
         setBookingData(prev => ({
             ...prev,
-            ...(field === 'doctor' || field === 'date' ? { time: null } : {}),
+            ...(field === 'doctor' || field === 'date' ? { time: null, scheduleId: null } : {}),
             [field]: value
         }));
     };
@@ -90,7 +113,7 @@ const BookingPage = () => {
 
     const getDoctorDisplayName = (doctorId) => {
         const doctor = doctors.find(item => String(item.id) === String(doctorId));
-        return doctor?.name || doctorId;
+        return doctor?.fullName || doctorId;
     };
 
     const schedulesBySession = schedules.reduce((grouped, schedule) => {
@@ -105,6 +128,11 @@ const BookingPage = () => {
         grouped[schedule.session].push(schedule);
         return grouped;
     }, {});
+
+    const handleCloseModal = () => {
+        setShowModal(false);
+        nav(`/patient/payment/${bookingData.profile}`);
+    };
 
     return (
         <>
@@ -163,7 +191,12 @@ const BookingPage = () => {
                                                             <button
                                                                 type="button"
                                                                 className={`w-100 text-start p-2 rounded-3 border bg-white ${selected ? 'border-success shadow-sm' : 'border-default'} `}
-                                                                onClick={() => !isFull && handleFilterChange('time', timeLabel)}
+                                                                onClick={() => {
+                                                                    if (!isFull) {
+                                                                        handleFilterChange('time', timeLabel);
+                                                                        handleFilterChange('scheduleId', schedule.id); // Lưu thêm ID của ca khám này
+                                                                    }
+                                                                }}
                                                                 disabled={isFull}
                                                                 style={{ minHeight: '58px', transition: 'all 0.2s ease', opacity: isFull ? 0.55 : 1 }}
                                                             >
@@ -228,15 +261,39 @@ const BookingPage = () => {
                                         <p className="text-muted small mb-1">Lý do khám</p>
                                         <p className="fw-semibold mb-0">{bookingData.reason || "Chưa nhập"}</p>
                                     </div>
-
-                                    <button className="btn btn-primary w-100 fw-semibold">
+                                    <div className="text-center mt-4">
+                                        {loading === true ? <MySpinner /> :<button className="btn btn-primary w-100 fw-semibold" onClick={registerAppointment}>
                                         Xác nhận đặt lịch
-                                    </button>
+                                    </button>}
+                                    </div>
                                 </div>
                             </Card.Body>
                         </Card>
                     </Col>
                 </Row>
+                <Modal show={showModal} onHide={handleCloseModal} centered backdrop="static">
+                <Modal.Header closeButton>
+                    <Modal.Title className="fw-bold">
+                        <i className="bi bi-check-circle-fill me-2"></i> Đặt lịch thành công!
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body className="p-4">
+                    <div className="bg-light p-3 rounded border">
+                        <p className="mb-2"><strong>Người khám:</strong> {bookingData.profile ? getProfileDisplayName(bookingData.profile) : ""}</p>
+                        <p className="mb-2"><strong>Bác sĩ:</strong> {bookingData.doctor ? getDoctorDisplayName(bookingData.doctor) : ""}</p>
+                        <p className="mb-2"><strong>Ngày khám:</strong> {bookingData.date}</p>
+                        <p className="mb-0"><strong>Ca khám:</strong> {bookingData.time}</p>
+                    </div>
+                    <p className="text-center text-danger fst-italic mt-3">
+                        Thông tin lịch hẹn đã được lưu.<br/> Vui lòng tiến hành thanh toán để hoàn tất quá trình đặt lịch!
+                    </p>
+                </Modal.Body>
+                <Modal.Footer className="justify-content-center border-top-0">
+                    <Button variant="primary" className="px-5 py-2 fw-bold" onClick={handleCloseModal}>
+                        Thanh toán ngay
+                    </Button>
+                </Modal.Footer>
+            </Modal>
             </Container >
         </>
     );
