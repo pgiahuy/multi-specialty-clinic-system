@@ -59,9 +59,10 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<User> implements User
     @Override
     public User getUserByUsername(String username) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<User> q = session.createNamedQuery("User.findByUsername", User.class);
-        q.setParameter("username", username);
-        return q.getSingleResult();
+        String hql = "SELECT u FROM User u LEFT JOIN FETCH u.patientCollection WHERE u.username = :username";
+        Query<User> query = session.createQuery(hql, User.class);
+        query.setParameter("username", username);
+        return query.getSingleResult();
 
     }
 

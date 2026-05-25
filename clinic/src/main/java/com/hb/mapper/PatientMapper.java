@@ -31,6 +31,7 @@ public class PatientMapper {
         res.setPhone(p.getPhone());
         res.setDob(p.getDob());
         res.setAddress(p.getAddress());
+        res.setGender(p.getGender());
 //
 //        if (p.getUserId() != null) {
 //            res.setEmail(p.getUserId().getEmail());

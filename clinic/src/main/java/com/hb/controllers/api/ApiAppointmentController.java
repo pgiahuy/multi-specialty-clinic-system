@@ -76,6 +76,8 @@ public class ApiAppointmentController {
             return ResponseEntity.status(500).body("Lỗi hệ thống: " + e.getMessage());
         }
     }
+    
+   
 
     @PutMapping("/secure/appointments/{id}")
     public ResponseEntity<?> update(@PathVariable("id") Long id,
