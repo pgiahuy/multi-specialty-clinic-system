@@ -21,7 +21,6 @@ import com.hb.service.PaymentItemsService;
 import com.hb.service.PaymentService;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -108,7 +107,7 @@ public class PaymentItemsServiceImpl implements PaymentItemsService {
                 item.setStatus(PaymentStatus.SUCCESS);
                 item.setMethod(PaymentMethod.valueOf(method));
                 item.setTransId(transId);
-                item.setPaidAt(new Date());
+                item.setPaidAt(LocalDateTime.now());
                 itemRepo.addOrUpdateItem(item);
             }
         }
