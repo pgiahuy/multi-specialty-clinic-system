@@ -25,7 +25,7 @@ public interface PaymentRepository {
     void updatePayment(Payment p);                   
     Payment getPaymentByOrderId(String orderId); 
     void updatePaymentStatus(Long paymentId, PaymentStatus status, PaymentMethod method);
-    
     void addOrUpdatePayment(Payment p);
+    List<Payment> getPaymentByPatientId(Long patientId, Map<String, String> params);
     
 }

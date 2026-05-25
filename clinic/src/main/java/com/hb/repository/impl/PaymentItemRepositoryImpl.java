@@ -8,7 +8,10 @@ import com.hb.pojo.Appointment;
 import com.hb.pojo.Payment;
 import com.hb.pojo.PaymentItems;
 import com.hb.repository.PaymentItemRepository;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,6 +82,47 @@ public class PaymentItemRepositoryImpl implements PaymentItemRepository {
         query.setParameter("payment", payment);
 
         return query.getResultList();
+    }
+
+//    @Override
+//    public List<PaymentItems> getItemsByPaymentId(Long paymentId, Map<String, String> params) {
+//        Session session = this.factory.getObject().getCurrentSession();
+//
+//        StringBuilder hql = new StringBuilder("From PaymentItems p WHERE p.paymentId = :paymentId");
+//
+//        String status = params.get("status");
+//        String startDate = params.get("startDate");
+//        String endDate = params.get("endDate");
+//
+//        if (status != null && status.isEmpty()) {
+//            hql.append("AND p.status = :status");
+//        }
+//
+//        if (startDate != null && !startDate.isEmpty() && endDate != null && !endDate.isEmpty()) {
+//            hql.append(" AND p.paidAt BETWEEN :startDate AND :endDate");
+//        }
+//
+//        Query<PaymentItems> query = session.createQuery(hql.toString(), PaymentItems.class);
+//        query.setParameter("paymentId", paymentId);
+//        
+//        
+//        if (status != null && status.isEmpty()) {
+//            query.setParameter("status", status);
+//        }
+//
+//        if (startDate != null && !startDate.isEmpty() && endDate != null && !endDate.isEmpty()) {
+//
+//            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//            query.setParameter("startDate", LocalDateTime.parse(startDate, formatter));
+//            query.setParameter("endDate", LocalDateTime.parse(endDate, formatter));
+//        }
+//        
+//        return query.getResultList();
+//    }
+
+    @Override
+    public List<PaymentItems> getPaymentItems(Map<String, String> params) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
 }

@@ -8,6 +8,7 @@ import com.hb.pojo.Appointment;
 import com.hb.pojo.Payment;
 import com.hb.pojo.PaymentItems;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -16,6 +17,7 @@ import java.util.List;
 public interface PaymentItemRepository {
     List<PaymentItems> getItemsByPaymentId(Long paymentId);
     List<PaymentItems> getItemsByPayment(Payment payment);
+    List<PaymentItems> getPaymentItems(Map<String,String> params);
     PaymentItems getItemById(Long id);
     PaymentItems getItemByAppointment(Appointment appoint);
     void addOrUpdateItem(PaymentItems item);
