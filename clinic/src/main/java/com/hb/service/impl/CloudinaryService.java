@@ -25,8 +25,10 @@ public class CloudinaryService {
     @Autowired
     private Cloudinary cloudinary;
 
-    public Map<String, String> uploadFile(MultipartFile file, String folder) {
+    public Map<String, String> uploadFile(MultipartFile file, String folder ) {
         try {
+            
+            
             Map uploadResult = cloudinary.uploader().upload(
                     file.getBytes(),
                     ObjectUtils.asMap(

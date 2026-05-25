@@ -4,17 +4,14 @@
  */
 package com.hb.service.impl;
 
+import com.hb.dto.request.form.MedicineForm;
 import com.hb.pojo.Medicine;
 import com.hb.repository.MedicineRepository;
 import com.hb.service.MedicineService;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -25,45 +22,44 @@ public class MedicineServiceImpl implements MedicineService {
 
     @Autowired
     private MedicineRepository medicineRepo;
-    
+
     @Autowired
     private CloudinaryService cloudinaryService;
 
     @Override
-    public Medicine addMedicine(Map<String, String> params, MultipartFile avatar) {
+    public Medicine addOrUpdateMedicine(MedicineForm form) {
 
-        Medicine m = new Medicine();
+        Medicine medicine;
+        if (form.getId() != null) {
+            medicine = this.medicineRepo.getMedicineById(form.getId());
 
-        m.setName(params.getOrDefault("name", "").trim());
-
-        String stockStr = params.get("stock");
-        if (stockStr != null && !stockStr.isEmpty()) {
-            try {
-                m.setStock(Integer.valueOf(stockStr));
-            } catch (NumberFormatException e) {
-                throw new RuntimeException("Số lượng không hợp lệ");
+            if (medicine == null) {
+                medicine = new Medicine();
             }
+        } else {
+            medicine = new Medicine();
         }
 
-        String dateStr = params.get("expirationDate");
+        medicine.setName(form.getName() != null ? form.getName().trim() : "");
+        medicine.setCode(form.getCode() != null ? form.getCode().trim() : null);
+        medicine.setPrice(form.getPrice());
+        medicine.setMinStockAlert(form.getMinStockAlert());
+        medicine.setUnit(form.getUnit() != null ? form.getUnit().trim() : "");
 
-        if (dateStr != null && !dateStr.isEmpty()) {
-            try {
-                Date expirationDate = new SimpleDateFormat("yyyy-MM-dd").parse(dateStr);
-                m.setExpirationDate(expirationDate);
-            } catch (ParseException e) {
-                throw new RuntimeException("Ngày hết hạn không hợp lệ");
+        if (form.getImage() != null && !form.getImage().isEmpty()) {
+            if (medicine.getPublicId() != null && !medicine.getPublicId().isEmpty()) {
+                this.cloudinaryService.deleteFile(medicine.getPublicId());
             }
-        }
 
-        if ( !avatar.isEmpty()) {
-            Map res = this.cloudinaryService.uploadFile(avatar, "avatar");
-            
-            m.setSecureUrl(res.get("secureUrl").toString());
-            m.setPublicId(res.get("publicId").toString());
-        }
+            Map<?, ?> res = this.cloudinaryService.uploadFile(form.getImage(), "medicine");
 
-        return this.medicineRepo.addMedicine(m);
+            if (res != null && res.containsKey("secureUrl")) {
+                medicine.setSecureUrl(res.get("secureUrl").toString());
+                medicine.setPublicId(res.get("publicId").toString());
+            }
+
+        }
+        return this.medicineRepo.addMedicine(medicine);
     }
 
     @Override
