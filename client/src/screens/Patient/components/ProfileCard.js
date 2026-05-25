@@ -20,6 +20,7 @@ const PatientProfileCard = ({ patient }) => {
         className="shadow-sm border-0 mb-3"
         style={{
           border: '2px solid #0080ff',
+          backgroundColor: '#f0f7ff',
           borderRadius: '12px',
           // borderLeft: '5px solid #0d6efd',
           width: '100%'
