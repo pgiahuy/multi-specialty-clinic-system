@@ -1,4 +1,4 @@
-FROM tomcat:11.0-jdk17-openjdk-slim
+FROM tomcat:11.0-jre17-temurin-noble
 
 RUN rm -rf /usr/local/tomcat/webapps/*
 
