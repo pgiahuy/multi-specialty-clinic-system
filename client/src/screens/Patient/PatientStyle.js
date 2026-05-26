@@ -124,3 +124,4 @@ export const filterBox = {
         fontWeight: '500'
     }
 };
+

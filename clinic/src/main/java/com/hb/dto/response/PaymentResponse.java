@@ -4,6 +4,7 @@
  */
 package com.hb.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -16,6 +17,7 @@ public class PaymentResponse {
     private String patientName;
     private String address;
     private BigDecimal totalAmount;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private LocalDateTime createdDate;
 
     public PaymentResponse() {

@@ -1,4 +1,4 @@
-import { Button, Card, Form, Alert, Container } from "react-bootstrap";
+import { Button, Card, Form, Alert, Container, Image } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { useContext, useState } from 'react';
 import { jwtDecode } from "jwt-decode";
@@ -50,9 +50,12 @@ const Login = () => {
                 const decoded = jwtDecode(res.data.token);
                 const role = decoded.role;
                 cookies.save("token", res.data.token);
+                
 
 
                 let u = await authApis().get(endpoint['current-user']);
+                localStorage.setItem("user", JSON.stringify(u.data));
+                cookies.save("user", u.data);
 
                 dispatch({ "type": "LOGIN", "payload": u.data });
 
@@ -120,6 +123,14 @@ const Login = () => {
                             disabled={loading}
                         >
                             {loading ? <MySpinner /> : 'Đăng nhập'}
+                        </Button>
+                        <Button
+                            variant="outline-primary"
+                            type="submit"
+                            className="w-100 mt-3" style={formCardStyle.button}
+                            disabled={loading}
+                        ><Image src="/gg.png" alt="Google" style={{ width: 20, height: 20, marginRight: 8 }} />    
+                            {loading ? <MySpinner /> : 'Đăng nhập bằng tài khoản Google'}
                         </Button>
                     </Form>
                     <div className="login-footer text-center mt-4">

@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,6 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author DELL
  */
 @RestController
+@CrossOrigin
 @RequestMapping("/api/secure")
 public class ApiPaymentController {
 
@@ -52,10 +54,10 @@ public class ApiPaymentController {
 
     @Autowired
     private PaymentItemRepository itemRepo;
-    
+
     @Autowired
     private UserService userService;
-    
+
     @Autowired
     private PaymentMapper payMapper;
 
@@ -110,7 +112,7 @@ public class ApiPaymentController {
 
     @PostMapping("/payments/momo/ipn")
     public ResponseEntity<?> momoIpn(@RequestBody Map<String, String> params) throws Exception {
-
+       
         boolean valid = momoService.verifySignature(params);
         Map<String, Object> result = new HashMap<>();
         try {
@@ -145,29 +147,28 @@ public class ApiPaymentController {
         }
         return ResponseEntity.ok(result);
     }
-    
+
     @GetMapping("/payments/{patientId}")
-    public ResponseEntity<?> list(Principal principal, @PathVariable(value="patientId") Long patientId,
-                                    @RequestParam Map<String, String> params) {
+    public ResponseEntity<?> list(Principal principal, @PathVariable(value = "patientId") Long patientId,
+            @RequestParam Map<String, String> params) {
         User u = userService.getUserByUsername(principal.getName());
         if (u == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        
+
         Collection<Patient> patients = u.getPatientCollection();
 
         List<Long> patientIds = patients.stream()
                 .map(Patient::getId)
                 .collect(Collectors.toList());
-        
+
         if (!patientIds.contains(patientId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        
+
         List<Payment> payments = this.paymentService.getPaymentByPatientId(patientId, params);
-        
-        
+
         return ResponseEntity.ok(payments.stream().map(payMapper::toResponse).toList());
-        
+
     }
 }

@@ -22,4 +22,5 @@ public interface PaymentItemRepository {
     PaymentItems getItemByAppointment(Appointment appoint);
     void addOrUpdateItem(PaymentItems item);
     void deleteItem(Long id);
+    List<PaymentItems> getItemsByPaymentId(Long paymentId, Map<String, String> params);
 }

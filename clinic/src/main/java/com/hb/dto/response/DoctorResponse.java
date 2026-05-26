@@ -10,19 +10,54 @@ package com.hb.dto.response;
  */
 public class DoctorResponse {
     private Long id;
+    private String avatar;
     private String fullName;
     private String description;
     private String specialty;
     private String email;
     private String gender;
-    
 
     public DoctorResponse() {
     }
 
-   
-    
-    
+    public DoctorResponse(Long id, String avatar, String fullName, String description, String specialty, String email, String gender) {
+        this.id = id;
+        this.avatar = avatar;
+        this.fullName = fullName;
+        this.description = description;
+        this.specialty = specialty;
+        this.email = email;
+        this.gender = gender;
+    }
+
+    /**
+     * @return the id
+     */
+    public Long getId() {
+        return id;
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    /**
+     * @return the avatar
+     */
+    public String getAvatar() {
+        return avatar;
+    }
+
+    /**
+     * @param avatar the avatar to set
+     */
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
     /**
      * @return the fullName
      */
@@ -92,21 +127,9 @@ public class DoctorResponse {
     public void setGender(String gender) {
         this.gender = gender;
     }
+    
 
-    /**
-     * @return the id
-     */
-    public Long getId() {
-        return id;
-    }
-
-    /**
-     * @param id the id to set
-     */
-    public void setId(Long id) {
-        this.id = id;
-    }
-
+    
    
     
     
