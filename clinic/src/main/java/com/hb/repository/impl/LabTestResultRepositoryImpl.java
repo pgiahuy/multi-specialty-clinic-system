@@ -4,9 +4,7 @@
  */
 package com.hb.repository.impl;
 
-import com.hb.dto.response.LabTestResultResponse;
 import com.hb.pojo.LabResults;
-import com.hb.repository.LabTestRepository;
 import com.hb.repository.LabTestResultRepository;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

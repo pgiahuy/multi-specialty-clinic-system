@@ -80,11 +80,11 @@ public class ScheduleRepositoryImpl extends BaseRepositoryImpl<Schedules> implem
 
         if (s.getId() == null) {
             session.persist(s);
+            return s;
         } else {
-            session.merge(s);
+            return session.merge(s);
         }
 
-        return s;
     }
 
     @Override

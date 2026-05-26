@@ -31,15 +31,10 @@ public class PrescriptionItemRepositoryImpl implements PrescriptionItemRepositor
         Session session = factory.getObject().getCurrentSession();
         if (item.getId() == null) {
             session.persist(item);
+            return item;
         } else {
-            // id not null -> decide between persist/merge by checking existence
-            if (session.find(PrescriptionItem.class, item.getId()) == null) {
-                session.persist(item);
-            } else {
-                session.merge(item);
-            }
+            return session.merge(item);
         }
-        return item;
     }
 
     @Override

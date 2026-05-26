@@ -4,6 +4,7 @@
  */
 package com.hb.dto.request;
 
+import java.time.LocalDate;
 import java.util.Date;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,7 +18,7 @@ public class PatientCreateRequest {
     private String fullName;
     private String gender;
     @DateTimeFormat(pattern = "dd/MM/yyyy")
-    private Date dob;
+    private LocalDate dob;
     private String phone;
     private String address;
     private MultipartFile avatar;
@@ -25,7 +26,7 @@ public class PatientCreateRequest {
     public PatientCreateRequest() {
     }
 
-    public PatientCreateRequest(String cccd, String fullName, String gender, Date dob, String phone,String address, MultipartFile avatar) {
+    public PatientCreateRequest(String cccd, String fullName, String gender, LocalDate dob, String phone,String address, MultipartFile avatar) {
         this.cccd = cccd;
         this.fullName = fullName;
         this.gender = gender;
@@ -66,14 +67,14 @@ public class PatientCreateRequest {
     /**
      * @return the dob
      */
-    public Date getDob() {
+    public LocalDate getDob() {
         return dob;
     }
 
     /**
      * @param dob the dob to set
      */
-    public void setDob(Date dob) {
+    public void setDob(LocalDate dob) {
         this.dob = dob;
     }
 
