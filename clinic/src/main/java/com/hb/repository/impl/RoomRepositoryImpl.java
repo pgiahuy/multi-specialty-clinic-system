@@ -51,10 +51,14 @@ public class RoomRepositoryImpl extends BaseRepositoryImpl<Rooms> implements Roo
     }
 
     @Override
-    public Rooms addRoom(Rooms a) {
+    public Rooms saveOrUpdate(Rooms a) {
         Session session = this.factory.getObject().getCurrentSession();
-        session.persist(a);
-        return a;
+        if (a.getId()==null) {
+            session.persist(a);
+            return a;
+        }else{
+            return session.merge(a);
+        }
     }
 
     @Override

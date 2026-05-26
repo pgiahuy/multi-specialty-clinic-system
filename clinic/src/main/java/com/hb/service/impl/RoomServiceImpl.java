@@ -4,7 +4,11 @@
  */
 package com.hb.service.impl;
 
+import com.hb.dto.request.form.RoomForm;
+import com.hb.exception.BadRequestException;
+import com.hb.pojo.Areas;
 import com.hb.pojo.Rooms;
+import com.hb.repository.AreasRepository;
 import com.hb.repository.RoomRepository;
 import com.hb.service.RoomService;
 import java.util.List;
@@ -21,6 +25,9 @@ public class RoomServiceImpl implements RoomService{
     @Autowired
     private RoomRepository roomRepo;
     
+    @Autowired
+    private AreasRepository areaRepo;
+    
     @Override
     public List<Rooms> getRooms(Map<String, String> params) {
         return roomRepo.getRooms(params);
@@ -36,8 +43,23 @@ public class RoomServiceImpl implements RoomService{
     }
 
     @Override
-    public Rooms addRoom(Map<String, String> params) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public Rooms saveOrUpdate(RoomForm form) {
+        Rooms r;
+        if (form.getId()==null) {
+            r = new Rooms();
+        }else{
+            r = this.roomRepo.getRoomById(form.getId());
+        }
+        
+        r.setRoomNumber(form.getRoomNumber());
+        if(form.getAreaId()!=null){
+            Areas a = this.areaRepo.getAreasById(form.getAreaId());
+            r.setAreaId(a);
+        }else{
+            throw new BadRequestException("Thiếu thông tin phân khu!");
+        }
+        
+        return this.roomRepo.saveOrUpdate(r);
     }
 
     @Override

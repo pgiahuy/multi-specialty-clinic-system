@@ -2,41 +2,40 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.hb.dto.response;
+package com.hb.dto.request.form;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
-import java.util.Date;
 
 /**
  *
- * @author DELL
+ * @author HUY
  */
-public class PatientResponse {
+public class PatientForm {
     private Long id;
     private String cccd;
     private String fullName;
-    private String phone;
-    @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate dob;
-    private String address;
     private String gender;
+    private String address;
+    private String phone;
+    private Long userId;
+    
 
-    public PatientResponse() {
+    public PatientForm() {
     }
 
-    public PatientResponse(Long id, String cccd, String fullName, String phone, LocalDate dob, String address, String gender) {
+    public PatientForm(Long id, String cccd, String fullName, LocalDate dob, String gender, String address, String phone, Long userId) {
         this.id = id;
         this.cccd = cccd;
         this.fullName = fullName;
-        this.phone = phone;
         this.dob = dob;
-        this.address = address;
         this.gender = gender;
+        this.address = address;
+        this.phone = phone;
+        this.userId = userId;
     }
     
-    
-    
+
     /**
      * @return the id
      */
@@ -80,20 +79,6 @@ public class PatientResponse {
     }
 
     /**
-     * @return the phone
-     */
-    public String getPhone() {
-        return phone;
-    }
-
-    /**
-     * @param phone the phone to set
-     */
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    /**
      * @return the dob
      */
     public LocalDate getDob() {
@@ -105,6 +90,20 @@ public class PatientResponse {
      */
     public void setDob(LocalDate dob) {
         this.dob = dob;
+    }
+
+    /**
+     * @return the gender
+     */
+    public String getGender() {
+        return gender;
+    }
+
+    /**
+     * @param gender the gender to set
+     */
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     /**
@@ -122,21 +121,31 @@ public class PatientResponse {
     }
 
     /**
-     * @return the gender
+     * @return the phone
      */
-    public String getGender() {
-        return gender;
+    public String getPhone() {
+        return phone;
     }
 
     /**
-     * @param gender the gender to set
+     * @param phone the phone to set
      */
-    public void setGender(String gender) {
-        this.gender = gender;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
-   
-    
 
-    
+    /**
+     * @return the userId
+     */
+    public Long getUserId() {
+        return userId;
+    }
+
+    /**
+     * @param userId the userId to set
+     */
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
     
 }

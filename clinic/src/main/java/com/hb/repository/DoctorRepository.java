@@ -5,6 +5,7 @@
 package com.hb.repository;
 
 import com.hb.pojo.Doctor;
+import com.hb.pojo.Specialty;
 import java.util.List;
 import java.util.Map;
 
@@ -14,7 +15,8 @@ import java.util.Map;
  */
 public interface DoctorRepository extends BaseRepository<Doctor>{
     List<Doctor> getDoctors(Map<String,String> params);
-    Doctor addDoctor(Doctor d);
+    List<Doctor> getAllDoctors();
+    Doctor saveOrUpdate(Doctor d);
     Doctor getDoctorById(Long id);
     void deleteDoctor(Long id);
 }

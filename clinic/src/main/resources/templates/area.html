@@ -1,85 +1,113 @@
-
-
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
-    <head>
-        <title>Quản lý Khu</title>
 
-    <th:block th:replace="base :: css"></th:block>
-    <th:block th:replace="base :: js"></th:block>
-    <script th:src="@{/js/area.js}"></script>
+<head>
+    <title>Quản lý Khu vực</title>
+    <th:block th:replace="~{base :: css}"></th:block>
+    <th:block th:replace="~{base :: js}"></th:block>
+    <script th:inline="javascript">
+        window.__OPEN_AREA_FORM__ = /*[[${openForm != null ? openForm : false}]]*/ false;
+    </script>
+    <script th:src="@{/js/admin-crud.js}"></script>
 </head>
 
-
-
 <body>
+    <div th:replace="~{base :: header('QUẢN LÝ KHU VỰC')}"></div>
+    <div th:replace="~{base :: sidebar}"></div>
 
-    <div th:replace="base :: header('QUẢN LÝ KHU')"></div>
+    <div class="content mt-6">
+        <th:block th:with="hasError=${errorMsg}, hasSuccess=${successMsg}">
+            <div th:if="${hasError}" class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+                <span th:text="${errorMsg}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${hasSuccess}" class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+                <span th:text="${successMsg}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        </th:block>
 
-    <div th:replace="base :: sidebar"></div>
+        <div class="d-flex justify-content-end mb-3">
+            <button type="button" id="toggleAreaFormBtn" class="btn btn-success"
+                onclick="toggleCrudForm('areaForm', 'toggleAreaFormBtn')">
+                <i class="bi bi-plus-circle me-2"></i>Thêm khu vực
+            </button>
+        </div>
 
-    <div class="content">
+        <form class="row g-2 mb-3" method="get" action="" id="areaFilterForm">
+            <div class="col-md-6">
+                <input type="text" name="areaName" class="form-control" placeholder="Tìm khu vực"
+                    th:value="${param.areaName != null ? param.areaName : ''}" />
+            </div>
+            <div class="col-md-6">
+                <button type="submit" class="btn btn-outline-primary">Tìm kiếm</button>
+                <a th:href="@{/admin/areas}" class="btn btn-outline-secondary ms-2">Đặt lại</a>
+            </div>
+        </form>
 
+        <form id="areaForm" th:class="${openForm} ? 'card p-4 mb-4' : 'card p-4 mb-4 d-none'" method="post"
+            th:object="${areaForm}" th:action="@{/admin/areas}">
+            <h4 id="formTitle" class="mb-3 text-uppercase fw-bold text-primary">Thêm / Cập nhật khu vực</h4>
+            <input type="hidden" th:field="*{id}" id="areaId" />
 
-<!--        <form method="post" th:action="@{/admin/doctors}" enctype="multipart/form-data">
-
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" name="username" class="form-control" id="username">
+            <div class="mb-3">
+                <label class="form-label fw-bold">Tên khu vực:</label>
+                <input type="text" th:field="*{areaName}" class="form-control" id="areaName" required />
             </div>
 
-            <div class="form-group">
-                <label for="email">Email address:</label>
-                <input type="email" name="email" class="form-control" id="email">
+            <div class="mb-3">
+                <label class="form-label fw-bold">Mô tả:</label>
+                <input th:field="*{locationFloor}" class="form-control" id="locationFloor"></input>
             </div>
 
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" name="password" class="form-control" id="password">
+            <div class="d-flex gap-2 justify-content-end">
+                <button type="button" class="btn btn-secondary"
+                    onclick="toggleCrudForm('areaForm', 'toggleAreaFormBtn')">Hủy</button>
+                <button type="submit" id="submitFormBtn" class="btn btn-primary">Lưu thông tin</button>
             </div>
+        </form>
 
-            <div class="form-group">
-                <label for="avatar">Avatar</label>
-                <input type="file" name="avatar" class="form-control mb-2">
-            </div>
-
-            <button type="submit" class="btn btn-primary mb-3">Submit</button>
-        </form>-->
-
-
-
-        <table class="table table-bordered table-hover align-middle">
-            <thead class="table-primary">
+        <table class="table table-bordered table-hover align-middle shadow-sm">
+            <thead class="table-primary text-center">
                 <tr>
-                    <th>Tên khu</th>
+                    <th>Tên khu vực</th>
                     <th>Tầng</th>
-                    <th></th>
+                    <th>Hành động</th>
                 </tr>
             </thead>
-
             <tbody>
-                <tr th:each="a : ${areas}">
-                    <td th:text="${a.areaName}"></td>
+                <tr th:each="a : ${areas}" th:id="'area-row-' + ${a.id}">
+                    <td th:text="${a.areaName}" th:id="'a-name-' + ${a.id}"></td>
                     <td th:text="${a.locationFloor}"></td>
-                    <td>
-                        <button class="btn btn-warning btn-sm">Sửa</button>
+                    <td class="text-center">
+                        <button class="btn btn-warning btn-sm" th:onclick="|editArea(${a.id})|">Sửa</button>
                         <button class="btn btn-danger btn-sm"
-                                th:onclick="'deleteAreas(' + ${a.id} + ')'">
-                            Xóa
-                        </button>
+                            th:onclick="|deleteCrudItem(${a.id}, '/admin/areas/', 'area-row-')|">Xóa</button>
                     </td>
                 </tr>
             </tbody>
         </table>
-
     </div>
 
-    <div class="d-flex justify-content-center mt-4">
+    <div class="d-flex justify-content-center mt-1">
         <div th:replace="~{fragments :: pagination('/admin/areas', ${totalPages}, ${currentPage})}"></div>
     </div>
 
-    <div th:replace="base :: footer">
+    <div th:replace="~{base :: footer}"></div>
 
-    </div>
+    <script th:inline="javascript">
+        initFormState(window.__OPEN_AREA_FORM__, 'areaForm', 'toggleAreaFormBtn');
+
+        function editArea(id) {
+            document.getElementById('areaId').value = id;
+            document.getElementById('areaName').value = document.getElementById('a-name-' + id).innerText.trim();
+            document.getElementById('formTitle').innerText = 'Cập nhật khu vực (ID: ' + id + ')';
+            document.getElementById('submitFormBtn').innerText = 'Lưu thay đổi';
+            document.getElementById('areaForm').classList.remove('d-none');
+            document.getElementById('toggleAreaFormBtn').className = 'btn btn-secondary';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
 </body>
+
 </html>

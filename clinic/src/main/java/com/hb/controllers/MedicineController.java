@@ -6,7 +6,13 @@ package com.hb.controllers;
 
 import com.hb.dto.request.form.MedicineForm;
 import com.hb.service.MedicineService;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
@@ -19,7 +25,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -28,7 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @PropertySource("classpath:configs.properties")
 @Controller
-@RequestMapping("/admin/medicines")
+@RequestMapping("/admin")
 public class MedicineController {
 
     @Autowired
@@ -36,7 +41,7 @@ public class MedicineController {
     @Autowired
     private Environment env;
     
-    @GetMapping("")
+    @GetMapping("/medicines")
     public String list(Model model, @RequestParam Map<String, String> params) {
         int page = params.containsKey("page") ? Integer.parseInt(params.get("page")) : 1;
 
@@ -54,15 +59,37 @@ public class MedicineController {
         return "medicine";
     }
 
-    @PostMapping("")
-    public String create(@ModelAttribute("medicineForm") MedicineForm form) {
-        medicineService.addOrUpdateMedicine(form);
+    @PostMapping("/medicines")
+    public String create(@ModelAttribute("medicineForm") MedicineForm medicineForm) {
+        medicineService.addOrUpdateMedicine(medicineForm);
         return "redirect:/admin/medicines";
     }
 
-    @DeleteMapping("/{id}")
-    public String delete(@PathVariable Long id) {
-        medicineService.deleteMedicine(id);
-        return "redirect:/admin/medicines";
+    @DeleteMapping("/medicines/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        try {
+            medicineService.deleteMedicine(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Medicine not found");
+        }
+    }
+
+    @GetMapping("/medicines/search")
+    @ResponseBody
+    public List<Map<String, Object>> searchMedicines(@RequestParam(value = "kw", required = false) String kw) {
+        Map<String, String> params = new HashMap<>();
+        if (kw != null && !kw.trim().isEmpty()) {
+            params.put("kw", kw.trim());
+        }
+
+        return this.medicineService.getMedicines(params).stream()
+                .map(m -> {
+                    Map<String, Object> item = new HashMap<>();
+                    item.put("id", m.getId());
+                    item.put("name", m.getName());
+                    return item;
+                })
+                .collect(Collectors.toList());
     }
 }

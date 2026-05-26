@@ -46,14 +46,14 @@ public class MedicineRepositoryImpl extends BaseRepositoryImpl<Medicine> impleme
     }
 
     @Override
-    public Medicine addMedicine(Medicine d) {
+    public Medicine addMedicine(Medicine m) {
         Session session = this.factory.getObject().getCurrentSession();
-        if (d.getId() == null) {
-            session.persist(d);
+        if (m.getId() == null) {
+            session.persist(m);
+            return m;
         }else{
-            session.merge(d);
+            return session.merge(m);
         }
-        return d;
     }
 
     @Override

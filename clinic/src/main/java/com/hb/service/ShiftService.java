@@ -4,6 +4,7 @@
  */
 package com.hb.service;
 
+import com.hb.dto.request.form.ShiftForm;
 import com.hb.dto.response.ShiftResponse;
 import com.hb.pojo.Shifts;
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.Map;
  */
 public interface ShiftService {
     List<ShiftResponse> getShifts(Map<String, String> params);
-    Shifts addShift(Map<String, String> params);
+    Shifts saveOrUpdate(ShiftForm  form);
     ShiftResponse getShiftById(Long id);
     void deleteShift(Long id);
     long countShifts(Map<String, String> params);

@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public interface ShiftRepository extends BaseRepository<Shifts>{
     List<Shifts> getShifts(Map<String,String> params);
-    Shifts addShift(Shifts d);
+    Shifts saveOrUpdate(Shifts d);
     Shifts getShiftById(Long id);
     void deleteShift(Long id);
     
