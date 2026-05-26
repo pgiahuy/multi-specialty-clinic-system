@@ -148,7 +148,10 @@ public class PaymentRepositoryImpl implements PaymentRepository {
             hql.append(" AND p.createdAt BETWEEN :startDate AND :endDate");
         }
         
+        hql.append(" ORDER BY p.createdAt DESC");
+        
         Query<Payment> query = session.createQuery(hql.toString(), Payment.class);
+        
         query.setParameter("patientId", patientId);
         
          if (startDate != null && !startDate.isEmpty() && endDate != null && !endDate.isEmpty()) {

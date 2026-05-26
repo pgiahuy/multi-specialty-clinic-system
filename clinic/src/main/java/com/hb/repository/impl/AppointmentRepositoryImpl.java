@@ -47,7 +47,7 @@ public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> i
                 String role = params.get("currentUserRole");
 
                 if ("ROLE_PATIENT".equals(role)) {
-                    
+
                     hql.append(" AND p.userId.id = :userId ");
 
                 } else if ("ROLE_DOCTOR".equals(role)) {
@@ -67,10 +67,10 @@ public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> i
         if (params != null) {
             if (params.containsKey("currentUserId")) {
                 q.setParameter("userId", Long.valueOf(params.get("currentUserId")));
-                
+
                 if ("ROLE_DOCTOR".equals(params.get("currentUserRole"))) {
-                q.setParameter("status", AppointmentStatus.PENDING);
-            }
+                    q.setParameter("status", AppointmentStatus.PENDING);
+                }
             }
             if (params.containsKey("date")) {
                 q.setParameter("date", java.sql.Date.valueOf(params.get("date")));
@@ -103,6 +103,20 @@ public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> i
         } else {
             session.merge(a);
         }
+    }
+
+    @Override
+    public boolean isPatientAlreadyBookedInSchedule(Long patientId, Long scheduleId) {
+        Session session = this.factory.getObject().getCurrentSession();
+
+        String hql = "SELECT count(a.id) FROM Appointment a WHERE a.patientId.id = :patientId AND a.scheduleId.id = :scheduleId";
+
+        Query<Long> query = session.createQuery(hql, Long.class);
+        query.setParameter("patientId", patientId);
+        query.setParameter("scheduleId", scheduleId);
+
+        Long count = query.uniqueResult();
+        return count != null && count > 0; 
     }
 
 }
