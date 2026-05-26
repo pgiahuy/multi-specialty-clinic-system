@@ -4,6 +4,7 @@
  */
 package com.hb.repository.impl;
 
+import com.hb.exception.ResourceNotFoundException;
 import com.hb.pojo.Doctor;
 import com.hb.pojo.Specialty;
 import java.util.List;
@@ -48,6 +49,7 @@ public class SpecialtyRepositoryImpl extends BaseRepositoryImpl<Specialty> imple
         if (params != null && hasText(params.get("doctorName"))) {
             hql.append(" AND hod.fullName LIKE :doctorName");
         }
+        hql.append(" AND s.isActive=true");
 
         Query<Specialty> q = session.createQuery(hql.toString(), Specialty.class);
 
@@ -86,6 +88,7 @@ public class SpecialtyRepositoryImpl extends BaseRepositoryImpl<Specialty> imple
         if (params != null && hasText(params.get("doctorName"))) {
             hql.append(" AND hod.fullName LIKE :doctorName");
         }
+        hql.append(" AND s.isActive=true");
 
         Query<Long> q = session.createQuery(hql.toString(), Long.class);
         if (params != null && hasText(params.get("kw"))) {
@@ -127,5 +130,19 @@ public class SpecialtyRepositoryImpl extends BaseRepositoryImpl<Specialty> imple
                 .setParameter("ids", ids)
                 .getResultList();
     }
+
+    @Override
+    public void delete(Long id) {
+        Session session = this.factory.getObject().getCurrentSession();
+        Specialty s = session.get(Specialty.class, id);
+        if (s != null) {
+            s.setIsActive(false);
+            session.merge(s);
+        } else {
+            throw new ResourceNotFoundException("Không tìm thấy chuyên khoa!");
+        }
+    }
+    
+    
 
 }

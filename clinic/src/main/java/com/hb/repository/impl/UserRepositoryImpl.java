@@ -41,6 +41,7 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<User> implements User
         if (params != null && params.containsKey("kw")) {
             hql.append(" AND u.username LIKE :kw");
         }
+        hql.append(" AND u.isActive=true");
 
         Query<User> q = session.createQuery(hql.toString(), User.class);
 
@@ -56,6 +57,26 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<User> implements User
         }
 
         return q.getResultList();
+    }
+    
+    @Override
+    public long count(Map<String, String> params,Class<User> clazz) {
+        Session session = this.factory.getObject().getCurrentSession();
+
+        StringBuilder hql = new StringBuilder("SELECT COUNT(u) FROM User u WHERE 1=1");
+
+        if (params != null && params.containsKey("kw")) {
+            hql.append(" AND u.username LIKE :kw");
+        }
+        hql.append(" AND u.isActive=true");
+
+        Query<Long> q = session.createQuery(hql.toString(), Long.class);
+
+        if (params != null && params.containsKey("kw")) {
+            q.setParameter("kw", "%" + params.get("kw") + "%");
+        }
+
+        return q.getSingleResult();
     }
 
     @Override
@@ -102,8 +123,8 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<User> implements User
             if (u.getDoctor() != null) {
                 u.getDoctor().setUserId(null);
             }
-
-            session.remove(u);
+            u.setIsActive(false);
+            session.merge(u);
         }
     }
 

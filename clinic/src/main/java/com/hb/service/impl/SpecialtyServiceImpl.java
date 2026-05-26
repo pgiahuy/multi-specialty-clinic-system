@@ -73,8 +73,8 @@ public class SpecialtyServiceImpl implements SpecialtyService {
     }
 
     @Override
-    public void deleteDoctor(Long id) {
-        this.doctorRepo.deleteDoctor(id);
+    public void deleteSpecialty(Long id) {
+        this.specialtieRepo.delete(id);
     }
 
     @Override

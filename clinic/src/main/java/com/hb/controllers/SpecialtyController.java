@@ -74,12 +74,10 @@ public class SpecialtyController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") Long id) {
-        try {
-            specialtyService.deleteDoctor(id);
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy chuyên khoa");
-        }
+
+        specialtyService.deleteSpecialty(id);
+        return ResponseEntity.noContent().build();
+        
     }
 
     @GetMapping("/search-doctors")

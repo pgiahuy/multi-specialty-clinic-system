@@ -51,6 +51,7 @@ public class DoctorRepositoryImpl extends BaseRepositoryImpl<Doctor> implements 
         if (hasText(params.get("doctorName"))) {
             hql.append(" AND d.fullName LIKE :dName");
         }
+        hql.append(" AND d.isActive=true");
 
         Query<Long> q = session.createQuery(hql.toString(), Long.class);
         if (hasText(params.get("specialtyName"))) {
@@ -86,6 +87,8 @@ public class DoctorRepositoryImpl extends BaseRepositoryImpl<Doctor> implements 
         if (hasText(params.get("doctorName"))) {
             hql.append(" AND d.fullName LIKE :dName");
         }
+        hql.append(" AND d.isActive=true");
+        
 
         Query<Long> q = session.createQuery(hql.toString(), Long.class);
         if (hasText(params.get("specialtyName"))) {
@@ -122,9 +125,10 @@ public class DoctorRepositoryImpl extends BaseRepositoryImpl<Doctor> implements 
         Session session = this.factory.getObject().getCurrentSession();
         Doctor d = session.get(Doctor.class, id);
         if (d != null) {
-            session.remove(d);
+            d.setIsActive(false);
+            session.merge(d);
         } else {
-            throw new ResourceNotFoundException("Doctor not found!");
+            throw new ResourceNotFoundException("Không tìm thấy bác sĩ!");
         }
     }
 
