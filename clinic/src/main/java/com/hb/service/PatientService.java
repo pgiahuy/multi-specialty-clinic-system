@@ -19,6 +19,7 @@ import java.util.Map;
 public interface PatientService {
     List<Patient> getPatients(Map<String,String> params);
     Patient getPatientById(Long id);
+    void deletePatient(Long id);
     PatientResponse updateProfile(Long id, PatientCreateRequest prq);
     PatientResponse addPatient(PatientCreateRequest prq, User u);
     long countPatients(Map<String,String> params);

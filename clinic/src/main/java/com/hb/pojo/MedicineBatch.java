@@ -14,14 +14,13 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.Collection;
+import java.time.LocalDate;
 import java.util.Date;
 
 /**
@@ -29,15 +28,15 @@ import java.util.Date;
  * @author HUY
  */
 @Entity
-@Table(name = "medicinebatch")
+@Table(name = "medicine_batch")
 @NamedQueries({
-    @NamedQuery(name = "Medicinebatch.findAll", query = "SELECT m FROM Medicinebatch m"),
-    @NamedQuery(name = "Medicinebatch.findById", query = "SELECT m FROM Medicinebatch m WHERE m.id = :id"),
-    @NamedQuery(name = "Medicinebatch.findByBatchCode", query = "SELECT m FROM Medicinebatch m WHERE m.batchCode = :batchCode"),
-    @NamedQuery(name = "Medicinebatch.findByExpiryDate", query = "SELECT m FROM Medicinebatch m WHERE m.expiryDate = :expiryDate"),
-    @NamedQuery(name = "Medicinebatch.findByQuantity", query = "SELECT m FROM Medicinebatch m WHERE m.quantity = :quantity"),
-    @NamedQuery(name = "Medicinebatch.findByImportDate", query = "SELECT m FROM Medicinebatch m WHERE m.importDate = :importDate")})
-public class Medicinebatch implements Serializable {
+    @NamedQuery(name = "MedicineBatch.findAll", query = "SELECT m FROM MedicineBatch m"),
+    @NamedQuery(name = "MedicineBatch.findById", query = "SELECT m FROM MedicineBatch m WHERE m.id = :id"),
+    @NamedQuery(name = "MedicineBatch.findByBatchCode", query = "SELECT m FROM MedicineBatch m WHERE m.batchCode = :batchCode"),
+    @NamedQuery(name = "MedicineBatch.findByExpiryDate", query = "SELECT m FROM MedicineBatch m WHERE m.expiryDate = :expiryDate"),
+    @NamedQuery(name = "MedicineBatch.findByQuantity", query = "SELECT m FROM MedicineBatch m WHERE m.quantity = :quantity"),
+    @NamedQuery(name = "MedicineBatch.findByImportDate", query = "SELECT m FROM MedicineBatch m WHERE m.importDate = :importDate")})
+public class MedicineBatch implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -53,29 +52,25 @@ public class Medicinebatch implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "expiry_date")
-    @Temporal(TemporalType.DATE)
-    private Date expiryDate;
+    private LocalDate expiryDate;
     @Basic(optional = false)
     @NotNull
     @Column(name = "quantity")
     private int quantity;
     @Column(name = "import_date")
-    @Temporal(TemporalType.DATE)
-    private Date importDate;
+    private LocalDate importDate;
     @JoinColumn(name = "medicine_id", referencedColumnName = "id")
     @ManyToOne
     private Medicine medicineId;
-    @OneToMany(mappedBy = "batchId")
-    private Collection<InventoryLog> inventorylogCollection;
 
-    public Medicinebatch() {
+    public MedicineBatch() {
     }
 
-    public Medicinebatch(Long id) {
+    public MedicineBatch(Long id) {
         this.id = id;
     }
 
-    public Medicinebatch(Long id, String batchCode, Date expiryDate, int quantity) {
+    public MedicineBatch(Long id, String batchCode, LocalDate expiryDate, int quantity) {
         this.id = id;
         this.batchCode = batchCode;
         this.expiryDate = expiryDate;
@@ -98,11 +93,11 @@ public class Medicinebatch implements Serializable {
         this.batchCode = batchCode;
     }
 
-    public Date getExpiryDate() {
+    public LocalDate getExpiryDate() {
         return expiryDate;
     }
 
-    public void setExpiryDate(Date expiryDate) {
+    public void setExpiryDate(LocalDate expiryDate) {
         this.expiryDate = expiryDate;
     }
 
@@ -114,11 +109,11 @@ public class Medicinebatch implements Serializable {
         this.quantity = quantity;
     }
 
-    public Date getImportDate() {
+    public LocalDate getImportDate() {
         return importDate;
     }
 
-    public void setImportDate(Date importDate) {
+    public void setImportDate(LocalDate importDate) {
         this.importDate = importDate;
     }
 
@@ -128,14 +123,6 @@ public class Medicinebatch implements Serializable {
 
     public void setMedicineId(Medicine medicineId) {
         this.medicineId = medicineId;
-    }
-
-    public Collection<InventoryLog> getInventorylogCollection() {
-        return inventorylogCollection;
-    }
-
-    public void setInventorylogCollection(Collection<InventoryLog> inventorylogCollection) {
-        this.inventorylogCollection = inventorylogCollection;
     }
 
     @Override
@@ -148,10 +135,10 @@ public class Medicinebatch implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Medicinebatch)) {
+        if (!(object instanceof MedicineBatch)) {
             return false;
         }
-        Medicinebatch other = (Medicinebatch) object;
+        MedicineBatch other = (MedicineBatch) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -160,7 +147,7 @@ public class Medicinebatch implements Serializable {
 
     @Override
     public String toString() {
-        return "com.hb.pojo.Medicinebatch[ id=" + id + " ]";
+        return "com.hb.pojo.MedicineBatch[ id=" + id + " ]";
     }
     
 }

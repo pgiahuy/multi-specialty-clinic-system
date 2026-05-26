@@ -13,14 +13,12 @@ import com.hb.pojo.User;
 import com.hb.repository.PatientRepository;
 import com.hb.repository.UserRepository;
 import com.hb.service.PatientService;
-import com.hb.service.UserService;
 
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -48,6 +46,11 @@ public class PatientServiceImpl implements PatientService {
     @Override
     public Patient getPatientById(Long id) {
         return this.patientRepo.getPatientById(id);
+    }
+
+    @Override
+    public void deletePatient(Long id) {
+        this.patientRepo.deletePatient(id);
     }
 
     @Override

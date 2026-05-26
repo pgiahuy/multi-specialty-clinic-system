@@ -1,0 +1,234 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Quản lý Lô Thuốc</title>
+    <th:block th:replace="~{base :: css}"></th:block>
+    <th:block th:replace="~{base :: js}"></th:block>
+    <script th:inline="javascript">
+        window.__OPEN_MEDICINE_BATCH_FORM__ = /*[[${openForm != null ? openForm : false}]]*/ false;
+    </script>
+    <script th:src="@{/js/admin-crud.js}"></script>
+</head>
+
+<body>
+    <div th:replace="~{base :: header('QUẢN LÝ LÔ THUỐC')}"></div>
+    <div th:replace="~{base :: sidebar}"></div>
+
+    <div class="content mt-6">
+        <th:block th:with="hasError=${errorMsg}, hasSuccess=${successMsg}">
+            <div th:if="${hasError}" class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+                <span th:text="${errorMsg}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${hasSuccess}" class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+                <span th:text="${successMsg}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        </th:block>
+
+        <div class="d-flex justify-content-end mb-3">
+            <button type="button" id="toggleMedicineBatchFormBtn" class="btn btn-success"
+                onclick="toggleCrudForm('medicineBatchForm', 'toggleMedicineBatchFormBtn')">
+                <i class="bi bi-plus-circle me-2"></i>Thêm lô thuốc mới
+            </button>
+        </div>
+
+        <form id="medicineBatchForm" th:class="${openForm} ? 'card p-4 mb-4' : 'card p-4 mb-4 d-none'" method="post"
+            th:object="${medicineBatchForm}" th:action="@{/admin/medicine-batchs}">
+            <h4 id="formTitle" class="mb-3 text-uppercase fw-bold text-primary">Thêm / Cập nhật lô thuốc</h4>
+            <input type="hidden" th:field="*{id}" id="medicineBatchId" />
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Mã lô:</label>
+                    <input type="text" th:field="*{batchCode}" class="form-control" id="medicineBatchCode" required />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Số lượng</label>
+                    <input type="number" min="1" th:field="*{quantity}" class="form-control" id="medicineBatchQuantity"
+                        required />
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Ngày nhập:</label>
+                    <input type="date" th:field="*{importDate}" class="form-control" id="medicineBatchImportDate" />
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Hạn sử dụng:</label>
+                    <input type="date" th:field="*{expiryDate}" class="form-control" id="medicineBatchExpiryDate"
+                        required />
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Thuốc:</label>
+                    <div class="input-group mb-2">
+                        <input type="text" id="medicineSearchInput" class="form-control" placeholder="Tìm thuốc...">
+                        <button type="button" class="btn btn-outline-secondary" id="clearMedicineSearch">X</button>
+                    </div>
+                    <select th:field="*{medicine.id}" class="form-select" id="medicineBatchMedicineId" required>
+                        <option value="">-- Chọn thuốc --</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 justify-content-end">
+                <button type="button" class="btn btn-secondary"
+                    onclick="toggleCrudForm('medicineBatchForm', 'toggleMedicineBatchFormBtn')">Hủy</button>
+                <button type="submit" id="submitFormBtn" class="btn btn-primary">Lưu thông tin</button>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle shadow-sm">
+                <thead class="table-primary text-center">
+                    <tr>
+                        <th style="width: 12%">Mã lô</th>
+                        <th>Thuốc</th>
+                        <th style="width: 14%">Ngày nhập</th>
+                        <th style="width: 14%">Hạn sử dụng</th>
+                        <th style="width: 10%">Số lượng</th>
+                        <th style="width: 18%">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="mb : ${medicineBatchs}" th:id="'mb-row-' + ${mb.id}">
+                        <td th:id="'mb-code-' + ${mb.id}" th:text="${mb.batchCode}"
+                            class="text-center fw-bold text-secondary"></td>
+                        <td th:id="'mb-medicine-' + ${mb.id}">
+                            <div class="fw-semibold"
+                                th:text="${mb.medicineId != null ? mb.medicineId.code + ' - ' + mb.medicineId.name : 'Chưa gắn thuốc'}">
+                            </div>
+                        </td>
+                        <td th:id="'mb-import-' + ${mb.id}"
+                            th:text="${mb.importDate != null ? #temporals.format(mb.importDate, 'dd/MM/yyyy') : '-'}"
+                            class="text-center"></td>
+                        <td th:id="'mb-expiry-' + ${mb.id}" th:text="${#temporals.format(mb.expiryDate, 'dd/MM/yyyy')}"
+                            class="text-center fw-semibold text-danger"></td>
+                        <td th:id="'mb-quantity-' + ${mb.id}" th:text="${mb.quantity}" class="text-center fw-bold"></td>
+                        <td class="text-center">
+                            <button class="btn btn-warning btn-sm me-1"
+                                th:attr="data-id=${mb.id}, data-batch-code=${mb.batchCode}, data-import-date=${mb.importDate}, data-expiry-date=${mb.expiryDate}, data-quantity=${mb.quantity}, data-medicine-id=${mb.medicineId != null ? mb.medicineId.id : ''}, data-medicine-label=${mb.medicineId != null ? mb.medicineId.code + ' - ' + mb.medicineId.name : ''}"
+                                onclick="editMedicineBatch(this)">
+                                <i class="bi bi-pencil-square"></i> Sửa
+                            </button>
+                            <button class="btn btn-danger btn-sm"
+                                th:onclick="|deleteCrudItem(${mb.id}, '/admin/medicine-batchs/', 'mb-row-')|">
+                                <i class="bi bi-trash-fill"></i> Xóa
+                            </button>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(medicineBatchs)}">
+                        <td colspan="6" class="text-center text-muted p-4">Không tìm thấy lô thuốc nào trong hệ thống.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-center mt-1">
+        <div th:replace="~{fragments :: pagination('/admin/medicine-batchs', ${totalPages}, ${currentPage})}"></div>
+    </div>
+
+    <div th:replace="~{base :: footer}"></div>
+
+    <script th:inline="javascript">
+        initFormState(window.__OPEN_MEDICINE_BATCH_FORM__, 'medicineBatchForm', 'toggleMedicineBatchFormBtn');
+
+        const medicineSearchUrl = /*[[@{/admin/medicines/search}]]*/ '/admin/medicines/search';
+
+        async function loadMedicines(kw = '') {
+            const response = await fetch(medicineSearchUrl + '?kw=' + encodeURIComponent(kw));
+            const items = await response.json();
+            const medicineSelect = document.getElementById('medicineBatchMedicineId');
+            if (!medicineSelect)
+                return;
+
+            const selectedValue = medicineSelect.value;
+            medicineSelect.innerHTML = '<option value="">-- Chọn thuốc --</option>';
+            items.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.id;
+                option.textContent = item.code ? (item.code + ' - ' + item.name) : item.name;
+                medicineSelect.appendChild(option);
+            });
+            if (selectedValue)
+                medicineSelect.value = selectedValue;
+        }
+
+        function debounce(func, delay) {
+            let timer;
+            return function (...args) {
+                clearTimeout(timer);
+                timer = setTimeout(() => func.apply(this, args), delay);
+            };
+        }
+
+        const debouncedLoadMedicines = debounce((val) => loadMedicines(val), 500);
+        document.getElementById('medicineSearchInput')?.addEventListener('input', (e) => {
+            debouncedLoadMedicines(e.target.value);
+        });
+
+        document.getElementById('clearMedicineSearch')?.addEventListener('click', function () {
+            const inp = document.getElementById('medicineSearchInput');
+            if (inp)
+                inp.value = '';
+            loadMedicines('');
+        });
+
+        function editMedicineBatch(button) {
+            const id = button.getAttribute('data-id');
+            const batchCode = button.getAttribute('data-batch-code') || '';
+            const importDate = button.getAttribute('data-import-date') || '';
+            const expiryDate = button.getAttribute('data-expiry-date') || '';
+            const quantity = button.getAttribute('data-quantity') || '';
+            const medicineId = button.getAttribute('data-medicine-id') || '';
+            const medicineLabel = button.getAttribute('data-medicine-label') || '';
+
+            document.getElementById('medicineBatchId').value = id;
+            document.getElementById('medicineBatchCode').value = batchCode;
+            document.getElementById('medicineBatchImportDate').value = importDate;
+            document.getElementById('medicineBatchExpiryDate').value = expiryDate;
+            document.getElementById('medicineBatchQuantity').value = quantity;
+            const medicineSelect = document.getElementById('medicineBatchMedicineId');
+            if (medicineSelect) {
+                const selected = String(medicineId || '').trim();
+                if (selected) {
+                    let matchedOption = medicineSelect.querySelector('option[value="' + selected + '"]');
+                    if (!matchedOption) {
+                        matchedOption = document.createElement('option');
+                        matchedOption.value = selected;
+                        matchedOption.text = medicineLabel || ('Thuốc #' + selected);
+                        medicineSelect.appendChild(matchedOption);
+                    }
+                    medicineSelect.value = selected;
+                } else {
+                    medicineSelect.value = '';
+                }
+            }
+
+            const medicineSearchInput = document.getElementById('medicineSearchInput');
+            if (medicineSearchInput) {
+                medicineSearchInput.value = medicineLabel;
+                loadMedicines(medicineSearchInput.value);
+            }
+
+            document.getElementById('formTitle').innerText = 'Cập nhật lô thuốc (ID: ' + id + ')';
+            document.getElementById('submitFormBtn').innerText = 'Lưu thay đổi';
+
+            const form = document.getElementById('medicineBatchForm');
+            const toggleBtn = document.getElementById('toggleMedicineBatchFormBtn');
+            form.classList.remove('d-none');
+            toggleBtn.innerHTML = '<i class="bi bi-dash-circle me-2"></i>Đóng form';
+            toggleBtn.className = 'btn btn-secondary';
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        loadMedicines('');
+    </script>
+</body>
+
+</html>

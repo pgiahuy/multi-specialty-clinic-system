@@ -1,70 +1,79 @@
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
 
-    <head>
-        <title>Quản lý người dùng</title>
-    <th:block th:replace="base :: css"></th:block>
-    <th:block th:replace="base :: js"></th:block>
+<head>
+    <title>Quản lý người dùng</title>
+    <th:block th:replace="~{base :: css}"></th:block>
+    <th:block th:replace="~{base :: js}"></th:block>
     <script th:inline="javascript">
-        window.__OPEN_USER_FORM__ = /*[[${openForm}]]*/ false;
+        window.__OPEN_USER_FORM__ = /*[[${openForm != null ? openForm : false}]]*/ false;
     </script>
-    <script th:src="@{/js/user.js}"></script>
+    <script th:src="@{/js/admin-crud.js}"></script>
 </head>
 
 <body>
-    <div th:replace="base :: header('QUẢN LÝ TÀI KHOẢN')"></div>
-    <div th:replace="base :: sidebar"></div>
+    <div th:replace="~{base :: header('QUẢN LÝ TÀI KHOẢN')}"></div>
+    <div th:replace="~{base :: sidebar}"></div>
 
     <div class="content mt-6">
-
         <th:block th:with="hasError=${errorMsg}, hasSuccess=${successMsg}">
             <div th:if="${hasError}" class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
-                <i class="bi bi-exclamation-triangle me-2"></i>
                 <span th:text="${errorMsg}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
-
             <div th:if="${hasSuccess}" class="alert alert-success alert-dismissible fade show mb-3" role="alert">
-                <i class="bi bi-check-circle me-2"></i>
                 <span th:text="${successMsg}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         </th:block>
 
         <div class="d-flex justify-content-end mb-3">
-            <button type="button" id="toggleUserFormBtn" class="btn btn-success" onclick="toggleUserForm()">
+            <button type="button" id="toggleUserFormBtn" class="btn btn-success"
+                onclick="toggleCrudForm('userForm', 'toggleUserFormBtn')">
                 <i class="bi bi-plus-circle me-2"></i>Thêm tài khoản
             </button>
         </div>
 
-        <form id="userForm" th:class="${openForm} ? 'card p-4 mb-4' : 'card p-4 mb-4 d-none'" method="post"
-              th:object="${user}" th:action="@{/admin/users}" enctype="multipart/form-data">
-            <h4 id="formTitle" class="mb-3 text-uppercase fw-bold text-primary">Tạo tài khoản mới</h4>
+        <form class="row g-2 mb-3" method="get" action="" id="userFilterForm">
+            <div class="col-md-6">
+                <input type="text" name="kw" class="form-control" placeholder="Tìm theo tên tài khoản"
+                    th:value="${param.kw != null ? param.kw : ''}" />
+            </div>
+            <div class="col-md-6">
+                <button type="submit" class="btn btn-outline-primary">Tìm kiếm</button>
+                <a th:href="@{/admin/users}" class="btn btn-outline-secondary ms-2">Đặt lại</a>
+            </div>
+        </form>
 
+        <form id="userForm" th:class="${openForm} ? 'card p-4 mb-4' : 'card p-4 mb-4 d-none'" method="post"
+            th:object="${user}" th:action="@{/admin/users}" enctype="multipart/form-data">
+            <h4 id="formTitle" class="mb-3 text-uppercase fw-bold text-primary">Tạo tài khoản mới</h4>
             <input type="hidden" th:field="*{id}" id="userId" />
 
-            <div class="mb-3">
-                <label for="username" class="form-label fw-bold">Tên đăng nhập:</label>
-                <input type="text" th:field="*{username}" class="form-control" id="username"
-                       placeholder="Nhập tên đăng nhập..." required />
-            </div>
-
-            <div class="mb-3">
-                <label for="email" class="form-label fw-bold">Email:</label>
-                <input type="email" th:field="*{email}" class="form-control" id="email" placeholder="example@gmail.com"
-                       required />
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="username" class="form-label fw-bold">Tên đăng nhập:</label>
+                    <input type="text" th:field="*{username}" class="form-control" id="username"
+                        placeholder="Nhập tên đăng nhập..." required />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="email" class="form-label fw-bold">Email:</label>
+                    <input type="email" th:field="*{email}" class="form-control" id="email"
+                        placeholder="example@gmail.com" required />
+                </div>
             </div>
 
             <div class="mb-3" id="passwordGroup">
                 <label for="password" class="form-label fw-bold">Mật khẩu:</label>
-                <input type="password" th:field="*{password}" class="form-control" id="password" placeholder="********"
-                       required />
+                <input type="password" th:field="*{password}" class="form-control" id="password"
+                    placeholder="********" />
+                <div class="form-text">Bắt buộc khi tạo mới, có thể bỏ trống khi cập nhật.</div>
             </div>
 
             <div class="mb-4">
-                <label for="avatarFile" class="form-label fw-bold">Ảnh đại diện:</label>
+                <label for="avatar" class="form-label fw-bold">Ảnh đại diện:</label>
                 <input type="file" name="avatar" class="form-control" id="avatar" accept="image/*" />
-                <div class="form-text">Định dạng hỗ trợ: JPG, PNG, GIF. (Để trống nếu giữ nguyên ảnh cũ)</div>
+                <div class="form-text">Để trống nếu giữ nguyên ảnh cũ.</div>
             </div>
 
             <div class="d-flex gap-2 justify-content-end">
@@ -83,26 +92,34 @@
                         <th>Email</th>
                         <th>Vai trò</th>
                         <th>Avatar</th>
-                        <th>Hành động</th>
+                        <th style="width: 18%">Hành động</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                    <tr th:each="u : ${users}">
+                    <tr th:each="u : ${users}" th:id="'user-row-' + ${u.id}">
                         <td th:id="'name-' + ${u.id}" th:text="${u.username}"></td>
                         <td th:id="'email-' + ${u.id}" th:text="${u.email}"></td>
                         <td th:id="'role-' + ${u.id}" th:text="${u.role}" class="text-center"></td>
                         <td class="text-center">
                             <img th:src="${u.secureUrl != null ? u.secureUrl : '/images/default-avatar.png'}"
-                                 alt="avatar" class="rounded-circle object-fit-cover" width="45" height="45" />
+                                alt="avatar" class="rounded-circle object-fit-cover" width="45" height="45" />
                         </td>
                         <td class="text-center">
-                            <button class="btn btn-warning btn-sm me-1" th:onclick="|editUser(${u.id})|">
+                            <button class="btn btn-warning btn-sm me-1" th:attr="data-id=${u.id}"
+                                onclick="editUser(this)">
                                 <i class="bi bi-pencil-square"></i> Sửa
                             </button>
-                            <button class="btn btn-danger btn-sm" th:onclick="|deleteUser(${u.id})|">
-                                <i class="bi bi-trash-fill"></i> Xóa
+                            
+                            <button class="btn btn-danger btn-sm" th:data-id="${u.id}" th:data-url="@{/admin/users/}"
+                            th:data-row-prefix="'user-row-'"
+                            onclick="deleteCrudItem(this.dataset.id, this.dataset.url, this.dataset.rowPrefix)">
+                            <i class="bi bi-trash-fill"></i>Xóa
                             </button>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(users)}">
+                        <td colspan="5" class="text-center text-muted p-4">Không tìm thấy tài khoản nào trong hệ thống.
                         </td>
                     </tr>
                 </tbody>
@@ -114,7 +131,65 @@
         <div th:replace="~{fragments :: pagination('/admin/users', ${totalPages}, ${currentPage})}"></div>
     </div>
 
-    <div th:replace="base :: footer"></div>
+    <div th:replace="~{base :: footer}"></div>
+
+    <script th:inline="javascript">
+        initFormState(window.__OPEN_USER_FORM__, 'userForm', 'toggleUserFormBtn');
+
+        function syncPasswordState() {
+            const idField = document.getElementById('userId');
+            const passwordGroup = document.getElementById('passwordGroup');
+            const passwordInput = document.getElementById('password');
+            const submitBtn = document.getElementById('submitFormBtn');
+            const formTitle = document.getElementById('formTitle');
+
+            if (!passwordGroup || !passwordInput || !submitBtn || !formTitle || !idField) {
+                return;
+            }
+
+            const isEditMode = !!String(idField.value || '').trim();
+            passwordInput.required = !isEditMode;
+            passwordGroup.classList.remove('d-none');
+            passwordInput.placeholder = isEditMode ? 'Để trống nếu giữ mật khẩu cũ' : '********';
+            submitBtn.innerHTML = isEditMode
+                ? '<i class="bi bi-check-circle-fill me-2"></i>Lưu thay đổi'
+                : '<i class="bi bi-person-plus-fill me-2"></i>Tạo tài khoản';
+            formTitle.innerText = isEditMode ? 'Cập nhật tài khoản' : 'Tạo tài khoản mới';
+        }
+
+        function editUser(button) {
+            const id = button.getAttribute('data-id');
+            const username = document.getElementById('name-' + id)?.innerText.trim() || '';
+            const email = document.getElementById('email-' + id)?.innerText.trim() || '';
+
+            document.getElementById('userId').value = id;
+            document.getElementById('username').value = username;
+            document.getElementById('email').value = email;
+            document.getElementById('password').value = '';
+
+            const form = document.getElementById('userForm');
+            const toggleBtn = document.getElementById('toggleUserFormBtn');
+            form.classList.remove('d-none');
+            toggleBtn.innerHTML = '<i class="bi bi-dash-circle me-2"></i>Đóng form';
+            toggleBtn.className = 'btn btn-secondary';
+
+            syncPasswordState();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function resetAndCloseForm() {
+            const form = document.getElementById('userForm');
+            const toggleBtn = document.getElementById('toggleUserFormBtn');
+            form.reset();
+            document.getElementById('userId').value = '';
+            form.classList.add('d-none');
+            toggleBtn.innerHTML = '<i class="bi bi-plus-circle me-2"></i>Thêm tài khoản';
+            toggleBtn.className = 'btn btn-success';
+            syncPasswordState();
+        }
+
+        document.addEventListener('DOMContentLoaded', syncPasswordState);
+    </script>
 </body>
 
 </html>
