@@ -22,6 +22,7 @@ import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Date;
 
@@ -62,7 +63,7 @@ public class Patient implements Serializable {
     @NotNull
     @Column(name = "dob")
     @Temporal(TemporalType.DATE)
-    private Date dob;
+    private LocalDate dob;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 10)
@@ -94,7 +95,7 @@ public class Patient implements Serializable {
         this.id = id;
     }
 
-    public Patient(Long id, String cccd, String fullName, Date dob, String gender, String address) {
+    public Patient(Long id, String cccd, String fullName, LocalDate dob, String gender, String address) {
         this.id = id;
         this.cccd = cccd;
         this.fullName = fullName;
@@ -127,11 +128,11 @@ public class Patient implements Serializable {
         this.fullName = fullName;
     }
 
-    public Date getDob() {
+    public LocalDate getDob() {
         return dob;
     }
 
-    public void setDob(Date dob) {
+    public void setDob(LocalDate dob) {
         this.dob = dob;
     }
 

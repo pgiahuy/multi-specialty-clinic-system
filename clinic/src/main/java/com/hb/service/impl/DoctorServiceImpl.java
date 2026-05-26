@@ -4,6 +4,8 @@
  */
 package com.hb.service.impl;
 
+import com.hb.dto.request.form.DoctorForm;
+import com.hb.exception.BadRequestException;
 import com.hb.exception.ResourceNotFoundException;
 import com.hb.pojo.Doctor;
 import com.hb.pojo.Specialty;
@@ -16,6 +18,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.hb.repository.SpecialtyRepository;
+import java.util.HashSet;
 
 /**
  *
@@ -26,7 +29,7 @@ public class DoctorServiceImpl implements DoctorService {
 
     @Autowired
     private DoctorRepository doctorRepo;
-    
+
     @Autowired
     private SpecialtyRepository specialtieRepo;
 
@@ -34,41 +37,47 @@ public class DoctorServiceImpl implements DoctorService {
     private UserRepository userRepo;
 
     @Override
-    public Doctor addDoctor(Map<String, String> params) {
-        Doctor d = new Doctor();
+    public Doctor saveOrUpdate(DoctorForm doctorForm) {
+        Doctor d;
+        if (doctorForm.getId() == null) {
+            d = new Doctor();
+        } else {
+            d = this.doctorRepo.getDoctorById(doctorForm.getId());
+        }
 
-        d.setDescription(params.getOrDefault("description", ""));
+        d.setDescription(doctorForm.getDescription() != null ? doctorForm.getDescription().trim() : "");
+        d.setFullName(doctorForm.getFullName() != null ? doctorForm.getFullName().trim() : "");
+        d.setGender(doctorForm.getGender() != null ? doctorForm.getGender().trim() : "");
 
-        String username = params.get("username");
-        if (username != null && !username.isEmpty()) {
-            User u = this.userRepo.getUserByUsername(username);
+        if (doctorForm.getUserId() != null) {
+            User u = this.userRepo.getUserById(doctorForm.getUserId());
             if (u == null) {
-                throw new ResourceNotFoundException("User not found");
+                throw new ResourceNotFoundException("User không tồn tại!");
             }
             d.setUserId(u);
-        } else {
-            throw new RuntimeException("Missing username");
         }
 
-        String specIdStr = params.get("specialtyId");
-        if (specIdStr != null && !specIdStr.isEmpty()) {
-            Long specId = Long.valueOf(specIdStr);
-            Specialty s = this.specialtieRepo.getSpecialtieById(specId);
-            if (s == null) {
-                throw new ResourceNotFoundException("Specialty not found");
-            }
-            d.setSpecialty(s);
-        } else {
-            throw new RuntimeException("Missing specialty");
-        }
+        if (doctorForm.getSpecialtyIds() != null && !doctorForm.getSpecialtyIds().isEmpty()) {
+            List<Long> ids = doctorForm.getSpecialtyIds();
 
-        return this.doctorRepo.addDoctor(d);
+            List<Specialty> specs = this.specialtieRepo.getAllById(ids);
+
+            if (specs.size() != ids.size())
+                throw new ResourceNotFoundException("Một số chuyên khoa không tồn tại!");
+
+            d.setSpecialtyCollection(new HashSet<>(specs));
+
+        } else {
+            throw new BadRequestException("Thiếu thông tin chuyên khoa!");
+        }
+        return this.doctorRepo.saveOrUpdate(d);
     }
 
     @Override
     public List<Doctor> getDoctors(Map<String, String> params) {
         return doctorRepo.getDoctors(params);
     }
+    
 
     @Override
     public Doctor getDoctorById(Long id) {

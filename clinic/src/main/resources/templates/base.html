@@ -1,8 +1,8 @@
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 
-<head>
-    <title>Admin</title>
+    <head>
+        <title>Admin</title>
 
     <th:block th:fragment="js">
 
@@ -59,63 +59,54 @@
             </li>
 
             <li class="nav-item">
-                <a class="nav-link text-white" th:href="@{/admin/users}"><i class="bi bi-person-fill me-2"></i>Tài
+                <a class="nav-link text-white" th:href="@{/admin/users}">Tài
                     khoản</a>
             </li>
-
             <li class="nav-item">
-                <a class="nav-link text-white" th:href="@{/admin/medicines}"><i class="bi bi-capsule me-2"></i>Dược
-                    phẩm</a>
+                <a class="nav-link text-white" th:href="@{/admin/doctors}">Bác sĩ</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" th:href="@{/admin/schedules}">Lịch bác sĩ</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" th:href="@{/admin/specialties}">Chuyên khoa</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" th:href="@{/admin/patients}">Bệnh nhân</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" th:href="@{/admin/appointments}">Lịch hẹn</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" th:href="@{/admin/medical-records}">Bệnh án</a>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link text-white" th:href="@{/admin/medical-records}"><i
-                        class="bi bi-clipboard2-pulse-fill me-2"></i></i>Bệnh án</a>
+                <a class="nav-link text-white" th:href="@{/admin/lab-tests}">Xét
+                    nghiệm</a>
             </li>
 
-            <li class="nav-item">
-                <a class="nav-link text-white" th:href="@{/admin/appointments}"><i
-                        class="bi bi-calendar2-check me-2"></i>Lịch hẹn</a>
-            </li>
 
             <li class="nav-item">
-                <a class="nav-link text-white" th:href="@{/admin/areas}"><i class="bi bi-calendar2-check me-2"></i>Khu
+                <a class="nav-link text-white" th:href="@{/admin/areas}">Khu
                     vực khám</a>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link text-white" th:href="@{/admin/rooms}"><i class="bi bi-calendar2-check me-2"></i>Phòng
+                <a class="nav-link text-white" th:href="@{/admin/rooms}">Phòng
                     khám</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-white" th:href="@{/admin/lab-tests}"><i class="bi bi-flask"></i></i>Xét
-                    nghiệm</a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link text-white" th:href="@{/admin/specialties}">Chuyên khoa</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link text-white" th:href="@{/admin/shifts}">Ca khám</a>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link text-white" th:href="@{/admin/doctors}">Bác sĩ</a>
+                <a class="nav-link text-white" th:href="@{/admin/medicines}">Dược phẩm</a>
             </li>
 
-            <li class="nav-item">
-                <a class="nav-link text-white" th:href="@{/admin/schedules}">Lịch bác sĩ</a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link text-white" th:href="@{/admin/patients}">Bệnh nhân</a>
-            </li>
             <li class="nav-item">
                 <a class="nav-link text-white" th:href="@{/admin/stats}">Thống kê</a>
             </li>
-
-
-
 
         </ul>
     </div>

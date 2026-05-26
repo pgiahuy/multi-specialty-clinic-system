@@ -1,10 +1,155 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Quản lý Bệnh nhân</title>
+    <th:block th:replace="~{base :: css}"></th:block>
+    <th:block th:replace="~{base :: js}"></th:block>
+    <script th:inline="javascript">
+        window.__OPEN_PATIENT_FORM__ = /*[[${openForm != null ? openForm : false}]]*/ false;
+    </script>
+    <script th:src="@{/js/admin-crud.js}"></script>
+</head>
+
+<body>
+    <div th:replace="~{base :: header('QUẢN LÝ BỆNH NHÂN')}"></div>
+    <div th:replace="~{base :: sidebar}"></div>
+
+    <div class="content mt-6">
+        <th:block th:with="hasError=${errorMsg}, hasSuccess=${successMsg}">
+            <div th:if="${hasError}" class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+                <span th:text="${errorMsg}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${hasSuccess}" class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+                <span th:text="${successMsg}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        </th:block>
+
+        <div class="d-flex justify-content-end mb-3">
+            <button type="button" id="togglePatientFormBtn" class="btn btn-success"
+                onclick="toggleCrudForm('patientForm', 'togglePatientFormBtn')">
+                <i class="bi bi-plus-circle me-2"></i>Thêm bệnh nhân
+            </button>
+        </div>
+
+        <form class="row g-2 mb-3" method="get" action="" id="patientFilterForm">
+            <div class="col-md-4">
+                <input type="text" name="patientName" class="form-control" placeholder="Tìm bệnh nhân"
+                    th:value="${param.patientName != null ? param.patientName : ''}" />
+            </div>
+            <div class="col-md-4">
+                <select name="gender" class="form-select">
+                    <option value="">-- Giới tính --</option>
+                    <option value="Nam">Nam</option>
+                    <option value="Nữ">Nữ</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-outline-primary">Tìm kiếm</button>
+                <a th:href="@{/admin/patients}" class="btn btn-outline-secondary ms-2">Đặt lại</a>
+            </div>
+        </form>
+
+        <form id="patientForm" th:class="${openForm} ? 'card p-4 mb-4' : 'card p-4 mb-4 d-none'" method="post"
+            th:object="${patientForm}" th:action="@{/admin/patients}">
+            <h4 id="formTitle" class="mb-3 text-uppercase fw-bold text-primary">Thêm / Cập nhật bệnh nhân</h4>
+            <input type="hidden" th:field="*{id}" id="patientId" />
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Họ tên:</label>
+                    <input type="text" th:field="*{fullName}" class="form-control" id="patientFullName" required />
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label fw-bold">Ngày sinh:</label>
+                    <input type="date" th:field="*{dob}" class="form-control" id="patientDob" />
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label fw-bold">Giới tính:</label>
+                    <select th:field="*{gender}" class="form-select" id="patientGender">
+                        <option value="">-- Chọn --</option>
+                        <option value="Nam">Nam</option>
+                        <option value="Nữ">Nữ</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Số điện thoại:</label>
+                    <input type="text" th:field="*{phone}" class="form-control" />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Địa chỉ:</label>
+                    <input type="text" th:field="*{address}" class="form-control" />
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 justify-content-end">
+                <button type="button" class="btn btn-secondary"
+                    onclick="toggleCrudForm('patientForm', 'togglePatientFormBtn')">Hủy</button>
+                <button type="submit" id="submitFormBtn" class="btn btn-primary">Lưu thông tin</button>
+            </div>
+        </form>
+
+        <table class="table table-bordered table-hover align-middle shadow-sm">
+            <thead class="table-primary text-center">
+                <tr>
+                    <th>Họ tên</th>
+                    <th>Ngày sinh</th>
+                    <th>Giới tính</th>
+                    <th>Điện thoại</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="p : ${patients}" th:id="'patient-row-' + ${p.id}">
+                    <td th:text="${p.fullName}" th:id="'p-name-' + ${p.id}"></td>
+                    <td th:text="${p.dob}"></td>
+                    <td th:text="${p.gender}"></td>
+                    <td th:text="${p.phone}"></td>
+                    <td class="text-center">
+                        <button class="btn btn-warning btn-sm" th:onclick="|editPatient(${p.id})|">Sửa</button>
+                        <button class="btn btn-danger btn-sm"
+                            th:onclick="|deleteCrudItem(${p.id}, '/admin/patients/', 'patient-row-')|">Xóa</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="d-flex justify-content-center mt-1">
+        <div th:replace="~{fragments :: pagination('/admin/patients', ${totalPages}, ${currentPage})}"></div>
+    </div>
+
+    <div th:replace="~{base :: footer}"></div>
+
+    <script th:inline="javascript">
+        initFormState(window.__OPEN_PATIENT_FORM__, 'patientForm', 'togglePatientFormBtn');
+
+        function editPatient(id) {
+            document.getElementById('patientId').value = id;
+            document.getElementById('patientFullName').value = document.getElementById('p-name-' + id).innerText.trim();
+            document.getElementById('formTitle').innerText = 'Cập nhật bệnh nhân (ID: ' + id + ')';
+            document.getElementById('submitFormBtn').innerText = 'Lưu thay đổi';
+            document.getElementById('patientForm').classList.remove('d-none');
+            document.getElementById('togglePatientFormBtn').className = 'btn btn-secondary';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+
+</html>
 
 
 
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
-    <head>
-        <title>Quản lý Bệnh nhân</title>
+
+<head>
+    <title>Quản lý Bệnh nhân</title>
 
     <th:block th:replace="base :: css"></th:block>
     <th:block th:replace="base :: js"></th:block>
@@ -16,8 +161,8 @@
             submitBtnId: 'submitFormBtn',
             passwordGroupId: 'passwordGroup',
             idField: 'userId',
-            fields: ['username','email','password','avatar'],
-            tableFieldMap: {'username':'name-','email':'email-'},
+            fields: ['username', 'email', 'password', 'avatar'],
+            tableFieldMap: { 'username': 'name-', 'email': 'email-' },
             open: /*[[${openForm}]]*/ false,
             serverData: /*[[${user}]]*/ {}
         });
@@ -40,8 +185,8 @@
     <div th:replace="base :: sidebar"></div>
 
     <div class="content">
-        
-         <th:block th:with="hasError=${errorMsg}, hasSuccess=${successMsg}">
+
+        <th:block th:with="hasError=${errorMsg}, hasSuccess=${successMsg}">
             <div th:if="${hasError}" class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
                 <i class="bi bi-exclamation-triangle me-2"></i>
                 <span th:text="${errorMsg}"></span>
@@ -54,8 +199,8 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         </th:block>
-        
-<!--        <div class="d-flex justify-content-end mb-3">
+
+        <!--        <div class="d-flex justify-content-end mb-3">
             <button type="button" id="toggleUserFormBtn" class="btn btn-success" onclick="toggleUserForm()">
                 <i class="bi bi-plus-circle me-2"></i>Thêm bệnh nhân
             </button>
@@ -125,11 +270,10 @@
                     <td th:text="${d.dob}"></td>
                     <td th:text="${d.address}"></td>
                     <td th:text="${d.userId.username}"></td>
-           
+
                     <td>
                         <button class="btn btn-warning btn-sm">Sửa</button>
-                        <button class="btn btn-danger btn-sm"
-                                th:onclick="'deleteDoctor(' + ${d.id} + ')'">
+                        <button class="btn btn-danger btn-sm" th:onclick="'deleteDoctor(' + ${d.id} + ')'">
                             Xóa
                         </button>
                     </td>
@@ -147,4 +291,5 @@
 
     </div>
 </body>
+
 </html>

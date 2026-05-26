@@ -35,14 +35,24 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<User> implements User
     @Override
     public List<User> getUsers(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<User> q = session.createNamedQuery("User.findAll", User.class);
 
-        if (params != null) {
+        StringBuilder hql = new StringBuilder("FROM User u WHERE 1=1");
+
+        if (params != null && params.containsKey("kw")) {
+            hql.append(" AND u.username LIKE :kw");
+        }
+
+        Query<User> q = session.createQuery(hql.toString(), User.class);
+
+        if (params != null && params.containsKey("kw")) {
+            q.setParameter("kw", "%" + params.get("kw") + "%");
+        }
+
+        if (params != null && params.containsKey("pageSize")) {
             int pageSize = Integer.parseInt(params.get("pageSize"));
             int page = Integer.parseInt(params.getOrDefault("page", "1"));
-            int start = (page - 1) * pageSize;
             q.setMaxResults(pageSize);
-            q.setFirstResult(start);
+            q.setFirstResult((page - 1) * pageSize);
         }
 
         return q.getResultList();
@@ -71,10 +81,10 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<User> implements User
         Session session = this.factory.getObject().getCurrentSession();
         if (u.getId() == null) {
             session.persist(u);
+            return u;
         } else {
-            session.merge(u);
+            return session.merge(u);
         }
-        return u;
     }
 
     @Override
@@ -88,7 +98,7 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<User> implements User
                     p.setUserId(null);
                 }
             }
-            
+
             if (u.getDoctor() != null) {
                 u.getDoctor().setUserId(null);
             }

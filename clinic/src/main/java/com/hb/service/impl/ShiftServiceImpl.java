@@ -4,6 +4,7 @@
  */
 package com.hb.service.impl;
 
+import com.hb.dto.request.form.ShiftForm;
 import com.hb.dto.response.ShiftResponse;
 import com.hb.mapper.ShiftMapper;
 import com.hb.pojo.Shifts;
@@ -18,23 +19,33 @@ import org.springframework.stereotype.Service;
  *
  * @author HUY
  */
-
 @Service
 public class ShiftServiceImpl implements ShiftService {
-    
+
     @Autowired
     private ShiftRepository shiftRepo;
 
     @Override
     public List<ShiftResponse> getShifts(Map<String, String> params) {
-        List<Shifts> res =  this.shiftRepo.getShifts(params);
+        List<Shifts> res = this.shiftRepo.getShifts(params);
         return res.stream().map(ShiftMapper.INSTANCE::toResponse).toList();
     }
 
     @Override
-    public Shifts addShift(Map<String, String> params) {
-        Shifts shift = new Shifts();
-        return this.shiftRepo.addShift(shift);
+    public Shifts saveOrUpdate(ShiftForm form) {
+        Shifts s;
+        if (form.getId() == null) {
+            s = new Shifts();
+        } else {
+            s = this.shiftRepo.getShiftById(form.getId());
+        }
+
+        s.setStartTime(form.getStartTime() != null ? form.getStartTime() : null);
+        s.setEndTime(form.getEndTime() != null ? form.getEndTime() : null);
+        s.setSession(form.getSession()!= null ? form.getSession() : null);
+        s.setMinPatients(form.getMinPatients()!= null ? form.getMinPatients() : null);
+        s.setMaxPatients(form.getMaxPatients()!= null ? form.getMaxPatients() : null);
+        return this.shiftRepo.saveOrUpdate(s);
     }
 
     @Override
@@ -52,5 +63,5 @@ public class ShiftServiceImpl implements ShiftService {
     public long countShifts(Map<String, String> params) {
         return shiftRepo.count(params, Shifts.class);
     }
-    
+
 }

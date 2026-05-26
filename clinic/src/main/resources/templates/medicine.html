@@ -3,31 +3,27 @@
 
 <head>
     <title>Quản lý Thuốc</title>
-    <th:block th:replace="base :: css"></th:block>
-    <th:block th:replace="base :: js"></th:block>
+    <th:block th:replace="~{base :: css}"></th:block>
+    <th:block th:replace="~{base :: js}"></th:block>
     <script th:inline="javascript">
-        window.__OPEN_MEDICINE_FORM__ = /*[[${openForm}]]*/ false;
+        window.__OPEN_MEDICINE_FORM__ = /*[[${openForm != null ? openForm : false}]]*/ false;
     </script>
     <script th:src="@{/js/admin-crud.js}"></script>
 </head>
 
 <body>
-    <div th:replace="base :: header('QUẢN LÝ DANH MỤC THUỐC')"></div>
-    <div th:replace="base :: sidebar"></div>
+    <div th:replace="~{base :: header('QUẢN LÝ THUỐC')}"></div>
+    <div th:replace="~{base :: sidebar}"></div>
 
     <div class="content mt-6">
-
         <th:block th:with="hasError=${errorMsg}, hasSuccess=${successMsg}">
             <div th:if="${hasError}" class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
-                <i class="bi bi-exclamation-triangle me-2"></i>
                 <span th:text="${errorMsg}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
-
             <div th:if="${hasSuccess}" class="alert alert-success alert-dismissible fade show mb-3" role="alert">
-                <i class="bi bi-check-circle me-2"></i>
                 <span th:text="${successMsg}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         </th:block>
 
@@ -40,54 +36,47 @@
 
         <form id="medicineForm" th:class="${openForm} ? 'card p-4 mb-4' : 'card p-4 mb-4 d-none'" method="post"
             th:object="${medicineForm}" th:action="@{/admin/medicines}" enctype="multipart/form-data">
-
-            <h4 id="formTitle" class="mb-3 text-uppercase fw-bold text-primary">Thêm thuốc mới</h4>
-
+            <h4 id="formTitle" class="mb-3 text-uppercase fw-bold text-primary">Thêm / Cập nhật thuốc</h4>
             <input type="hidden" th:field="*{id}" id="medicineId" />
 
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    <label for="code" class="form-label fw-bold">Mã thuốc:</label>
-                    <input type="text" th:field="*{code}" class="form-control" id="code" placeholder="Ví dụ: MED-001..." required />
+                    <label class="form-label fw-bold">Mã thuốc:</label>
+                    <input type="text" th:field="*{code}" class="form-control" id="medicineCode" required />
                 </div>
-
                 <div class="col-md-6 mb-3">
-                    <label for="name" class="form-label fw-bold">Tên thuốc:</label>
-                    <input type="text" th:field="*{name}" class="form-control" id="name" placeholder="Nhập tên thuốc..." required />
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="price" class="form-label fw-bold">Giá bán (VNĐ):</label>
-                    <input type="number" step="0.01" th:field="*{price}" class="form-control" id="price" placeholder="Nhập giá thuốc..." required />
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label for="unit" class="form-label fw-bold">Đơn vị tính:</label>
-                    <input type="text" th:field="*{unit}" class="form-control" id="unit" placeholder="Ví dụ: Viên, Vỉ, Hộp, Chai..." required />
+                    <label class="form-label fw-bold">Tên thuốc:</label>
+                    <input type="text" th:field="*{name}" class="form-control" id="medicineName" required />
                 </div>
             </div>
 
             <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="minStockAlert" class="form-label fw-bold">Cảnh báo kho tối thiểu:</label>
-                    <input type="number" th:field="*{minStockAlert}" class="form-control" id="minStockAlert" placeholder="Hệ thống sẽ báo động nếu tồn kho dưới mức này..." />
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Giá:</label>
+                    <input type="number" step="0.01" min="0" th:field="*{price}" class="form-control" id="medicinePrice"
+                        required />
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Đơn vị:</label>
+                    <input type="text" th:field="*{unit}" class="form-control" id="medicineUnit" required />
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Mức cảnh báo tồn kho:</label>
+                    <input type="number" min="0" th:field="*{minStockAlert}" class="form-control"
+                        id="medicineMinStockAlert" />
                 </div>
             </div>
 
             <div class="mb-4">
-                <label for="imageFile" class="form-label fw-bold">Hình ảnh thuốc:</label>
-                <input type="file" name="image" class="form-control" id="imageFile" accept="image/*" />
-                <div class="form-text">Định dạng hỗ trợ: JPG, PNG. (Để trống nếu giữ nguyên ảnh cũ)</div>
+                <label class="form-label fw-bold">Ảnh thuốc:</label>
+                <input type="file" name="image" class="form-control" id="medicineImage" accept="image/*" />
+                <div class="form-text">Để trống nếu giữ nguyên ảnh cũ.</div>
             </div>
 
             <div class="d-flex gap-2 justify-content-end">
                 <button type="button" class="btn btn-secondary"
                     onclick="toggleCrudForm('medicineForm', 'toggleMedicineFormBtn')">Hủy</button>
-                <button type="submit" id="submitFormBtn" class="btn btn-primary">
-                    Lưu thông tin
-                </button>
+                <button type="submit" id="submitFormBtn" class="btn btn-primary">Lưu thông tin</button>
             </div>
         </form>
 
@@ -98,36 +87,38 @@
                         <th style="width: 12%">Mã thuốc</th>
                         <th>Tên thuốc</th>
                         <th style="width: 15%">Giá bán</th>
-                        <th style="width: 10%">Đơn vị</th> 
+                        <th style="width: 10%">Đơn vị</th>
                         <th style="width: 15%">Mức cảnh báo</th>
                         <th style="width: 12%">Hình ảnh</th>
                         <th style="width: 18%">Hành động</th>
                     </tr>
                 </thead>
-
                 <tbody>
                     <tr th:each="m : ${medicines}" th:id="'med-row-' + ${m.id}">
-                        <td th:id="'code-' + ${m.id}" th:text="${m.code}" class="text-center fw-bold text-secondary">
-                        </td>
-                        <td th:id="'name-' + ${m.id}" th:text="${m.name}"></td>
-                        <td th:id="'price-' + ${m.id}"
+                        <td th:id="'med-code-' + ${m.id}" th:text="${m.code}"
+                            class="text-center fw-bold text-secondary"></td>
+                        <td th:id="'med-name-' + ${m.id}" th:text="${m.name}"></td>
+                        <td th:id="'med-price-' + ${m.id}"
                             th:text="${#numbers.formatDecimal(m.price, 0, 'COMMA', 0, 'POINT')} + ' đ'"
                             class="text-end fw-bold text-danger"></td>
-                        <td th:id="'unit-' + ${m.id}" th:text="${m.unit}" class="text-center"></td>
+                        <td th:id="'med-unit-' + ${m.id}" th:text="${m.unit}" class="text-center"></td>
                         <td class="text-center">
                             <span th:text="${m.minStockAlert != null ? m.minStockAlert : 'Không đặt'}"></span>
-                            <input type="hidden" th:id="'stock-' + ${m.id}" th:value="${m.minStockAlert}" />
+                            <input type="hidden" th:id="'med-min-' + ${m.id}" th:value="${m.minStockAlert}" />
                         </td>
                         <td class="text-center">
                             <img th:src="${m.secureUrl != null ? m.secureUrl : '/images/default-medicine.png'}"
                                 alt="medicine image" class="img-thumbnail object-fit-cover" width="60" height="60" />
+                            <input type="hidden" th:id="'med-image-' + ${m.id}" th:value="${m.secureUrl}" />
                         </td>
                         <td class="text-center">
-                            <button class="btn btn-warning btn-sm me-1" th:onclick="|editMedicine(${m.id})|">
+                            <button class="btn btn-warning btn-sm me-1"
+                                th:attr="data-id=${m.id}, data-code=${m.code}, data-name=${m.name}, data-price=${m.price}, data-unit=${m.unit}, data-min=${m.minStockAlert}"
+                                onclick="editMedicine(this)">
                                 <i class="bi bi-pencil-square"></i> Sửa
                             </button>
                             <button class="btn btn-danger btn-sm"
-                                th:onclick="|deleteCrudItem(${m.id}, '/clinic/admin/medicines/', 'med-row-')|">
+                                th:onclick="|deleteCrudItem(${m.id}, '/admin/medicines/', 'med-row-')|">
                                 <i class="bi bi-trash-fill"></i> Xóa
                             </button>
                         </td>
@@ -145,37 +136,38 @@
         <div th:replace="~{fragments :: pagination('/admin/medicines', ${totalPages}, ${currentPage})}"></div>
     </div>
 
-    <div th:replace="base :: footer"></div>
+    <div th:replace="~{base :: footer}"></div>
+
+    <script th:inline="javascript">
+        initFormState(window.__OPEN_MEDICINE_FORM__, 'medicineForm', 'toggleMedicineFormBtn');
+
+        function editMedicine(button) {
+            const id = button.getAttribute('data-id');
+            const code = button.getAttribute('data-code') || '';
+            const name = button.getAttribute('data-name') || '';
+            const price = button.getAttribute('data-price') || '';
+            const unit = button.getAttribute('data-unit') || '';
+            const minStockAlert = button.getAttribute('data-min') || '';
+
+            document.getElementById('medicineId').value = id;
+            document.getElementById('medicineCode').value = code;
+            document.getElementById('medicineName').value = name;
+            document.getElementById('medicinePrice').value = price;
+            document.getElementById('medicineUnit').value = unit;
+            document.getElementById('medicineMinStockAlert').value = minStockAlert === 'null' ? '' : minStockAlert;
+
+            document.getElementById('formTitle').innerText = 'Cập nhật thuốc (ID: ' + id + ')';
+            document.getElementById('submitFormBtn').innerText = 'Lưu thay đổi';
+
+            const form = document.getElementById('medicineForm');
+            const toggleBtn = document.getElementById('toggleMedicineFormBtn');
+            form.classList.remove('d-none');
+            toggleBtn.innerHTML = '<i class="bi bi-dash-circle me-2"></i>Đóng form';
+            toggleBtn.className = 'btn btn-secondary';
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
 </body>
-
-<script th:inline="javascript">
-    initFormState(window.__OPEN_MEDICINE_FORM__, 'medicineForm', 'toggleMedicineFormBtn');
-
-    function editMedicine(id) {
-        const codeVal = document.getElementById('code-' + id).innerText;
-        const nameVal = document.getElementById('name-' + id).innerText;
-        const priceVal = document.getElementById('price-' + id).innerText.replace(/[^0-9]/g, '');
-        const stockVal = document.getElementById('stock-' + id).value;
-        const unitVal = document.getElementById('unit-' + id).innerText; 
-
-        document.getElementById('medicineId').value = id;
-        document.getElementById('code').value = codeVal;
-        document.getElementById('name').value = nameVal;
-        document.getElementById('price').value = priceVal;
-        document.getElementById('minStockAlert').value = stockVal === 'null' ? '' : stockVal;
-        document.getElementById('unit').value = unitVal;
-
-        document.getElementById('formTitle').innerText = 'Cập nhật thông tin thuốc (ID: ' + id + ')';
-        document.getElementById('submitFormBtn').innerHTML = 'Lưu thay đổi';
-
-        const form = document.getElementById('medicineForm');
-        const toggleBtn = document.getElementById('toggleMedicineFormBtn');
-        form.classList.remove('d-none');
-        toggleBtn.innerHTML = '<i class="bi bi-dash-circle me-2"></i>Đóng form';
-        toggleBtn.className = 'btn btn-secondary';
-
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-</script>
 
 </html>

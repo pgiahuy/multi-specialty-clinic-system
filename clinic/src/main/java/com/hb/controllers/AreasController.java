@@ -4,8 +4,8 @@
  */
 package com.hb.controllers;
 
+import com.hb.dto.request.form.AreaForm;
 import com.hb.service.AreasService;
-import com.hb.service.DoctorService;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
@@ -16,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,6 +44,7 @@ public class AreasController {
         int pageSize = this.env.getProperty("admin.page_size", Integer.class);
         params.put("pageSize", String.valueOf(pageSize));
         model.addAttribute("areas", areaService.getAreas(params));
+        model.addAttribute("areaForm", new AreaForm());
 
         long totalAreas = areaService.countAreas(params);
         int totalPages = (int) Math.ceil((double) totalAreas / pageSize);
@@ -55,10 +57,10 @@ public class AreasController {
     
 
     @PostMapping("/areas")
-    public String create(@RequestParam Map<String, String> params) {
+    public String create(@ModelAttribute AreaForm areaForm) {
 
-        areaService.addArea(params);
-        return "redirect:/admin/area";
+        areaService.saveOrUpdate(areaForm);
+        return "redirect:/admin/areas";
     }
 
     @DeleteMapping("/areas/{id}")

@@ -50,8 +50,14 @@ public class ShiftRepositoryImpl extends BaseRepositoryImpl<Shifts> implements S
     }
 
     @Override
-    public Shifts addShift(Shifts d) {
-        return null;
+    public Shifts saveOrUpdate(Shifts d) {
+        Session session = this.factory.getObject().getCurrentSession();
+        if (d.getId()==null) {
+            session.persist(d);
+            return d;
+        }else{
+            return session.merge(d);
+        }
     }
 
     @Override

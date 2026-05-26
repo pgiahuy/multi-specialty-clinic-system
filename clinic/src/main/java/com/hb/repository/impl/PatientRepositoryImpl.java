@@ -54,16 +54,16 @@ public class PatientRepositoryImpl extends BaseRepositoryImpl<Patient> implement
     }
 
     @Override
-    public Patient addPatient(Patient p) {
+    public Patient saveOrUpdate(Patient p) {
         Session session = this.factory.getObject().getCurrentSession();
-        session.persist(p);
-        return p;
+        if(p.getId()==null){
+            session.persist(p);
+            return p;
+        }else{
+            return session.merge(p);
+        }
     }
 
-    @Override
-    public void updatePatient(Patient p) {
-        Session session = this.factory.getObject().getCurrentSession();
-        session.merge(p);
-    }
+   
     
 }
