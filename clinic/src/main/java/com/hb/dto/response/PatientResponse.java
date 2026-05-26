@@ -133,10 +133,5 @@ public class PatientResponse {
      */
     public void setGender(String gender) {
         this.gender = gender;
-    }
-   
-    
-
-    
-    
+    } 
 }

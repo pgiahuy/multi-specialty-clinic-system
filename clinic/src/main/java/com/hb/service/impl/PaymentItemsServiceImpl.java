@@ -121,7 +121,7 @@ public class PaymentItemsServiceImpl implements PaymentItemsService {
 
     @Override
     public List<PaymentItems> getPaymentItemsByPaymentId(Long paymentId, Map<String, String> params) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        return this.itemRepo.getItemsByPaymentId(paymentId, params);
     }
 
 }

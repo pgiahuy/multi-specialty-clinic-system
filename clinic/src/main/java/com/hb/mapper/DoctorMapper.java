@@ -38,6 +38,7 @@ public class DoctorMapper {
        
         if (d.getUserId() != null) {
             res.setEmail(d.getUserId().getEmail());
+            res.setAvatar(d.getUserId().getSecureUrl());
         }
 
         return res;

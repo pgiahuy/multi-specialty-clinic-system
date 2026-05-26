@@ -6,6 +6,7 @@ package com.hb.service.impl;
 
 import com.hb.dto.request.AppointmentCreateRequest;
 import com.hb.dto.response.AppointmentResponse;
+import com.hb.exception.DuplicateResourceException;
 import com.hb.exception.FullSlotException;
 import com.hb.exception.ResourceNotFoundException;
 import com.hb.mapper.AppointmentMapper;
@@ -87,7 +88,11 @@ public class AppointmentServiceImpl implements AppointmentService {
             if (schedule == null) {
                 throw new ResourceNotFoundException("Schedule not found!");
             }
-
+            
+            boolean isAlreadyBooked = appointmentRepo.isPatientAlreadyBookedInSchedule(req.getPatientId(), req.getScheduleId());
+            if (isAlreadyBooked) {
+                throw new DuplicateResourceException("Bạn đã đăng ký khám ca này rồi!"); 
+            }
             if (schedule.getCurrentPatients() >= schedule.getMaxPatients()) {
                 throw new FullSlotException("Rất tiếc, ca khám này đã đủ số lượng người đăng ký!");
             }

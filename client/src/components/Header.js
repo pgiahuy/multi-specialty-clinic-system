@@ -18,9 +18,25 @@ const Header = () => {
     const navigate = useNavigate();
     const [user, dispatch] = useContext(MyUserContext);
 
+    const handleLogout = () => {
+        localStorage.removeItem("user");
+        dispatch({ type: 'LOGOUT' });
+        navigate("/");
+    };
 
     return (
-        <Navbar expand="lg" className="bg-body-tertiary">
+        <Navbar
+            expand="lg"
+            className="bg-body-tertiary"
+            style={{
+                backgroundColor: '#e6f2ff',
+                backdropFilter: 'blur(6px)',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
+                position: 'sticky',
+                top: 0,
+                zIndex: 1030,
+            }}
+        >
             <Container fluid className="m-0 ps-5 pe-4">
                 <Navbar.Brand onClick={() => navigate('/')}>
                     OU-Clinic
@@ -30,6 +46,9 @@ const Header = () => {
                     <Nav className="me-auto">
                         <Nav.Link onClick={() => navigate('/')}>
                             Trang chủ
+                        </Nav.Link>
+                        <Nav.Link onClick={() => navigate('/doctors')}>
+                            Bác sĩ
                         </Nav.Link>
 
                         <NavDropdown title="Chuyên khoa" id="basic-nav-dropdown">
@@ -43,6 +62,12 @@ const Header = () => {
                                 Separated link
                             </NavDropdown.Item>
                         </NavDropdown>
+                        <Nav.Link onClick={() => navigate('/patient/dashboard')}>
+                           Dịch vụ
+                        </Nav.Link>
+                        <Nav.Link onClick={() => navigate('/')}>
+                           Liên hệ
+                        </Nav.Link>
                     </Nav>
                     <Nav>
 
@@ -70,11 +95,27 @@ const Header = () => {
                             Đăng nhập
                         </Button>
                     </> : <>
-                        <img src={user.avatar} width="30" className="rounded-circle" />
-                        <Button variant="outline-success" className="m-2"
-                            onClick={() => { dispatch({ type: "LOGOUT" }) }}>
-                            Đăng xuất
-                        </Button>
+                        <NavDropdown
+                            align="end"
+                            id="user-nav-dropdown"
+                            title={
+                                <span className="d-inline-flex align-items-center">
+                                    <img
+                                        src={user.avatar}
+                                        className="rounded-circle"
+                                        style={{ width: 36, height: 36, objectFit: 'cover', border: '2px solid rgba(13,110,253,0.12)' }}
+                                    />
+                                    
+                                </span>
+                            }
+                        >
+                            <NavDropdown.Item onClick={() => navigate('/patient/profile')}>Cập nhật thông tin</NavDropdown.Item>
+                            <NavDropdown.Item onClick={() => navigate('/user/change-password')}>Đổi mật khẩu</NavDropdown.Item>
+                            <NavDropdown.Divider />
+                            <NavDropdown.Item className="text-danger" onClick={handleLogout}>
+                                Đăng xuất
+                            </NavDropdown.Item>
+                        </NavDropdown>
                     </>}
                 </Navbar.Collapse>
             </Container>

@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { Card, Col, Container, Row } from "react-bootstrap";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Footer from "../../components/Footer";
 import Header from "../../components/Header";
 import { authApis, endpoint } from "../../configs/Apis";
@@ -10,6 +10,7 @@ const PaymentDetail = () => {
     const { patientId } = useParams();
     const [user] = useContext(MyUserContext);
     const [payments, setPayments] = useState([]);
+    const nav = useNavigate();
 
     const loadPayments = async () => {
         try {
@@ -33,7 +34,7 @@ const PaymentDetail = () => {
                 <main className="flex-grow-1 py-5">
                     <Container>
                         <div className="d-flex justify-content-between align-items-end mb-4 border-bottom pb-3">
-                            <h2 className="fw-bold text-primary mb-0">Lịch sử thanh toán</h2>
+                            <h2 className="fw-bold mb-0">Danh sách hóa đơn</h2>
                             <span className="text-muted">Tổng số: {payments.length} hóa đơn</span>
                         </div>
 
@@ -48,36 +49,37 @@ const PaymentDetail = () => {
                                 payments.map((p) => (
 
                                     <Col key={p.id} xs={12} md={6} lg={4}>
-                                        <Card className="h-100 shadow-sm border-0" style={{ borderRadius: '12px' }}>
+                                        <Card className="h-100 shadow-sm border-0" style={{ borderRadius: '24px', overflow: 'hidden' }}>
+                                            <div className="h-100 d-flex flex-column bg-white">
+                                                <div className="px-4 py-4" >
+                                                    <div className="d-flex justify-content-between align-items-start gap-3">
+                                                        <div>
 
+                                                            <div className="fw-bold text-dark">Mã hóa đơn: {p.id}</div>
+                                                        </div>
+                                                        <div className="text-end">
 
-                                            <Card.Header className="bg-white border-bottom-0 pt-3 pb-0 d-flex justify-content-between align-items-center">
-                                                <span className="text-muted fw-bold">Mã HĐ: #{p.id}</span>
-
-                                            </Card.Header>
-
-                                            <Card.Body>
-
-                                                <h3 className="text-primary mb-4 text-center fw-bold">
-                                                    {p.totalAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
-
-                                                </h3>
-
-                                                <div className="d-flex justify-content-between mb-2">
-                                                    <span className="text-muted">Ngày lập:</span>
-                                                    <span> {p.createdDate} </span>
-
+                                                            <div className="fw-semibold">{p.createdDate}</div>
+                                                        </div>
+                                                    </div>
                                                 </div>
 
+                                                <Card.Body className="d-flex flex-column flex-grow-1 px-4 py-4">
+                                                    <div className="mb-4">
+                                                        
+                                                        <div>
+                                                            <span className="text-uppercase small text-secondary mb-2">Tổng thanh toán: </span>
+                                                            <span className="fs-5 fw-bold text-primary">{p.totalAmount.toLocaleString('vi-VN') } VNĐ</span>
+                                                        </div>
+                                                    </div>
 
-                                            </Card.Body>
-
-
-                                            <Card.Footer className="bg-white border-top-0 pb-3 pt-0">
-                                                <button className="btn btn-outline-primary w-100 rounded-pill">
-                                                    Xem chi tiết
-                                                </button>
-                                            </Card.Footer>
+                                                    <div className="mt-auto text-end">
+                                                        <button className="btn btn-primary rounded-4 px-4 py-2 fw-semibold" onClick={() => nav(`/patient/payment-items/${p.id}`)}>
+                                                            Xem chi tiết
+                                                        </button>
+                                                    </div>
+                                                </Card.Body>
+                                            </div>
                                         </Card>
                                     </Col>
                                 ))

@@ -21,10 +21,21 @@ import TestResults from "./screens/Patient/TestResults";
 import TestResultDetail from "./screens/Patient/TestResultDetail";
 import Payment from "./screens/Patient/Payment";
 import PaymentDetail from "./screens/Patient/PaymentDetail";
+import PaymentItems from "./screens/Patient/PaymentItems";
+import PaymentResult from "./screens/Patient/PaymentResult";
+import { jwtDecode } from "jwt-decode";
+import cookies from 'react-cookies'
+import HistoryBooking from "./screens/Patient/BookingHistory";
+import ListDoctor from "./screens/Home/ListDoctor";
 
+const initUserState = () => {
+    const savedUser = localStorage.getItem("user");
+    return savedUser ? JSON.parse(savedUser) : null;
+};
 
 function App() {
-  const [user, dispatch] = useReducer(MyUserReducers, null);
+  const [user, dispatch] = useReducer(MyUserReducers, null, initUserState);
+
   return (
     <MyUserContext.Provider value={[user, dispatch]}>
       <BrowserRouter>
@@ -50,10 +61,15 @@ function App() {
             <Route path="/patient/profiles" element={<PatientProfile />} />
             <Route path="/patient/register-record" element={<RegisterRecord />} />
             <Route path="/patient/booking" element={<BookingPage />} />
+            <Route path="/patient/history-booking" element={<HistoryBooking />} />
             <Route path="/patient/test-results" element={<TestResults />} />
             <Route path="/patient/test-results/:patientId" element={<TestResultDetail />} />
             <Route path="/patient/payment" element={<Payment />} />
             <Route path="/patient/payment/:patientId" element={<PaymentDetail />} />
+            <Route path="/patient/payment-items/:paymentId" element={<PaymentItems />} />
+            <Route path="/patient/payment-result" element={<PaymentResult />} />
+            <Route path="/doctors" element={<ListDoctor />} />
+            
           </Routes>
 
         </Container>

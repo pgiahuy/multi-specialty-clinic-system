@@ -1,43 +1,74 @@
-import { Alert } from "react-bootstrap"
+import React from "react";
+import { Container, Row, Col } from "react-bootstrap";
+import { Link } from "react-router-dom"; // Import Link từ react-router-dom
 
 const Footer = () => {
     return (
-        <footer className="page-footer font-small blue pt-4 mt-auto" style={{ backgroundColor: 'oklch(0.93 0.05 221.06)' }}>
-            <div className="container-fluid text-center text-md-left">
-                <div className="row">
-                    <div className="col-md-6 mt-md-0 mt-3">
-                        <h5 className="text-uppercase">OU-Clinic</h5>
-                        <p>Here you can use rows and columns to organize your footer content.</p>
-                    </div>
+        <footer
+            className="mt-auto pt-5 pb-3"
+            style={{
+                backgroundColor: '#e6f2ff',
+                color: '#495057',
+                borderTop: '1px solid rgba(0,0,0,0.04)'
+            }}
+        >
+            <Container>
+                <Row className="gy-4">
+                    
+                    {/* Cột 1: Thông tin phòng khám */}
+                    <Col lg={5} md={12} className="mb-4 mb-md-0">
+                        <h4 className="fw-bold text-primary mb-3">
+                            <i className="bi bi-hospital me-2"></i> OU-Clinic
+                        </h4>
+                        <p className="text-muted pe-lg-4">
+                            Hệ thống quản lý phòng khám hiện đại, mang đến trải nghiệm y tế thông minh, nhanh chóng và tận tâm cho bạn cùng gia đình.
+                        </p>
+                    </Col>
 
-                    <hr className="clearfix w-100 d-md-none pb-0" />
-
-                    <div className="col-md-3 mb-md-0 mb-3">
-                        <h5 className="text-uppercase">Links</h5>
-                        <ul className="list-unstyled">
-                            <li><a href="#!">Link 1</a></li>
-                            <li><a href="#!">Link 2</a></li>
-                            <li><a href="#!">Link 3</a></li>
-                            <li><a href="#!">Link 4</a></li>
+                    {/* Cột 2: Các dịch vụ/Liên kết */}
+                    <Col lg={3} md={6} className="mb-4 mb-md-0">
+                        <h6 className="fw-bold text-uppercase mb-3">Dịch vụ</h6>
+                        <ul className="list-unstyled mb-0">
+                            <li className="mb-2">
+                                {/* Thay <a> thành <Link> và href thành to */}
+                                <Link to="/" className="text-muted text-decoration-none">Trang chủ</Link>
+                            </li>
+                            <li className="mb-2">
+                                <Link to="/patient/booking" className="text-muted text-decoration-none">Đăng ký lịch hẹn</Link>
+                            </li>
+                            <li className="mb-2">
+                                <Link to="/patient/test-results" className="text-muted text-decoration-none">Tra cứu kết quả</Link>
+                            </li>
+                            <li>
+                                <Link to="/patient/payment" className="text-muted text-decoration-none">Thanh toán viện phí</Link>
+                            </li>
                         </ul>
-                    </div>
+                    </Col>
 
-                    <div className="col-md-3 mb-md-0 mb-3">
-                        <h5 className="text-uppercase">Links</h5>
-                        <ul className="list-unstyled">
-                            <li><a href="#!">Link 1</a></li>
-                            <li><a href="#!">Link 2</a></li>
-                            <li><a href="#!">Link 3</a></li>
-                            <li><a href="#!">Link 4</a></li>
+                    {/* Cột 3: Hỗ trợ / Chính sách */}
+                    <Col lg={4} md={6} className="mb-4 mb-md-0">
+                        <h6 className="fw-bold text-uppercase mb-3">Hỗ trợ khách hàng</h6>
+                        <ul className="list-unstyled text-muted">
+                            <li className="mb-2">
+                                <strong>Hotline:</strong> 1900 xxxx
+                            </li>
+                            <li className="mb-2">
+                                <strong>Email:</strong> support@ouclinic.com
+                            </li>
+                            <li className="mb-2">
+                                <strong>Giờ làm việc:</strong> 07:00 - 17:00 (Thứ 2 - Thứ 7)
+                            </li>
                         </ul>
-                    </div>
+                    </Col>
+                </Row>
+            </Container>
+
+            {/* Phần Copyright */}
+            <Container className="mt-4">
+                <div className="pt-3 border-top border-secondary-subtle text-center text-muted">
+                    <small>© 2026 OU-Clinic. All rights reserved.</small>
                 </div>
-            </div>
-
-            <div className="footer-copyright text-center py-3">© 2026 Copyright
-        
-            </div>
-
+            </Container>
         </footer>
     );
 }
