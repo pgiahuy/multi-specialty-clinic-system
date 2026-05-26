@@ -12,7 +12,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
@@ -31,7 +30,8 @@ import java.util.Collection;
     @NamedQuery(name = "Specialty.findAll", query = "SELECT s FROM Specialty s"),
     @NamedQuery(name = "Specialty.findById", query = "SELECT s FROM Specialty s WHERE s.id = :id"),
     @NamedQuery(name = "Specialty.findByName", query = "SELECT s FROM Specialty s WHERE s.name = :name"),
-    @NamedQuery(name = "Specialty.findByPrice", query = "SELECT s FROM Specialty s WHERE s.price = :price")})
+    @NamedQuery(name = "Specialty.findByPrice", query = "SELECT s FROM Specialty s WHERE s.price = :price"),
+    @NamedQuery(name = "Specialty.findByIsActive", query = "SELECT s FROM Specialty s WHERE s.isActive = :isActive")})
 public class Specialty implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -50,13 +50,13 @@ public class Specialty implements Serializable {
     @NotNull
     @Column(name = "price")
     private BigDecimal price;
+    @Column(name = "is_active")
+    private Boolean isActive;
     @ManyToMany(mappedBy = "specialtyCollection")
     private Collection<Doctor> doctorCollection;
     @JoinColumn(name = "id_hod", referencedColumnName = "id")
     @OneToOne
     private Doctor idHod;
-    @OneToMany(mappedBy = "specialtyId")
-    private Collection<Schedules> schedulesCollection;
 
     public Specialty() {
     }
@@ -95,6 +95,14 @@ public class Specialty implements Serializable {
         this.price = price;
     }
 
+    public Boolean getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
+    }
+
     public Collection<Doctor> getDoctorCollection() {
         return doctorCollection;
     }
@@ -109,14 +117,6 @@ public class Specialty implements Serializable {
 
     public void setIdHod(Doctor idHod) {
         this.idHod = idHod;
-    }
-
-    public Collection<Schedules> getSchedulesCollection() {
-        return schedulesCollection;
-    }
-
-    public void setSchedulesCollection(Collection<Schedules> schedulesCollection) {
-        this.schedulesCollection = schedulesCollection;
     }
 
     @Override

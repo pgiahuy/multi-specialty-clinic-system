@@ -4,9 +4,10 @@
  */
 package com.hb.controllers;
 
-import com.hb.dto.request.PatientCreateRequest;
-import com.hb.dto.request.form.PatientForm;
-import com.hb.service.PatientService;
+import com.hb.dto.request.form.MedicineBatchForm;
+import com.hb.pojo.Medicine;
+import com.hb.service.MedicineBatchService;
+import com.hb.service.MedicineService;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
@@ -23,55 +24,52 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-
 /**
  *
  * @author HUY
  */
-
-
 @PropertySource("classpath:configs.properties")
 @Controller
 @RequestMapping("/admin")
-public class PatientController {
-    
+public class MedicineBatchController {
     @Autowired
-    private PatientService patientService;
-
+    private MedicineBatchService medicineBatchService;
     @Autowired
     private Environment env;
-
-    @GetMapping("/patients")
+    
+    @GetMapping("/medicine-batchs")
     public String list(Model model, @RequestParam Map<String, String> params) {
         int page = params.containsKey("page") ? Integer.parseInt(params.get("page")) : 1;
 
         int pageSize = this.env.getProperty("admin.page_size", Integer.class);
         params.put("pageSize", String.valueOf(pageSize));
-        model.addAttribute("patients", patientService.getPatients(params));
-        model.addAttribute("patientForm", new PatientForm());
+        model.addAttribute("medicineBatchs", this.medicineBatchService.getMedicineBatchs(params));
+        MedicineBatchForm medicineBatchForm = new MedicineBatchForm();
+        medicineBatchForm.setMedicine(new Medicine());
+        model.addAttribute("medicineBatchForm", medicineBatchForm);
 
-        long totalPatients = patientService.countPatients(params);
-        int totalPages = (int) Math.ceil((double) totalPatients / pageSize);
+        long totalMedicineBtachs = medicineBatchService.countMedicineBatchs(params);
+        int totalPages = (int) Math.ceil((double) totalMedicineBtachs / pageSize);
 
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("currentPage", page);
 
-        return "patient";
-    }
-    
-    @PostMapping("/patients")
-    public String create(@ModelAttribute PatientForm patientForm){
-        patientService.saveOrUpdate(patientForm);
-        return "redirect:/admin/patients";
+        return "medicine-batch";
     }
 
-    @DeleteMapping("/patients/{id}")
-    public ResponseEntity<?> delete(@PathVariable("id") Long id) {
-        patientService.deletePatient(id);
-        return ResponseEntity.noContent().build();
+    @PostMapping("/medicine-batchs")
+    public String create(@ModelAttribute MedicineBatchForm medicineBatchForm) {
+        medicineBatchService.addOrUpdateMedicineBatch(medicineBatchForm);
+        return "redirect:/admin/medicine-batchs";
     }
-    
-    
 
-
+    @DeleteMapping("/medicine-batchs/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        try {
+            medicineBatchService.deleteMedicineBatch(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e);
+        }
+    }
 }

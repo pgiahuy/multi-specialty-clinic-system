@@ -5,7 +5,6 @@
 package com.hb.pojo;
 
 import jakarta.persistence.Basic;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -15,7 +14,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
@@ -23,7 +21,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.Collection;
 import java.util.Date;
 
 /**
@@ -40,7 +37,8 @@ import java.util.Date;
     @NamedQuery(name = "Patient.findByDob", query = "SELECT p FROM Patient p WHERE p.dob = :dob"),
     @NamedQuery(name = "Patient.findByGender", query = "SELECT p FROM Patient p WHERE p.gender = :gender"),
     @NamedQuery(name = "Patient.findByAddress", query = "SELECT p FROM Patient p WHERE p.address = :address"),
-    @NamedQuery(name = "Patient.findByPhone", query = "SELECT p FROM Patient p WHERE p.phone = :phone")})
+    @NamedQuery(name = "Patient.findByPhone", query = "SELECT p FROM Patient p WHERE p.phone = :phone"),
+    @NamedQuery(name = "Patient.findByIsActive", query = "SELECT p FROM Patient p WHERE p.isActive = :isActive")})
 public class Patient implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -62,7 +60,6 @@ public class Patient implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "dob")
-    @Temporal(TemporalType.DATE)
     private LocalDate dob;
     @Basic(optional = false)
     @NotNull
@@ -78,15 +75,11 @@ public class Patient implements Serializable {
     @Size(max = 20)
     @Column(name = "phone")
     private String phone;
-    @OneToMany(mappedBy = "patientId")
-    private Collection<Appointment> appointmentCollection;
+    @Column(name = "is_active")
+    private Boolean isActive;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @ManyToOne
     private User userId;
-    @OneToMany(mappedBy = "patientId")
-    private Collection<LabResults> labResultsCollection;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "patientId")
-    private Collection<Payment> paymentCollection;
 
     public Patient() {
     }
@@ -160,12 +153,12 @@ public class Patient implements Serializable {
         this.phone = phone;
     }
 
-    public Collection<Appointment> getAppointmentCollection() {
-        return appointmentCollection;
+    public Boolean getIsActive() {
+        return isActive;
     }
 
-    public void setAppointmentCollection(Collection<Appointment> appointmentCollection) {
-        this.appointmentCollection = appointmentCollection;
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
     }
 
     public User getUserId() {
@@ -174,22 +167,6 @@ public class Patient implements Serializable {
 
     public void setUserId(User userId) {
         this.userId = userId;
-    }
-
-    public Collection<LabResults> getLabResultsCollection() {
-        return labResultsCollection;
-    }
-
-    public void setLabResultsCollection(Collection<LabResults> labResultsCollection) {
-        this.labResultsCollection = labResultsCollection;
-    }
-
-    public Collection<Payment> getPaymentCollection() {
-        return paymentCollection;
-    }
-
-    public void setPaymentCollection(Collection<Payment> paymentCollection) {
-        this.paymentCollection = paymentCollection;
     }
 
     @Override

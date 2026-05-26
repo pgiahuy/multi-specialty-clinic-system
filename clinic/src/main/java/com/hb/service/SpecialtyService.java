@@ -18,6 +18,6 @@ public interface SpecialtyService {
     
     Specialty getSpecialtieById(Long id);
     Specialty saveOrUpdate(SpecialtyForm form);
-    void deleteDoctor(Long id);
+    void deleteSpecialty(Long id);
     long countSpecialties(Map<String,String> params);
 }

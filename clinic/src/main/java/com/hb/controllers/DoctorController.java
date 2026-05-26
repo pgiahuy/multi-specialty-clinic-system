@@ -9,7 +9,6 @@ import com.hb.dto.request.form.DoctorForm;
 import com.hb.service.DoctorService;
 import com.hb.service.SpecialtyService;
 import com.hb.service.UserService;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +16,6 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,6 +27,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
  *
@@ -74,19 +73,24 @@ public class DoctorController {
     
 
     @PostMapping("/doctors")
-    public String create(@ModelAttribute DoctorForm doctorForm) {
-        doctorService.saveOrUpdate(doctorForm);
+    public String create(@ModelAttribute DoctorForm doctorForm,RedirectAttributes redirectAttributes) {
+        try {
+            doctorService.saveOrUpdate(doctorForm);
+            redirectAttributes.addFlashAttribute("successMsg", "Thao tác dữ liệu thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
+            redirectAttributes.addFlashAttribute("doctorForm", doctorForm);
+            redirectAttributes.addFlashAttribute("openForm", true);
+        }
+        
+        
         return "redirect:/admin/doctors";
     }
 
     @DeleteMapping("/doctors/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") Long id) {
-        try {
-            doctorService.deleteDoctor(id);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Doctor not found");
-        }
+        doctorService.deleteDoctor(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/doctors/search-users")

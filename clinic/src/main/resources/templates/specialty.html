@@ -1,8 +1,8 @@
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
 
-    <head>
-        <title>Quản lý Chuyên khoa</title>
+<head>
+    <title>Quản lý Chuyên khoa</title>
     <th:block th:replace="base :: css"></th:block>
     <th:block th:replace="base :: js"></th:block>
     <script th:inline="javascript">
@@ -29,7 +29,7 @@
 
         <div class="d-flex justify-content-end mb-3">
             <button type="button" id="toggleSpecialtyFormBtn" class="btn btn-success"
-                    onclick="toggleCrudForm('specialtyForm', 'toggleSpecialtyFormBtn')">
+                onclick="toggleCrudForm('specialtyForm', 'toggleSpecialtyFormBtn')">
                 <i class="bi bi-plus-circle me-2"></i>Thêm chuyên khoa mới
             </button>
         </div>
@@ -37,11 +37,11 @@
         <form class="row g-2 mb-3" method="get" action="" id="specialtyFilterForm">
             <div class="col-md-4">
                 <input type="text" name="specialtyName" class="form-control" placeholder="Tìm chuyên khoa"
-                       th:value="${param.specialtyName != null ? param.specialtyName : ''}" />
+                    th:value="${param.specialtyName != null ? param.specialtyName : ''}" />
             </div>
             <div class="col-md-4">
                 <input type="text" name="doctorName" class="form-control" placeholder="Tìm trưởng khoa"
-                       th:value="${param.doctorName != null ? param.doctorName : ''}" />
+                    th:value="${param.doctorName != null ? param.doctorName : ''}" />
             </div>
             <div class="col-md-4">
                 <button type="submit" class="btn btn-outline-primary">Tìm kiếm</button>
@@ -50,7 +50,7 @@
         </form>
 
         <form id="specialtyForm" th:class="${openForm} ? 'card p-4 mb-4' : 'card p-4 mb-4 d-none'" method="post"
-              th:object="${specialtyForm}" th:action="@{/admin/specialties}">
+            th:object="${specialtyForm}" th:action="@{/admin/specialties}">
 
             <h4 id="formTitle" class="mb-3 text-uppercase fw-bold text-primary">Thêm chuyên khoa mới</h4>
             <input type="hidden" th:field="*{id}" id="specialtyId" />
@@ -63,7 +63,7 @@
                 <div class="col-md-6 mb-3">
                     <label class="form-label fw-bold">Giá khám:</label>
                     <input type="number" min="0" step="1000" th:field="*{price}" class="form-control"
-                           id="specialtyPrice" required />
+                        id="specialtyPrice" required />
                 </div>
             </div>
 
@@ -81,7 +81,7 @@
 
             <div class="d-flex gap-2 justify-content-end">
                 <button type="button" class="btn btn-secondary"
-                        onclick="toggleCrudForm('specialtyForm', 'toggleSpecialtyFormBtn')">Hủy</button>
+                    onclick="toggleCrudForm('specialtyForm', 'toggleSpecialtyFormBtn')">Hủy</button>
                 <button type="submit" id="submitFormBtn" class="btn btn-primary">Lưu thông tin</button>
             </div>
         </form>
@@ -101,9 +101,9 @@
                     <td th:id="'spec-name-' + ${s.id}">
                         <span th:text="${s.name}"></span>
                         <input type="hidden" th:id="'spec-hod-id-' + ${s.id}"
-                               th:value="${s.idHod != null ? s.idHod.id : ''}">
+                            th:value="${s.idHod != null ? s.idHod.id : ''}">
                         <input type="hidden" th:id="'spec-hod-name-' + ${s.id}"
-                               th:value="${s.idHod != null ? s.idHod.fullName : ''}">
+                            th:value="${s.idHod != null ? s.idHod.fullName : ''}">
                         <input type="hidden" th:id="'spec-price-' + ${s.id}" th:value="${s.price}">
                     </td>
                     <td th:text="${#numbers.formatDecimal(s.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></td>
@@ -111,9 +111,13 @@
                     <td th:text="${s.doctorCollection != null ? s.doctorCollection.size() : 0}"></td>
                     <td class="text-center">
                         <button class="btn btn-warning btn-sm" type="button"
-                                th:onclick="|editSpecialty(${s.id})|">Sửa</button>
-                        <button class="btn btn-danger btn-sm" type="button"
-                                th:onclick="|deleteCrudItem(${s.id}, '/admin/specialties/', 'spec-row-')|">Xóa</button>
+                            th:onclick="|editSpecialty(${s.id})|">Sửa</button>
+
+                        <button class="btn btn-danger btn-sm" th:data-id="${s.id}" th:data-url="@{/admin/specialties/}"
+                            th:data-row-prefix="'spec-row-'"
+                            onclick="deleteCrudItem(this.dataset.id, this.dataset.url, this.dataset.rowPrefix)">
+                            <i class="bi bi-trash-fill"></i>Xóa
+                        </button>
                     </td>
                 </tr>
             </tbody>
@@ -191,7 +195,7 @@
             toggleBtn.innerHTML = '<i class="bi bi-dash-circle me-2"></i>Đóng form';
             toggleBtn.className = 'btn btn-secondary';
 
-            window.scrollTo({top: 0, behavior: 'smooth'});
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         let debounceTimer;
