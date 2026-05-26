@@ -87,6 +87,7 @@ public class MedicineController {
                 .map(m -> {
                     Map<String, Object> item = new HashMap<>();
                     item.put("id", m.getId());
+                    item.put("code", m.getCode());
                     item.put("name", m.getName());
                     return item;
                 })

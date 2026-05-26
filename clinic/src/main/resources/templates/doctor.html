@@ -131,8 +131,13 @@
                     <td th:text="${d.userId != null ? d.userId.username : 'Chưa có'}"></td>
                     <td class="text-center">
                         <button class="btn btn-warning btn-sm" th:onclick="|editDoctor(${d.id})|">Sửa</button>
-                        <button class="btn btn-danger btn-sm"
-                                th:onclick="|deleteCrudItem(${d.id}, '/admin/doctors/', 'doc-row-')|">Xóa</button>
+                        <button class="btn btn-danger btn-sm" 
+                                    th:data-id="${d.id}"
+                                    th:data-url="@{/admin/doctors/}"
+                                    th:data-row-prefix="'doctor-row-'"
+                                    onclick="deleteCrudItem(this.dataset.id, this.dataset.url, this.dataset.rowPrefix)">
+                                 <i class="bi bi-trash-fill"></i>Xóa
+                            </button>
                     </td>
                 </tr>
             </tbody>

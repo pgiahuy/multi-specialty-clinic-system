@@ -18,5 +18,5 @@ public interface SpecialtyRepository extends BaseRepository<Specialty>{
     List<Specialty> getAllById(List<Long> ids);
     Specialty getSpecialtieById(Long id);
     Specialty saveOrUpdate(Specialty s);
-    
+    void delete(Long id);
 }
