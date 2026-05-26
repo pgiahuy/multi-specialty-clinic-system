@@ -4,7 +4,8 @@
  */
 package com.hb.service.impl;
 
-import com.hb.exception.ResourceNotFoundException;
+import com.hb.dto.request.form.SpecialtyForm;
+import com.hb.exception.BadRequestException;
 import com.hb.pojo.Doctor;
 import com.hb.pojo.Specialty;
 import com.hb.repository.DoctorRepository;
@@ -24,7 +25,7 @@ public class SpecialtyServiceImpl implements SpecialtyService {
 
     @Autowired
     private SpecialtyRepository specialtieRepo;
-    
+
     @Autowired
     private DoctorRepository doctorRepo;
 
@@ -43,28 +44,37 @@ public class SpecialtyServiceImpl implements SpecialtyService {
     }
 
     @Override
-    public Specialty addSpecialtie(Map<String, String> params) {
-        Specialty s = new Specialty();
-
-        String name = params.get("name");
-        if (name == null || name.isEmpty()) {
-            throw new ResourceNotFoundException("Missing name");
+    public Specialty saveOrUpdate(SpecialtyForm form) {
+        Specialty s;
+        if (form.getId() == null) {
+            s = new Specialty();
+        } else {
+            s = this.getSpecialtieById(form.getId());
         }
-        s.setName(name);
 
-        String hodIdStr = params.get("hodId");
-        if (hodIdStr != null && !hodIdStr.isEmpty()) {
-            Long hodId = Long.valueOf(hodIdStr);
-            Doctor d = doctorRepo.getDoctorById(hodId);
+        if (form.getName() != null || !form.getName().isEmpty()) {
+            s.setName(form.getName());
+        } else {
+            throw new BadRequestException("Thiếu tên khoa!");
+        }
+
+        if (form.getPrice()!= null) {
+            s.setPrice(form.getPrice());
+        } else {
+            throw new BadRequestException("Thiếu phí khám bệnh!");
+        }
+
+        if (form.getHodId() != null) {
+            Doctor d = doctorRepo.getDoctorById(form.getHodId());
             s.setIdHod(d);
         }
 
-        return specialtieRepo.addSpecialtie(s);
+        return specialtieRepo.saveOrUpdate(s);
     }
 
     @Override
-    public void deleteDoctor(Long id) {
-        this.doctorRepo.deleteDoctor(id);
+    public void deleteSpecialty(Long id) {
+        this.specialtieRepo.delete(id);
     }
 
     @Override

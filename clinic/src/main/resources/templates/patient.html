@@ -1,150 +1,289 @@
-
-
-
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
+
     <head>
         <title>Quản lý Bệnh nhân</title>
-
-    <th:block th:replace="base :: css"></th:block>
-    <th:block th:replace="base :: js"></th:block>
-    <script th:src="@{/js/admin-forms.js}"></script>
+    <th:block th:replace="~{base :: css}"></th:block>
+    <th:block th:replace="~{base :: js}"></th:block>
     <script th:inline="javascript">
-        /*<![CDATA[*/
-        initAdminForm('userForm', {
-            toggleBtnId: 'toggleUserFormBtn',
-            submitBtnId: 'submitFormBtn',
-            passwordGroupId: 'passwordGroup',
-            idField: 'userId',
-            fields: ['username','email','password','avatar'],
-            tableFieldMap: {'username':'name-','email':'email-'},
-            open: /*[[${openForm}]]*/ false,
-            serverData: /*[[${user}]]*/ {}
-        });
-
-        function toggleUserForm() {
-            var f = document.getElementById('userForm');
-            if (!f) return;
-            if (f.classList.contains('d-none')) openForCreate_userForm(); else resetAndClose_userForm();
-        }
-
-        function resetAndCloseForm() { resetAndClose_userForm(); }
-        /*]]>*/
+        window.__OPEN_PATIENT_FORM__ = /*[[${openForm != null ? openForm : false}]]*/ false;
     </script>
+    <script th:src="@{/js/admin-crud.js}"></script>
 </head>
 
 <body>
+    <div th:replace="~{base :: header('QUẢN LÝ BỆNH NHÂN')}"></div>
+    <div th:replace="~{base :: sidebar}"></div>
 
-    <div th:replace="base :: header('QUẢN LÝ BỆNH NHÂN')"></div>
-
-    <div th:replace="base :: sidebar"></div>
-
-    <div class="content">
-        
-         <th:block th:with="hasError=${errorMsg}, hasSuccess=${successMsg}">
+    <div class="content mt-6">
+        <th:block th:with="hasError=${errorMsg}, hasSuccess=${successMsg}">
             <div th:if="${hasError}" class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
-                <i class="bi bi-exclamation-triangle me-2"></i>
                 <span th:text="${errorMsg}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
-
             <div th:if="${hasSuccess}" class="alert alert-success alert-dismissible fade show mb-3" role="alert">
-                <i class="bi bi-check-circle me-2"></i>
                 <span th:text="${successMsg}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         </th:block>
-        
-<!--        <div class="d-flex justify-content-end mb-3">
-            <button type="button" id="toggleUserFormBtn" class="btn btn-success" onclick="toggleUserForm()">
+
+        <div class="d-flex justify-content-end mb-3">
+            <button type="button" id="togglePatientFormBtn" class="btn btn-success"
+                    onclick="toggleCrudForm('patientForm', 'togglePatientFormBtn')">
                 <i class="bi bi-plus-circle me-2"></i>Thêm bệnh nhân
             </button>
         </div>
 
-        <form id="userForm" th:class="${openForm} ? 'card p-4 mb-4' : 'card p-4 mb-4 d-none'" method="post"
-              th:object="${user}" th:action="@{/admin/users}" enctype="multipart/form-data">
-            <h4 id="formTitle" class="mb-3 text-uppercase fw-bold text-primary">Tạo tài khoản mới</h4>
+        <form class="row g-2 mb-3" method="get" action="" id="patientFilterForm">
+            <div class="col-md-4">
+                <input type="text" name="patientName" class="form-control" placeholder="Tìm theo tên hoặc CCCD"
+                       th:value="${param.patientName != null ? param.patientName : ''}" />
+            </div>
+            <div class="col-md-4">
+                <select name="gender" class="form-select">
+                    <option value="">-- Giới tính --</option>
+                    <option value="Nam" th:selected="${param.gender != null and param.gender[0] == 'Nam'}">Nam</option>
+                    <option value="Nữ" th:selected="${param.gender != null and param.gender[0] == 'Nữ'}">Nữ</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-outline-primary">Tìm kiếm</button>
+                <a th:href="@{/admin/patients}" class="btn btn-outline-secondary ms-2">Đặt lại</a>
+            </div>
+        </form>
 
-            <input type="hidden" th:field="*{id}" id="userId" />
+        <form id="patientForm" th:class="${openForm} ? 'card p-4 mb-4' : 'card p-4 mb-4 d-none'" method="post"
+              th:object="${patientForm}" th:action="@{/admin/patients}">
+            <h4 id="formTitle" class="mb-3 text-uppercase fw-bold text-primary">Thêm / Cập nhật bệnh nhân</h4>
+            <input type="hidden" th:field="*{id}" id="patientId" />
 
-            <div class="mb-3">
-                <label for="username" class="form-label fw-bold">Tên đăng nhập:</label>
-                <input type="text" th:field="*{username}" class="form-control" id="username"
-                       placeholder="Nhập tên đăng nhập..." required />
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">CCCD:</label>
+                    <input type="text" th:field="*{cccd}" class="form-control" id="patientCccd" maxlength="12"
+                           required />
+                </div>
+                <div class="col-md-8 mb-3">
+                    <label class="form-label fw-bold">Họ tên:</label>
+                    <input type="text" th:field="*{fullName}" class="form-control" id="patientFullName" required />
+                </div>
             </div>
 
-            <div class="mb-3">
-                <label for="email" class="form-label fw-bold">Email:</label>
-                <input type="email" th:field="*{email}" class="form-control" id="email" placeholder="example@gmail.com"
-                       required />
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Ngày sinh:</label>
+                    <input type="date" th:field="*{dob}" class="form-control" id="patientDob" />
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Giới tính:</label>
+                    <select th:field="*{gender}" class="form-select" id="patientGender" required>
+                        <option value="">-- Chọn --</option>
+                        <option value="Nam">Nam</option>
+                        <option value="Nữ">Nữ</option>
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Số điện thoại:</label>
+                    <input type="text" th:field="*{phone}" class="form-control" id="patientPhone" />
+                </div>
             </div>
 
-            <div class="mb-3" id="passwordGroup">
-                <label for="password" class="form-label fw-bold">Mật khẩu:</label>
-                <input type="password" th:field="*{password}" class="form-control" id="password" placeholder="********"
-                       required />
-            </div>
-
-            <div class="mb-4">
-                <label for="avatarFile" class="form-label fw-bold">Ảnh đại diện:</label>
-                <input type="file" name="avatar" class="form-control" id="avatar" accept="image/*" />
-                <div class="form-text">Định dạng hỗ trợ: JPG, PNG, GIF. (Để trống nếu giữ nguyên ảnh cũ)</div>
+            <div class="row">
+                <div class="col-md-8 mb-3">
+                    <label class="form-label fw-bold">Địa chỉ:</label>
+                    <input type="text" th:field="*{address}" class="form-control" id="patientAddress" required />
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Tài khoản:</label>
+                    <div class="input-group mb-2">
+                        <input type="text" id="userSearchInput" class="form-control" placeholder="Tìm user...">
+                        <button type="button" class="btn btn-outline-secondary" id="clearUserSearch">X</button>
+                    </div>
+                    <select th:field="*{userId}" class="form-select" id="patientUserId">
+                        <option value="">-- Chọn tài khoản --</option>
+                    </select>
+                </div>
             </div>
 
             <div class="d-flex gap-2 justify-content-end">
-                <button type="button" class="btn btn-secondary" onclick="resetAndCloseForm()">Hủy</button>
-                <button type="submit" id="submitFormBtn" class="btn btn-primary">
-                    <i class="bi bi-person-plus-fill me-2"></i>Tạo tài khoản
-                </button>
+                <button type="button" class="btn btn-secondary"
+                        onclick="toggleCrudForm('patientForm', 'togglePatientFormBtn')">Hủy</button>
+                <button type="submit" id="submitFormBtn" class="btn btn-primary">Lưu thông tin</button>
             </div>
-        </form>-->
+        </form>
 
-
-
-
-        <table class="table table-bordered table-hover align-middle">
-            <thead class="table-primary">
-                <tr>
-                    <th>Họ tên</th>
-                    <th>CCCD</th>
-                    <th>SĐT</th>
-                    <th>Giới tính</th>
-                    <th>Ngày sinh</th>
-                    <th>Địa chỉ</th>
-                    <th>Tài khoản</th>
-                    <th></th>
-                </tr>
-            </thead>
-
-            <tbody>
-                <tr th:each="d : ${patients}">
-                    <td th:text="${d.fullName}"></td>
-                    <td th:text="${d.cccd}"></td>
-                    <td th:text="${d.phone}"></td>
-                    <td th:text="${d.gender}"></td>
-                    <td th:text="${d.dob}"></td>
-                    <td th:text="${d.address}"></td>
-                    <td th:text="${d.userId.username}"></td>
-           
-                    <td>
-                        <button class="btn btn-warning btn-sm">Sửa</button>
-                        <button class="btn btn-danger btn-sm"
-                                th:onclick="'deleteDoctor(' + ${d.id} + ')'">
-                            Xóa
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle shadow-sm">
+                <thead class="table-primary text-center">
+                    <tr>
+                        <th style="width: 12%">CCCD</th>
+                        <th>Họ tên</th>
+                        <th style="width: 10%">Giới tính</th>
+                        <th style="width: 12%">Ngày sinh</th>
+                        <th style="width: 12%">SĐT</th>
+                        <th>Địa chỉ</th>
+                        <th style="width: 12%">Tài khoản</th>
+                        <th style="width: 14%">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="p : ${patients}" th:id="'patient-row-' + ${p.id}">
+                        <td th:text="${p.cccd}" class="fw-semibold text-secondary text-center"></td>
+                        <td>
+                            <span th:id="'p-name-' + ${p.id}" th:text="${p.fullName}" class="fw-semibold"></span>
+                            <input type="hidden" th:id="'p-user-id-' + ${p.id}"
+                                   th:value="${p.userId != null ? p.userId.id : ''}" />
+                            <input type="hidden" th:id="'p-user-name-' + ${p.id}"
+                                   th:value="${p.userId != null ? p.userId.username : ''}" />
+                        </td>
+                        <td th:text="${p.gender}" class="text-center"></td>
+                        <td th:text="${p.dob != null ? #temporals.format(p.dob, 'dd/MM/yyyy') : '-'}"
+                            class="text-center"></td>
+                        <td th:text="${p.phone != null ? p.phone : '-'}" class="text-center"></td>
+                        <td th:text="${p.address}"></td>
+                        <td th:text="${p.userId != null ? p.userId.username : '-'}" class="text-center"></td>
+                        <td class="text-center">
+                            <button class="btn btn-warning btn-sm me-1" th:attr="data-id=${p.id}"
+                                    onclick="editPatient(this)">
+                                <i class="bi bi-pencil-square"></i> Sửa
+                            </button>
+                            
+                            <button class="btn btn-danger btn-sm" 
+                                    th:data-id="${p.id}"
+                                    th:data-url="@{/admin/patients/}"
+                                    th:data-row-prefix="'patient-row-'"
+                                    onclick="deleteCrudItem(this.dataset.id, this.dataset.url, this.dataset.rowPrefix)">
+                                 <i class="bi bi-trash-fill"></i>Xóa
+                            </button>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(patients)}">
+                        <td colspan="8" class="text-center text-muted p-4">Không tìm thấy bệnh nhân nào trong hệ thống.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <div class="d-flex justify-content-center mt-4">
+    <div class="d-flex justify-content-center mt-1">
         <div th:replace="~{fragments :: pagination('/admin/patients', ${totalPages}, ${currentPage})}"></div>
     </div>
 
-    <div th:replace="base :: footer">
+    <div th:replace="~{base :: footer}"></div>
 
-    </div>
+    <script th:inline="javascript">
+        initFormState(window.__OPEN_PATIENT_FORM__, 'patientForm', 'togglePatientFormBtn');
+
+        const patientUserSearchUrl = /*[[@{/admin/doctors/search-users}]]*/ '/admin/doctors/search-users';
+
+        async function loadUsers(kw = '') {
+            const response = await fetch(patientUserSearchUrl + '?kw=' + encodeURIComponent(kw));
+            const items = await response.json();
+            const userSelect = document.getElementById('patientUserId');
+            if (!userSelect)
+                return;
+
+            const selectedValue = userSelect.value;
+            userSelect.innerHTML = '<option value="">-- Chọn tài khoản --</option>';
+            items.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.id;
+                option.textContent = item.username;
+                userSelect.appendChild(option);
+            });
+            if (selectedValue)
+                userSelect.value = selectedValue;
+        }
+
+        function debounce(func, delay) {
+            let timer;
+            return function (...args) {
+                clearTimeout(timer);
+                timer = setTimeout(() => func.apply(this, args), delay);
+            };
+        }
+
+        const debouncedLoadUsers = debounce((val) => loadUsers(val), 500);
+        document.getElementById('userSearchInput')?.addEventListener('input', (e) => {
+            debouncedLoadUsers(e.target.value);
+        });
+
+        document.getElementById('clearUserSearch')?.addEventListener('click', function () {
+            const inp = document.getElementById('userSearchInput');
+            if (inp)
+                inp.value = '';
+            loadUsers('');
+        });
+
+        function editPatient(button) {
+            const id = button.getAttribute('data-id');
+            const row = button.closest('tr');
+            if (!row)
+                return;
+
+            const cells = row.querySelectorAll('td');
+            const cccd = cells[0]?.innerText.trim() || '';
+            const fullName = document.getElementById('p-name-' + id)?.innerText.trim() || '';
+            const gender = cells[2]?.innerText.trim() || '';
+            const dobText = cells[3]?.innerText.trim() || '';
+            const phone = cells[4]?.innerText.trim() || '';
+            const address = cells[5]?.innerText.trim() || '';
+            const userIdHidden = document.getElementById('p-user-id-' + id);
+            const userNameHidden = document.getElementById('p-user-name-' + id);
+
+            document.getElementById('patientId').value = id;
+            document.getElementById('patientCccd').value = cccd;
+            document.getElementById('patientFullName').value = fullName;
+            document.getElementById('patientDob').value = dobText ? toIsoDate(dobText) : '';
+            document.getElementById('patientGender').value = gender;
+            document.getElementById('patientPhone').value = phone === '-' ? '' : phone;
+            document.getElementById('patientAddress').value = address;
+
+            const userSelect = document.getElementById('patientUserId');
+            const selectedUserId = userIdHidden && userIdHidden.value ? String(userIdHidden.value).trim() : '';
+            if (userSelect) {
+                if (selectedUserId) {
+                    let matchedOption = userSelect.querySelector('option[value="' + selectedUserId + '"]');
+                    if (!matchedOption) {
+                        matchedOption = document.createElement('option');
+                        matchedOption.value = selectedUserId;
+                        matchedOption.text = userNameHidden && userNameHidden.value ? userNameHidden.value : ('User #' + selectedUserId);
+                        userSelect.appendChild(matchedOption);
+                    }
+                    userSelect.value = selectedUserId;
+                } else {
+                    userSelect.value = '';
+                }
+            }
+
+            const userSearchInput = document.getElementById('userSearchInput');
+            if (userSearchInput) {
+                userSearchInput.value = userNameHidden && userNameHidden.value ? userNameHidden.value : '';
+                loadUsers(userSearchInput.value);
+            }
+
+            document.getElementById('formTitle').innerText = 'Cập nhật bệnh nhân (ID: ' + id + ')';
+            document.getElementById('submitFormBtn').innerText = 'Lưu thay đổi';
+
+            const form = document.getElementById('patientForm');
+            const toggleBtn = document.getElementById('togglePatientFormBtn');
+            form.classList.remove('d-none');
+            toggleBtn.innerHTML = '<i class="bi bi-dash-circle me-2"></i>Đóng form';
+            toggleBtn.className = 'btn btn-secondary';
+
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        function toIsoDate(displayDate) {
+            const parts = displayDate.split('/');
+            if (parts.length !== 3)
+                return '';
+            return parts[2] + '-' + parts[1].padStart(2, '0') + '-' + parts[0].padStart(2, '0');
+        }
+
+        loadUsers('');
+    </script>
 </body>
+
 </html>

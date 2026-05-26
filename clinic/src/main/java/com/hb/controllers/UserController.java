@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 /**
  *
@@ -64,6 +66,7 @@ public class UserController {
             userService.saveOrUpdateUser(urq);
             redirectAttributes.addFlashAttribute("successMsg", "Thao tác dữ liệu thành công!");
         } catch (Exception e) {
+            urq.setAvatar(null);
             redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
             redirectAttributes.addFlashAttribute("user", urq);
             redirectAttributes.addFlashAttribute("openForm", true);
@@ -73,10 +76,9 @@ public class UserController {
     }
 
     @DeleteMapping("/users/{id}")
-    public void delete(@PathVariable("id") Long id) {
-        System.out.println("Controller xoa thanh congggggggggggggg 1");
+    public ResponseEntity<?> delete(@PathVariable("id") Long id) {
         userService.deleteUser(id);
-        System.out.println("Controller xoa thanh congggggggggggggg 2");
+        return ResponseEntity.noContent().build();
     }
 
 }

@@ -11,8 +11,6 @@ import java.util.Map;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,12 +27,26 @@ public class MedicineRepositoryImpl extends BaseRepositoryImpl<Medicine> impleme
     @Autowired
     private LocalSessionFactoryBean factory;
 
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
+    }
+
     @Override
     public List<Medicine> getMedicines(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<Medicine> q = session.createNamedQuery("Medicine.findAll", Medicine.class);
 
-        if (params != null) {
+        StringBuilder hql = new StringBuilder("FROM Medicine m WHERE 1=1");
+        if (params != null && hasText(params.get("kw"))) {
+            hql.append(" AND (m.name LIKE :kw OR m.code LIKE :kw)");
+        }
+
+        Query<Medicine> q = session.createQuery(hql.toString(), Medicine.class);
+
+        if (params != null && hasText(params.get("kw"))) {
+            q.setParameter("kw", "%" + params.get("kw").trim() + "%");
+        }
+
+        if (params != null && params.containsKey("pageSize") && hasText(params.get("pageSize"))) {
             int pageSize = Integer.parseInt(params.get("pageSize"));
             int page = Integer.parseInt(params.getOrDefault("page", "1"));
             int start = (page - 1) * pageSize;
@@ -46,14 +58,14 @@ public class MedicineRepositoryImpl extends BaseRepositoryImpl<Medicine> impleme
     }
 
     @Override
-    public Medicine addMedicine(Medicine d) {
+    public Medicine addMedicine(Medicine m) {
         Session session = this.factory.getObject().getCurrentSession();
-        if (d.getId() == null) {
-            session.persist(d);
+        if (m.getId() == null) {
+            session.persist(m);
+            return m;
         }else{
-            session.merge(d);
+            return session.merge(m);
         }
-        return d;
     }
 
     @Override

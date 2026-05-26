@@ -16,7 +16,6 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
@@ -33,7 +32,9 @@ import java.util.Collection;
     @NamedQuery(name = "Doctor.findAll", query = "SELECT d FROM Doctor d"),
     @NamedQuery(name = "Doctor.findById", query = "SELECT d FROM Doctor d WHERE d.id = :id"),
     @NamedQuery(name = "Doctor.findByFullName", query = "SELECT d FROM Doctor d WHERE d.fullName = :fullName"),
-    @NamedQuery(name = "Doctor.findByGender", query = "SELECT d FROM Doctor d WHERE d.gender = :gender")})
+    @NamedQuery(name = "Doctor.findByGender", query = "SELECT d FROM Doctor d WHERE d.gender = :gender"),
+    @NamedQuery(name = "Doctor.findByIsActive", query = "SELECT d FROM Doctor d WHERE d.isActive = :isActive"),
+    @NamedQuery(name = "Doctor.findByRating", query = "SELECT d FROM Doctor d WHERE d.rating = :rating")})
 public class Doctor implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -52,18 +53,21 @@ public class Doctor implements Serializable {
     @Size(max = 3)
     @Column(name = "gender")
     private String gender;
+    @Column(name = "is_active")
+    private Boolean isActive;
+    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    @Column(name = "rating")
+    private Float rating;
     @JoinTable(name = "specialty_doctor", joinColumns = {
         @JoinColumn(name = "doctor_id", referencedColumnName = "id")}, inverseJoinColumns = {
         @JoinColumn(name = "specialty_id", referencedColumnName = "id")})
     @ManyToMany
     private Collection<Specialty> specialtyCollection;
-    @OneToOne(mappedBy = "idHod")
-    private Specialty specialty;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @OneToOne
     private User userId;
-    @OneToMany(mappedBy = "doctorId")
-    private Collection<Schedules> schedulesCollection;
+    @OneToOne(mappedBy = "idHod")
+    private Specialty specialty;
 
     public Doctor() {
     }
@@ -104,20 +108,28 @@ public class Doctor implements Serializable {
         this.gender = gender;
     }
 
+    public Boolean getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
+    }
+
+    public Float getRating() {
+        return rating;
+    }
+
+    public void setRating(Float rating) {
+        this.rating = rating;
+    }
+
     public Collection<Specialty> getSpecialtyCollection() {
         return specialtyCollection;
     }
 
     public void setSpecialtyCollection(Collection<Specialty> specialtyCollection) {
         this.specialtyCollection = specialtyCollection;
-    }
-
-    public Specialty getSpecialty() {
-        return specialty;
-    }
-
-    public void setSpecialty(Specialty specialty) {
-        this.specialty = specialty;
     }
 
     public User getUserId() {
@@ -128,12 +140,12 @@ public class Doctor implements Serializable {
         this.userId = userId;
     }
 
-    public Collection<Schedules> getSchedulesCollection() {
-        return schedulesCollection;
+    public Specialty getSpecialty() {
+        return specialty;
     }
 
-    public void setSchedulesCollection(Collection<Schedules> schedulesCollection) {
-        this.schedulesCollection = schedulesCollection;
+    public void setSpecialty(Specialty specialty) {
+        this.specialty = specialty;
     }
 
     @Override

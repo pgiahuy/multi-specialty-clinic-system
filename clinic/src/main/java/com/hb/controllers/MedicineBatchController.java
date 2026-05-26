@@ -4,8 +4,10 @@
  */
 package com.hb.controllers;
 
-import com.hb.dto.request.form.AreaForm;
-import com.hb.service.AreasService;
+import com.hb.dto.request.form.MedicineBatchForm;
+import com.hb.pojo.Medicine;
+import com.hb.service.MedicineBatchService;
+import com.hb.service.MedicineService;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
@@ -24,52 +26,50 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  *
- * @author DELL
+ * @author HUY
  */
-
-
-
 @PropertySource("classpath:configs.properties")
 @Controller
 @RequestMapping("/admin")
-public class AreasController {
+public class MedicineBatchController {
     @Autowired
-    private AreasService areaService;
-    
+    private MedicineBatchService medicineBatchService;
     @Autowired
     private Environment env;
-    @GetMapping("/areas")
+    
+    @GetMapping("/medicine-batchs")
     public String list(Model model, @RequestParam Map<String, String> params) {
         int page = params.containsKey("page") ? Integer.parseInt(params.get("page")) : 1;
+
         int pageSize = this.env.getProperty("admin.page_size", Integer.class);
         params.put("pageSize", String.valueOf(pageSize));
-        model.addAttribute("areas", areaService.getAreas(params));
-        model.addAttribute("areaForm", new AreaForm());
+        model.addAttribute("medicineBatchs", this.medicineBatchService.getMedicineBatchs(params));
+        MedicineBatchForm medicineBatchForm = new MedicineBatchForm();
+        medicineBatchForm.setMedicine(new Medicine());
+        model.addAttribute("medicineBatchForm", medicineBatchForm);
 
-        long totalAreas = areaService.countAreas(params);
-        int totalPages = (int) Math.ceil((double) totalAreas / pageSize);
+        long totalMedicineBtachs = medicineBatchService.countMedicineBatchs(params);
+        int totalPages = (int) Math.ceil((double) totalMedicineBtachs / pageSize);
 
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("currentPage", page);
 
-        return "area";
-    }
-    
-
-    @PostMapping("/areas")
-    public String create(@ModelAttribute AreaForm areaForm) {
-
-        areaService.saveOrUpdate(areaForm);
-        return "redirect:/admin/areas";
+        return "medicine-batch";
     }
 
-    @DeleteMapping("/areas/{id}")
-    public ResponseEntity<?> delete(@PathVariable("id") Long id) {
+    @PostMapping("/medicine-batchs")
+    public String create(@ModelAttribute MedicineBatchForm medicineBatchForm) {
+        medicineBatchService.addOrUpdateMedicineBatch(medicineBatchForm);
+        return "redirect:/admin/medicine-batchs";
+    }
+
+    @DeleteMapping("/medicine-batchs/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) {
         try {
-            areaService.deleteAreas(id);
-            return ResponseEntity.ok().build();
+            medicineBatchService.deleteMedicineBatch(id);
+            return ResponseEntity.noContent().build();
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Area not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e);
         }
     }
 }
