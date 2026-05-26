@@ -5,6 +5,7 @@
 package com.hb.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import java.time.LocalDate;
 import java.util.Date;
 
 /**
@@ -17,14 +18,14 @@ public class PatientResponse {
     private String fullName;
     private String phone;
     @JsonFormat(pattern = "dd/MM/yyyy")
-    private Date dob;
+    private LocalDate dob;
     private String address;
     private String gender;
 
     public PatientResponse() {
     }
 
-    public PatientResponse(Long id, String cccd, String fullName, String phone, Date dob, String address, String gender) {
+    public PatientResponse(Long id, String cccd, String fullName, String phone, LocalDate dob, String address, String gender) {
         this.id = id;
         this.cccd = cccd;
         this.fullName = fullName;
@@ -95,14 +96,14 @@ public class PatientResponse {
     /**
      * @return the dob
      */
-    public Date getDob() {
+    public LocalDate getDob() {
         return dob;
     }
 
     /**
      * @param dob the dob to set
      */
-    public void setDob(Date dob) {
+    public void setDob(LocalDate dob) {
         this.dob = dob;
     }
 
@@ -132,10 +133,5 @@ public class PatientResponse {
      */
     public void setGender(String gender) {
         this.gender = gender;
-    }
-   
-    
-
-    
-    
+    } 
 }
