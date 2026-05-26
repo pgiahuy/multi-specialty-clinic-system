@@ -1,4 +1,4 @@
-import { Alert, Button, Container, Nav, Stack, Row, Col } from "react-bootstrap";
+import { Alert, Button, Container, Nav, Stack, Row, Col, Modal, Form } from "react-bootstrap";
 import API, { authApis, endpoint } from "../../configs/Apis";
 import { useEffect, useState, useContext } from "react";
 import Header from "../../components/Header";
@@ -14,6 +14,54 @@ const PatientProfile = () => {
     const [patientProfiles, setPatientProfiles] = useState([]);
     const navigate = useNavigate();
 
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [editData, setEditData] = useState({});
+
+    const handleEdit = (profile) => {
+        let dataToEdit = { ...profile };
+
+        // 2. Kiểm tra xem có ngày sinh dạng dd/MM/yyyy không thì đảo ngược nó lại
+        if (dataToEdit.dob && dataToEdit.dob.includes("/")) {
+            const parts = dataToEdit.dob.split("/"); 
+            if (parts.length === 3) {
+                // Đảo từ dd/MM/yyyy sang yyyy-MM-dd
+                dataToEdit.dob = `${parts[2]}-${parts[1]}-${parts[0]}`; 
+            }
+        }
+
+        // 3. Gán dữ liệu đã chuẩn hóa vào State và mở Modal
+        setEditData(dataToEdit);
+       
+        setShowEditModal(true);
+    };
+
+    const handleCloseModal = () => {
+        setShowEditModal(false);
+        setEditData({});
+    };
+
+    const handleInputChange = (e) => {
+        setEditData({
+            ...editData,
+            [e.target.name]: e.target.value
+        });
+    };
+
+
+    const handleSaveChanges = async () => {
+        try {
+            console.log("ID đang sửa là: ", editData.id);
+            const response = await authApis().put(endpoint['patient-profile'](editData.id), editData);
+            
+            alert("Cập nhật thành công!");
+            setShowEditModal(false);
+            loadPatientProfiles(); 
+        } catch (error) {
+            console.error(error);
+            alert("Có lỗi xảy ra khi cập nhật!");
+        }
+    };
+
     const loadPatientProfiles = async () => {
         try {
             const res = await authApis().get(endpoint['patientProfiles']);
@@ -23,15 +71,11 @@ const PatientProfile = () => {
         }
     };
 
-    const handleEdit = (profile) => {
-        // TODO: Implement edit functionality
-        console.log("Edit profile:", profile);
-        navigate(`/patient/register-record/${profile.id}`);
-    };
+    
 
     const handleDelete = (profile) => {
         if (window.confirm(`Bạn có chắc chắn muốn xóa hồ sơ của ${profile.fullName} không?`)) {
-            // TODO: Implement delete functionality via API
+           
             console.log("Delete profile:", profile);
         }
     };
@@ -105,6 +149,105 @@ const PatientProfile = () => {
                     </Row>
                 </Container>
                 <Footer />
+                <Modal
+                    show={showEditModal}
+                    onHide={handleCloseModal}
+                    backdrop="static"
+                    centered
+                    size="lg"
+                    className="rounded-4"
+                    contentClassName="rounded-4 border-0 shadow-lg"
+                >
+                    <Modal.Header closeButton>
+                        <Modal.Title className="fw-bold">Chỉnh sửa hồ sơ</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Form>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Họ và tên</Form.Label>
+                            <Form.Control 
+                                type="text" 
+                                name="fullName" 
+                                value={editData.fullName || ""} 
+                                onChange={handleInputChange} 
+                                className="rounded-4"
+                            />
+                        </Form.Group>
+
+                        <Form.Group className="mb-3">
+                            <Form.Label>CCCD/CMND</Form.Label>
+                            <Form.Control 
+                                type="text" 
+                                name="cccd" 
+                                value={editData.cccd || ""} 
+                                onChange={handleInputChange} 
+                                className="rounded-4"
+                            />
+                        </Form.Group>
+
+                        <Row>
+                            <Col md={6}>
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Số điện thoại</Form.Label>
+                                    <Form.Control 
+                                        type="tel" 
+                                        name="phone" 
+                                        value={editData.phone || ""} 
+                                        onChange={handleInputChange} 
+                                        className="rounded-4"
+                                    />
+                                </Form.Group>
+                            </Col>
+                            <Col md={6}>
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Ngày sinh</Form.Label>
+                                    <Form.Control 
+                                        type="date" 
+                                        name="dob" 
+                                        value={editData.dob || ""} 
+                                        onChange={handleInputChange} 
+                                        className="rounded-4"
+                                    />
+                                </Form.Group>
+                            </Col>
+                        </Row>
+
+                        <Form.Group className="mb-3">
+                            <Form.Label>Giới tính</Form.Label>
+                            <Form.Select 
+                                name="gender" 
+                                value={editData.gender || ""} 
+                                onChange={handleInputChange}
+                                className="rounded-4"
+                            >
+                                <option value="Nam">Nam</option>
+                                <option value="Nữ">Nữ</option>
+                                <option value="Khác">Khác</option>
+                            </Form.Select>
+                        </Form.Group>
+
+                        <Form.Group className="mb-3">
+                            <Form.Label>Địa chỉ</Form.Label>
+                            <Form.Control 
+                                
+                                type="text"
+                                name="address" 
+                                value={editData.address || ""} 
+                                onChange={handleInputChange} 
+                                className="rounded-4"
+                            />
+                        </Form.Group>
+                    </Form>
+                </Modal.Body>
+                <Modal.Footer >
+                    <Button variant="outline-danger" className="rounded-4 px-4" onClick={handleCloseModal}>
+                        Hủy bỏ
+                    </Button>
+                    <Button variant="primary" className="rounded-4 px-4" onClick={handleSaveChanges}>
+                        Lưu thay đổi
+                    </Button>
+                </Modal.Footer>
+            </Modal>
             </div>
 
         </>
