@@ -43,7 +43,10 @@ public abstract class BaseRepositoryImpl<T> implements BaseRepository<T> {
             params.forEach((key, value) -> {
             if (!key.equalsIgnoreCase("page") && !key.equalsIgnoreCase("pageSize")) {
                 if (value != null && !value.isEmpty()) {
-                    predicates.add(cb.like(root.get(key).as(String.class), String.format("%%%s%%", value)));
+                    try {
+                        predicates.add(cb.like(root.get(key).as(String.class), String.format("%%%s%%", value)));
+                    } catch (IllegalArgumentException ex) {
+                    }
                 }
             }
         });

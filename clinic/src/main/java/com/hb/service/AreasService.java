@@ -4,6 +4,7 @@
  */
 package com.hb.service;
 
+import com.hb.dto.request.form.AreaForm;
 import com.hb.pojo.Areas;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +16,7 @@ import java.util.Map;
 public interface AreasService {
     List<Areas> getAreas(Map<String,String> params);
     Areas getAreasById(Long id);
-    Areas addArea(Map<String,String> params);
+    Areas saveOrUpdate(AreaForm form);
     void deleteAreas(Long id);
     long countAreas(Map<String,String> params);
 }

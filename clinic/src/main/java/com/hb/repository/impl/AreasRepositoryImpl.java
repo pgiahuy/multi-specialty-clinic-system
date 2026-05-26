@@ -11,8 +11,7 @@ import java.util.Map;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
+
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,10 +49,14 @@ public class AreasRepositoryImpl extends BaseRepositoryImpl<Areas> implements Ar
     }
 
     @Override
-    public Areas addArea(Areas a) {
+    public Areas saveOrUpdate(Areas a) {
         Session session = this.factory.getObject().getCurrentSession();
-        session.persist(a);
-        return a;
+        if (a.getId()==null) {
+            session.persist(a);
+            return a;
+        }else{
+            return session.merge(a);
+        }
     }
     
     @Override

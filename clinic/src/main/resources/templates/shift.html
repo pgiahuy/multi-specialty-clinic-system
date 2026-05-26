@@ -1,67 +1,133 @@
-
-
-
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
-    <head>
-        <title>Quản lý Ca làm việc</title>
 
-    <th:block th:replace="base :: css"></th:block>
-    <th:block th:replace="base :: js"></th:block>
-    <script th:src="@{/js/admin-forms.js}"></script>
+<head>
+    <title>Quản lý Ca làm việc</title>
+    <th:block th:replace="~{base :: css}"></th:block>
+    <th:block th:replace="~{base :: js}"></th:block>
+    <script th:inline="javascript">
+        window.__OPEN_SHIFT_FORM__ = /*[[${openForm != null ? openForm : false}]]*/ false;
+    </script>
+    <script th:src="@{/js/admin-crud.js}"></script>
 </head>
 
 <body>
+    <div th:replace="~{base :: header('QUẢN LÝ CA LÀM VIỆC')}"></div>
+    <div th:replace="~{base :: sidebar}"></div>
 
-    <div th:replace="base :: header('QUẢN LÝ CA')"></div>
+    <div class="content mt-6">
+        <div th:if="${errorMsg}" class="alert alert-danger alert-dismissible fade show mb-3">
+            <span th:text="${errorMsg}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${successMsg}" class="alert alert-success alert-dismissible fade show mb-3">
+            <span th:text="${successMsg}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
 
-    <div th:replace="base :: sidebar"></div>
+        <div class="d-flex justify-content-end mb-3">
+            <button type="button" id="toggleShiftFormBtn" class="btn btn-success"
+                onclick="toggleCrudForm('shiftForm', 'toggleShiftFormBtn')">
+                <i class="bi bi-plus-circle me-2"></i>Thêm ca trực
+            </button>
+        </div>
 
-    <div class="content">
+        <form id="shiftForm" th:class="${openForm} ? 'card p-4 mb-4' : 'card p-4 mb-4 d-none'" method="post"
+            th:object="${shiftForm}" th:action="@{/admin/shifts}">
+            <h4 id="formTitle" class="mb-3 text-uppercase fw-bold text-primary">Thêm / Cập nhật ca trực</h4>
+            <input type="hidden" th:field="*{id}" id="shiftId" />
 
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <label class="form-label fw-bold">Bắt đầu:</label>
+                    <input type="time" th:field="*{startTime}" class="form-control" required />
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label fw-bold">Kết thúc:</label>
+                    <input type="time" th:field="*{endTime}" class="form-control" required />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Buổi:</label>
+                    <input type="text" th:field="*{session}" class="form-control" placeholder="Ví dụ: Sáng, Chiều"
+                        required />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Bệnh nhân tối thiểu:</label>
+                    <input type="number" th:field="*{minPatients}" class="form-control" required />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Bệnh nhân tối đa:</label>
+                    <input type="number" th:field="*{maxPatients}" class="form-control" required />
+                </div>
+            </div>
 
+            <div class="d-flex gap-2 justify-content-end">
+                <button type="button" class="btn btn-secondary"
+                    onclick="toggleCrudForm('shiftForm', 'toggleShiftFormBtn')">Hủy</button>
+                <button type="submit" id="submitFormBtn" class="btn btn-primary">Lưu thông tin</button>
+            </div>
+        </form>
 
-        <table class="table table-bordered table-hover align-middle">
-            <thead class="table-primary">
+        <table class="table table-bordered table-hover align-middle shadow-sm">
+            <thead class="table-primary text-center">
                 <tr>
                     <th>Bắt đầu</th>
                     <th>Kết thúc</th>
                     <th>Buổi</th>
-                    <th>Bệnh nhân tối đa</th>
-                    <th>Bệnh nhân tối thiểu</th>
-             
-                    <th></th>
+                    <th>BN Tối thiểu</th>
+                    <th>BN Tối đa</th>
+                    <th>Hành động</th>
                 </tr>
             </thead>
-
             <tbody>
-                <tr th:each="d : ${shifts}">
-                    <td th:text="${#temporals.format(d.startTime, 'HH:mm')}"></td>
-                    <td th:text="${#temporals.format(d.endTime, 'HH:mm')}"></td>
-                    <td th:text="${d.session}"></td>
-                    <td th:text="${d.maxPatients}"></td>
-                    <td th:text="${d.minPatients}"></td>
-   
-           
-                    <td>
-                        <button class="btn btn-warning btn-sm">Sửa</button>
+                <tr th:each="s : ${shifts}" th:id="'shift-row-' + ${s.id}">
+                    <td class="text-center" th:text="${#temporals.format(s.startTime, 'HH:mm')}"></td>
+                    <td class="text-center" th:text="${#temporals.format(s.endTime, 'HH:mm')}"></td>
+                    <td class="text-center" th:text="${s.session}"></td>
+                    <td class="text-center" th:text="${s.minPatients}"></td>
+                    <td class="text-center" th:text="${s.maxPatients}"></td>
+                    <td class="text-center">
+                        <button class="btn btn-warning btn-sm"
+                            th:attr="data-id=${s.id}, data-session=${s.session}, data-min=${s.minPatients}, data-max=${s.maxPatients}"
+                            onclick="editShift(this)">Sửa</button>
                         <button class="btn btn-danger btn-sm"
-                                th:onclick="'deleteDoctor(' + ${d.id} + ')'">
-                            Xóa
-                        </button>
+                            th:onclick="|deleteCrudItem(${s.id}, '/admin/shifts/', 'shift-row-')|">Xóa</button>
                     </td>
                 </tr>
             </tbody>
         </table>
-
     </div>
 
-    <div class="d-flex justify-content-center mt-4">
+    <div class="d-flex justify-content-center mt-1">
         <div th:replace="~{fragments :: pagination('/admin/shifts', ${totalPages}, ${currentPage})}"></div>
     </div>
 
-    <div th:replace="base :: footer">
+    <div th:replace="~{base :: footer}"></div>
 
-    </div>
+    <script th:inline="javascript">
+        initFormState(window.__OPEN_SHIFT_FORM__, 'shiftForm', 'toggleShiftFormBtn');
+
+        function editShift(button) {
+            const id = button.getAttribute('data-id');
+            const session = button.getAttribute('data-session');
+            const min = button.getAttribute('data-min');
+            const max = button.getAttribute('data-max');
+
+            document.getElementById('shiftId').value = id;
+            document.getElementById('session').value = session;
+            document.getElementById('minPatients').value = min;
+            document.getElementById('maxPatients').value = max;
+
+            document.getElementById('formTitle').innerText = 'Cập nhật ca (ID: ' + id + ')';
+            document.getElementById('submitFormBtn').innerText = 'Lưu thay đổi';
+
+            document.getElementById('shiftForm').classList.remove('d-none');
+            document.getElementById('toggleShiftFormBtn').className = 'btn btn-secondary';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
 </body>
+
 </html>
