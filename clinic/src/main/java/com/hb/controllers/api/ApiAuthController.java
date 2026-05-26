@@ -53,8 +53,8 @@ public class ApiAuthController {
     @Autowired
     private UserService userService;
 
-    @Value("${CLIENT_ID}")
-    private String clientId;
+    @Autowired
+    private GoogleIdTokenVerifier verifier;
 
     @PostMapping(value = "/auth/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> create(@ModelAttribute UserCreateRequest urq) {
@@ -88,62 +88,32 @@ public class ApiAuthController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Sai thông tin đăng nhập");
     }
 
-//    @PostMapping("/google")
-//    public ResponseEntity<?> loginWithGoogle(@RequestBody Map<String, String> params) {
-//        String idTokenString = params.get("token");
-//
-//        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
-//                .setAudience(Collections.singletonList(clientId))
-//                .build();
-//
-//        try {
-//            GoogleIdToken idToken = verifier.verify(idTokenString);
-//            if (idToken != null) {
-//                GoogleIdToken.Payload payload = idToken.getPayload();
-//
-//                String email = payload.getEmail();
-//                String name = (String) payload.get("name");
-//                String googleId = payload.getSubject();
-//
-//                User user = userService.processSocialLogin(email, name, googleId, AuthProvider.GOOGLE.name());
-//
-//                String token = JwtUtils.generateToken(user.getUsername());
-//                return ResponseEntity.ok().body(Collections.singletonMap("token", token));
-//
-//            }
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token không hợp lệ");
-//        }
-//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-//    }
-//
-//    @PostMapping("/facebook")
-//    public ResponseEntity<?> loginWithFacebook(@RequestBody Map<String, String> body) {
-//        String accessToken = body.get("token");
-//
-//        try {
-//            FacebookClient facebookClient = new DefaultFacebookClient(accessToken, Version.LATEST);
-//
-//            com.restfb.types.User fbUser = facebookClient.fetchObject("me", com.restfb.types.User.class,
-//                    Parameter.with("fields", "id,name,email"));
-//
-//            if (fbUser != null) {
-//                String email = fbUser.getEmail();
-//                String name = fbUser.getName();
-//                String fbId = fbUser.getId();
-//
-//                if (email == null) {
-//                    email = fbId + "@facebook.com";
-//                }
-//
-//                User user = userService.processSocialLogin(email, name, fbId, AuthProvider.FACEBOOK.name());
-//
-//                String token = JwtUtils.generateToken(user.getUsername());
-//                return ResponseEntity.ok().body(Collections.singletonMap("token", token));
-//            }
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Facebook Token không hợp lệ");
-//        }
-//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-//    }
+    @PostMapping("/auth/google")
+    public ResponseEntity<?> loginWithGoogle(@RequestBody Map<String, String> params) {
+        String idTokenString = params.get("token");
+        String fcmToken = params.get("fcmToken");
+
+        if (idTokenString == null || idTokenString.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token không được để trống");
+        }
+
+        try {
+
+            GoogleIdToken idToken = verifier.verify(idTokenString);
+            if (idToken == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token không hợp lệ");
+            }
+
+            GoogleIdToken.Payload payload = idToken.getPayload();
+
+            User user = userService.processSocialLogin(payload,fcmToken);
+
+            String role = userService.getRoleByUsername(user.getUsername());
+
+            return ResponseEntity.ok(Collections.singletonMap("token", JwtUtils.generateToken(user.getEmail(), role)));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi hệ thống: " + e.getMessage());
+        }
+    }
 }

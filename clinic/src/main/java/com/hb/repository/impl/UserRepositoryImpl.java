@@ -5,7 +5,9 @@
 package com.hb.repository.impl;
 
 import com.hb.pojo.Patient;
+import com.hb.pojo.SocialAccount;
 import com.hb.pojo.User;
+import com.hb.repository.SocialAccountRepository;
 import com.hb.repository.UserRepository;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +30,12 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<User> implements User
 
     @Autowired
     private LocalSessionFactoryBean factory;
+    
+    @Autowired
+    private SocialAccountRepository socialAccountRepo;
+    
+    @Autowired
+    private UserRepository userRepo;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
@@ -58,9 +66,9 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<User> implements User
 
         return q.getResultList();
     }
-    
+
     @Override
-    public long count(Map<String, String> params,Class<User> clazz) {
+    public long count(Map<String, String> params, Class<User> clazz) {
         Session session = this.factory.getObject().getCurrentSession();
 
         StringBuilder hql = new StringBuilder("SELECT COUNT(u) FROM User u WHERE 1=1");
@@ -159,6 +167,33 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<User> implements User
         q.setParameter("email", email);
 
         return q.uniqueResultOptional().orElse(null);
+    }
+
+    @Transactional
+    public User processSocialLogin(String email, String name, String googleId, String provider) {
+
+        SocialAccount socialAccount = socialAccountRepo.findByProviderAndProviderId(provider, googleId);
+
+        if (socialAccount != null) {
+            return socialAccount.getUserId();
+        }
+
+        User user = userRepo.getUserByEmail(email);
+
+        if (user == null) {
+            user = new User();
+            user.setEmail(email);
+            user.setUsername(email);
+//            user.setSecureUrl(email);
+            user = userRepo.saveOrUpdate(user);
+        }
+
+        SocialAccount newAccount = new SocialAccount();
+        newAccount.setProvider(provider);
+        newAccount.setProviderId(googleId);
+        newAccount.setUserId(user);
+        socialAccountRepo.save(newAccount);
+        return user;
     }
 
 }

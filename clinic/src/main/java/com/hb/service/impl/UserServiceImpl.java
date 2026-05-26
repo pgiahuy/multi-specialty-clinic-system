@@ -4,10 +4,13 @@
  */
 package com.hb.service.impl;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.hb.dto.request.UserCreateRequest;
 import com.hb.exception.DuplicateResourceException;
 import com.hb.exception.ResourceNotFoundException;
+import com.hb.pojo.SocialAccount;
 import com.hb.pojo.User;
+import com.hb.repository.SocialAccountRepository;
 import com.hb.service.UserService;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,12 +39,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @PropertySource("classpath:configs.properties")
 public class UserServiceImpl implements UserService {
-    
+
     @Autowired
     private Environment env;
 
     @Autowired
     private UserRepository userRepo;
+
+    @Autowired
+    private SocialAccountRepository socialRepo;
 
     @Autowired
     private CloudinaryService cloudinaryService;
@@ -87,7 +93,6 @@ public class UserServiceImpl implements UserService {
                 u.setPassword(passwordEncoder.encode(urq.getPassword()));
             }
 
-
         } else {
             User checkUser = userRepo.existsByUsername(urq.getUsername());
             if (checkUser != null) {
@@ -107,17 +112,15 @@ public class UserServiceImpl implements UserService {
             u.setCreatedAt(LocalDateTime.now());
         }
 
-
         if (urq.getAvatar() != null && !urq.getAvatar().isEmpty()) {
 
-            if (u.getPublicId()!= null) { 
-                this.cloudinaryService.deleteFile(u.getPublicId()); 
+            if (u.getPublicId() != null) {
+                this.cloudinaryService.deleteFile(u.getPublicId());
             }
             Map res = this.cloudinaryService.uploadFile(urq.getAvatar(), "avatar");
             u.setSecureUrl(res.get("secureUrl").toString());
             u.setPublicId(res.get("publicId").toString());
-        }
-        else if (u.getId() == null) {
+        } else if (u.getId() == null) {
             String url = this.env.getProperty("avatar.default", String.class);
             u.setSecureUrl(url);
         }
@@ -151,10 +154,45 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User processSocialLogin(String email, String name,
-            String providerId, String providerName
-    ) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public User processSocialLogin(GoogleIdToken.Payload payload, String fcmToken) {
+        String googleId = payload.getSubject();
+        String email = payload.getEmail();
+        String name = (String) payload.get("name");
+        String provider = "GOOGLE";
+        String avatarUrl = (String) payload.get("picture");
+
+        SocialAccount social = socialRepo.findByProviderAndProviderId(provider, googleId);
+        if (social != null) {
+            return social.getUserId();
+        }
+
+        User user = userRepo.getUserByEmail(email);
+
+        if (user == null) {
+            user = new User();
+            user.setUsername(email);
+            user.setEmail(email);
+            user.setName(name);
+            user.setSecureUrl(avatarUrl);
+            user.setRole("ROLE_PATIENT");
+            user.setCreatedAt(LocalDateTime.now());
+
+            userRepo.saveOrUpdate(user);
+        }
+
+        SocialAccount newSocial = new SocialAccount();
+        newSocial.setProvider(provider);
+        newSocial.setProviderId(googleId);
+        newSocial.setUserId(user);
+
+        socialRepo.save(newSocial);
+
+        if (fcmToken != null && !fcmToken.isEmpty()) {
+            user.setFcmToken(fcmToken);
+            userRepo.saveOrUpdate(user);
+        }
+
+        return user;
     }
 
     @Override
