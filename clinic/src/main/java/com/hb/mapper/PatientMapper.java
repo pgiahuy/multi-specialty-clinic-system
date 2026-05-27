@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PatientMapper {
 
-      public PatientResponse toResponse(Patient p) {
+    public PatientResponse toResponse(Patient p) {
         if (p == null) {
             return null;
         }
@@ -49,7 +49,7 @@ public class PatientMapper {
         Patient p = new Patient();
 
         p.setUserId(user);
-    
+
         p.setCccd(req.getCccd());
         p.setFullName(req.getFullName());
         p.setPhone(req.getPhone());
@@ -58,6 +58,20 @@ public class PatientMapper {
         p.setGender(req.getGender());
 
         return p;
+    }
+
+    public void updateEntity(PatientCreateRequest req, Patient p) {
+        if (req == null || p == null) {
+            return;
+        }
+
+        p.setCccd(req.getCccd());
+        p.setFullName(req.getFullName());
+        p.setPhone(req.getPhone());
+        p.setDob(req.getDob());
+        p.setAddress(req.getAddress());
+        p.setGender(req.getGender());
+
     }
 
 }

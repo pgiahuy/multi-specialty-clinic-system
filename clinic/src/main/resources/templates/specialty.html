@@ -1,63 +1,221 @@
-
-
-
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
-    <head>
-        <title>Quản lý Chuyên khoa</title>
 
+<head>
+    <title>Quản lý Chuyên khoa</title>
     <th:block th:replace="base :: css"></th:block>
     <th:block th:replace="base :: js"></th:block>
-    <script th:src="@{/js/specialty.js}"></script>
+    <script th:inline="javascript">
+        window.__OPEN_SPECIALTY_FORM__ = /*[[${openForm}]]*/ false;
+    </script>
+    <script th:src="@{/js/admin-crud.js}"></script>
 </head>
 
 <body>
-
     <div th:replace="base :: header('QUẢN LÝ CHUYÊN KHOA')"></div>
-
     <div th:replace="base :: sidebar"></div>
 
-    <div class="content">
+    <div class="content mt-6">
+        <th:block th:with="hasError=${errorMsg}, hasSuccess=${successMsg}">
+            <div th:if="${hasError}" class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+                <span th:text="${errorMsg}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${hasSuccess}" class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+                <span th:text="${successMsg}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        </th:block>
 
+        <div class="d-flex justify-content-end mb-3">
+            <button type="button" id="toggleSpecialtyFormBtn" class="btn btn-success"
+                onclick="toggleCrudForm('specialtyForm', 'toggleSpecialtyFormBtn')">
+                <i class="bi bi-plus-circle me-2"></i>Thêm chuyên khoa mới
+            </button>
+        </div>
 
+        <form class="row g-2 mb-3" method="get" action="" id="specialtyFilterForm">
+            <div class="col-md-4">
+                <input type="text" name="specialtyName" class="form-control" placeholder="Tìm chuyên khoa"
+                    th:value="${param.specialtyName != null ? param.specialtyName : ''}" />
+            </div>
+            <div class="col-md-4">
+                <input type="text" name="doctorName" class="form-control" placeholder="Tìm trưởng khoa"
+                    th:value="${param.doctorName != null ? param.doctorName : ''}" />
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-outline-primary">Tìm kiếm</button>
+                <a th:href="@{/admin/specialties}" class="btn btn-outline-secondary ms-2">Đặt lại</a>
+            </div>
+        </form>
 
-        <table class="table table-bordered table-hover align-middle">
-            <thead class="table-primary">
+        <form id="specialtyForm" th:class="${openForm} ? 'card p-4 mb-4' : 'card p-4 mb-4 d-none'" method="post"
+            th:object="${specialtyForm}" th:action="@{/admin/specialties}">
+
+            <h4 id="formTitle" class="mb-3 text-uppercase fw-bold text-primary">Thêm chuyên khoa mới</h4>
+            <input type="hidden" th:field="*{id}" id="specialtyId" />
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Tên chuyên khoa:</label>
+                    <input type="text" th:field="*{name}" class="form-control" id="specialtyName" required />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Giá khám:</label>
+                    <input type="number" min="0" step="1000" th:field="*{price}" class="form-control"
+                        id="specialtyPrice" required />
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Trưởng khoa:</label>
+                <div class="input-group mb-2">
+                    <input type="text" id="doctorSearchInput" class="form-control" placeholder="Tìm bác sĩ...">
+                    <button type="button" class="btn btn-outline-secondary" id="clearDoctorSearch">X</button>
+                </div>
+                <select th:field="*{hodId}" class="form-select" id="hodId">
+                    <option value="">-- Chọn trưởng khoa --</option>
+                    <option th:each="d : ${doctors}" th:value="${d.id}" th:text="${d.fullName}"></option>
+                </select>
+            </div>
+
+            <div class="d-flex gap-2 justify-content-end">
+                <button type="button" class="btn btn-secondary"
+                    onclick="toggleCrudForm('specialtyForm', 'toggleSpecialtyFormBtn')">Hủy</button>
+                <button type="submit" id="submitFormBtn" class="btn btn-primary">Lưu thông tin</button>
+            </div>
+        </form>
+
+        <table class="table table-bordered table-hover align-middle shadow-sm">
+            <thead class="table-primary text-center">
                 <tr>
                     <th>Khoa</th>
                     <th>Giá khám</th>
                     <th>Trưởng khoa</th>
-                    <th>Số lượng Bác sĩ</th>
-                    <th></th>
+                    <th>Số lượng bác sĩ</th>
+                    <th>Hành động</th>
                 </tr>
             </thead>
-            
             <tbody>
-                <tr th:each="d : ${specialties}">
-                    <td th:text="${d.name}"></td>
-                    <td th:text="${#numbers.formatDecimal(d.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></td>
-                    <td th:text="${d.idHod != null ? d.idHod.fullName : 'Chưa có'}"></td>
-                    <td th:text="${d.doctorCollection != null ? d.doctorCollection.size() : 0}"></td>
-           
-                    <td>
-                        <button class="btn btn-warning btn-sm">Sửa</button>
-                        <button class="btn btn-danger btn-sm"
-                                th:onclick="'deleteDoctor(' + ${d.id} + ')'">
-                            Xóa
+                <tr th:each="s : ${specialties}" th:id="'spec-row-' + ${s.id}">
+                    <td th:id="'spec-name-' + ${s.id}">
+                        <span th:text="${s.name}"></span>
+                        <input type="hidden" th:id="'spec-hod-id-' + ${s.id}"
+                            th:value="${s.idHod != null ? s.idHod.id : ''}">
+                        <input type="hidden" th:id="'spec-hod-name-' + ${s.id}"
+                            th:value="${s.idHod != null ? s.idHod.fullName : ''}">
+                        <input type="hidden" th:id="'spec-price-' + ${s.id}" th:value="${s.price}">
+                    </td>
+                    <td th:text="${#numbers.formatDecimal(s.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></td>
+                    <td th:text="${s.idHod != null ? s.idHod.fullName : 'Chưa có'}"></td>
+                    <td th:text="${s.doctorCollection != null ? s.doctorCollection.size() : 0}"></td>
+                    <td class="text-center">
+                        <button class="btn btn-warning btn-sm" type="button"
+                            th:onclick="|editSpecialty(${s.id})|">Sửa</button>
+
+                        <button class="btn btn-danger btn-sm" th:data-id="${s.id}" th:data-url="@{/admin/specialties/}"
+                            th:data-row-prefix="'spec-row-'"
+                            onclick="deleteCrudItem(this.dataset.id, this.dataset.url, this.dataset.rowPrefix)">
+                            <i class="bi bi-trash-fill"></i>Xóa
                         </button>
                     </td>
                 </tr>
             </tbody>
         </table>
-
     </div>
 
-    <div class="d-flex justify-content-center mt-4">
+    <div class="d-flex justify-content-center mt-1">
         <div th:replace="~{fragments :: pagination('/admin/specialties', ${totalPages}, ${currentPage})}"></div>
     </div>
 
-    <div th:replace="base :: footer">
+    <div th:replace="base :: footer"></div>
 
-    </div>
+    <script th:inline="javascript">
+        initFormState(window.__OPEN_SPECIALTY_FORM__, 'specialtyForm', 'toggleSpecialtyFormBtn');
+
+        const specialtyDoctorSearchUrl = /*[[@{/admin/specialties/search-doctors}]]*/ '/admin/specialties/search-doctors';
+
+        async function loadDoctors(kw = '') {
+            const response = await fetch(specialtyDoctorSearchUrl + '?kw=' + encodeURIComponent(kw));
+            const items = await response.json();
+            const doctorSelect = document.getElementById('hodId');
+            if (!doctorSelect)
+                return;
+
+            const selectedValue = doctorSelect.value;
+            doctorSelect.innerHTML = '<option value="">-- Chọn trưởng khoa --</option>';
+            items.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.id;
+                option.textContent = item.fullName;
+                doctorSelect.appendChild(option);
+            });
+            if (selectedValue)
+                doctorSelect.value = selectedValue;
+        }
+
+        function editSpecialty(id) {
+            const form = document.getElementById('specialtyForm');
+            const toggleBtn = document.getElementById('toggleSpecialtyFormBtn');
+
+            document.getElementById('specialtyId').value = id;
+            document.getElementById('specialtyName').value = document.getElementById('spec-name-' + id).innerText.trim();
+            const priceHidden = document.getElementById('spec-price-' + id);
+            document.getElementById('specialtyPrice').value = priceHidden && priceHidden.value ? priceHidden.value : '';
+
+            const hodIdHidden = document.getElementById('spec-hod-id-' + id);
+            const hodNameHidden = document.getElementById('spec-hod-name-' + id);
+            const hodSelect = document.getElementById('hodId');
+            if (hodSelect) {
+                const hodId = hodIdHidden && hodIdHidden.value ? String(hodIdHidden.value).trim() : '';
+                if (hodId) {
+                    let matched = hodSelect.querySelector('option[value="' + hodId + '"]');
+                    if (!matched) {
+                        matched = document.createElement('option');
+                        matched.value = hodId;
+                        matched.text = hodNameHidden && hodNameHidden.value ? hodNameHidden.value : ('Bác sĩ #' + hodId);
+                        hodSelect.appendChild(matched);
+                    }
+                    hodSelect.value = hodId;
+                    const doctorSearchInput = document.getElementById('doctorSearchInput');
+                    if (doctorSearchInput) {
+                        doctorSearchInput.value = hodNameHidden && hodNameHidden.value ? hodNameHidden.value : '';
+                        loadDoctors(doctorSearchInput.value);
+                    }
+                } else {
+                    hodSelect.value = '';
+                    loadDoctors('');
+                }
+            }
+
+            document.getElementById('formTitle').innerText = 'Cập nhật chuyên khoa (ID: ' + id + ')';
+            document.getElementById('submitFormBtn').innerText = 'Lưu thay đổi';
+
+            form.classList.remove('d-none');
+            toggleBtn.innerHTML = '<i class="bi bi-dash-circle me-2"></i>Đóng form';
+            toggleBtn.className = 'btn btn-secondary';
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        let debounceTimer;
+        document.getElementById('doctorSearchInput')?.addEventListener('input', function (e) {
+            const searchTerm = e.target.value;
+
+            clearTimeout(debounceTimer);
+
+            debounceTimer = setTimeout(() => {
+                loadDoctors(searchTerm);
+            }, 500);
+        });
+
+        document.getElementById('clearDoctorSearch')?.addEventListener('click', function () {
+            const inp = document.getElementById('doctorSearchInput');
+            if (inp)
+                inp.value = '';
+            loadDoctors('');
+        });
+    </script>
 </body>
+
 </html>

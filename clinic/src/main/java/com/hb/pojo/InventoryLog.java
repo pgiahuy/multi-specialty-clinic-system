@@ -65,7 +65,7 @@ public class InventoryLog implements Serializable {
     private Medicine medicineId;
     @JoinColumn(name = "batch_id", referencedColumnName = "id")
     @ManyToOne
-    private Medicinebatch batchId;
+    private MedicineBatch batchId;
 
     public InventoryLog() {
     }
@@ -136,11 +136,11 @@ public class InventoryLog implements Serializable {
         this.medicineId = medicineId;
     }
 
-    public Medicinebatch getBatchId() {
+    public MedicineBatch getBatchId() {
         return batchId;
     }
 
-    public void setBatchId(Medicinebatch batchId) {
+    public void setBatchId(MedicineBatch batchId) {
         this.batchId = batchId;
     }
 

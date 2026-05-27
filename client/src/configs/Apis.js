@@ -29,9 +29,13 @@ export const endpoint = {
     'notifications': '/secure/users/notifications',
     'current-user': '/secure/users/profile',
     'appointments': '/secure/appointments',
+    'create-payment': '/secure/payments/create',
+    'momo-return': '/secure/payments/momo/return',
     'payments': (patientId) => `/secure/payments/${patientId}`,
+    'payment-items': (paymentId) => `/secure/payment-items/${paymentId}`,
     'test-results': (patientId) => `/secure/test/${patientId}`,
     'patient-profile': (patientId) => `/secure/profile/${patientId}`,
+    'specialties': '/specialties',
 };
 
 export const authApis = () => {

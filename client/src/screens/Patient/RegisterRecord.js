@@ -6,6 +6,7 @@ import { formCardStyle } from "../User/UserStyle";
 import { useState } from "react";
 import { authApis, endpoint } from "../../configs/Apis";
 import { useNavigate } from "react-router-dom";
+import Footer from "../../components/Footer";
 
 
 
@@ -45,12 +46,30 @@ const RegisterRecord = () => {
 
     const validate = () => {
         for (let u of patientInfo)
-            if (!(u.field in patient) || !patient[u.field]) {
+            if (!patient[u.field] || patient[u.field].toString().trim() === ""){ 
                 setErr(`Vui lòng nhập ${u.title}!`);
                 return false;
             }
+        const cccdRegex = /^\d{12}$/;
+        if (!cccdRegex.test(patient.cccd)) {
+            setErr("CCCD phải có 12 số!");
+            return false;
+        }
+        const phoneRegex = /(84|0[3|5|7|8|9])+([0-9]{8})\b/;
+        if (!phoneRegex.test(patient.phone)) {
+            setErr("Số điện thoại không hợp lệ!");
+            return false;
 
+            const selectedDate = new Date(patient.dob);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
 
+            if (selectedDate > today) {
+                setErr("Ngày sinh không thể lớn hơn ngày hiện tại!");
+                return false;
+            }
+        }
+        setErr(null);
         return true;
     };
 
@@ -92,48 +111,52 @@ const RegisterRecord = () => {
 
     return (
         <>
-            <Header />
-            <Container className="mt-4" style={{ maxWidth: '600px' }}>
-                <Card>
-                    <Card.Body>
-                        <h3 className="mb-4 text-center text-primary">Đăng ký hồ sơ</h3>
-                        {err && <Alert variant="danger">{err}</Alert>}
-                        <Form onSubmit={addRecord}>
-                            {patientInfo.map(u => <Form.Floating key={u.field} className="mb-3">
-                                {u.type === "select" ? (
-                                    <Form.Select
-                                        style={formCardStyle.input}
-                                        value={patient[u.field] || ""}
-                                        onChange={(e) => setPatient({ ...patient, [u.field]: e.target.value })}
-                                    >
-                                        <option value="">{u.title}</option>
-                                        {u.options.map(opt => (
-                                            <option key={opt} value={opt}>{opt}</option>
-                                        ))}
-                                    </Form.Select>
-                                ) : (
-                                    <Form.Control
-                                        style={formCardStyle.input}
-                                        type={u.type}
-                                        placeholder={u.title}
-                                        value={patient[u.field] || ""}
-                                        onChange={(e) => setPatient({ ...patient, [u.field]: e.target.value })}
-                                    />
-                                )}
-                                <Form.Label>{u.title}</Form.Label>
-                            </Form.Floating>)}
+            <div className="d-flex flex-column min-vh-100">
+                <Header />
+                <Container className="mt-5 mb-5" style={{ maxWidth: '600px' }}>
+                    <Card>
+                        <Card.Body>
+                            <h3 className="mb-4 text-center text-primary">Thêm hồ sơ bệnh nhân</h3>
+                            {err && <Alert variant="danger">{err}</Alert>}
+                            <Form onSubmit={addRecord}>
+                                {patientInfo.map(u => <Form.Floating key={u.field} className="mb-3">
+                                    {u.type === "select" ? (
+                                        <Form.Select
+                                            style={formCardStyle.input}
+                                            value={patient[u.field] || ""}
+                                            onChange={(e) => setPatient({ ...patient, [u.field]: e.target.value })}
+                                        >
+                                            <option value="">{u.title}</option>
+                                            {u.options.map(opt => (
+                                                <option key={opt} value={opt}>{opt}</option>
+                                            ))}
+                                        </Form.Select>
+                                    ) : (
+                                        <Form.Control
+                                            style={formCardStyle.input}
+                                            type={u.type}
+                                            placeholder={u.title}
+                                            value={patient[u.field] || ""}
+                                            onChange={(e) => setPatient({ ...patient, [u.field]: e.target.value })}
+                                        />
+                                    )}
+                                    <Form.Label>{u.title}</Form.Label>
+                                </Form.Floating>)}
 
 
-                            <Form.Group className="mb-3 text-center " controlId="button" >
-                                {loading === true ? <MySpinner /> : <Button variant="primary" type="submit" className="w-100" style={formCardStyle.button}>
-                                    Đăng ký
-                                </Button>}
-                            </Form.Group>
-                        </Form>
-                    </Card.Body>
-                </Card>
+                                <Form.Group className="mb-3 text-center " controlId="button" >
+                                    {loading === true ? <MySpinner /> : <Button variant="primary" type="submit" className="w-100 border-0 header-cta header-cta-primary" style={formCardStyle.button}>
+                                        Thêm hồ sơ
+                                    </Button>}
+                                </Form.Group>
+                            </Form>
+                        </Card.Body>
+                    </Card>
 
-            </Container>
+                </Container>
+                <Footer />
+            </div>
+
         </>
 
     );

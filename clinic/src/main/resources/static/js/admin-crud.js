@@ -42,8 +42,6 @@ function deleteCrudItem(id, deleteUrl, rowSelectorId) {
                     } else {
                         location.reload();
                     }
-                } else {
-                    alert('Xóa thất bại! Có thể dữ liệu này đang dính khóa ngoại.');
                 }
             })
             .catch(err => console.error('Error:', err));

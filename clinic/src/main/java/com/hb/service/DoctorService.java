@@ -4,6 +4,7 @@
  */
 package com.hb.service;
 
+import com.hb.dto.request.form.DoctorForm;
 import com.hb.pojo.Doctor;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +14,7 @@ import java.util.Map;
  * @author HUY
  */
 public interface DoctorService {
-    Doctor addDoctor(Map<String,String> params);
+    Doctor saveOrUpdate(DoctorForm doctorForm);
     List<Doctor> getDoctors(Map<String,String> params);
     Doctor getDoctorById(Long id);
     Doctor getDoctorByUsername(String username);

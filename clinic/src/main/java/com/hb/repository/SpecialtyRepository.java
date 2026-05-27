@@ -14,7 +14,9 @@ import java.util.Map;
  */
 public interface SpecialtyRepository extends BaseRepository<Specialty>{
     List<Specialty> getSpecialties(Map<String,String> params);
-    Specialty getSpecialtieById(Long id);
-    Specialty addSpecialtie(Specialty s);
     
+    List<Specialty> getAllById(List<Long> ids);
+    Specialty getSpecialtieById(Long id);
+    Specialty saveOrUpdate(Specialty s);
+    void delete(Long id);
 }

@@ -15,46 +15,6 @@
     <div th:replace="base :: sidebar"></div>
 
     <div class="content">
-        
-<!--        
-<table class="table table-bordered table-hover align-middle">
-            <thead class="table-primary">
-                <tr>
-                    <th>Ngày</th>
-                    <th>Bác sĩ</th>
-                    <th>Phòng</th>
-                    <th>Khu</th>
-                    <th>Bắt đầu</th>
-                    <th>Kết thúc</th>
-                    <th>Bệnh nhân tối đa</th>
-                    <th>Bệnh nhân hiện tại</th>
-                    <th></th>
-                </tr>
-            </thead>
-
-            <tbody>
-                <tr th:each="d : ${schedules}">
-                    <td th:text="${d.date}"></td>
-                    <td th:text="${d.doctorName}"></td>
-                    <td th:text="${d.room}"></td>
-                    <td th:text="${d.area}"></td>
-                    <td th:text="${d.shiftStartTime}"></td>
-                    <td th:text="${d.shiftEndTime}"></td>
-                    <td th:text="${d.maxPatients}"></td>
-                    <td th:text="${d.currentPatients}"></td>
-
-
-                    <td>
-                        <button class="btn btn-warning btn-sm">Sửa</button>
-                        <button class="btn btn-danger btn-sm"
-                                th:onclick="'deleteSchedule(' + ${d.id} + ')'">
-                            Xóa
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>-->
-
        
         <table class="table table-bordered table-hover align-middle">
             <thead class="table-primary">

@@ -16,6 +16,6 @@ import java.util.Map;
 public interface AreasRepository extends BaseRepository<Areas>{
     List<Areas> getAreas(Map<String,String> params);
     Areas getAreasById(Long id);
-    Areas addArea(Areas a);
+    Areas saveOrUpdate(Areas a);
     void deleteAreas(Long id);
 }

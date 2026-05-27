@@ -46,6 +46,7 @@ public class Medicine implements Serializable {
     @Column(name = "name")
     private String name;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Basic(optional = false)
     @NotNull
     @Column(name = "price")
@@ -59,6 +60,8 @@ public class Medicine implements Serializable {
     @Size(max = 50)
     @Column(name = "unit")
     private String unit;
+    @OneToMany(mappedBy = "medicineId")
+    private Collection<MedicineBatch> medicineBatchCollection;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -69,7 +72,7 @@ public class Medicine implements Serializable {
     @Column(name = "min_stock_alert")
     private Integer minStockAlert;
     @OneToMany(mappedBy = "medicineId")
-    private Collection<Medicinebatch> medicinebatchCollection;
+    private Collection<MedicineBatch> medicinebatchCollection;
     @OneToMany(mappedBy = "medicineId")
     private Collection<InventoryLog> inventorylogCollection;
     @OneToMany(mappedBy = "medicineId")
@@ -121,11 +124,11 @@ public class Medicine implements Serializable {
         this.minStockAlert = minStockAlert;
     }
 
-    public Collection<Medicinebatch> getMedicinebatchCollection() {
+    public Collection<MedicineBatch> getMedicinebatchCollection() {
         return medicinebatchCollection;
     }
 
-    public void setMedicinebatchCollection(Collection<Medicinebatch> medicinebatchCollection) {
+    public void setMedicinebatchCollection(Collection<MedicineBatch> medicinebatchCollection) {
         this.medicinebatchCollection = medicinebatchCollection;
     }
 
@@ -195,12 +198,21 @@ public class Medicine implements Serializable {
     }
 
 
+
     public String getUnit() {
         return unit;
     }
 
     public void setUnit(String unit) {
         this.unit = unit;
+    }
+
+    public Collection<MedicineBatch> getMedicineBatchCollection() {
+        return medicineBatchCollection;
+    }
+
+    public void setMedicineBatchCollection(Collection<MedicineBatch> medicineBatchCollection) {
+        this.medicineBatchCollection = medicineBatchCollection;
     }
     
 }

@@ -7,9 +7,7 @@ package com.hb.service.impl;
 import com.hb.dto.request.UserCreateRequest;
 import com.hb.exception.DuplicateResourceException;
 import com.hb.exception.ResourceNotFoundException;
-import com.hb.pojo.Patient;
 import com.hb.pojo.User;
-import com.hb.repository.PatientRepository;
 import com.hb.service.UserService;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -119,7 +117,7 @@ public class UserServiceImpl implements UserService {
             u.setSecureUrl(res.get("secureUrl").toString());
             u.setPublicId(res.get("publicId").toString());
         }
-        else{
+        else if (u.getId() == null) {
             String url = this.env.getProperty("avatar.default", String.class);
             u.setSecureUrl(url);
         }
@@ -149,15 +147,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(Long id) {
-//        User u = userRepo.getUserById(id);
-//        if (u == null) {
-//            throw new ResourceNotFoundException("User not found!");
-//        }
-//        if (u.getPublicId()!= null) { 
-//                this.cloudinaryService.deleteFile(u.getPublicId()); 
-//        }
         this.userRepo.deleteUser(id);
-        System.out.println("Xoa thanh congggggggggggggggggggggggggggg");
     }
 
     @Override

@@ -5,13 +5,14 @@
 package com.hb.service.impl;
 
 import com.hb.dto.request.PatientCreateRequest;
+import com.hb.dto.request.form.PatientForm;
 import com.hb.dto.response.PatientResponse;
 import com.hb.mapper.PatientMapper;
 import com.hb.pojo.Patient;
 import com.hb.pojo.User;
 import com.hb.repository.PatientRepository;
+import com.hb.repository.UserRepository;
 import com.hb.service.PatientService;
-import com.hb.service.UserService;
 
 import java.util.List;
 import java.util.Map;
@@ -25,10 +26,14 @@ import org.springframework.transaction.annotation.Transactional;
  * @author HUY
  */
 @Service
+@Transactional
 public class PatientServiceImpl implements PatientService {
 
     @Autowired
     private PatientRepository patientRepo;
+    
+    @Autowired
+    private UserRepository userRepo;
 
 
     @Autowired
@@ -46,25 +51,58 @@ public class PatientServiceImpl implements PatientService {
     }
 
     @Override
+    public void deletePatient(Long id) {
+        this.patientRepo.deletePatient(id);
+    }
+
+    @Override
     public PatientResponse addPatient(PatientCreateRequest prq, User u) {
         Patient p = patientMapper.toEntity(prq, u);
         p.setUserId(u);
-        Patient patient = this.patientRepo.addPatient(p);
+        Patient patient = this.patientRepo.saveOrUpdate(p);
         return patientMapper.toResponse(patient);
 
     }
 
     @Override
-    public void updateProfile(Long id, PatientCreateRequest prq) {
+    public PatientResponse updateProfile(Long id, PatientCreateRequest prq) {
         Patient patient = patientRepo.getPatientById(id);
-        patientMapper.toEntity(prq, patient.getUserId());
-        patientRepo.updatePatient(patient);
+        patientMapper.updateEntity(prq, patient);
+        patientRepo.saveOrUpdate(patient);
+        return this.patientMapper.toResponse(patient);
     }
 
     @Override
     public long countPatients(Map<String, String> params) {
         return patientRepo.count(params, Patient.class);
     }
+
+    @Override
+    public Patient saveOrUpdate(PatientForm form) {
+        Patient p;
+        if (form.getId()==null) {
+            p = new Patient();
+        }else{
+            p = this.patientRepo.getPatientById(form.getId());
+        }
+        
+        p.setCccd(form.getCccd()!= null ? form.getCccd() : null);
+        p.setFullName(form.getFullName()!= null ? form.getFullName() : null);
+        p.setDob(form.getDob()!= null ? form.getDob() : null);
+        p.setGender(form.getGender()!= null ? form.getGender(): null);
+        p.setAddress(form.getAddress()!= null ? form.getAddress(): null);
+        p.setPhone(form.getPhone()!= null ? form.getPhone(): null);
+        
+        if(form.getUserId()!=null){
+            User u = this.userRepo.getUserById(form.getUserId());
+            p.setUserId(u);
+        }
+        
+        return this.patientRepo.saveOrUpdate(p);
+
+    }
+    
+    
 
     
 }

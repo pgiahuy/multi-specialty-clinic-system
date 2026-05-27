@@ -15,6 +15,6 @@ import java.util.Map;
 public interface RoomRepository extends BaseRepository<Rooms>{
     List<Rooms> getRooms(Map<String,String> params);
     Rooms getRoomById(Long id);
-    Rooms addRoom(Rooms a);
+    Rooms saveOrUpdate(Rooms a);
     void deleteRoom(Long id);
 }

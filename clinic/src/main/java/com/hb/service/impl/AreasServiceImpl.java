@@ -4,6 +4,7 @@
  */
 package com.hb.service.impl;
 
+import com.hb.dto.request.form.AreaForm;
 import com.hb.pojo.Areas;
 import com.hb.repository.AreasRepository;
 import com.hb.service.AreasService;
@@ -37,16 +38,27 @@ public class AreasServiceImpl implements AreasService {
     }
 
     @Override
-    public Areas addArea(Map<String, String> params) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    @Override
     public void deleteAreas(Long id) {
         this.areaRepo.deleteAreas(id);
     }
+
     @Override
     public long countAreas(Map<String, String> params) {
         return areaRepo.count(params, Areas.class);
+    }
+
+    @Override
+    public Areas saveOrUpdate(AreaForm form) {
+        Areas a;
+        if (form.getId() == null) {
+            a = new Areas();
+        } else {
+            a = this.areaRepo.getAreasById(form.getId());
+        }
+
+        a.setAreaName(form.getAreaName() != null ? form.getAreaName() : null);
+        a.setLocationFloor(form.getLocationFloor() != null ? form.getLocationFloor() : null);
+        
+        return this.areaRepo.saveOrUpdate(a);
     }
 }

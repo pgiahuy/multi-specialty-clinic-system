@@ -27,5 +27,6 @@
     <class>com.hb.pojo.Inventorylog</class>
     <class>com.hb.pojo.Conversation</class>
     <class>com.hb.pojo.ChatMessage</class>
+    <class>com.hb.pojo.MedicineBatch</class>
   </persistence-unit>
 </persistence>

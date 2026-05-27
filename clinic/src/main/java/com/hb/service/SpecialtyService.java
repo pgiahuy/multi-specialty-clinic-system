@@ -4,6 +4,7 @@
  */
 package com.hb.service;
 
+import com.hb.dto.request.form.SpecialtyForm;
 import com.hb.pojo.Specialty;
 import java.util.List;
 import java.util.Map;
@@ -14,8 +15,9 @@ import java.util.Map;
  */
 public interface SpecialtyService {
     List<Specialty> getSpecialties(Map<String,String> params);
+    
     Specialty getSpecialtieById(Long id);
-    Specialty addSpecialtie(Map<String, String> params);
-    void deleteDoctor(Long id);
+    Specialty saveOrUpdate(SpecialtyForm form);
+    void deleteSpecialty(Long id);
     long countSpecialties(Map<String,String> params);
 }

@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -83,6 +85,26 @@ public class ApiPatientController {
         List<Patient> patients = (List<Patient>) u.getPatientCollection();
         patients.forEach(s -> System.out.println(s.getFullName()));
         return ResponseEntity.ok(patients.stream().map(patientMapper::toResponse).toList());
+    }
+    
+    
+    @PutMapping("secure/profile/{patientId}")
+    @Transactional
+    public ResponseEntity<?> updateProfile(Principal principal,
+            @PathVariable(value = "patientId") Long patientId,
+            @RequestBody PatientCreateRequest prq){
+        try {
+            
+            PatientResponse updatedProfile = patientService.updateProfile(patientId, prq);
+            
+            
+            return ResponseEntity.ok(updatedProfile);
+            
+        } catch (RuntimeException e) {
+           
+            return ResponseEntity.badRequest().build(); 
+           
+        }
     }
 
 }

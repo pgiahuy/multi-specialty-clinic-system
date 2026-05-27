@@ -4,14 +4,20 @@
  */
 package com.hb.repository.impl;
 
+import com.hb.exception.ResourceNotFoundException;
 import com.hb.pojo.Patient;
 import com.hb.repository.PatientRepository;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,28 +26,52 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author HUY
  */
-
 @Repository
 @Transactional
-public class PatientRepositoryImpl extends BaseRepositoryImpl<Patient> implements PatientRepository{
+public class PatientRepositoryImpl extends BaseRepositoryImpl<Patient> implements PatientRepository {
 
     @Autowired
     private LocalSessionFactoryBean factory;
-    
+
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
+    }
 
     @Override
-    public List<Patient> getPatients(Map<String,String> params) {
+    public List<Patient> getPatients(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<Patient> q = session.createNamedQuery("Patient.findAll", Patient.class);
-        
-        if (params != null) {
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<Patient> cq = cb.createQuery(Patient.class);
+        Root<Patient> root = cq.from(Patient.class);
+
+        root.fetch("userId", JoinType.LEFT);
+
+        List<Predicate> predicates = new ArrayList<>();
+        if (params != null && hasText(params.get("patientName"))) {
+            String kw = "%" + params.get("patientName").trim() + "%";
+            predicates.add(cb.or(
+                    cb.like(root.get("fullName").as(String.class), kw),
+                    cb.like(root.get("cccd").as(String.class), kw)
+            ));
+        }
+        if (params != null && hasText(params.get("gender"))) {
+            predicates.add(cb.equal(root.get("gender"), params.get("gender").trim()));
+        }
+
+        cq.where(predicates.toArray(new Predicate[0]));
+        cq.where(cb.equal(root.get("isActive"), true));
+        cq.orderBy(cb.desc(root.get("id")));
+
+        Query<Patient> q = session.createQuery(cq);
+
+        if (params != null && params.containsKey("pageSize") && hasText(params.get("pageSize"))) {
             int pageSize = Integer.parseInt(params.get("pageSize"));
             int page = Integer.parseInt(params.getOrDefault("page", "1"));
-            int start = (page-1)*pageSize;
+            int start = (page - 1) * pageSize;
             q.setMaxResults(pageSize);
             q.setFirstResult(start);
-            
         }
+
         return q.getResultList();
     }
 
@@ -54,16 +84,51 @@ public class PatientRepositoryImpl extends BaseRepositoryImpl<Patient> implement
     }
 
     @Override
-    public Patient addPatient(Patient p) {
+    public Patient saveOrUpdate(Patient p) {
         Session session = this.factory.getObject().getCurrentSession();
-        session.persist(p);
-        return p;
+        if (p.getId() == null) {
+            session.persist(p);
+            return p;
+        } else {
+            return session.merge(p);
+        }
     }
 
     @Override
-    public void updatePatient(Patient p) {
+    public void deletePatient(Long id) {
         Session session = this.factory.getObject().getCurrentSession();
-        session.merge(p);
+        Patient patient = session.get(Patient.class, id);
+
+        if (patient != null) {
+            patient.setIsActive(false);
+            session.merge(patient);
+        } else {
+            throw new ResourceNotFoundException("Không tìm thấy bệnh nhân có ID: " + id);
+        }
     }
-    
+
+    @Override
+    public long count(Map<String, String> params, Class<Patient> clazz) {
+        Session session = this.factory.getObject().getCurrentSession();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+        Root<Patient> root = cq.from(Patient.class);
+
+        List<Predicate> predicates = new ArrayList<>();
+        if (params != null && hasText(params.get("patientName"))) {
+            String kw = "%" + params.get("patientName").trim() + "%";
+            predicates.add(cb.or(
+                    cb.like(root.get("fullName").as(String.class), kw),
+                    cb.like(root.get("cccd").as(String.class), kw)
+            ));
+        }
+        if (params != null && hasText(params.get("gender"))) {
+            predicates.add(cb.equal(root.get("gender"), params.get("gender").trim()));
+        }
+        cq.where(cb.equal(root.get("isActive"), true));
+
+        cq.select(cb.count(root)).where(predicates.toArray(new Predicate[0]));
+        return session.createQuery(cq).getSingleResult();
+    }
+
 }
