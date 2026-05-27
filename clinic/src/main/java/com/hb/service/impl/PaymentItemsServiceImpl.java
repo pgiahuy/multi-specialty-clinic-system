@@ -4,9 +4,11 @@
  */
 package com.hb.service.impl;
 
+import com.hb.enums.AppointmentStatus;
 import com.hb.enums.PaymentItemType;
 import com.hb.enums.PaymentMethod;
 import com.hb.enums.PaymentStatus;
+import com.hb.mapper.AppointmentMapper;
 import com.hb.pojo.Appointment;
 import com.hb.pojo.LabTests;
 import com.hb.pojo.Payment;
@@ -17,6 +19,7 @@ import com.hb.repository.AppointmentRepository;
 import com.hb.repository.LabTestRepository;
 import com.hb.repository.PaymentItemRepository;
 import com.hb.repository.PrescriptionRepository;
+import com.hb.service.AppointmentService;
 import com.hb.service.PaymentItemsService;
 import com.hb.service.PaymentService;
 import java.math.BigDecimal;
@@ -35,13 +38,16 @@ public class PaymentItemsServiceImpl implements PaymentItemsService {
 
     @Autowired
     private PaymentItemRepository itemRepo;
+    
     @Autowired
     private LabTestRepository labRepo;
+    
     @Autowired
     private AppointmentRepository appRepo;
+    
     @Autowired
     private PrescriptionRepository presRepo;
-    
+
     @Autowired
     private PaymentService payService;
 
@@ -105,6 +111,14 @@ public class PaymentItemsServiceImpl implements PaymentItemsService {
         for (Long id : itemIds) {
             PaymentItems item = itemRepo.getItemById(id);
             if (item != null) {
+                if (item.getItemType().equals(PaymentItemType.APPOINTMENT)) {
+                    Appointment a = item.getAppointmentId();
+
+                    a.setStatus(AppointmentStatus.CONFIRMED);
+
+                    appRepo.addOrUpdateAppointment(a);
+                }
+                
                 item.setStatus(PaymentStatus.SUCCESS);
                 item.setMethod(PaymentMethod.valueOf(method));
                 item.setTransId(transId);

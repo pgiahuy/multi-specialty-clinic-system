@@ -40,7 +40,7 @@ const Home = () => {
                   hồ sơ y tế trực tuyến một cách nhanh chóng, an toàn và tiện lợi.
                 </p>
                 <div className="mt-4">
-                  <Button variant="primary rounded-4" className="border-0 header-cta header-cta-primary" size="lg">
+                  <Button variant="primary rounded-4" className="border-0" size="lg">
                     Đặt lịch khám ngay
                   </Button>
                 </div>

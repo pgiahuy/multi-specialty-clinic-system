@@ -361,7 +361,7 @@ const BookingPage = () => {
                                         </div>
                                         <div className="text-center mt-4">
                                             
-                                            {loading === true ? <MySpinner /> : <button className="btn btn-primary w-100 fw-semibold rounded-4 border-0 header-cta header-cta-primary" onClick={registerAppointment}>
+                                            {loading === true ? <MySpinner /> : <button className="btn btn-primary w-100 fw-semibold rounded-4 border-0" onClick={registerAppointment}>
                                                 Xác nhận đặt lịch
                                             </button>}
                                         </div>

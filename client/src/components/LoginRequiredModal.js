@@ -34,7 +34,7 @@ const LoginRequiredModal = ({ show, onHide, onLogin }) => {
         <Button variant="outline-secondary rounded-4" onClick={onHide}>
           Hủy
         </Button>
-        <Button variant="primary rounded-4 border-0 header-cta-primary" onClick={handleLogin}>
+        <Button variant="primary rounded-4 border-0 " onClick={handleLogin}>
           Đăng nhập
         </Button>
       </Modal.Footer>

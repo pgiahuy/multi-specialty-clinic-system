@@ -102,7 +102,7 @@ const PatientProfile = () => {
 
                         <Button
                             variant="primary"
-                            className="ms-auto d-flex align-items-center gap-2 shadow-sm py-2 px-3 rounded-4 border-0 header-cta header-cta-primary"
+                            className="ms-auto d-flex align-items-center gap-2 shadow-sm py-2 px-3 rounded-4 border-0 "
                             style={{ borderRadius: '10px' }}
                             onClick={() => navigate('/patient/register-record')}
                         >
