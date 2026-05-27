@@ -4,6 +4,7 @@
  */
 package com.hb.service;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.hb.dto.request.UserCreateRequest;
 import com.hb.pojo.User;
 import java.util.List;
@@ -22,7 +23,10 @@ public interface UserService extends UserDetailsService {
     User saveOrUpdateUser(UserCreateRequest urq);
     List<User> getUsers(Map<String,String> params);
     void deleteUser(Long id);
-    User processSocialLogin(String email, String name, String providerId, String providerName);
+    User processSocialLogin(GoogleIdToken.Payload payload, String fcmToken);
+    User processSocialLoginFacebook(String facebookId, String email, String name);
+            
+            
     long countUsers(Map<String, String> params);
     void updateFcmToken(String username, String fcmToken);
     String getRoleByUsername(String username);

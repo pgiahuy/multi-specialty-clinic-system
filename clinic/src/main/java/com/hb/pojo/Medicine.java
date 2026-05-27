@@ -34,9 +34,16 @@ import java.util.Collection;
     @NamedQuery(name = "Medicine.findByPrice", query = "SELECT m FROM Medicine m WHERE m.price = :price"),
     @NamedQuery(name = "Medicine.findBySecureUrl", query = "SELECT m FROM Medicine m WHERE m.secureUrl = :secureUrl"),
     @NamedQuery(name = "Medicine.findByPublicId", query = "SELECT m FROM Medicine m WHERE m.publicId = :publicId"),
-    @NamedQuery(name = "Medicine.findByMinStockAlert", query = "SELECT m FROM Medicine m WHERE m.minStockAlert = :minStockAlert")})
+    @NamedQuery(name = "Medicine.findByMinStockAlert", query = "SELECT m FROM Medicine m WHERE m.minStockAlert = :minStockAlert"),
+    @NamedQuery(name = "Medicine.findByUnit", query = "SELECT m FROM Medicine m WHERE m.unit = :unit")})
 public class Medicine implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id")
+    private Long id;
     @Size(max = 50)
     @Column(name = "code")
     private String code;
@@ -45,7 +52,6 @@ public class Medicine implements Serializable {
     @Size(min = 1, max = 255)
     @Column(name = "name")
     private String name;
-    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Basic(optional = false)
     @NotNull
@@ -57,24 +63,15 @@ public class Medicine implements Serializable {
     @Size(max = 255)
     @Column(name = "public_id")
     private String publicId;
+    @Column(name = "min_stock_alert")
+    private Integer minStockAlert;
     @Size(max = 50)
     @Column(name = "unit")
     private String unit;
     @OneToMany(mappedBy = "medicineId")
     private Collection<MedicineBatch> medicineBatchCollection;
-
-    private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "id")
-    private Long id;
-    @Column(name = "min_stock_alert")
-    private Integer minStockAlert;
     @OneToMany(mappedBy = "medicineId")
-    private Collection<MedicineBatch> medicinebatchCollection;
-    @OneToMany(mappedBy = "medicineId")
-    private Collection<InventoryLog> inventorylogCollection;
+    private Collection<Inventorylog> inventorylogCollection;
     @OneToMany(mappedBy = "medicineId")
     private Collection<PrescriptionItem> prescriptionItemCollection;
 
@@ -99,6 +96,29 @@ public class Medicine implements Serializable {
         this.id = id;
     }
 
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
 
     public String getSecureUrl() {
         return secureUrl;
@@ -124,19 +144,27 @@ public class Medicine implements Serializable {
         this.minStockAlert = minStockAlert;
     }
 
-    public Collection<MedicineBatch> getMedicinebatchCollection() {
-        return medicinebatchCollection;
+    public String getUnit() {
+        return unit;
     }
 
-    public void setMedicinebatchCollection(Collection<MedicineBatch> medicinebatchCollection) {
-        this.medicinebatchCollection = medicinebatchCollection;
+    public void setUnit(String unit) {
+        this.unit = unit;
     }
 
-    public Collection<InventoryLog> getInventorylogCollection() {
+    public Collection<MedicineBatch> getMedicineBatchCollection() {
+        return medicineBatchCollection;
+    }
+
+    public void setMedicineBatchCollection(Collection<MedicineBatch> medicineBatchCollection) {
+        this.medicineBatchCollection = medicineBatchCollection;
+    }
+
+    public Collection<Inventorylog> getInventorylogCollection() {
         return inventorylogCollection;
     }
 
-    public void setInventorylogCollection(Collection<InventoryLog> inventorylogCollection) {
+    public void setInventorylogCollection(Collection<Inventorylog> inventorylogCollection) {
         this.inventorylogCollection = inventorylogCollection;
     }
 
@@ -171,48 +199,6 @@ public class Medicine implements Serializable {
     @Override
     public String toString() {
         return "com.hb.pojo.Medicine[ id=" + id + " ]";
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-
-
-    public String getUnit() {
-        return unit;
-    }
-
-    public void setUnit(String unit) {
-        this.unit = unit;
-    }
-
-    public Collection<MedicineBatch> getMedicineBatchCollection() {
-        return medicineBatchCollection;
-    }
-
-    public void setMedicineBatchCollection(Collection<MedicineBatch> medicineBatchCollection) {
-        this.medicineBatchCollection = medicineBatchCollection;
     }
     
 }

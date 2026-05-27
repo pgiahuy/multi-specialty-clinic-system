@@ -5,6 +5,7 @@
 package com.hb.pojo;
 
 import jakarta.persistence.Basic;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -41,7 +42,8 @@ import java.util.Date;
     @NamedQuery(name = "User.findByCreatedAt", query = "SELECT u FROM User u WHERE u.createdAt = :createdAt"),
     @NamedQuery(name = "User.findBySecureUrl", query = "SELECT u FROM User u WHERE u.secureUrl = :secureUrl"),
     @NamedQuery(name = "User.findByPublicId", query = "SELECT u FROM User u WHERE u.publicId = :publicId"),
-    @NamedQuery(name = "User.findByIsActive", query = "SELECT u FROM User u WHERE u.isActive = :isActive")})
+    @NamedQuery(name = "User.findByIsActive", query = "SELECT u FROM User u WHERE u.isActive = :isActive"),
+    @NamedQuery(name = "User.findByName", query = "SELECT u FROM User u WHERE u.name = :name")})
 public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -82,10 +84,23 @@ public class User implements Serializable {
     private String fcmToken;
     @Column(name = "is_active")
     private Boolean isActive;
+    @Size(max = 255)
+    @Column(name = "name")
+    private String name;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "senderId")
+    private Collection<ChatMessage> chatMessageCollection;
     @OneToOne(mappedBy = "userId")
     private Doctor doctor;
     @OneToMany(mappedBy = "userId")
+    private Collection<Notification> notificationCollection;
+    @OneToMany(mappedBy = "userId")
     private Collection<Patient> patientCollection;
+    @OneToMany(mappedBy = "userId")
+    private Collection<SocialAccount> socialAccountCollection;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "patientId")
+    private Collection<Conversation> conversationCollection;
+    @OneToMany(mappedBy = "receiverId")
+    private Collection<Conversation> conversationCollection1;
 
     public User() {
     }
@@ -180,6 +195,22 @@ public class User implements Serializable {
         this.isActive = isActive;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Collection<ChatMessage> getChatMessageCollection() {
+        return chatMessageCollection;
+    }
+
+    public void setChatMessageCollection(Collection<ChatMessage> chatMessageCollection) {
+        this.chatMessageCollection = chatMessageCollection;
+    }
+
     public Doctor getDoctor() {
         return doctor;
     }
@@ -188,12 +219,44 @@ public class User implements Serializable {
         this.doctor = doctor;
     }
 
+    public Collection<Notification> getNotificationCollection() {
+        return notificationCollection;
+    }
+
+    public void setNotificationCollection(Collection<Notification> notificationCollection) {
+        this.notificationCollection = notificationCollection;
+    }
+
     public Collection<Patient> getPatientCollection() {
         return patientCollection;
     }
 
     public void setPatientCollection(Collection<Patient> patientCollection) {
         this.patientCollection = patientCollection;
+    }
+
+    public Collection<SocialAccount> getSocialAccountCollection() {
+        return socialAccountCollection;
+    }
+
+    public void setSocialAccountCollection(Collection<SocialAccount> socialAccountCollection) {
+        this.socialAccountCollection = socialAccountCollection;
+    }
+
+    public Collection<Conversation> getConversationCollection() {
+        return conversationCollection;
+    }
+
+    public void setConversationCollection(Collection<Conversation> conversationCollection) {
+        this.conversationCollection = conversationCollection;
+    }
+
+    public Collection<Conversation> getConversationCollection1() {
+        return conversationCollection1;
+    }
+
+    public void setConversationCollection1(Collection<Conversation> conversationCollection1) {
+        this.conversationCollection1 = conversationCollection1;
     }
 
     @Override
