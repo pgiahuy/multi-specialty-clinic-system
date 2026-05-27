@@ -76,14 +76,15 @@ public class AppointmentServiceImpl implements AppointmentService {
             }
 
             if (req.getStatus() != null) {
-
                 a.setStatus(req.getStatus());
             }
+            
         } else {
             Patient patient = patientRepo.getPatientById(req.getPatientId());
             if (patient == null) {
                 throw new ResourceNotFoundException("Patient not found!");
             }
+            
             Schedules schedule = scheduleRepo.getScheduleById(req.getScheduleId());
             if (schedule == null) {
                 throw new ResourceNotFoundException("Schedule not found!");
@@ -93,6 +94,7 @@ public class AppointmentServiceImpl implements AppointmentService {
             if (isAlreadyBooked) {
                 throw new DuplicateResourceException("Bạn đã đăng ký khám ca này rồi!"); 
             }
+            
             if (schedule.getCurrentPatients() >= schedule.getMaxPatients()) {
                 throw new FullSlotException("Rất tiếc, ca khám này đã đủ số lượng người đăng ký!");
             }

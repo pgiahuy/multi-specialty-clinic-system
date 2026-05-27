@@ -191,7 +191,7 @@ const PaymentItems = () => {
                                                             </div>
                                                         </Card.Body>
                                                         <Card.Footer className="d-flex justify-content-end bg-transparent border-0 mt-auto px-0 pb-0 pt-3">
-                                                            <Button variant="primary" className="mb-3 me-3 w-50 rounded-4 fw-bold border-0 header-cta header-cta-primary" style={{ minHeight: '48px' }} onClick={() => openPaymentModal(invoice)}>
+                                                            <Button variant="primary" className="mb-3 me-3 w-50 rounded-4 fw-bold border-0 " style={{ minHeight: '48px' }} onClick={() => openPaymentModal(invoice)}>
                                                                 Thanh toán ngay
                                                             </Button>
                                                         </Card.Footer>
@@ -306,7 +306,7 @@ const PaymentItems = () => {
                                 <Button variant="outline-secondary" className="rounded-4 px-4" onClick={() => setShowPaymentModal(false)}>
                                     Hủy
                                 </Button>
-                                <Button variant="primary" className="rounded-4 px-4 fw-bold border-0 header-cta header-cta-primary" onClick={handleConfirmPayment}>
+                                <Button variant="primary" className="rounded-4 px-4 fw-bold border-0" onClick={handleConfirmPayment}>
                                     Tiến hành thanh toán
                                 </Button>
                             </Modal.Footer>

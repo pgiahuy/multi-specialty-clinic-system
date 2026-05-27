@@ -59,6 +59,10 @@ public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> i
             if (params.containsKey("date")) {
                 hql.append(" AND s.date = :date ");
             }
+            
+            if (params.containsKey("scheduleId")) {
+                hql.append(" AND s.id = :scheduleId");
+            }
 
         }
 
@@ -74,6 +78,10 @@ public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> i
             }
             if (params.containsKey("date")) {
                 q.setParameter("date", java.sql.Date.valueOf(params.get("date")));
+            }
+            
+            if (params.containsKey("scheduleId")) {
+                q.setParameter("scheduleId",Long.valueOf(params.get("scheduleId")));
             }
 
             if (params.containsKey("pageSize")) {

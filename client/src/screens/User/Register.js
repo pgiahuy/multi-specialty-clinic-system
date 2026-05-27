@@ -125,7 +125,7 @@ const Register = () => {
                         </Form.Floating>
 
                         <Form.Group className="mb-3 text-center" controlId="button">
-                            {loading === true ? <MySpinner /> : <Button variant="primary" type="submit" className="w-100 rounded-4 border-0 header-cta header-cta-primary" style={formCardStyle.button}>
+                            {loading === true ? <MySpinner /> : <Button variant="primary" type="submit" className="w-100 rounded-4 border-0 " style={formCardStyle.button}>
                                 Đăng ký
                             </Button>}
                             <div className="login-footer text-center mt-4">
