@@ -35,6 +35,7 @@ export const endpoint = {
     'payment-items': (paymentId) => `/secure/payment-items/${paymentId}`,
     'test-results': (patientId) => `/secure/test/${patientId}`,
     'patient-profile': (patientId) => `/secure/profile/${patientId}`,
+    'specialties': '/specialties',
 };
 
 export const authApis = () => {
