@@ -5,6 +5,7 @@
 package com.hb.pojo;
 
 import jakarta.persistence.Basic;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,6 +15,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
@@ -61,6 +63,7 @@ public class Patient implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "dob")
+    @Temporal(TemporalType.DATE)
     private LocalDate dob;
     @Basic(optional = false)
     @NotNull
@@ -78,9 +81,15 @@ public class Patient implements Serializable {
     private String phone;
     @Column(name = "is_active")
     private Boolean isActive;
+    @OneToMany(mappedBy = "patientId")
+    private Collection<Appointment> appointmentCollection;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @ManyToOne
     private User userId;
+    @OneToMany(mappedBy = "patientId")
+    private Collection<LabResults> labResultsCollection;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "patientId")
+    private Collection<Payment> paymentCollection;
 
     public Patient() {
     }
@@ -162,12 +171,36 @@ public class Patient implements Serializable {
         this.isActive = isActive;
     }
 
+    public Collection<Appointment> getAppointmentCollection() {
+        return appointmentCollection;
+    }
+
+    public void setAppointmentCollection(Collection<Appointment> appointmentCollection) {
+        this.appointmentCollection = appointmentCollection;
+    }
+
     public User getUserId() {
         return userId;
     }
 
     public void setUserId(User userId) {
         this.userId = userId;
+    }
+
+    public Collection<LabResults> getLabResultsCollection() {
+        return labResultsCollection;
+    }
+
+    public void setLabResultsCollection(Collection<LabResults> labResultsCollection) {
+        this.labResultsCollection = labResultsCollection;
+    }
+
+    public Collection<Payment> getPaymentCollection() {
+        return paymentCollection;
+    }
+
+    public void setPaymentCollection(Collection<Payment> paymentCollection) {
+        this.paymentCollection = paymentCollection;
     }
 
     @Override

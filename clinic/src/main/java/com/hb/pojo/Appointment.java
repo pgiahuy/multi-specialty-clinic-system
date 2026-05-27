@@ -8,8 +8,6 @@ import com.hb.enums.AppointmentStatus;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -49,7 +47,6 @@ public class Appointment implements Serializable {
     private Long id;
     @Size(max = 11)
     @Column(name = "status")
-    @Enumerated(EnumType.STRING)
     private AppointmentStatus status;
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)

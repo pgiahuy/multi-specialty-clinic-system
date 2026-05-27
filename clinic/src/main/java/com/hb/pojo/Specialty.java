@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
@@ -57,6 +58,8 @@ public class Specialty implements Serializable {
     @JoinColumn(name = "id_hod", referencedColumnName = "id")
     @OneToOne
     private Doctor idHod;
+    @OneToMany(mappedBy = "specialtyId")
+    private Collection<Schedules> schedulesCollection;
 
     public Specialty() {
     }
@@ -117,6 +120,14 @@ public class Specialty implements Serializable {
 
     public void setIdHod(Doctor idHod) {
         this.idHod = idHod;
+    }
+
+    public Collection<Schedules> getSchedulesCollection() {
+        return schedulesCollection;
+    }
+
+    public void setSchedulesCollection(Collection<Schedules> schedulesCollection) {
+        this.schedulesCollection = schedulesCollection;
     }
 
     @Override

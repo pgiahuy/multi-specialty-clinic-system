@@ -16,6 +16,7 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
@@ -63,11 +64,13 @@ public class Doctor implements Serializable {
         @JoinColumn(name = "specialty_id", referencedColumnName = "id")})
     @ManyToMany
     private Collection<Specialty> specialtyCollection;
+    @OneToOne(mappedBy = "idHod")
+    private Specialty specialty;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @OneToOne
     private User userId;
-    @OneToOne(mappedBy = "idHod")
-    private Specialty specialty;
+    @OneToMany(mappedBy = "doctorId")
+    private Collection<Schedules> schedulesCollection;
 
     public Doctor() {
     }
@@ -132,6 +135,14 @@ public class Doctor implements Serializable {
         this.specialtyCollection = specialtyCollection;
     }
 
+    public Specialty getSpecialty() {
+        return specialty;
+    }
+
+    public void setSpecialty(Specialty specialty) {
+        this.specialty = specialty;
+    }
+
     public User getUserId() {
         return userId;
     }
@@ -140,12 +151,12 @@ public class Doctor implements Serializable {
         this.userId = userId;
     }
 
-    public Specialty getSpecialty() {
-        return specialty;
+    public Collection<Schedules> getSchedulesCollection() {
+        return schedulesCollection;
     }
 
-    public void setSpecialty(Specialty specialty) {
-        this.specialty = specialty;
+    public void setSchedulesCollection(Collection<Schedules> schedulesCollection) {
+        this.schedulesCollection = schedulesCollection;
     }
 
     @Override
