@@ -100,10 +100,10 @@ const Header = () => {
                         }} />
                     </Nav>
                     {user === null ? <>
-                        <Button variant="outline-primary" className=" rounded-4 header-cta header-cta-secondary m-2" as={Link} to="/register">
+                        <Button variant="outline-primary" className=" rounded-4  m-2" as={Link} to="/register">
                             Đăng ký
                         </Button>
-                        <Button variant="primary" className="rounded-4 border-0 header-cta header-cta-primary m-2" as={Link} to="/login">
+                        <Button variant="primary" className="rounded-4 border-0  m-2" as={Link} to="/login">
                             Đăng nhập
                         </Button>
                     </> : <>
