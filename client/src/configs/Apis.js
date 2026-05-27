@@ -23,6 +23,7 @@ export const getSchedule = () => API.get("/schedules");
 export const endpoint = {
     'register': 'auth/register',
     'login': 'auth/login',
+    'facebook-login': '/auth/facebook',
     'patientProfiles': '/secure/profiles',
     'doctors': '/doctors',
     'schedules': '/secure/schedules',
