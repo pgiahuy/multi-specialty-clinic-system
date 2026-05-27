@@ -59,20 +59,20 @@ export const tableStyles = {
     },
     dataCell: {
         padding: '12px 16px',
-        fontSize: '13px',
+        fontSize: '14px',
         textAlign: 'center',
         color: '#6c757d'
     },
     dataCellLeft: {
         padding: '12px 16px',
-        fontSize: '13px',
+        fontSize: '14px',
         fontWeight: '500',
         color: '#212529',
         textAlign: 'left'
     },
     resultCell: {
         padding: '12px 16px',
-        fontSize: '13px',
+        fontSize: '14px',
         textAlign: 'center',
         color: '#0d6efd',
         fontWeight: '600'
