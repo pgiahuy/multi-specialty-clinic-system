@@ -66,7 +66,7 @@ const HistoryBooking = () => {
             <div className="d-flex flex-column min-vh-100">
                 <Header />
                 <Container className="py-4">
-                    <h3 className="mb-4">Lịch sử đặt lịch</h3>
+                    <h3 className="mb-4">Lịch sử đặt khám</h3>
 
                     <div className="mb-3">
                         <Tabs
@@ -89,7 +89,7 @@ const HistoryBooking = () => {
                         </div>
                     ) : filtered.length === 0 ? (
                         <div className="text-center text-muted py-5">
-                            Không có lịch hẹn phù hợp với bộ lọc.
+                            Chưa có lịch sử đặt khám phù hợp.
                         </div>
                     ) : (
                         <Row className="g-4">

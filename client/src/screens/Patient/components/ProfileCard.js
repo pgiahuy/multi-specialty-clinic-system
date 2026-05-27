@@ -74,13 +74,7 @@ const PatientProfileCard = ({ patient, actions }) => {
                   </div>
                   <div className="small text-truncate" title={patient.gender}>{patient.gender}</div>
                 </Col>
-                {/* <Col md={4}>
-                  {actions && (
-                    <div className="d-flex justify-content-end gap-2 mt-3">
-                      {actions}
-                    </div>
-                  )}
-                </Col> */}
+                
               </Row>
             </Col>
 

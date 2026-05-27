@@ -6,6 +6,7 @@ import { useContext, useEffect, useState } from "react";
 import { MyUserContext } from "../../configs/Contexts";
 import { useNavigate } from "react-router-dom";
 import { authApis, endpoint } from "../../configs/Apis";
+import { Bullseye, Eye } from "react-bootstrap-icons";
 
 const Payment = () => {
     const [user] = useContext(MyUserContext);
@@ -54,13 +55,14 @@ const Payment = () => {
                                        
                                         <Col md={1} className="text-md-end text-center mt-2 mt-md-0">
                                             <Button
-                                                variant="outline-primary"
+                                                variant="outline-info"
                                                 size="sm"
                                                 onClick={() => nav(`/patient/payment/${profile.id}`)}
-                                                style={{ borderRadius: '5px', padding: '4px 8px', border: 'none' }}
+                                                
                                                 title="Xem kết quả"
+                                                className="mb-5 w-100 py-2 rounded-4"
                                             >
-                                                Xem hóa đơn
+                                               <Eye />
                                             </Button>
                                         </Col>
 
