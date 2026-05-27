@@ -20,16 +20,16 @@ const PatientProfile = () => {
     const handleEdit = (profile) => {
         let dataToEdit = { ...profile };
 
-        // 2. Kiểm tra xem có ngày sinh dạng dd/MM/yyyy không thì đảo ngược nó lại
+       
         if (dataToEdit.dob && dataToEdit.dob.includes("/")) {
             const parts = dataToEdit.dob.split("/"); 
             if (parts.length === 3) {
-                // Đảo từ dd/MM/yyyy sang yyyy-MM-dd
+                
                 dataToEdit.dob = `${parts[2]}-${parts[1]}-${parts[0]}`; 
             }
         }
 
-        // 3. Gán dữ liệu đã chuẩn hóa vào State và mở Modal
+       
         setEditData(dataToEdit);
        
         setShowEditModal(true);
@@ -84,9 +84,6 @@ const PatientProfile = () => {
         loadPatientProfiles();
     }, []);
 
-    if (!user) {
-        return <Navigate to="/login" />;
-    }
 
     return (
         <>
@@ -105,7 +102,7 @@ const PatientProfile = () => {
 
                         <Button
                             variant="primary"
-                            className="ms-auto d-flex align-items-center gap-2 shadow-sm py-2 px-3"
+                            className="ms-auto d-flex align-items-center gap-2 shadow-sm py-2 px-3 rounded-4 border-0 header-cta header-cta-primary"
                             style={{ borderRadius: '10px' }}
                             onClick={() => navigate('/patient/register-record')}
                         >
@@ -128,11 +125,11 @@ const PatientProfile = () => {
 
                                        
                                         <Col md={1} className="text-md-end text-center mt-2 mt-md-0">
-                                            <Button variant="outline-info" className="mb-5" onClick={() => handleEdit(profile)}>
+                                            <Button variant="outline-info" className="mb-5 w-100 py-2" onClick={() => handleEdit(profile)}>
                                                 <PencilSquare />
                                                 
                                             </Button>
-                                            <Button variant="outline-danger" className="ms-2 mt-5 mt-md-0" onClick={() => handleDelete(profile)}>
+                                            <Button variant="outline-danger" className="mt-5 mt-md-0 w-100 py-2" onClick={() => handleDelete(profile)}>
                                                 <Trash/>
                                             </Button>
                                         </Col>
@@ -243,7 +240,7 @@ const PatientProfile = () => {
                     <Button variant="outline-danger" className="rounded-4 px-4" onClick={handleCloseModal}>
                         Hủy bỏ
                     </Button>
-                    <Button variant="primary" className="rounded-4 px-4" onClick={handleSaveChanges}>
+                    <Button variant="primary" className="rounded-4 px-4 border-0 header-cta header-cta-primary" onClick={handleSaveChanges}>
                         Lưu thay đổi
                     </Button>
                 </Modal.Footer>

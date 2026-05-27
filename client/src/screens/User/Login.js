@@ -119,7 +119,7 @@ const Login = () => {
                         <Button
                             variant="primary"
                             type="submit"
-                            className="w-100" style={formCardStyle.button}
+                            className="w-100 rounded-4 border-0 header-cta header-cta-primary" style={formCardStyle.button}
                             disabled={loading}
                         >
                             {loading ? <MySpinner /> : 'Đăng nhập'}

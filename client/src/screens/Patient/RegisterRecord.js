@@ -116,7 +116,7 @@ const RegisterRecord = () => {
                 <Container className="mt-5 mb-5" style={{ maxWidth: '600px' }}>
                     <Card>
                         <Card.Body>
-                            <h3 className="mb-4 text-center text-primary">Đăng ký hồ sơ</h3>
+                            <h3 className="mb-4 text-center text-primary">Thêm hồ sơ bệnh nhân</h3>
                             {err && <Alert variant="danger">{err}</Alert>}
                             <Form onSubmit={addRecord}>
                                 {patientInfo.map(u => <Form.Floating key={u.field} className="mb-3">
@@ -145,8 +145,8 @@ const RegisterRecord = () => {
 
 
                                 <Form.Group className="mb-3 text-center " controlId="button" >
-                                    {loading === true ? <MySpinner /> : <Button variant="primary" type="submit" className="w-100" style={formCardStyle.button}>
-                                        Đăng ký
+                                    {loading === true ? <MySpinner /> : <Button variant="primary" type="submit" className="w-100 border-0 header-cta header-cta-primary" style={formCardStyle.button}>
+                                        Thêm hồ sơ
                                     </Button>}
                                 </Form.Group>
                             </Form>

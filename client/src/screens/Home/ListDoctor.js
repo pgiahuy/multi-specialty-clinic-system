@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { Container, Row, Col, Card, Button, Spinner, Image } from "react-bootstrap";
+import { Container, Row, Col, Card, Button, Spinner, Image, Form } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { authApis, endpoint } from "../../configs/Apis";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
+import { formCardStyle } from "../User/UserStyle";
 
 const ListDoctor = () => {
     const [doctors, setDoctors] = useState([]);
@@ -30,7 +31,30 @@ const ListDoctor = () => {
             <div className="d-flex flex-column min-vh-100">
                 <Header />
                 <Container className="py-4">
-                    <h3 className="mb-4">Bác sĩ</h3>
+                    <div>
+                        <Form>
+                            <Row>
+                                <Col md={8}>
+                                    <Form.Group className="mb-4">
+                                        <Form.Control placeholder="Tìm kiếm bác sĩ..."/>
+                                        
+                                    </Form.Group>
+                                </Col>
+                                <Col md={4}>
+                                    <Form.Select className="mb-4">
+                                        <option value="">---Chuyên khoa---</option>
+                                        <option value="cardiology">Tim mạch</option>
+                                        <option value="dermatology">Da liễu</option>
+                                        <option value="neurology">Thần kinh</option>
+                                        <option value="pediatrics">Nhi khoa</option>
+                                        <option value="psychiatry">Tâm thần</option>
+                                    </Form.Select>
+                                </Col>
+                            </Row>
+                        </Form>
+                    </div>
+
+                    <h3 className="mb-4">Danh sách bác sĩ</h3>
 
                     {loading ? (
                         <div className="text-center py-5"><Spinner animation="border" /></div>
@@ -53,17 +77,17 @@ const ListDoctor = () => {
                                             </div>
 
                                             <div className="mt-auto d-flex justify-content-between align-items-center">
-                                                
+
                                                 <div>
-                                                    <Button variant="outline-primary" size="sm" className="me-2 rounded-3">Hồ sơ</Button>
+                                                    <Button variant="outline-primary" className="me-2 rounded-3">Xem hồ sơ</Button>
                                                     <Button
                                                         as={Link}
                                                         to={`/patient/booking?doctorId=${doc.id}`}
-                                                        variant="primary"
-                                                        size="sm"
-                                                        className="rounded-3"
+
+
+                                                        className="rounded-3 border-0 header-cta header-cta-primary"
                                                     >
-                                                        Đặt lịch
+                                                        Đặt lịch khám
                                                     </Button>
                                                 </div>
                                             </div>
@@ -74,7 +98,7 @@ const ListDoctor = () => {
                         </Row>
                     )}
                 </Container>
-                <Footer/>
+                <Footer />
             </div>
         </>
 

@@ -74,7 +74,7 @@ const PaymentDetail = () => {
                                                     </div>
 
                                                     <div className="mt-auto text-end">
-                                                        <button className="btn btn-primary rounded-4 px-4 py-2 fw-semibold" onClick={() => nav(`/patient/payment-items/${p.id}`)}>
+                                                        <button className="btn btn-primary rounded-4 px-4 py-2 fw-semibold border-0 header-cta header-cta-primary" onClick={() => nav(`/patient/payment-items/${p.id}`)}>
                                                             Xem chi tiết
                                                         </button>
                                                     </div>
