@@ -1,14 +1,18 @@
 import { Container, Row, Col, Card, Modal, Button } from "react-bootstrap";
 import Header from "../../components/Header";
-import { useEffect, useState } from "react";
+import LoginRequiredModal from "../../components/LoginRequiredModal";
+import { useContext, useEffect, useState } from "react";
 import { authApis, endpoint } from "../../configs/Apis";
 import MySpinner from "../../components/MySpinner";
 import MyAlert from "../../components/MyAlert";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Footer from "../../components/Footer";
+import { MyUserContext } from "../../configs/Contexts";
 
 
 const BookingPage = () => {
+
+    const [user] = useContext(MyUserContext);
     const [loading, setLoading] = useState(false);
     const [bookingData, setBookingData] = useState({
         profile: null,
@@ -20,6 +24,7 @@ const BookingPage = () => {
     });
 
     const [showModal, setShowModal] = useState(false);
+    const [loginPromptVisible, setLoginPromptVisible] = useState(false);
     const [alertData, setAlertData] = useState({
         show: false,
         heading: "Thông báo",
@@ -70,6 +75,11 @@ const BookingPage = () => {
     };
 
     const registerAppointment = async () => {
+        if (!user) {
+            setLoginPromptVisible(true);
+            return;
+        }
+
         if (!bookingData.profile || !bookingData.doctor || !bookingData.date || !bookingData.time || !bookingData.scheduleId) {
             setAlertData({
                 show: true,
@@ -351,7 +361,7 @@ const BookingPage = () => {
                                         </div>
                                         <div className="text-center mt-4">
                                             
-                                            {loading === true ? <MySpinner /> : <button className="btn btn-primary w-100 fw-semibold rounded-4" onClick={registerAppointment}>
+                                            {loading === true ? <MySpinner /> : <button className="btn btn-primary w-100 fw-semibold rounded-4 border-0 header-cta header-cta-primary" onClick={registerAppointment}>
                                                 Xác nhận đặt lịch
                                             </button>}
                                         </div>
@@ -383,6 +393,12 @@ const BookingPage = () => {
                             </Button>
                         </Modal.Footer>
                     </Modal>
+
+                    <LoginRequiredModal
+                        show={loginPromptVisible}
+                        onHide={() => setLoginPromptVisible(false)}
+                        onLogin={() => nav('/login')}
+                    />
                 </Container >
                 <Footer />
             </div>

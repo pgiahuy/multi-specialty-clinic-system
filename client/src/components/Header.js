@@ -9,6 +9,7 @@ import {
 import { Bell } from "react-bootstrap-icons";
 import { Link, useNavigate } from "react-router-dom";
 import NotificationBox from "./NotificationBox";
+import LoginRequiredModal from "./LoginRequiredModal";
 import API, { endpoint } from "../configs/Apis";
 import { useContext, useEffect, useState } from "react";
 import { MyUserContext } from "../configs/Contexts";
@@ -18,6 +19,7 @@ const Header = () => {
     const navigate = useNavigate();
     const [user, dispatch] = useContext(MyUserContext);
     const [specialties, setSpecialties] = useState([]);
+    const [showLoginRequired, setShowLoginRequired] = useState(false);
 
     const handleLogout = () => {
         localStorage.removeItem("user");
@@ -66,7 +68,16 @@ const Header = () => {
                                 </NavDropdown.Item>
                             ))}
                         </NavDropdown>
-                        <Nav.Link className="header-navlink" onClick={() => navigate('/patient/dashboard')}>
+                        <Nav.Link
+                            className="header-navlink"
+                            onClick={() => {
+                                if (user === null) {
+                                    setShowLoginRequired(true);
+                                } else {
+                                    navigate('/patient/dashboard');
+                                }
+                            }}
+                        >
                            Dịch vụ
                         </Nav.Link>
                         <Nav.Link className="header-navlink" onClick={() => navigate('/')}>
@@ -89,10 +100,10 @@ const Header = () => {
                         }} />
                     </Nav>
                     {user === null ? <>
-                        <Button variant="outline-primary" className="header-cta header-cta-secondary m-2" as={Link} to="/login">
+                        <Button variant="outline-primary" className=" rounded-4 header-cta header-cta-secondary m-2" as={Link} to="/register">
                             Đăng ký
                         </Button>
-                        <Button variant="primary" className="header-cta header-cta-primary m-2" as={Link} to="/login">
+                        <Button variant="primary" className="rounded-4 border-0 header-cta header-cta-primary m-2" as={Link} to="/login">
                             Đăng nhập
                         </Button>
                     </> : <>
@@ -117,6 +128,11 @@ const Header = () => {
                             </NavDropdown.Item>
                         </NavDropdown>
                     </>}
+                    <LoginRequiredModal
+                        show={showLoginRequired}
+                        onHide={() => setShowLoginRequired(false)}
+                        onLogin={() => navigate('/login')}
+                    />
                 </Navbar.Collapse>
             </Container>
         </Navbar>
