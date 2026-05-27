@@ -30,10 +30,10 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<User> implements User
 
     @Autowired
     private LocalSessionFactoryBean factory;
-    
+
     @Autowired
     private SocialAccountRepository socialAccountRepo;
-    
+
     @Autowired
     private UserRepository userRepo;
 
@@ -146,9 +146,11 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<User> implements User
     @Override
     public User getUserByEmail(String email) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<User> q = session.createNamedQuery("User.findByEmail", User.class);
-        q.setParameter("email", email);
-        return q.getSingleResult();
+        Query<User> query = session.createQuery("SELECT u FROM User u WHERE u.email = :email",User.class);
+        query.setParameter("email", email);
+
+        List<User> users = query.getResultList();
+        return users.isEmpty() ? null : users.get(0);
     }
 
     @Override
@@ -167,33 +169,6 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<User> implements User
         q.setParameter("email", email);
 
         return q.uniqueResultOptional().orElse(null);
-    }
-
-    @Transactional
-    public User processSocialLogin(String email, String name, String googleId, String provider) {
-
-        SocialAccount socialAccount = socialAccountRepo.findByProviderAndProviderId(provider, googleId);
-
-        if (socialAccount != null) {
-            return socialAccount.getUserId();
-        }
-
-        User user = userRepo.getUserByEmail(email);
-
-        if (user == null) {
-            user = new User();
-            user.setEmail(email);
-            user.setUsername(email);
-//            user.setSecureUrl(email);
-            user = userRepo.saveOrUpdate(user);
-        }
-
-        SocialAccount newAccount = new SocialAccount();
-        newAccount.setProvider(provider);
-        newAccount.setProviderId(googleId);
-        newAccount.setUserId(user);
-        socialAccountRepo.save(newAccount);
-        return user;
     }
 
 }

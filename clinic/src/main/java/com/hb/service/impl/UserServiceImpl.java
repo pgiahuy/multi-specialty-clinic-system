@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.security.core.GrantedAuthority;
@@ -176,6 +177,8 @@ public class UserServiceImpl implements UserService {
             user.setSecureUrl(avatarUrl);
             user.setRole("ROLE_PATIENT");
             user.setCreatedAt(LocalDateTime.now());
+            String randomPassword = UUID.randomUUID().toString();
+            user.setPassword(passwordEncoder.encode(randomPassword));
 
             userRepo.saveOrUpdate(user);
         }
@@ -191,6 +194,31 @@ public class UserServiceImpl implements UserService {
             user.setFcmToken(fcmToken);
             userRepo.saveOrUpdate(user);
         }
+
+        return user;
+    }
+
+    public User processSocialLoginFacebook(String facebookId, String email, String name) {
+        SocialAccount social = socialRepo.findByProviderAndProviderId("FACEBOOK", facebookId);
+        if (social != null) {
+            return social.getUserId();
+        }
+
+        User user = userRepo.getUserByEmail(email);
+        if (user == null) {
+            user = new User();
+            user.setEmail(email);
+            user.setName(name);
+            user.setUsername(email); 
+            user.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+            userRepo.saveOrUpdate(user);
+        }
+
+        SocialAccount newSocial = new SocialAccount();
+        newSocial.setProvider("FACEBOOK");
+        newSocial.setProviderId(facebookId);
+        newSocial.setUserId(user);
+        socialRepo.save(newSocial);
 
         return user;
     }
