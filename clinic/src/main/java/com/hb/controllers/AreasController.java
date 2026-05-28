@@ -38,8 +38,10 @@ public class AreasController {
     
     @Autowired
     private Environment env;
+    
     @GetMapping("/areas")
     public String list(Model model, @RequestParam Map<String, String> params) {
+        System.out.print("================");
         int page = params.containsKey("page") ? Integer.parseInt(params.get("page")) : 1;
         int pageSize = this.env.getProperty("admin.page_size", Integer.class);
         params.put("pageSize", String.valueOf(pageSize));
@@ -48,6 +50,8 @@ public class AreasController {
 
         long totalAreas = areaService.countAreas(params);
         int totalPages = (int) Math.ceil((double) totalAreas / pageSize);
+        
+        
 
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("currentPage", page);

@@ -1,8 +1,8 @@
-    
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
-    <head>
-        <title>Quản lý lịch hẹn</title>
+
+<head>
+    <title>Quản lý lịch hẹn</title>
 
     <th:block th:replace="base :: css"></th:block>
     <th:block th:replace="base :: js"></th:block>
@@ -16,7 +16,6 @@
     <div th:replace="base :: sidebar"></div>
 
     <div class="content">
-
 
         <table class="table table-bordered table-hover align-middle">
             <thead class="table-primary">
@@ -34,8 +33,8 @@
             <tbody>
                 <tr th:each="a : ${appointments}">
 
-                    <td th:text="${a.doctor.fullName}"></td>
-                    <td th:text="${a.patient.fullName}"></td>
+                    <td th:text="${a.doctorId.fullName}"></td>
+                    <td th:text="${a.patientId.fullName}"></td>
 
                     <td th:text="${a.date}"></td>
                     <td th:text="${a.timeSlot}"></td>
@@ -43,7 +42,7 @@
                     <td th:text="${a.createdAt}"></td>
                     <td>
                         <button class="btn btn-warning btn-sm">Sửa</button>
-                       
+
                     </td>
                 </tr>
             </tbody>
@@ -59,4 +58,5 @@
 
     </div>
 </body>
+
 </html>

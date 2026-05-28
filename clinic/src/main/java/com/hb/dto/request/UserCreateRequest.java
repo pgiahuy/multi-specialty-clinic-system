@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserCreateRequest {
     private Long id;
     private String username;
+    private String name;
     private String password;
     private String email;
     private MultipartFile avatar;
@@ -98,6 +99,20 @@ public class UserCreateRequest {
      */
     public void setId(Long id) {
         this.id = id;
+    }
+
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
     }
     
 }
