@@ -236,11 +236,12 @@ const PatientProfile = () => {
                         <Button variant="outline-danger" className="rounded-4 px-4" onClick={handleCloseModal}>
                             Hủy bỏ
                         </Button>
-                        <Button variant="primary" className="rounded-4 px-4 border-0 header-cta header-cta-primary" onClick={handleSaveChanges}>
+                        <Button variant="primary" className="rounded-4 px-4 border-0" onClick={handleSaveChanges}>
                             Lưu thay đổi
                         </Button>
                     </Modal.Footer>
                 </Modal>
+
             </div>
 
         </>

@@ -82,4 +82,13 @@ public class LabTestResultRepositoryImpl implements LabTestResultRepository {
 
     }
 
+    @Override
+    public List<LabResults> getLabResultsByAppointment(Long appointmentId) {
+        Session session = this.factory.getObject().getCurrentSession();
+        Query<LabResults> query = session.createQuery("SELECT r FROM LabResults r WHERE appointmentId.id = :appointmentId", LabResults.class);
+        
+        query.setParameter("appointmentId", appointmentId);
+        return query.getResultList();
+    }
+
 }

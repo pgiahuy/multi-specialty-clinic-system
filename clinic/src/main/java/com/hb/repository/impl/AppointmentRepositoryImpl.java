@@ -59,6 +59,9 @@ public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> i
                     hql.append(" AND d.userId.id = :userId ");
                 }
             }
+            if (params.containsKey("patientId")) {
+                hql.append(" AND a.patientId.id = :patientId");
+            }
 
             if (params.containsKey("date") && !params.get("date").isEmpty()) {
                 hql.append(" AND s.date = :date ");
@@ -84,6 +87,13 @@ public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> i
                     q.setParameter("status", AppointmentStatus.PENDING);
                 }
             }
+            
+            if (params.containsKey("patientId")) {
+                q.setParameter("patientId", params.get("patientId"));
+            }
+            
+            
+
             if (params.containsKey("date") && !params.get("date").isEmpty()) {
                 q.setParameter("date", java.sql.Date.valueOf(params.get("date")));
             }
@@ -190,5 +200,7 @@ public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> i
         Long count = query.uniqueResult();
         return count != null && count > 0; 
     }
+
+    
 
 }

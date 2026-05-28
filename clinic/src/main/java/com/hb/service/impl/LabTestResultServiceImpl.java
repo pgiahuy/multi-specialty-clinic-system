@@ -93,6 +93,11 @@ public class LabTestResultServiceImpl implements LabTestResultService {
         return res.stream().map(resultMapper::toResponse).toList();
     }
 
+    @Override
+    public List<LabResults> getLabResultsesByAppointmentId(Long appointmentId) {
+        return this.labResultRepo.getLabResultsByAppointment(appointmentId);
+    }
+
     
     
 }

@@ -8,11 +8,13 @@ import com.hb.dto.request.AppointmentCreateRequest;
 import com.hb.dto.response.AppointmentResponse;
 import com.hb.mapper.AppointmentMapper;
 import com.hb.pojo.Appointment;
+import com.hb.pojo.Patient;
 import com.hb.pojo.User;
 
 import com.hb.service.AppointmentService;
 import com.hb.service.UserService;
 import java.security.Principal;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -53,6 +55,8 @@ public class ApiAppointmentController {
 
     @Autowired
     private UserService userService;
+    
+
 
     @PostMapping("/secure/appointments")
     public ResponseEntity<AppointmentResponse> register(@RequestBody AppointmentCreateRequest req) {
@@ -78,8 +82,14 @@ public class ApiAppointmentController {
             return ResponseEntity.status(500).body("Lỗi hệ thống: " + e.getMessage());
         }
     }
+
+    @GetMapping("/secure/appointment/{id}")
+    public ResponseEntity<AppointmentResponse> getAppointment(@PathVariable(value = "id") Long id) {
+        Appointment res = this.appointmentService.getAppointmentById(id);
+        return ResponseEntity.ok(appMapper.toResponse(res));
+    }
+
     
-   
 
     @PutMapping("/secure/appointments/{id}")
     public ResponseEntity<?> update(@PathVariable("id") Long id,

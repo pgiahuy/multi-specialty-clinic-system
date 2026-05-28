@@ -20,9 +20,11 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -35,24 +37,37 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("api/secure")
 @PropertySource("classpath:configs.properties")
+@CrossOrigin
 public class ApiMedicalRecordController {
-    
+
     @Autowired
     private MedicalRecordService medicalRecordService;
-    
+
     @Autowired
     private Environment env;
-    
+
     @Autowired
     private UserService userService;
-    
+
+    @Autowired
+    private MedicalRecordMapper recordMapper;
+
     @PostMapping("/medical-records")
-    public ResponseEntity<MedicalRecordResponse> create(@RequestBody MedicalRecordCreateRequest req){
-        return null;
+    public ResponseEntity<MedicalRecordResponse> create(@RequestBody MedicalRecordCreateRequest req) {
+        MedicalRecord record = medicalRecordService.addOrUpdateMedicalRecord(req);
+        return ResponseEntity.status(HttpStatus.CREATED).body(recordMapper.toResponse(record));
     }
-    
+
+    @PutMapping("medical-records/{id}")
+    public ResponseEntity<MedicalRecordResponse> update(@PathVariable(value = ("id")) Long id
+                                                        ,@RequestBody MedicalRecordCreateRequest req) {
+        req.setId(id);
+        MedicalRecord record = medicalRecordService.addOrUpdateMedicalRecord(req);
+        return ResponseEntity.ok(recordMapper.toResponse(record));
+    }
+
     @GetMapping("/medical-records")
-    public ResponseEntity<List<MedicalRecordResponse>> list(@RequestParam Map<String,String> params, Principal principal){
+    public ResponseEntity<List<MedicalRecordResponse>> list(@RequestParam Map<String, String> params, Principal principal) {
         User u = userService.getUserByUsername(principal.getName());
         if (u != null) {
             params.put("currentUserId", String.valueOf(u.getId()));
@@ -64,23 +79,29 @@ public class ApiMedicalRecordController {
         List<MedicalRecord> res = medicalRecordService.getMedicalRecords(params);
         return ResponseEntity.ok(res.stream().map(MedicalRecordMapper.INSTANCE::toResponse).toList());
     }
-    
+
     @GetMapping("/medical-records/{patient-id}")
-    public ResponseEntity<List<MedicalRecordResponse>> getById(@PathVariable("patient-id") Long patienId, Principal principal){
+    public ResponseEntity<List<MedicalRecordResponse>> getByPatientId(@PathVariable("patient-id") Long patienId, Principal principal) {
         String userName = principal.getName();
-        boolean isAccess = medicalRecordService.checkAccessControll(userName, patienId);    
-        if (! isAccess) {
+        boolean isAccess = medicalRecordService.checkAccessControll(userName, patienId);
+        if (!isAccess) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
-        
+
         List<MedicalRecord> res = medicalRecordService.getMedicalRecordsByPatientId(patienId);
-        
+
         return ResponseEntity.ok(res.stream().map(MedicalRecordMapper.INSTANCE::toResponse).toList());
     }
-    
-   
+
+    @GetMapping("medical-records/appointment/{appointmentId}")
+    public ResponseEntity<MedicalRecordResponse> getByAppointmentId(@PathVariable(value = "appointmentId") Long appointmentId,
+            Principal principal) {
+        MedicalRecord res = medicalRecordService.getMedicalRecordByAppointmentId(appointmentId);
+        return ResponseEntity.ok(MedicalRecordMapper.INSTANCE.toResponse(res));
+    }
+
     @GetMapping("/medical-records/{id}")
-    public ResponseEntity<MedicalRecordResponse> getById(@PathVariable Long id){
+    public ResponseEntity<MedicalRecordResponse> getById(@PathVariable Long id) {
         return null;
     }
 }

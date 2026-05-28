@@ -14,12 +14,17 @@ import org.mapstruct.factory.Mappers;
  *
  * @author HUY
  */
-
-@Mapper
+@Mapper(componentModel = "spring")
 public interface MedicalRecordMapper {
+
     MedicalRecordMapper INSTANCE = Mappers.getMapper(MedicalRecordMapper.class);
 
     @Mapping(source = "appointmentId.patientId.fullName", target = "patientName")
+    @Mapping(source = "appointmentId.patientId.id", target = "patientId")
+    @Mapping(source = "appointmentId.id", target = "appointmentId")
+    @Mapping(source = "appointmentId.patientId.dob", target = "dob")
+    @Mapping(source = "appointmentId.patientId.gender", target = "gender")
+    @Mapping(source = "appointmentId.patientId.address", target = "address")
     MedicalRecordResponse toResponse(MedicalRecord medicalRecord);
-    
+
 }
