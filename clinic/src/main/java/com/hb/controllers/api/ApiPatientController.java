@@ -81,7 +81,6 @@ public class ApiPatientController {
     @Transactional
     public ResponseEntity<List<PatientResponse>> getProfiles(Principal principal) {
         User u = this.userService.getUserByUsername(principal.getName());
-        System.out.printf("=============%s==============", principal.getName());
         List<Patient> patients = (List<Patient>) u.getPatientCollection();
         patients.forEach(s -> System.out.println(s.getFullName()));
         return ResponseEntity.ok(patients.stream().map(patientMapper::toResponse).toList());

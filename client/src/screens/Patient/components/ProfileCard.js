@@ -1,5 +1,5 @@
-import { Card, Row, Col, Stack, Container, Popover, Button } from 'react-bootstrap';
-import { PersonVcard, Phone, Calendar3, GeoAlt, Fingerprint, GenderMale, GenderFemale, PencilSquare, Trash } from 'react-bootstrap-icons';
+import { Card, Row, Col, Stack, Container } from 'react-bootstrap';
+import { PersonVcard, Phone, Calendar3, GeoAlt, Fingerprint, GenderMale, GenderFemale } from 'react-bootstrap-icons';
 
 const PatientProfileCard = ({ patient, actions }) => {
   const getGenderIcon = () => {
@@ -74,7 +74,7 @@ const PatientProfileCard = ({ patient, actions }) => {
                   </div>
                   <div className="small text-truncate" title={patient.gender}>{patient.gender}</div>
                 </Col>
-                
+
               </Row>
             </Col>
 

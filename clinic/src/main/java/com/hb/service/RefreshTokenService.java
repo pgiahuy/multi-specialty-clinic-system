@@ -4,15 +4,21 @@
  */
 package com.hb.service;
 
-import jakarta.security.enterprise.identitystore.openid.RefreshToken;
+import com.hb.dto.response.AuthResponse;
+import com.hb.pojo.RefreshToken;
+
 
 /**
  *
  * @author HUY
  */
 public interface RefreshTokenService {
-    public RefreshToken createRefreshToken(Long userId);
-    public RefreshToken verifyExpiration(RefreshToken token);
-    public void revokeByUserId(Long userId);
+    RefreshToken createRefreshToken(Long userId);
+    RefreshToken createOrUpdateRefreshToken(Long userId, String deviceId, String deviceInfo);
+    RefreshToken verifyRefreshToken(String token);
+    AuthResponse refresh(String token);
+    void revokeByToken(String token);
+    void revokeByUserAndDevice(Long userId, String deviceId);
+    void revokeByRefreshToken(String refreshToken);
     
 }

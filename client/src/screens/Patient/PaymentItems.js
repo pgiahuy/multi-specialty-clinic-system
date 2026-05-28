@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { authApis, endpoint } from "../../configs/Apis";
+import { authApis, endpoint, PAYMENT_ENDPOINTS } from "../../configs/Apis";
 import { useParams } from "react-router-dom";
 import { Button, Card, Col, Container, Modal, Row, Tab, Tabs } from "react-bootstrap";
 import Footer from "../../components/Footer";
@@ -16,7 +16,7 @@ const PaymentItems = () => {
 
     const loadPaymentItems = async () => {
         try {
-            const res = await authApis().get(endpoint['payment-items'](paymentId));
+            const res = await authApis().get(PAYMENT_ENDPOINTS.ITEMS(paymentId));
             setPaymentItems(res.data);
         } catch (err) {
             console.log(err);
@@ -42,17 +42,17 @@ const PaymentItems = () => {
                 stransId: item.stransId,
                 totalAmount: 0,
                 count: 0,
-                details: [] 
+                details: []
             };
         }
 
         acc[type].totalAmount += item.amount;
         acc[type].count += 1;
 
-       
+
         const serviceName = item.testName || (type === 'APPOINTMENT' ? 'Khám chuyên khoa' : 'Dịch vụ y tế');
 
-        
+
         acc[type].details.push({
             id: item.id,
             name: serviceName,
@@ -77,37 +77,37 @@ const PaymentItems = () => {
 
 
     const handleConfirmPayment = async () => {
-        
+
         if (!selectedInvoice || !selectedInvoice.details) {
             alert("Dữ liệu hóa đơn không hợp lệ!");
             return;
         }
 
         try {
-            
+
             const itemIds = selectedInvoice.details.map(detail => detail.id);
 
-           
+
             const orderInfo = `Thanh toán ${translateType(selectedInvoice.type).toLowerCase()}`;
-            
+
             const formData = new URLSearchParams();
-            formData.append("method", selectedMethod); 
+            formData.append("method", selectedMethod);
             formData.append("orderInfo", orderInfo);
 
-           
+
             itemIds.forEach(id => formData.append("itemIds", id));
 
-           
-            const res = await authApis().post(endpoint['create-payment'], formData, {
+
+            const res = await authApis().post(PAYMENT_ENDPOINTS.CREATE, formData, {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 }
             });
 
-            
-            const payUrl = res.data.payUrl; 
+
+            const payUrl = res.data.payUrl;
             if (payUrl) {
-               
+
                 setShowPaymentModal(false);
                 window.location.href = payUrl;
             } else {
@@ -123,7 +123,7 @@ const PaymentItems = () => {
 
     const openPaymentModal = (invoice) => {
         setSelectedInvoice(invoice);
-        setSelectedMethod('MOMO'); 
+        setSelectedMethod('MOMO');
         setShowPaymentModal(true);
     };
 
@@ -136,9 +136,9 @@ const PaymentItems = () => {
                         <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-end mb-4 gap-3 border-bottom pb-3">
                             <div>
                                 <h2 className="fw-bold mb-1">Danh sách hóa đơn</h2>
-                                
+
                             </div>
-                            
+
                         </div>
 
                         <Card className="shadow-sm rounded-4 border-0 overflow-hidden mb-4">
@@ -240,7 +240,7 @@ const PaymentItems = () => {
                                                                 {invoice.method && <div className="d-flex justify-content-between"><span className="fw-bold">Phương thức</span><span>{invoice.method}</span></div>}
                                                             </div>
                                                         </Card.Body>
-                                                       
+
                                                     </Card>
                                                 </Col>
                                             ))}
@@ -260,7 +260,7 @@ const PaymentItems = () => {
                                 <Modal.Title className="fw-bold">Chọn phương thức thanh toán</Modal.Title>
                             </Modal.Header>
                             <Modal.Body className="pt-2 px-4 pb-4 bg-white">
-                               
+
 
                                 <div className="d-grid gap-3">
                                     <label

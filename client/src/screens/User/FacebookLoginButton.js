@@ -4,7 +4,7 @@ import { Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import cookies from 'react-cookies';
-import { authApis, endpoint } from '../../configs/Apis';
+import API, { AUTH_ENDPOINTS, authApis, USER_ENDPOINTS } from '../../configs/Apis';
 import { MyUserContext } from '../../configs/Contexts';
 
 const FacebookLoginButton = () => {
@@ -16,17 +16,27 @@ const FacebookLoginButton = () => {
         if (!response?.accessToken) return;
 
         try {
-            const res = await authApis().post(endpoint['facebook-login'], {
-                token: response.accessToken
+            let deviceId = localStorage.getItem('deviceId');
+            if (!deviceId) {
+                deviceId = crypto?.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2) + Date.now();
+                localStorage.setItem('deviceId', deviceId);
+            }
+            const deviceInfo = navigator.userAgent;
+
+            const res = await API.post(AUTH_ENDPOINTS.FACEBOOK_LOGIN, {
+                token: response.accessToken,
+                deviceId: deviceId,
+                deviceInfo: deviceInfo
             });
 
-            cookies.save('token', res.data.token);
+            cookies.save('accessToken', res.data.accessToken, { path: '/' });
+            if (res.data.refreshToken) cookies.save('refreshToken', res.data.refreshToken, { path: '/' });
 
-            const currentUser = await authApis().get(endpoint['current-user']);
-            cookies.save('user', currentUser.data);
+            const currentUser = await authApis().get(USER_ENDPOINTS.CURRENT_USER);
+            cookies.save('user', currentUser.data, { path: '/' });
             dispatch({ type: 'LOGIN', payload: currentUser.data });
 
-            const decoded = jwtDecode(res.data.token);
+            const decoded = jwtDecode(res.data.accessToken);
             if (decoded.role === 'ROLE_DOCTOR') nav('/doctor/dashboard');
             else nav('/patient/dashboard');
         } catch (err) {

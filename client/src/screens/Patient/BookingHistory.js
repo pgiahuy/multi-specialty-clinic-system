@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Container, Card, Badge, Row, Col, Spinner, Tabs, Tab } from "react-bootstrap";
 import Footer from "../../components/Footer";
 import Header from "../../components/Header";
-import { authApis, endpoint } from "../../configs/Apis";
+import { authApis, CLINIC_ENDPOINTS, endpoint } from "../../configs/Apis";
 
 const getStatusVariant = (status) => {
     switch ((status || "").toLowerCase()) {
@@ -28,7 +28,7 @@ const HistoryBooking = () => {
     const loadAppointments = async () => {
         try {
             setLoading(true);
-            const res = await authApis().get(endpoint["appointments"]);
+            const res = await authApis().get(CLINIC_ENDPOINTS.APPOINTMENTS);
             setAppointments(res.data);
         } catch (err) {
             console.log(err);
@@ -75,7 +75,7 @@ const HistoryBooking = () => {
                             className="nav-pills px-1 py-1 rounded-4 bg-white"
                             style={{ boxShadow: '0 12px 30px rgba(13,110,253,0.04)' }}
                         >
-                           
+
                             <Tab eventKey="pending" title="Chưa thanh toán" tabClassName="rounded-pill px-3 py-2" />
                             <Tab eventKey="confirmed" title="Đã thanh toán" tabClassName="rounded-pill px-3 py-2" />
                             <Tab eventKey="completed" title="Đã khám" tabClassName="rounded-pill px-3 py-2" />

@@ -4,14 +4,19 @@
  */
 package com.hb.repository;
 
-import com.hb.pojo.User;
-import java.util.Optional;
+import com.hb.pojo.RefreshToken;
 
 /**
  *
  * @author HUY
  */
 public interface RefreshTokenRepository {
-//    Optional<RefreshToken> getByToken(String token);
-    void deleteByUser(User u);
+    RefreshToken save(RefreshToken refreshToken);
+    RefreshToken getByToken(String token);
+    void revokeByToken(String token);
+    int revokeIfNotRevoked(String token);
+    RefreshToken findByUserIdAndDeviceId(Long userId, String deviceId);
+    void revokeAllByUser(Long userId);
+    void revokeByUserAndDevice(Long userId, String deviceId);
+    
 }
