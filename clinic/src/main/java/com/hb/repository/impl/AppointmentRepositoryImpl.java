@@ -28,6 +28,10 @@ public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> i
     @Autowired
     private LocalSessionFactoryBean factory;
 
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
+    }
+
     @Override
     public List<Appointment> getAppointments(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
@@ -59,6 +63,10 @@ public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> i
             if (params.containsKey("date") && !params.get("date").isEmpty()) {
                 hql.append(" AND s.date = :date ");
             }
+
+            if (hasText(params.get("kw"))) {
+                hql.append(" AND (p.fullName LIKE :kw OR d.fullName LIKE :kw)");
+            }
             
             if (params.containsKey("scheduleId")) {
                 hql.append(" AND s.id = :scheduleId");
@@ -79,6 +87,10 @@ public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> i
             if (params.containsKey("date") && !params.get("date").isEmpty()) {
                 q.setParameter("date", java.sql.Date.valueOf(params.get("date")));
             }
+
+            if (hasText(params.get("kw"))) {
+                q.setParameter("kw", "%" + params.get("kw").trim() + "%");
+            }
             
             if (params.containsKey("scheduleId")) {
                 q.setParameter("scheduleId",Long.valueOf(params.get("scheduleId")));
@@ -97,6 +109,11 @@ public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> i
 
     @Override
     public long count(Map<String, String> params, Class<Appointment> clazz) {
+        return countAppointments(params);
+    }
+
+    @Override
+    public long countAppointments(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
 
         StringBuilder hql = new StringBuilder("SELECT COUNT(DISTINCT a.id) FROM Appointment a "
@@ -107,6 +124,9 @@ public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> i
         if (params != null) {
             if (params.containsKey("date")) {
                 hql.append(" AND s.date = :date ");
+            }
+            if (hasText(params.get("kw"))) {
+                hql.append(" AND (p.fullName LIKE :kw OR d.fullName LIKE :kw)");
             }
             if (params.containsKey("currentUserId") && params.containsKey("currentUserRole")) {
                 String role = params.get("currentUserRole");
@@ -124,6 +144,9 @@ public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> i
         if (params != null) {
             if (params.containsKey("date")) {
                 q.setParameter("date", java.sql.Date.valueOf(params.get("date")));
+            }
+            if (hasText(params.get("kw"))) {
+                q.setParameter("kw", "%" + params.get("kw").trim() + "%");
             }
             if (params.containsKey("currentUserId")) {
                 q.setParameter("userId", Long.valueOf(params.get("currentUserId")));

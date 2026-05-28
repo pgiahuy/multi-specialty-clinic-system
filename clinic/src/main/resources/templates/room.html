@@ -102,6 +102,9 @@
                         </button>
                     </td>
                 </tr>
+                <tr th:if="${#lists.isEmpty(rooms)}">
+                    <td colspan="3" class="text-center text-muted p-4">Không tìm thấy phòng nào trong hệ thống.
+                    </td>
             </tbody>
         </table>
     </div>

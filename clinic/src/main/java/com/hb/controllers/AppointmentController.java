@@ -38,6 +38,7 @@ public class AppointmentController {
         params.put("pageSize", String.valueOf(pageSize));
         model.addAttribute("appointments", this.appointmentService.getAppointments(params));
         model.addAttribute("statuses", AppointmentStatus.values());
+        model.addAttribute("kw", params.get("kw"));
 
         long totalAppointments = appointmentService.countAppointments(params);
         int totalPages = (int) Math.ceil((double) totalAppointments / pageSize);

@@ -49,6 +49,7 @@ public class MedicineController {
         params.put("pageSize", String.valueOf(pageSize));
         model.addAttribute("medicines", this.medicineService.getMedicines(params));
         model.addAttribute("medicineForm", new MedicineForm());
+        model.addAttribute("kw", params.get("kw"));
 
         long totalMedicines = medicineService.countMedicines(params);
         int totalPages = (int) Math.ceil((double) totalMedicines / pageSize);

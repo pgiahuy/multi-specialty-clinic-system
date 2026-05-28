@@ -79,6 +79,6 @@ public class MedicineServiceImpl implements MedicineService {
 
     @Override
     public long countMedicines(Map<String, String> params) {
-        return medicineRepo.count(params, Medicine.class);
+        return medicineRepo.countMedicines(params);
     }
 }
