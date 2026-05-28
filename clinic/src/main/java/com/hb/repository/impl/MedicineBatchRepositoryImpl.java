@@ -38,7 +38,66 @@ public class MedicineBatchRepositoryImpl implements MedicineBatchRepository {
         return value != null && !value.trim().isEmpty();
     }
 
-    
+
+    @Override
+    public long count(Map<String, String> params, Class<MedicineBatch> clazz) {
+        Session session = this.factory.getObject().getCurrentSession();
+        StringBuilder hql = new StringBuilder("SELECT COUNT(DISTINCT mb.id) FROM MedicineBatch mb LEFT JOIN mb.medicineId m WHERE 1=1");
+
+        if (params != null && params.get("fromImport") != null && params.get("toImport") != null) {
+            hql.append(" AND mb.importDate BETWEEN :fromImport AND :toImport");
+        }
+
+        if (params != null && params.get("fromExpiry") != null && params.get("toExpiry") != null) {
+            hql.append(" AND mb.expiryDate BETWEEN :fromExpiry AND :toExpiry");
+        }
+
+        Query<Long> q = session.createQuery(hql.toString(), Long.class);
+        if (params != null && params.get("fromImport") != null && params.get("toImport") != null) {
+            q.setParameter("fromImport", LocalDate.parse(params.get("fromImport")));
+            q.setParameter("toImport", LocalDate.parse(params.get("toImport")));
+        }
+        if (params != null && params.get("fromExpiry") != null && params.get("toExpiry") != null) {
+            q.setParameter("fromExpiry", LocalDate.parse(params.get("fromExpiry")));
+            q.setParameter("toExpiry", LocalDate.parse(params.get("toExpiry")));
+        }
+
+        return q.getSingleResult();
+    }
+
+    @Override
+    public long countMedicineBatchs(Map<String, String> params) {
+        Session session = this.factory.getObject().getCurrentSession();
+        StringBuilder hql = new StringBuilder("SELECT COUNT(DISTINCT mb.id) FROM MedicineBatch mb LEFT JOIN mb.medicineId m WHERE 1=1");
+
+        if (params != null && hasText(params.get("kw"))) {
+            hql.append(" AND (mb.batchCode LIKE :kw OR m.name LIKE :kw OR m.code LIKE :kw)");
+        }
+
+        if (params != null && hasText(params.get("fromImport")) && hasText(params.get("toImport"))) {
+            hql.append(" AND mb.importDate BETWEEN :fromImport AND :toImport");
+        }
+
+        if (params != null && hasText(params.get("fromExpiry")) && hasText(params.get("toExpiry"))) {
+            hql.append(" AND mb.expiryDate BETWEEN :fromExpiry AND :toExpiry");
+        }
+
+        Query<Long> q = session.createQuery(hql.toString(), Long.class);
+
+        if (params != null && hasText(params.get("kw"))) {
+            q.setParameter("kw", "%" + params.get("kw").trim() + "%");
+        }
+        if (params != null && hasText(params.get("fromImport")) && hasText(params.get("toImport"))) {
+            q.setParameter("fromImport", LocalDate.parse(params.get("fromImport")));
+            q.setParameter("toImport", LocalDate.parse(params.get("toImport")));
+        }
+        if (params != null && hasText(params.get("fromExpiry")) && hasText(params.get("toExpiry"))) {
+            q.setParameter("fromExpiry", LocalDate.parse(params.get("fromExpiry")));
+            q.setParameter("toExpiry", LocalDate.parse(params.get("toExpiry")));
+        }
+
+        return q.getSingleResult();
+    }
 
     @Override
     public MedicineBatch saveOrUpdate(MedicineBatch m) {
@@ -62,13 +121,23 @@ public class MedicineBatchRepositoryImpl implements MedicineBatchRepository {
 
         List<Predicate> predicates = new ArrayList<>();
 
-        if (params.get("fromImport") != null && params.get("toImport") != null) {
+        if (params != null && hasText(params.get("kw"))) {
+            var medicineJoin = root.join("medicineId", JoinType.LEFT);
+            String keyword = "%" + params.get("kw").trim() + "%";
+            predicates.add(b.or(
+                    b.like(root.get("batchCode"), keyword),
+                    b.like(medicineJoin.get("name"), keyword),
+                    b.like(medicineJoin.get("code"), keyword)
+            ));
+        }
+
+        if (params != null && hasText(params.get("fromImport")) && hasText(params.get("toImport"))) {
             LocalDate from = LocalDate.parse(params.get("fromImport"));
             LocalDate to = LocalDate.parse(params.get("toImport"));
             predicates.add(b.between(root.get("importDate"), from, to));
         }
 
-        if (params.get("fromExpiry") != null && params.get("toExpiry") != null) {
+        if (params != null && hasText(params.get("fromExpiry")) && hasText(params.get("toExpiry"))) {
             LocalDate from = LocalDate.parse(params.get("fromExpiry"));
             LocalDate to = LocalDate.parse(params.get("toExpiry"));
             predicates.add(b.between(root.get("expiryDate"), from, to));
@@ -86,14 +155,7 @@ public class MedicineBatchRepositoryImpl implements MedicineBatchRepository {
                 .getResultList();
     }
     
-    @Override
-    public long count(Map<String, String> params, Class<MedicineBatch> clazz) {
-        Session session = this.factory.getObject().getCurrentSession();
-        String hql = "SELECT COUNT(DISTINCT mb.id) FROM MedicineBatch mb LEFT JOIN mb.medicineId m WHERE 1=1";
-        Query<Long> q = session.createQuery(hql, Long.class);
-        return q.getSingleResult();
-    }
-
+    
     @Override
     public MedicineBatch getMedicineBatchById(Long id) {
         Session session = this.factory.getObject().getCurrentSession();

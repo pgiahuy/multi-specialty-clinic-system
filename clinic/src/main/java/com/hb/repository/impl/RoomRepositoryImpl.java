@@ -11,8 +11,7 @@ import java.util.Map;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
+
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,16 +31,61 @@ public class RoomRepositoryImpl extends BaseRepositoryImpl<Rooms> implements Roo
     @Override
     public List<Rooms> getRooms(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<Rooms> q = session.createNamedQuery("Rooms.findAll", Rooms.class);
+        StringBuilder hql = new StringBuilder(
+                "SELECT DISTINCT r FROM Rooms r LEFT JOIN FETCH r.areaId a WHERE 1=1");
 
-        if (params != null) {
+        if (params != null && hasText(params.get("roomNumber"))) {
+            hql.append(" AND r.roomNumber LIKE :roomNumber");
+        }
+        if (params != null && hasText(params.get("areaName"))) {
+            hql.append(" AND a.areaName LIKE :areaName");
+        }
+
+        Query<Rooms> q = session.createQuery(hql.toString(), Rooms.class);
+
+        if (params != null && hasText(params.get("roomNumber"))) {
+            q.setParameter("roomNumber", "%" + params.get("roomNumber").trim() + "%");
+        }
+        if (params != null && hasText(params.get("areaName"))) {
+            q.setParameter("areaName", "%" + params.get("areaName").trim() + "%");
+        }
+
+        if (params != null && params.containsKey("pageSize")) {
             int pageSize = Integer.parseInt(params.get("pageSize"));
             int page = Integer.parseInt(params.getOrDefault("page", "1"));
-            int start = (page - 1) * pageSize;
+            q.setFirstResult((page - 1) * pageSize);
             q.setMaxResults(pageSize);
-            q.setFirstResult(start);
         }
         return q.getResultList();
+    }
+
+    @Override
+    public long count(Map<String, String> params, Class<Rooms> clazz) {
+        Session session = this.factory.getObject().getCurrentSession();
+        StringBuilder hql = new StringBuilder(
+                "SELECT COUNT(DISTINCT r.id) FROM Rooms r LEFT JOIN r.areaId a WHERE 1=1");
+
+        if (params != null && hasText(params.get("roomNumber"))) {
+            hql.append(" AND r.roomNumber LIKE :roomNumber");
+        }
+        if (params != null && hasText(params.get("areaName"))) {
+            hql.append(" AND a.areaName LIKE :areaName");
+        }
+
+        Query<Long> q = session.createQuery(hql.toString(), Long.class);
+
+        if (params != null && hasText(params.get("roomNumber"))) {
+            q.setParameter("roomNumber", "%" + params.get("roomNumber").trim() + "%");
+        }
+        if (params != null && hasText(params.get("areaName"))) {
+            q.setParameter("areaName", "%" + params.get("areaName").trim() + "%");
+        }
+
+        return q.getSingleResult();
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
     }
 
     @Override

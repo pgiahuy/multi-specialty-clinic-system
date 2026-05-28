@@ -4,6 +4,8 @@
  */
 package com.hb.dto.request.form;
 
+import com.hb.pojo.Areas;
+
 /**
  *
  * @author HUY
@@ -11,16 +13,17 @@ package com.hb.dto.request.form;
 public class RoomForm {
     private Long id;
     private String roomNumber;
-    private Long areaId;
+    private Areas area;
 
     public RoomForm() {
     }
 
-    public RoomForm(Long id, String roomNumber, Long areaId) {
+    public RoomForm(Long id, String roomNumber, Areas area) {
         this.id = id;
         this.roomNumber = roomNumber;
-        this.areaId = areaId;
+        this.area = area;
     }
+    
 
     /**
      * @return the id
@@ -51,18 +54,20 @@ public class RoomForm {
     }
 
     /**
-     * @return the areaId
+     * @return the area
      */
-    public Long getAreaId() {
-        return areaId;
+    public Areas getArea() {
+        return area;
     }
 
     /**
-     * @param areaId the areaId to set
+     * @param area the area to set
      */
-    public void setAreaId(Long areaId) {
-        this.areaId = areaId;
+    public void setArea(Areas area) {
+        this.area = area;
     }
 
+  
+ 
     
 }
