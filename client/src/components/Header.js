@@ -1,36 +1,39 @@
-import {
-    Badge,
-    Button,
-    Container,
-    Nav,
-    Navbar,
-    NavDropdown,
-} from "react-bootstrap";
+import { Badge, Button, Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
 import { Bell } from "react-bootstrap-icons";
 import { Link, useNavigate } from "react-router-dom";
 import NotificationBox from "./NotificationBox";
 import LoginRequiredModal from "./LoginRequiredModal";
-import API, { endpoint } from "../configs/Apis";
+import API, { AUTH_ENDPOINTS, authApis, CLINIC_ENDPOINTS } from "../configs/Apis";
+import cookies from 'react-cookies';
 import { useContext, useEffect, useState } from "react";
 import { MyUserContext } from "../configs/Contexts";
 
 
 const Header = () => {
     const navigate = useNavigate();
-    const [user, dispatch] = useContext(MyUserContext);
     const [specialties, setSpecialties] = useState([]);
     const [showLoginRequired, setShowLoginRequired] = useState(false);
+    const [user, dispatch] = useContext(MyUserContext);
 
-    const handleLogout = () => {
-        localStorage.removeItem("user");
-        dispatch({ type: 'LOGOUT' });
-        navigate("/");
+    const handleLogout = async () => {
+        try {
+            const refreshToken = cookies.load('refreshToken');
+            if (refreshToken) {
+                await authApis().post(AUTH_ENDPOINTS.LOGOUT, { refreshToken });
+            }
+        } catch (err) {
+            console.error('Logout revoke failed:', err);
+        } finally {
+            localStorage.removeItem("user");
+            dispatch({ type: "LOGOUT" });
+            navigate("/");
+        }
     };
 
 
     const loadSpecialties = async () => {
         try {
-            const response = await API.get(endpoint['specialties']);
+            const response = await API.get(CLINIC_ENDPOINTS.SPECIALTIES);
             setSpecialties(response.data);
         } catch (error) {
             console.error("Failed to load specialties:", error);
@@ -49,7 +52,7 @@ const Header = () => {
             style={{ zIndex: 1030 }}
         >
             <Container fluid className="m-0 ps-5 pe-4 py-2">
-                <Navbar.Brand className="header-brand mb-0" onClick={() => navigate('/') }>
+                <Navbar.Brand className="header-brand mb-0" onClick={() => navigate('/')}>
                     OU-Clinic
                 </Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -78,27 +81,29 @@ const Header = () => {
                                 }
                             }}
                         >
-                           Dịch vụ
+                            Dịch vụ
                         </Nav.Link>
                         <Nav.Link className="header-navlink" onClick={() => navigate('/')}>
-                           Liên hệ
+                            Liên hệ
                         </Nav.Link>
                     </Nav>
+                    {user === null ? null :
 
-                    <Nav className="align-items-center me-3 header-notification">
-                        <NotificationBox onNavigate={(path) => {
-                            if (!path) return;
-                            if (path.startsWith('/api/secure/prescriptions') || path.includes('/prescriptions')) {
-                                navigate('/patient/prescriptions');
-                                return;
-                            }
-                            if (path.startsWith('http://') || path.startsWith('https://')) {
-                                window.open(path, '_blank');
-                                return;
-                            }
-                            try { navigate(path); } catch (e) { window.open(path, '_blank'); }
-                        }} />
-                    </Nav>
+                        <Nav className="align-items-center me-3 header-notification">
+                            <NotificationBox onNavigate={(path) => {
+                                if (!path) return;
+                                if (path.startsWith('/api/secure/prescriptions') || path.includes('/prescriptions')) {
+                                    navigate('/patient/prescriptions');
+                                    return;
+                                }
+                                if (path.startsWith('http://') || path.startsWith('https://')) {
+                                    window.open(path, '_blank');
+                                    return;
+                                }
+                                try { navigate(path); } catch (e) { window.open(path, '_blank'); }
+                            }} />
+                        </Nav>}
+
                     {user === null ? <>
                         <Button variant="outline-primary" className=" rounded-4  m-2" as={Link} to="/register">
                             Đăng ký
@@ -113,9 +118,10 @@ const Header = () => {
                             title={
                                 <span className="d-inline-flex align-items-center">
                                     <img
-                                        src={user.avatar}
+                                        src={user?.avatar}
                                         className="rounded-circle header-avatar"
                                         alt="avatar"
+                                        onError={(e) => e.target.src = '/default-avatar.png'}
                                     />
                                 </span>
                             }

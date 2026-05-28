@@ -19,8 +19,6 @@ export const requestForToken = () => {
     return getToken(messaging, { vapidKey: "BHzjcKnvfNLBpVhFYgY64BBnVK3ElRPl_PirgJvVExgr6pvoDd3B6oObKwYgGOcab0dWrRWLGGDYHOZUzHslsPY" })
         .then((currentToken) => {
             if (currentToken) {
-                console.log('FCM Token:', currentToken);
-
                 return currentToken;
             }
         })

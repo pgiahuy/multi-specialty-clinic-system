@@ -66,7 +66,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserById(Long id) {
-        return userRepo.getUserById(id);
+        User u = userRepo.getUserById(id);
+        if (u == null) {
+            throw new ResourceNotFoundException("Tài khoản không tồn tại!");
+        }
+        return u;
     }
 
     @Override
