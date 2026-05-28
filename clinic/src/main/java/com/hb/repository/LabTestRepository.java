@@ -17,4 +17,5 @@ public interface LabTestRepository extends BaseRepository<LabTests>{
     LabTests getLabTestById(Long id);
     void addOrUpdateLabTest(LabTests test);
     void deleteLabTest(Long id);
+    Long countLabTests(Map<String, String> params);
 }

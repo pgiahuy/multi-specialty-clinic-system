@@ -23,13 +23,15 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Repository
 @Transactional
-public class LabTestRepositoryImpl extends BaseRepositoryImpl<LabTests> implements LabTestRepository{
+public class LabTestRepositoryImpl extends BaseRepositoryImpl<LabTests> implements LabTestRepository {
+
     @Autowired
     private LocalSessionFactoryBean factory;
 
     @Override
     public List<LabTests> getLabTests(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
+
         StringBuilder hql = new StringBuilder("SELECT l FROM LabTests l WHERE 1=1");
 
         if (params != null && hasText(params.get("kw"))) {
@@ -98,4 +100,21 @@ public class LabTestRepositoryImpl extends BaseRepositoryImpl<LabTests> implemen
             session.remove(test);
         }
     }
+    
+    @Override
+    public Long countLabTests(Map<String, String> params) {
+    Session session = this.factory.getObject().getCurrentSession();
+    Query<Long> q;
+    
+   
+    if (params != null && params.containsKey("testName") && !params.get("testName").isEmpty()) {
+        q = session.createQuery("SELECT COUNT(l) FROM LabTests l WHERE l.testName LIKE :testName", Long.class);
+        q.setParameter("testName", "%" + params.get("testName") + "%");
+    } else {
+        
+        q = session.createQuery("SELECT COUNT(l) FROM LabTests l", Long.class);
+    }
+    
+    return q.getSingleResult();
+}
 }

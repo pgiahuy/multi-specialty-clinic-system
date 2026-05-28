@@ -5,6 +5,7 @@
 package com.hb.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -13,15 +14,21 @@ import java.time.LocalDateTime;
  */
 public class MedicalRecordResponse {
     private Long id;
-    private String diagnosis;
-    private String note;
+    private Long appointmentId;
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime createdAt;
+    private Long patientId;
     private String patientName;
+    @JsonFormat(pattern = "dd/MM/yyyy")
+    private LocalDate dob;
+    private String gender;
+    private String address;
+    private String diagnosis;
+    private String note;
 
     public MedicalRecordResponse() {
     }
-
+    
     /**
      * @return the id
      */
@@ -90,6 +97,76 @@ public class MedicalRecordResponse {
      */
     public void setPatientName(String patientName) {
         this.patientName = patientName;
+    }
+
+    /**
+     * @return the patientId
+     */
+    public Long getPatientId() {
+        return patientId;
+    }
+
+    /**
+     * @param patientId the patientId to set
+     */
+    public void setPatientId(Long patientId) {
+        this.patientId = patientId;
+    }
+
+    /**
+     * @return the appointmentId
+     */
+    public Long getAppointmentId() {
+        return appointmentId;
+    }
+
+    /**
+     * @param appointmentId the appointmentId to set
+     */
+    public void setAppointmentId(Long appointmentId) {
+        this.appointmentId = appointmentId;
+    }
+
+    /**
+     * @return the dob
+     */
+    public LocalDate getDob() {
+        return dob;
+    }
+
+    /**
+     * @param dob the dob to set
+     */
+    public void setDob(LocalDate dob) {
+        this.dob = dob;
+    }
+
+    /**
+     * @return the gender
+     */
+    public String getGender() {
+        return gender;
+    }
+
+    /**
+     * @param gender the gender to set
+     */
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    /**
+     * @return the address
+     */
+    public String getAddress() {
+        return address;
+    }
+
+    /**
+     * @param address the address to set
+     */
+    public void setAddress(String address) {
+        this.address = address;
     }
     
     
