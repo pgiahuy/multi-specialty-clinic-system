@@ -48,6 +48,8 @@ public class DoctorServiceImpl implements DoctorService {
         d.setDescription(doctorForm.getDescription() != null ? doctorForm.getDescription().trim() : "");
         d.setFullName(doctorForm.getFullName() != null ? doctorForm.getFullName().trim() : "");
         d.setGender(doctorForm.getGender() != null ? doctorForm.getGender().trim() : "");
+        d.setCccd(doctorForm.getCccd() != null ? doctorForm.getCccd().trim() : "");
+        d.setIsActive(true);
 
         if (doctorForm.getUserId() != null) {
             User u = this.userRepo.getUserById(doctorForm.getUserId());

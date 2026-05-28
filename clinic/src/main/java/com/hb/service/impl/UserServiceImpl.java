@@ -65,6 +65,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User getUserById(Long id) {
+        return userRepo.getUserById(id);
+    }
+
+    @Override
     public User saveOrUpdateUser(UserCreateRequest urq) {
         User u;
 
@@ -93,6 +98,10 @@ public class UserServiceImpl implements UserService {
             if (urq.getPassword() != null && !urq.getPassword().trim().isEmpty()) {
                 u.setPassword(passwordEncoder.encode(urq.getPassword()));
             }
+            
+            if (urq.getName()!= null && !urq.getName().trim().isEmpty()) {
+                u.setName(urq.getName());
+            }
 
         } else {
             User checkUser = userRepo.existsByUsername(urq.getUsername());
@@ -110,6 +119,8 @@ public class UserServiceImpl implements UserService {
             u.setEmail(urq.getEmail());
             u.setPassword(passwordEncoder.encode(urq.getPassword()));
             u.setRole("ROLE_PATIENT");
+            u.setIsActive(true);
+            u.setName(urq.getName());
             u.setCreatedAt(LocalDateTime.now());
         }
 
@@ -250,6 +261,11 @@ public class UserServiceImpl implements UserService {
     ) {
         User user = this.userRepo.getUserByUsername(username);
         return user != null ? user.getRole() : null;
+    }
+
+    @Override
+    public List<User> getActiveUsers(String kw) {
+        return this.userRepo.getActiveUsers(kw);
     }
 
 }

@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
  *
@@ -67,8 +68,15 @@ public class SpecialtyController {
     }
     
     @PostMapping("")
-    public String create(@ModelAttribute SpecialtyForm specialtyForm) {
-        specialtyService.saveOrUpdate(specialtyForm);
+    public String create(@ModelAttribute SpecialtyForm specialtyForm,RedirectAttributes redirectAttributes) {
+        try {
+            specialtyService.saveOrUpdate(specialtyForm);
+            redirectAttributes.addFlashAttribute("successMsg", "Thao tác dữ liệu thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
+            redirectAttributes.addFlashAttribute("specialtyForm", specialtyForm);
+            redirectAttributes.addFlashAttribute("openForm", true);
+        }
         return "redirect:/admin/specialties";
     }
 
@@ -82,10 +90,15 @@ public class SpecialtyController {
 
     @GetMapping("/search-doctors")
     @ResponseBody
-    public List<Map<String, Object>> searchDoctors(@RequestParam(value = "kw", required = false) String kw) {
+    public List<Map<String, Object>> searchDoctors(
+            @RequestParam(value = "kw", required = false) String kw,
+            @RequestParam(value = "specialtyId", required = false) Long specialtyId) {
         Map<String, String> params = new HashMap<>();
         if (kw != null && !kw.trim().isEmpty()) {
             params.put("doctorName", kw.trim());
+        }
+        if (specialtyId != null) {
+            params.put("specialtyId", String.valueOf(specialtyId));
         }
 
         return this.doctorService.getDoctors(params).stream()

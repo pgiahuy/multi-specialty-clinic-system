@@ -34,15 +34,29 @@ public class MedicineBatchRepositoryImpl implements MedicineBatchRepository {
     @Autowired
     private LocalSessionFactoryBean factory;
 
-    private boolean hasText(String value) {
-        return value != null && !value.trim().isEmpty();
-    }
-
     @Override
     public long count(Map<String, String> params, Class<MedicineBatch> clazz) {
         Session session = this.factory.getObject().getCurrentSession();
-        String hql = "SELECT COUNT(DISTINCT mb.id) FROM MedicineBatch mb LEFT JOIN mb.medicineId m WHERE 1=1";
-        Query<Long> q = session.createQuery(hql, Long.class);
+        StringBuilder hql = new StringBuilder("SELECT COUNT(DISTINCT mb.id) FROM MedicineBatch mb LEFT JOIN mb.medicineId m WHERE 1=1");
+
+        if (params != null && params.get("fromImport") != null && params.get("toImport") != null) {
+            hql.append(" AND mb.importDate BETWEEN :fromImport AND :toImport");
+        }
+
+        if (params != null && params.get("fromExpiry") != null && params.get("toExpiry") != null) {
+            hql.append(" AND mb.expiryDate BETWEEN :fromExpiry AND :toExpiry");
+        }
+
+        Query<Long> q = session.createQuery(hql.toString(), Long.class);
+        if (params != null && params.get("fromImport") != null && params.get("toImport") != null) {
+            q.setParameter("fromImport", LocalDate.parse(params.get("fromImport")));
+            q.setParameter("toImport", LocalDate.parse(params.get("toImport")));
+        }
+        if (params != null && params.get("fromExpiry") != null && params.get("toExpiry") != null) {
+            q.setParameter("fromExpiry", LocalDate.parse(params.get("fromExpiry")));
+            q.setParameter("toExpiry", LocalDate.parse(params.get("toExpiry")));
+        }
+
         return q.getSingleResult();
     }
 
@@ -68,13 +82,13 @@ public class MedicineBatchRepositoryImpl implements MedicineBatchRepository {
 
         List<Predicate> predicates = new ArrayList<>();
 
-        if (params.get("fromImport") != null && params.get("toImport") != null) {
+        if (params != null && params.get("fromImport") != null && params.get("toImport") != null) {
             LocalDate from = LocalDate.parse(params.get("fromImport"));
             LocalDate to = LocalDate.parse(params.get("toImport"));
             predicates.add(b.between(root.get("importDate"), from, to));
         }
 
-        if (params.get("fromExpiry") != null && params.get("toExpiry") != null) {
+        if (params != null && params.get("fromExpiry") != null && params.get("toExpiry") != null) {
             LocalDate from = LocalDate.parse(params.get("fromExpiry"));
             LocalDate to = LocalDate.parse(params.get("toExpiry"));
             predicates.add(b.between(root.get("expiryDate"), from, to));

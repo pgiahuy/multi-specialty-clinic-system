@@ -52,9 +52,8 @@ public class RoomServiceImpl implements RoomService{
         }
         
         r.setRoomNumber(form.getRoomNumber());
-        if(form.getAreaId()!=null){
-            Areas a = this.areaRepo.getAreasById(form.getAreaId());
-            r.setAreaId(a);
+        if(form.getArea()!=null){
+            r.setAreaId(form.getArea());
         }else{
             throw new BadRequestException("Thiếu thông tin phân khu!");
         }

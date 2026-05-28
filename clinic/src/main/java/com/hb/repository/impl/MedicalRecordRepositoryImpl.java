@@ -23,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class MedicalRecordRepositoryImpl extends BaseRepositoryImpl<MedicalRecord> implements MedicalRecordRepository {
 
- 
     @Autowired
     private LocalSessionFactoryBean factory;
 
@@ -32,7 +31,7 @@ public class MedicalRecordRepositoryImpl extends BaseRepositoryImpl<MedicalRecor
         Session session = this.factory.getObject().getCurrentSession();
         Query<MedicalRecord> q = session.createNamedQuery("MedicalRecord.findAll", MedicalRecord.class);
 
-        if (params != null) {
+        if (params != null && params.containsKey("pageSize")) {
             int pageSize = Integer.parseInt(params.get("pageSize"));
             int page = Integer.parseInt(params.getOrDefault("page", "1"));
             int start = (page - 1) * pageSize;
@@ -41,6 +40,13 @@ public class MedicalRecordRepositoryImpl extends BaseRepositoryImpl<MedicalRecor
         }
 
         return q.getResultList();
+    }
+
+    @Override
+    public long count(Map<String, String> params, Class<MedicalRecord> clazz) {
+        Session session = this.factory.getObject().getCurrentSession();
+        Query<Long> q = session.createQuery("SELECT COUNT(m.id) FROM MedicalRecord m", Long.class);
+        return q.getSingleResult();
     }
 
     @Override

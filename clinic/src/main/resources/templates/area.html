@@ -56,9 +56,10 @@
             </div>
 
             <div class="mb-3">
-                <label class="form-label fw-bold">Mô tả:</label>
-                <input th:field="*{locationFloor}" class="form-control" id="locationFloor"></input>
+                <label class="form-label fw-bold">Tầng:</label>
+                <input type="text" th:field="*{locationFloor}" class="form-control" id="locationFloor" required />
             </div>
+
 
             <div class="d-flex gap-2 justify-content-end">
                 <button type="button" class="btn btn-secondary"
@@ -78,11 +79,17 @@
             <tbody>
                 <tr th:each="a : ${areas}" th:id="'area-row-' + ${a.id}">
                     <td th:text="${a.areaName}" th:id="'a-name-' + ${a.id}"></td>
-                    <td th:text="${a.locationFloor}"></td>
+                    <td th:text="${a.locationFloor}" th:id="'a-floor-' + ${a.id}"></td>
                     <td class="text-center">
-                        <button class="btn btn-warning btn-sm" th:onclick="|editArea(${a.id})|">Sửa</button>
-                        <button class="btn btn-danger btn-sm"
-                            th:onclick="|deleteCrudItem(${a.id}, '/admin/areas/', 'area-row-')|">Xóa</button>
+                        <button class="btn btn-warning btn-sm me-1" th:onclick="|editArea(${a.id})|">
+                            <i class="bi bi-pencil-square"></i> Sửa
+                        </button>
+                        <button class="btn btn-danger btn-sm" th:data-id="${a.id}" th:data-url="@{/admin/areas/}"
+                            th:data-row-prefix="'area-row-'"
+                            onclick="deleteCrudItem(this.dataset.id, this.dataset.url, this.dataset.rowPrefix)">
+                            <i class="bi bi-trash"></i> Xóa
+                        </button>
+
                     </td>
                 </tr>
             </tbody>
@@ -101,6 +108,7 @@
         function editArea(id) {
             document.getElementById('areaId').value = id;
             document.getElementById('areaName').value = document.getElementById('a-name-' + id).innerText.trim();
+            document.getElementById('locationFloor').value = document.getElementById('a-floor-' + id).innerText.trim();
             document.getElementById('formTitle').innerText = 'Cập nhật khu vực (ID: ' + id + ')';
             document.getElementById('submitFormBtn').innerText = 'Lưu thay đổi';
             document.getElementById('areaForm').classList.remove('d-none');
