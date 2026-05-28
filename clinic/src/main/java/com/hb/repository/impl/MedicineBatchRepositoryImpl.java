@@ -38,13 +38,7 @@ public class MedicineBatchRepositoryImpl implements MedicineBatchRepository {
         return value != null && !value.trim().isEmpty();
     }
 
-    @Override
-    public long count(Map<String, String> params, Class<MedicineBatch> clazz) {
-        Session session = this.factory.getObject().getCurrentSession();
-        String hql = "SELECT COUNT(DISTINCT mb.id) FROM MedicineBatch mb LEFT JOIN mb.medicineId m WHERE 1=1";
-        Query<Long> q = session.createQuery(hql, Long.class);
-        return q.getSingleResult();
-    }
+    
 
     @Override
     public MedicineBatch saveOrUpdate(MedicineBatch m) {
@@ -90,6 +84,14 @@ public class MedicineBatchRepositoryImpl implements MedicineBatchRepository {
                 .setFirstResult((page - 1) * pageSize)
                 .setMaxResults(pageSize)
                 .getResultList();
+    }
+    
+    @Override
+    public long count(Map<String, String> params, Class<MedicineBatch> clazz) {
+        Session session = this.factory.getObject().getCurrentSession();
+        String hql = "SELECT COUNT(DISTINCT mb.id) FROM MedicineBatch mb LEFT JOIN mb.medicineId m WHERE 1=1";
+        Query<Long> q = session.createQuery(hql, Long.class);
+        return q.getSingleResult();
     }
 
     @Override
