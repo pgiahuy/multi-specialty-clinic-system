@@ -7,6 +7,8 @@ package com.hb.controllers;
 import com.hb.dto.request.form.RoomForm;
 import com.hb.service.AreasService;
 import com.hb.service.RoomService;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,22 +45,53 @@ public class RoomController {
     private AreasService areasService;
     @Autowired
     private Environment  env;
+    
     @GetMapping("/rooms")
     public String list(Model model, @RequestParam Map<String, String> params) {
-        int page = params.containsKey("page") ? Integer.parseInt(params.get("page")) : 1;
+        int page = parsePositiveInt(params.get("page"), 1);
 
         int pageSize = this.env.getProperty("admin.page_size", Integer.class);
         params.put("pageSize", String.valueOf(pageSize));
 
         model.addAttribute("rooms", roomService.getRooms(params));
+        model.addAttribute("areas", areasService.getAreas(null));
         model.addAttribute("roomForm", new RoomForm());
         long totalRooms = roomService.countRooms(params);
         int totalPages = (int) Math.ceil((double) totalRooms / pageSize);
 
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("currentPage", page);
+        model.addAttribute("searchQuery", buildSearchQuery(params));
 
         return "room";
+    }
+
+    private int parsePositiveInt(String value, int defaultValue) {
+        try {
+            int parsed = Integer.parseInt(value);
+            return parsed > 0 ? parsed : defaultValue;
+        } catch (Exception ex) {
+            return defaultValue;
+        }
+    }
+
+    private String buildSearchQuery(Map<String, String> params) {
+        StringBuilder query = new StringBuilder();
+
+        params.forEach((key, value) -> {
+            if (value != null && !value.trim().isEmpty()
+                    && !"page".equalsIgnoreCase(key)
+                    && !"pageSize".equalsIgnoreCase(key)) {
+                if (query.length() > 0) {
+                    query.append('&');
+                }
+                query.append(URLEncoder.encode(key, StandardCharsets.UTF_8))
+                        .append('=')
+                        .append(URLEncoder.encode(value.trim(), StandardCharsets.UTF_8));
+            }
+        });
+
+        return query.toString();
     }
     
 

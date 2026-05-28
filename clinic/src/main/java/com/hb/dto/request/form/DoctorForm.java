@@ -15,6 +15,7 @@ public class DoctorForm {
     private String fullName;
     private String description;
     private String gender;
+    private String cccd;
     private List<Long> specialtyIds;
     private Long userId;
 
@@ -114,6 +115,20 @@ public class DoctorForm {
      */
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    /**
+     * @return the cccd
+     */
+    public String getCccd() {
+        return cccd;
+    }
+
+    /**
+     * @param cccd the cccd to set
+     */
+    public void setCccd(String cccd) {
+        this.cccd = cccd;
     }
     
     
