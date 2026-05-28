@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useContext, useState } from 'react';
 import { jwtDecode } from "jwt-decode";
 import cookies from "react-cookies";
-import Apis, { authApis, endpoint } from "../../configs/Apis";
+import API, { AUTH_ENDPOINTS, authApis, USER_ENDPOINTS } from "../../configs/Apis";
 
 import MySpinner from '../../components/MySpinner';
 
@@ -45,24 +45,37 @@ const Login = () => {
         if (validate()) {
             try {
                 setLoading(true);
+                const fcmToken = await Promise.race([
+                    requestForToken(),
+                    new Promise((resolve) => setTimeout(() => resolve(null), 1500))
+                ]);
 
+                let deviceId = localStorage.getItem('deviceId');
+                if (!deviceId) {
+                    deviceId = crypto?.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2) + Date.now();
+                    localStorage.setItem('deviceId', deviceId);
+                }
+                const deviceInfo = navigator.userAgent;
 
-                const fcmToken = await requestForToken();
-
-                const res = await Apis.post(endpoint['login'], {
+                const res = await API.post(AUTH_ENDPOINTS.LOGIN, {
                     ...user,
-                    fcmToken: fcmToken
+                    fcmToken: fcmToken,
+                    deviceId: deviceId,
+                    deviceInfo: deviceInfo
                 });
 
-                const decoded = jwtDecode(res.data.token);
+
+
+                const decoded = jwtDecode(res.data.accessToken);
                 const role = decoded.role;
-                cookies.save("token", res.data.token);
+                cookies.save("accessToken", res.data.accessToken, { path: '/' });
+                cookies.save("refreshToken", res.data.refreshToken, { path: '/' });
 
 
 
-                let u = await authApis().get(endpoint['current-user']);
+                let u = await authApis().get(USER_ENDPOINTS.CURRENT_USER);
                 localStorage.setItem("user", JSON.stringify(u.data));
-                cookies.save("user", u.data);
+                cookies.save("user", u.data, { path: '/' });
 
                 dispatch({ "type": "LOGIN", "payload": u.data });
 

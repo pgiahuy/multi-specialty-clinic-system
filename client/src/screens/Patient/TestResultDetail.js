@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { authApis, endpoint } from "../../configs/Apis";
+import { authApis, CLINIC_ENDPOINTS, endpoint, USER_ENDPOINTS } from "../../configs/Apis";
 import { exp } from "firebase/firestore/pipelines";
 import { MyUserContext } from "../../configs/Contexts";
 import { Card, Col, Container, Row, Table } from "react-bootstrap";
@@ -29,7 +29,7 @@ const TestResultDetail = () => {
 
     const loadPatientProfiles = async () => {
         try {
-            const res = await authApis().get(endpoint['patientProfiles']);
+            const res = await authApis().get(USER_ENDPOINTS.PATIENT_PROFILE_DETAIL(patientId));
             setPatientProfiles(res.data);
         } catch (err) {
             console.log(err);
@@ -39,7 +39,7 @@ const TestResultDetail = () => {
 
     const loadAppointments = async (patientId) => {
         try {
-            const res = await authApis().get(endpoint['appointments'], { params: { patientId } });
+            const res = await authApis().get(USER_ENDPOINTS.APPOINTMENTS);
             setAppointments(res.data);
         }
         catch (err) {
@@ -51,7 +51,11 @@ const TestResultDetail = () => {
     const loadTestResults = async (appointmentId) => {
         try {
 
-            const res = await authApis().get(endpoint['test-result-appointment'](appointmentId));
+            const res = await authApis().get(CLINIC_ENDPOINTS.TEST_RESULTS(patientId), {
+                params: {
+                    appointmentId: appointmentId
+                }
+            });
             setTestResults(res.data);
         } catch (err) {
             console.log(err);
@@ -122,14 +126,14 @@ const TestResultDetail = () => {
                                             <div>
                                                 <Row className="gy-3">
                                                     {patientFields.map((field) => {
-                                                       
+
                                                         const selectedProfile = patientProfiles.find(p => p.id === selectedProfileId);
 
-                                                        
+
                                                         if (!selectedProfile) return null;
 
                                                         return (
-                                                            
+
                                                             <Col xs={12} md={6} key={field.key}>
                                                                 <div>
                                                                     <label className="fw-bold text-muted small mb-1">{field.label}</label>

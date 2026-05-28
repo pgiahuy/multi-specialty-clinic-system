@@ -4,6 +4,7 @@
  */
 package com.hb.repository.impl;
 
+import com.hb.exception.DuplicateResourceException;
 import com.hb.exception.ResourceNotFoundException;
 import com.hb.pojo.Doctor;
 import com.hb.pojo.Specialty;
@@ -115,10 +116,16 @@ public class SpecialtyRepositoryImpl extends BaseRepositoryImpl<Specialty> imple
     @Override
     public Specialty saveOrUpdate(Specialty s) {
         Session session = this.factory.getObject().getCurrentSession();
-        if (s.getId()==null) {
+        Long currentId = (s.getId() != null) ? s.getId() : -1L;
+
+        if (isDoctorAlreadyHod(s.getIdHod().getId(), currentId)) {
+            throw new DuplicateResourceException("Bác sĩ này đã là trưởng của chuyên khoa khác!");
+        }
+
+        if (s.getId() == null) {
             session.persist(s);
             return s;
-        }else{
+        } else {
             return session.merge(s);
         }
     }
@@ -144,5 +151,19 @@ public class SpecialtyRepositoryImpl extends BaseRepositoryImpl<Specialty> imple
     }
     
     
+    private boolean isDoctorAlreadyHod(Long doctorId, Long currentSpecialtyId) {
+        Session session = this.factory.getObject().getCurrentSession();
+
+        String hql = "SELECT s FROM Specialty s WHERE s.idHod.id = :doctorId";
+
+        Specialty existing = session.createQuery(hql, Specialty.class)
+                .setParameter("doctorId", doctorId)
+                .uniqueResult();
+
+        if (existing != null) {
+            return !existing.getId().equals(currentSpecialtyId);
+        }
+        return false;
+    }
 
 }

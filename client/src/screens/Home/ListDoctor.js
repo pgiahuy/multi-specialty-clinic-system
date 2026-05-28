@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Container, Row, Col, Card, Button, Spinner, Image, Form } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import { authApis, endpoint } from "../../configs/Apis";
+import { authApis, CLINIC_ENDPOINTS, endpoint } from "../../configs/Apis";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { formCardStyle } from "../User/UserStyle";
@@ -13,7 +13,7 @@ const ListDoctor = () => {
     const loadDoctors = async () => {
         try {
             setLoading(true);
-            const res = await authApis().get(endpoint["doctors"]);
+            const res = await authApis().get(CLINIC_ENDPOINTS.DOCTORS);
             setDoctors(res.data || []);
         } catch (err) {
             console.log(err);
@@ -36,8 +36,8 @@ const ListDoctor = () => {
                             <Row>
                                 <Col md={8}>
                                     <Form.Group className="mb-4">
-                                        <Form.Control placeholder="Tìm kiếm bác sĩ..."/>
-                                        
+                                        <Form.Control placeholder="Tìm kiếm bác sĩ..." />
+
                                     </Form.Group>
                                 </Col>
                                 <Col md={4}>

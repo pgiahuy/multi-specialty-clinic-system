@@ -6,14 +6,17 @@ package com.hb.controllers.api;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.hb.dto.request.RefreshTokenRequest;
 import com.hb.dto.request.UserCreateRequest;
 import com.hb.dto.request.UserLogin;
+import com.hb.dto.response.AuthResponse;
 import com.hb.exception.DuplicateResourceException;
+import com.hb.pojo.RefreshToken;
 import com.hb.pojo.User;
 import com.hb.service.AuthService;
+import com.hb.service.RefreshTokenService;
 import com.hb.service.UserService;
 import com.hb.utils.JwtUtils;
-import java.util.Collections;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
@@ -43,6 +46,9 @@ public class ApiAuthController {
 
     @Autowired
     private UserService userService;
+    
+    @Autowired
+    private RefreshTokenService refreshTokenService;
 
     @Autowired
     private GoogleIdTokenVerifier verifier;
@@ -55,28 +61,37 @@ public class ApiAuthController {
         } catch (DuplicateResourceException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi hệ thống: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi hệ thống: ");
         }
     }
 
     @PostMapping("/auth/login")
     public ResponseEntity<?> login(@RequestBody UserLogin u) {
         if (this.authService.authenticate(u.getUsername(), u.getPassword())) {
-            try {
-
-                if (u.getFcmToken() != null && !u.getFcmToken().isEmpty()) {
+  
+                
+           if (u.getFcmToken() != null && !u.getFcmToken().isEmpty()) {
                     this.userService.updateFcmToken(u.getUsername(), u.getFcmToken());
                 }
 
                 String role = this.userService.getRoleByUsername(u.getUsername());
                 String token = JwtUtils.generateToken(u.getUsername(), role);
-
-                return ResponseEntity.ok().body(Collections.singletonMap("token", token));
-            } catch (Exception e) {
-                return ResponseEntity.status(500).body("Lỗi hệ thống khi xử lý đăng nhập");
-            }
+                User user = userService.getUserByUsername(u.getUsername());
+                String deviceId = u.getDeviceId();
+                String deviceInfo = u.getDeviceInfo();
+                RefreshToken rt = refreshTokenService.createOrUpdateRefreshToken(user.getId(), deviceId, deviceInfo);
+                String refreshToken = rt.getToken();
+                AuthResponse res = new AuthResponse(token, refreshToken);
+              
+                return ResponseEntity.ok().body(res);
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Sai thông tin đăng nhập");
+    }
+
+    @PostMapping("/auth/refresh")
+    public ResponseEntity<?> refresh(@RequestBody RefreshTokenRequest req ) {
+        AuthResponse res = refreshTokenService.refresh(req.getRefreshToken());
+        return ResponseEntity.ok().body(res);
     }
 
     @PostMapping("/auth/google")
@@ -100,8 +115,12 @@ public class ApiAuthController {
             User user = userService.processSocialLogin(payload, fcmToken);
 
             String role = userService.getRoleByUsername(user.getUsername());
+            String accessToken = JwtUtils.generateToken(user.getUsername(), role);
+            String deviceId = params.get("deviceId");
+            String deviceInfo = params.get("deviceInfo");
+            RefreshToken rt = refreshTokenService.createOrUpdateRefreshToken(user.getId(), deviceId, deviceInfo);
 
-            return ResponseEntity.ok(Collections.singletonMap("token", JwtUtils.generateToken(user.getUsername(), role)));
+            return ResponseEntity.ok(new AuthResponse(accessToken, rt.getToken()));
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi hệ thống: " + e.getMessage());
@@ -122,6 +141,27 @@ public class ApiAuthController {
 
         User user = userService.processSocialLoginFacebook(facebookId, email, name);
 
-        return ResponseEntity.ok(JwtUtils.generateToken(user.getUsername(),user.getRole()));
+        String deviceId = params.get("deviceId");
+        String deviceInfo = params.get("deviceInfo");
+        RefreshToken rt = refreshTokenService.createOrUpdateRefreshToken(user.getId(), deviceId, deviceInfo);
+
+        String accessToken = JwtUtils.generateToken(user.getUsername(), user.getRole());
+
+        return ResponseEntity.ok(new AuthResponse(accessToken, rt.getToken()));
+    }
+
+    @PostMapping("/auth/logout")
+    public ResponseEntity<?> logout(@RequestBody Map<String, String> params) {
+        try {
+            String refreshToken = params.get("refreshToken");
+            if (refreshToken == null || refreshToken.isEmpty()) {
+                return ResponseEntity.badRequest().body("refreshToken is required");
+            }
+
+            refreshTokenService.revokeByRefreshToken(refreshToken);
+            return ResponseEntity.ok().body("Logged out");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi máy chủ!");
+        }
     }
 }

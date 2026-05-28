@@ -13,6 +13,8 @@ const API = axios.create({
     baseURL: getBaseURL()
 });
 
+let refreshPromise = null;
+
 
 export const getDoctors = () => API.get("/z");
 export const getSpecialties = () => API.get("/specialties");
@@ -43,14 +45,143 @@ export const endpoint = {
     'medical-record': (appointmentId) => `/secure/medical-records/appointment/${appointmentId}`,
     'medical-record-update': (medicalRecordId) => `/secure/medical-records/${medicalRecordId}`
 };
+export const AUTH_ENDPOINTS = {
+    REGISTER: 'auth/register',
+    LOGIN: 'auth/login',
+    FACEBOOK_LOGIN: 'auth/facebook',
+    GOOGLE_LOGIN: 'auth/google',
+    REFRESH_TOKEN: 'auth/refresh',
+    LOGOUT: 'auth/logout'
+};
+
+export const CLINIC_ENDPOINTS = {
+    DOCTORS: 'doctors',
+    SPECIALTIES: 'specialties',
+    SCHEDULES: 'secure/schedules',
+    APPOINTMENTS: 'secure/appointments',
+    TEST_RESULTS: (patientId) => `secure/test/${patientId}`,
+};
+
+export const USER_ENDPOINTS = {
+    CURRENT_USER: 'secure/users/profile',
+    NOTIFICATIONS: 'secure/users/notifications',
+    PATIENT_PROFILES: 'secure/profiles',
+    PATIENT_PROFILE_DETAIL: (patientId) => `secure/profile/${patientId}`,
+};
+
+export const PAYMENT_ENDPOINTS = {
+    CREATE: 'secure/payments/create',
+    MOMO_RETURN: 'secure/payments/momo/return',
+    HISTORY: (patientId) => `secure/payments/${patientId}`,
+    ITEMS: (paymentId) => `secure/payment-items/${paymentId}`,
+};
+
+
+export const clinicApis = {
+    getDoctors: () => API.get(CLINIC_ENDPOINTS.DOCTORS),
+    getSpecialties: () => API.get(CLINIC_ENDPOINTS.SPECIALTIES),
+    getSchedule: () => authApis.get(CLINIC_ENDPOINTS.SCHEDULES),
+};
+
+
+
+const setupResponseInterceptor = (instance) => {
+
+    instance.interceptors.response.use(
+        response => response,
+        async error => {
+            const originalRequest = error.config;
+            if (!originalRequest || originalRequest.url?.includes("auth/refresh") || originalRequest.url?.includes("auth/login")) {
+                return Promise.reject(error);
+            }
+
+            if (error.response?.status === 401 && !originalRequest._retry) {
+                originalRequest._retry = true;
+
+                console.debug("Auth interceptor: 401 detected for", originalRequest.method, originalRequest.url);
+                const currentRefresh = cookies.load("refreshToken");
+                console.debug("Auth interceptor: cookies present?", { access: !!cookies.load("accessToken"), refresh: !!currentRefresh });
+
+                if (!refreshPromise) {
+                    console.debug("Auth interceptor: sending refresh request to", `${getBaseURL()}auth/refresh`);
+                    refreshPromise = axios.post(`${getBaseURL()}auth/refresh`, {
+                        refreshToken: currentRefresh
+                    }).then((res) => {
+                        const { accessToken, refreshToken } = res.data;
+                        if (accessToken) cookies.save("accessToken", accessToken, { path: '/' });
+                        if (refreshToken) cookies.save("refreshToken", refreshToken, { path: '/' });
+
+                        const short = t => t ? `${t.slice(0, 8)}...` : null;
+                        console.debug("Auth interceptor: refresh successful", { accessToken: short(accessToken), refreshToken: short(refreshToken) });
+
+
+                        const header = `Bearer ${accessToken}`;
+                        instance.defaults.headers = instance.defaults.headers || {};
+                        instance.defaults.headers.common = instance.defaults.headers.common || {};
+                        instance.defaults.headers.common['Authorization'] = header;
+                        API.defaults.headers = API.defaults.headers || {};
+                        API.defaults.headers.common = API.defaults.headers.common || {};
+                        API.defaults.headers.common['Authorization'] = header;
+
+                        return accessToken;
+                    }).catch((refreshError) => {
+                        console.debug("Auth interceptor: refresh failed", refreshError);
+                        cookies.remove("accessToken");
+                        cookies.remove("refreshToken");
+                        window.location.href = "/login";
+                        throw refreshError;
+                    }).finally(() => {
+                        refreshPromise = null;
+                    });
+                }
+
+                try {
+                    const accessToken = await refreshPromise;
+                    if (accessToken) {
+                        const tokenHeader = `Bearer ${accessToken}`;
+                        originalRequest.headers = originalRequest.headers || {};
+
+                        originalRequest.headers['Authorization'] = tokenHeader;
+                        originalRequest.headers['authorization'] = tokenHeader;
+
+
+                        instance.defaults.headers = instance.defaults.headers || {};
+                        instance.defaults.headers.common = instance.defaults.headers.common || {};
+                        instance.defaults.headers.common['Authorization'] = tokenHeader;
+                        API.defaults.headers = API.defaults.headers || {};
+                        API.defaults.headers.common = API.defaults.headers.common || {};
+                        API.defaults.headers.common['Authorization'] = tokenHeader;
+
+                        console.debug("Auth interceptor: retrying original request", originalRequest.method, originalRequest.url);
+                        return instance(originalRequest);
+                    }
+                } catch (refreshError) {
+                    return Promise.reject(refreshError);
+                }
+            }
+            return Promise.reject(error);
+        }
+    );
+};
+
+setupResponseInterceptor(API);
 
 export const authApis = () => {
-    return axios.create({
-        baseURL: getBaseURL(),
-        headers: {
-            'Authorization': `Bearer ${cookies.load("token")}`
-        }
+    const instance = axios.create({
+        baseURL: getBaseURL()
     });
+
+    instance.interceptors.request.use(config => {
+        const token = cookies.load("accessToken");
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    });
+
+    setupResponseInterceptor(instance);
+
+    return instance;
 }
 
 export default API;

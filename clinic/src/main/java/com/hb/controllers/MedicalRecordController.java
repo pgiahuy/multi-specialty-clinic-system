@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @PropertySource("classpath:configs.properties")
 @Controller
 @RequestMapping("/admin/medical-records")
-public class MedicalRecord {
+public class MedicalRecordController {
     
     @Autowired
     private MedicalRecordService medicalRecordService;
@@ -39,6 +39,7 @@ public class MedicalRecord {
         int pageSize = this.env.getProperty("admin.page_size", Integer.class);
         params.put("pageSize", String.valueOf(pageSize));
         model.addAttribute("medical_records", medicalRecordService.getMedicalRecords(params));
+        model.addAttribute("kw", params.get("kw"));
 
         long totalMedicalRecords = medicalRecordService.countMedicalRecords(params);
         int totalPages = (int) Math.ceil((double) totalMedicalRecords / pageSize);

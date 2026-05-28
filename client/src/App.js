@@ -31,9 +31,10 @@ import AppointmentList from "./screens/Doctor/AppointmentList";
 import MedicalRecord from "./screens/Doctor/MedicalRecord";
 import AssignTest from "./screens/Doctor/AssignTest";
 
+
 const initUserState = () => {
-    const savedUser = localStorage.getItem("user");
-    return savedUser ? JSON.parse(savedUser) : null;
+  const savedUser = localStorage.getItem("user");
+  return savedUser ? JSON.parse(savedUser) : null;
 };
 
 function App() {
@@ -71,11 +72,11 @@ function App() {
             <Route path="/patient/payment-items/:paymentId" element={<PaymentItems />} />
             <Route path="/patient/payment-result" element={<PaymentResult />} />
             <Route path="/doctors" element={<ListDoctor />} />
-            <Route path= "/doctor/schedules" element={<Schedules />} />
-            <Route path= "/doctor/:scheduleId/appointments" element={<AppointmentList />} />
-            <Route path= "/doctor/medical-records/appointment/:appointmentId" element={<MedicalRecord />} />
+            <Route path="/doctor/schedules" element={<Schedules />} />
+            <Route path="/doctor/:scheduleId/appointments" element={<AppointmentList />} />
+            <Route path="/doctor/medical-records/appointment/:appointmentId" element={<MedicalRecord />} />
             <Route path="doctor/assign-test/:appointmentId" element={<AssignTest />} />
-            
+
           </Routes>
 
         </Container>

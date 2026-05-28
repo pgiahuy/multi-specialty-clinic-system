@@ -30,7 +30,17 @@ public class AreasRepositoryImpl extends BaseRepositoryImpl<Areas> implements Ar
     @Override
     public List<Areas> getAreas(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<Areas> q = session.createNamedQuery("Areas.findAll", Areas.class);
+        StringBuilder hql = new StringBuilder("SELECT a FROM Areas a WHERE 1=1");
+
+        if (params != null && hasText(params.get("areaName"))) {
+            hql.append(" AND a.areaName LIKE :areaName");
+        }
+
+        Query<Areas> q = session.createQuery(hql.toString(), Areas.class);
+
+        if (params != null && hasText(params.get("areaName"))) {
+            q.setParameter("areaName", "%" + params.get("areaName").trim() + "%");
+        }
 
         if (params != null) {
             int pageSize = Integer.parseInt(params.get("pageSize"));
@@ -40,6 +50,28 @@ public class AreasRepositoryImpl extends BaseRepositoryImpl<Areas> implements Ar
             q.setFirstResult(start);
         }
         return q.getResultList();
+    }
+
+    @Override
+    public long count(Map<String, String> params, Class<Areas> clazz) {
+        Session session = this.factory.getObject().getCurrentSession();
+        StringBuilder hql = new StringBuilder("SELECT COUNT(a.id) FROM Areas a WHERE 1=1");
+
+        if (params != null && hasText(params.get("areaName"))) {
+            hql.append(" AND a.areaName LIKE :areaName");
+        }
+
+        Query<Long> q = session.createQuery(hql.toString(), Long.class);
+
+        if (params != null && hasText(params.get("areaName"))) {
+            q.setParameter("areaName", "%" + params.get("areaName").trim() + "%");
+        }
+
+        return q.getSingleResult();
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
     }
 
     @Override

@@ -15,6 +15,7 @@ import java.util.Map;
 public interface MedicalRecordRepository extends BaseRepository<MedicalRecord>{
     List<MedicalRecord> getMedicalRecords(Map<String,String> params);
     MedicalRecord addorUpdateMedicalRecord(MedicalRecord m);
+    long countMedicalRecords(Map<String, String> params);
     MedicalRecord getMedicalRecordById(Long id);
     MedicalRecord getMedicalRecordByAppointmentId(Long appointmentId);
     List<MedicalRecord> getMedicalRecordsByPatientId(Long patientId);

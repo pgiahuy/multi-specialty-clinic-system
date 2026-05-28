@@ -5,15 +5,15 @@
 package com.hb.controllers;
 
 import com.hb.service.ScheduleService;
+import com.hb.service.DoctorService;
+import com.hb.service.SpecialtyService;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -31,6 +31,10 @@ public class ScheduleController {
     
     @Autowired
     private ScheduleService scheduleService;
+    @Autowired
+    private DoctorService doctorService;
+    @Autowired
+    private SpecialtyService specialtyService;
     @Autowired
     private Environment env;
 
@@ -53,10 +57,10 @@ public class ScheduleController {
     }
     
 
-    @DeleteMapping("/{id}")
-    public String delete(@PathVariable Long id) {
-        scheduleService.deleteSchedule(id);
-        return "redirect:/admin/schedules";
-    }
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<?> delete(@PathVariable("id") Long id) {
+//        scheduleService.deleteSchedule(id);
+//        return ResponseEntity.noContent().build();
+//    }
     
 }

@@ -5,7 +5,6 @@
 package com.hb.repository.impl;
 
 import com.hb.pojo.Patient;
-import com.hb.pojo.SocialAccount;
 import com.hb.pojo.User;
 import com.hb.repository.SocialAccountRepository;
 import com.hb.repository.UserRepository;
@@ -146,7 +145,7 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<User> implements User
     @Override
     public User getUserByEmail(String email) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<User> query = session.createQuery("SELECT u FROM User u WHERE u.email = :email",User.class);
+        Query<User> query = session.createQuery("SELECT u FROM User u WHERE u.email = :email", User.class);
         query.setParameter("email", email);
 
         List<User> users = query.getResultList();
@@ -169,6 +168,23 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<User> implements User
         q.setParameter("email", email);
 
         return q.uniqueResultOptional().orElse(null);
+    }
+
+    @Override
+    public List<User> getActiveUsers(String kw) {
+        Session session = this.factory.getObject().getCurrentSession();
+
+        String hql = "FROM User u WHERE u.isActive = true "
+                + "AND NOT EXISTS (FROM Doctor d WHERE d.userId = u) "
+                + "AND NOT EXISTS (FROM Patient p WHERE p.userId = u) "
+                + "AND (:kw IS NULL OR :kw = '' OR u.username LIKE :kw OR u.name LIKE :kw)";
+
+        Query<User> q = session.createQuery(hql, User.class);
+
+        String searchKw = (kw != null && !kw.isEmpty()) ? "%" + kw + "%" : null;
+        q.setParameter("kw", searchKw);
+
+        return q.getResultList();
     }
 
 }

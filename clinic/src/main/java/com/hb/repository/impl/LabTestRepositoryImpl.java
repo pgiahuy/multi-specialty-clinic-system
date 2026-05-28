@@ -31,20 +31,20 @@ public class LabTestRepositoryImpl extends BaseRepositoryImpl<LabTests> implemen
     @Override
     public List<LabTests> getLabTests(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<LabTests> q;
 
-        
-        if (params != null && params.containsKey("testName") && !params.get("testName").isEmpty()) {
-            
-            q = session.createQuery("FROM LabTests l WHERE l.testName LIKE :testName", LabTests.class);
-            q.setParameter("testName", "%" + params.get("testName") + "%");
-        } else {
-            
-            q = session.createNamedQuery("LabTests.findAll", LabTests.class);
+        StringBuilder hql = new StringBuilder("SELECT l FROM LabTests l WHERE 1=1");
+
+        if (params != null && hasText(params.get("kw"))) {
+            hql.append(" AND (LOWER(l.testName) LIKE :kw OR LOWER(l.unit) LIKE :kw OR LOWER(l.normalRange) LIKE :kw)");
         }
 
-        if (params != null) {
+        Query<LabTests> q = session.createQuery(hql.toString(), LabTests.class);
 
+        if (params != null && hasText(params.get("kw"))) {
+            q.setParameter("kw", "%" + params.get("kw").trim().toLowerCase() + "%");
+        }
+
+        if (params != null && params.containsKey("pageSize")) {
             int pageSize = Integer.parseInt(params.get("pageSize"));
             int page = Integer.parseInt(params.getOrDefault("page", "1"));
             int start = (page - 1) * pageSize;
@@ -52,6 +52,28 @@ public class LabTestRepositoryImpl extends BaseRepositoryImpl<LabTests> implemen
             q.setFirstResult(start);
         }
         return q.getResultList();
+    }
+
+    @Override
+    public long count(Map<String, String> params, Class<LabTests> clazz) {
+        Session session = this.factory.getObject().getCurrentSession();
+        StringBuilder hql = new StringBuilder("SELECT COUNT(l.id) FROM LabTests l WHERE 1=1");
+
+        if (params != null && hasText(params.get("kw"))) {
+            hql.append(" AND (LOWER(l.testName) LIKE :kw OR LOWER(l.unit) LIKE :kw OR LOWER(l.normalRange) LIKE :kw)");
+        }
+
+        Query<Long> q = session.createQuery(hql.toString(), Long.class);
+
+        if (params != null && hasText(params.get("kw"))) {
+            q.setParameter("kw", "%" + params.get("kw").trim().toLowerCase() + "%");
+        }
+
+        return q.getSingleResult();
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
     }
 
     @Override

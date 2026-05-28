@@ -35,11 +35,15 @@
         </div>
 
         <form class="row g-2 mb-3" method="get" action="" id="roomFilterForm">
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <input type="text" name="roomNumber" class="form-control" placeholder="Tìm phòng"
                     th:value="${param.roomNumber != null ? param.roomNumber : ''}" />
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
+                <input type="text" name="areaName" class="form-control" placeholder="Tìm theo khu vực"
+                    th:value="${param.areaName != null ? param.areaName : ''}" />
+            </div>
+            <div class="col-md-4">
                 <button type="submit" class="btn btn-outline-primary">Tìm kiếm</button>
                 <a th:href="@{/admin/rooms}" class="btn btn-outline-secondary ms-2">Đặt lại</a>
             </div>
@@ -55,10 +59,10 @@
                     <label class="form-label fw-bold">Số phòng / Tên:</label>
                     <input type="text" th:field="*{roomNumber}" class="form-control" id="roomNumber" required />
                 </div>
-              
+
                 <div class="col-md-3 mb-3">
                     <label class="form-label fw-bold">Khu vực:</label>
-                    <select th:field="*{areaId}" class="form-select" id="areaId">
+                    <select th:field="*{area.id}" class="form-select" id="areaId">
                         <option value="">-- Chọn khu vực --</option>
                         <option th:each="a : ${areas}" th:value="${a.id}" th:text="${a.areaName}"></option>
                     </select>
@@ -83,13 +87,24 @@
             <tbody>
                 <tr th:each="r : ${rooms}" th:id="'room-row-' + ${r.id}">
                     <td th:text="${r.roomNumber}" th:id="'r-name-' + ${r.id}"></td>
-                    <td th:text="${r.areaId != null ? r.areaId.areaName : ''}"></td>
+                    <td th:text="${r.areaId != null ? r.areaId.areaName : ''}"
+                        th:attr="data-area-id=${r.areaId != null ? r.areaId.id : ''}" th:id="'area-name-' + ${r.id}">
+                    </td>
                     <td class="text-center">
-                        <button class="btn btn-warning btn-sm" th:onclick="|editRoom(${r.id})|">Sửa</button>
-                        <button class="btn btn-danger btn-sm"
-                            th:onclick="|deleteCrudItem(${r.id}, '/admin/rooms/', 'room-row-')|">Xóa</button>
+
+                        <button class="btn btn-warning btn-sm me-1" th:onclick="|editRoom(${r.id})|">
+                            <i class="bi bi-pencil-square"></i> Sửa
+                        </button>
+                        <button class="btn btn-danger btn-sm" th:data-id="${r.id}" th:data-url="@{/admin/rooms/}"
+                            th:data-row-prefix="'room-row-'"
+                            onclick="deleteCrudItem(this.dataset.id, this.dataset.url, this.dataset.rowPrefix)">
+                            <i class="bi bi-trash"></i> Xóa
+                        </button>
                     </td>
                 </tr>
+                <tr th:if="${#lists.isEmpty(rooms)}">
+                    <td colspan="3" class="text-center text-muted p-4">Không tìm thấy phòng nào trong hệ thống.
+                    </td>
             </tbody>
         </table>
     </div>
@@ -106,6 +121,7 @@
         function editRoom(id) {
             document.getElementById('roomId').value = id;
             document.getElementById('roomNumber').value = document.getElementById('r-name-' + id).innerText.trim();
+            document.getElementById('areaId').value = document.getElementById('area-name-' + id).dataset.areaId || '';
             document.getElementById('formTitle').innerText = 'Cập nhật phòng (ID: ' + id + ')';
             document.getElementById('submitFormBtn').innerText = 'Lưu thay đổi';
             document.getElementById('roomForm').classList.remove('d-none');
@@ -116,4 +132,3 @@
 </body>
 
 </html>
-

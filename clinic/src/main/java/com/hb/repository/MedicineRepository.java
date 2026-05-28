@@ -14,6 +14,7 @@ import java.util.Map;
  */
 public interface MedicineRepository extends BaseRepository<Medicine>{
     List<Medicine> getMedicines(Map<String,String> params);
+    long countMedicines(Map<String, String> params);
     Medicine addMedicine(Medicine d);
     Medicine getMedicineById(Long id);
     void deleteMedicine(Long id);

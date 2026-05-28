@@ -23,16 +23,32 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class MedicalRecordRepositoryImpl extends BaseRepositoryImpl<MedicalRecord> implements MedicalRecordRepository {
 
- 
     @Autowired
     private LocalSessionFactoryBean factory;
+    
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
+    }
+
 
     @Override
     public List<MedicalRecord> getMedicalRecords(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<MedicalRecord> q = session.createNamedQuery("MedicalRecord.findAll", MedicalRecord.class);
 
-        if (params != null) {
+        StringBuilder hql = new StringBuilder("SELECT mr FROM MedicalRecord mr JOIN mr.appointmentId a JOIN a.patientId p LEFT JOIN a.scheduleId s LEFT JOIN s.doctorId d WHERE 1=1");
+
+        if (params != null && hasText(params.get("kw"))) {
+            hql.append(" AND (p.fullName LIKE :kw OR d.fullName LIKE :kw)");
+        }
+
+        Query<MedicalRecord> q = session.createQuery(hql.toString(), MedicalRecord.class);
+
+        if (params != null && hasText(params.get("kw"))) {
+            q.setParameter("kw", "%" + params.get("kw").trim() + "%");
+        }
+
+        if (params != null && params.containsKey("pageSize") && hasText(params.get("pageSize"))) {
+
             int pageSize = Integer.parseInt(params.get("pageSize"));
             int page = Integer.parseInt(params.getOrDefault("page", "1"));
             int start = (page - 1) * pageSize;
@@ -41,6 +57,14 @@ public class MedicalRecordRepositoryImpl extends BaseRepositoryImpl<MedicalRecor
         }
 
         return q.getResultList();
+
+    }
+
+    @Override
+    public long count(Map<String, String> params, Class<MedicalRecord> clazz) {
+        Session session = this.factory.getObject().getCurrentSession();
+        Query<Long> q = session.createQuery("SELECT COUNT(m.id) FROM MedicalRecord m", Long.class);
+        return q.getSingleResult();
     }
 
     @Override
@@ -89,5 +113,23 @@ public class MedicalRecordRepositoryImpl extends BaseRepositoryImpl<MedicalRecor
         query.setParameter("appointmentId", appointmentId);
         
         return query.getSingleResult();
+    }
+        
+    @Override
+    public long countMedicalRecords(Map<String, String> params) {
+        Session session = this.factory.getObject().getCurrentSession();
+
+        StringBuilder hql = new StringBuilder("SELECT COUNT(mr) FROM MedicalRecord mr JOIN mr.appointmentId a JOIN a.patientId p LEFT JOIN a.scheduleId s LEFT JOIN s.doctorId d WHERE 1=1");
+
+        if (params != null && hasText(params.get("kw"))) {
+            hql.append(" AND (p.fullName LIKE :kw OR d.fullName LIKE :kw)");
+        }
+
+        Query<Long> q = session.createQuery(hql.toString(), Long.class);
+        if (params != null && hasText(params.get("kw"))) {
+            q.setParameter("kw", "%" + params.get("kw").trim() + "%");
+        }
+
+        return q.getSingleResult();
     }
 }
