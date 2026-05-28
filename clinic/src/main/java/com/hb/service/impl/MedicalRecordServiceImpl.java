@@ -4,7 +4,10 @@
  */
 package com.hb.service.impl;
 
+import com.hb.dto.request.MedicalRecordCreateRequest;
+import com.hb.enums.AppointmentStatus;
 import com.hb.exception.ResourceNotFoundException;
+import com.hb.mapper.MedicalRecordMapper;
 import com.hb.pojo.Appointment;
 import com.hb.pojo.MedicalRecord;
 import com.hb.pojo.Patient;
@@ -12,6 +15,7 @@ import com.hb.repository.AppointmentRepository;
 import com.hb.repository.MedicalRecordRepository;
 import com.hb.repository.PatientRepository;
 import com.hb.service.MedicalRecordService;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,36 +30,39 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 
     @Autowired
     private MedicalRecordRepository medicalRecordRepo;
-    
+
     @Autowired
     private PatientRepository patientRepo;
-    
-    @Autowired
-    private MedicalRecordRepository medRepo;
-    
+
     @Autowired
     private AppointmentRepository appointmentRepo;
 
     @Override
-    public MedicalRecord addMedicalRecord(Map<String, String> params) {
-        MedicalRecord m = new MedicalRecord();
+    public MedicalRecord addOrUpdateMedicalRecord(MedicalRecordCreateRequest req) {
+        MedicalRecord m;
 
-        m.setDiagnosis(params.getOrDefault("diagnosis", ""));
-        m.setNote(params.getOrDefault("note", ""));
+        if (medicalRecordRepo.getMedicalRecordById(req.getId()) != null) {
+            m = medicalRecordRepo.getMedicalRecordById(req.getId());
 
-        String appointmentIdStr = params.get("appointmentId");
-        if (appointmentIdStr != null && !appointmentIdStr.isEmpty()) {
-            try {
-                Long appointmentId = Long.parseLong(appointmentIdStr);
-                var appointment = appointmentRepo.getAppointmentById(appointmentId);
-                m.setAppointmentId(appointment);
-                
-            } catch (NumberFormatException e) {
-                throw new RuntimeException("Invalid appointment ID format");
+            if (!req.getDiagnosis().isEmpty()) {
+                m.setDiagnosis(req.getDiagnosis());
             }
+
+            if (!req.getNote().isEmpty()) {
+                m.setNote(req.getNote());
+            }
+        } else {
+            m = new MedicalRecord();
+
+            Appointment appointment = appointmentRepo.getAppointmentById(req.getAppointId());
+            m.setAppointmentId(appointment);
+            m.setCreatedAt(new Date());
+
+            appointment.setStatus(AppointmentStatus.IN_PROGRESS);
+            appointmentRepo.addOrUpdateAppointment(appointment);
         }
 
-        return this.medicalRecordRepo.addMedicalRecord(m);
+        return this.medicalRecordRepo.addorUpdateMedicalRecord(m);
     }
 
     @Override
@@ -84,7 +91,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
         if (p == null) {
             throw new ResourceNotFoundException("Patient not found!");
         }
-        
+
         return p.getUserId().getUsername().equals(username);
     }
 
@@ -94,8 +101,20 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
         if (p == null) {
             throw new ResourceNotFoundException("Patient not found!");
         }
-        
-        List<MedicalRecord> res = medRepo.getMedicalRecordsByPatientId(patientId);
+
+        List<MedicalRecord> res = medicalRecordRepo.getMedicalRecordsByPatientId(patientId);
         return res;
+    }
+
+    @Override
+    public MedicalRecord getMedicalRecordByAppointmentId(Long appointmentId) {
+        Appointment a = appointmentRepo.getAppointmentById(appointmentId);
+
+        if (a == null) {
+            throw new ResourceNotFoundException("Appointment not found!");
+        }
+
+        return this.medicalRecordRepo.getMedicalRecordByAppointmentId(appointmentId);
+
     }
 }

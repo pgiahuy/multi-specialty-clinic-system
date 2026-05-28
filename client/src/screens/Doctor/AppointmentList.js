@@ -13,6 +13,7 @@ const AppointmentList = () => {
     const { scheduleId } = useParams();
     const [appointments, setAppointments] = useState([]);
     const [loading, setLoading] = useState(false);
+    const nav = useNavigate();
 
 
     const loadAppointments = async (scheduleId) => {
@@ -89,15 +90,16 @@ const AppointmentList = () => {
                                             <td style={tableStyles.dataCell}>{renderStatusText(appointment.status)}</td>
                                             {appointment.status === 'COMPLETED' ?
                                                 (<td style={tableStyles.dataCell}>
-                                                    <Button variant="outline-primary" className=" rounded-4">Cập nhật bệnh án</Button>
+                                                    <Button variant="outline-primary" className=" rounded-4" onClick={() => nav(`/doctor/medical-records/appointment/${appointment.id}`)}>
+                                                        Cập nhật bệnh án
+                                                    </Button>
                                                 </td>) : (
                                                     <td style={tableStyles.dataCell}>
-                                                        <Button variant="outline-primary" className="rounded-4">
+                                                        <Button variant="outline-primary" className="rounded-4" onClick={() => nav(`/doctor/medical-records/appointment/${appointment.id}`)}>
                                                             Ghi nhận bệnh án
                                                         </Button>
                                                     </td>
                                                 )}
-
                                         </tr>
                                     ))}
                                 </tbody>

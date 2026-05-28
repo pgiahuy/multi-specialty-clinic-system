@@ -23,16 +23,28 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Repository
 @Transactional
-public class LabTestRepositoryImpl extends BaseRepositoryImpl<LabTests> implements LabTestRepository{
+public class LabTestRepositoryImpl extends BaseRepositoryImpl<LabTests> implements LabTestRepository {
+
     @Autowired
     private LocalSessionFactoryBean factory;
 
     @Override
     public List<LabTests> getLabTests(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<LabTests> q = session.createNamedQuery("LabTests.findAll", LabTests.class);
+        Query<LabTests> q;
+
+        
+        if (params != null && params.containsKey("testName") && !params.get("testName").isEmpty()) {
+            
+            q = session.createQuery("FROM LabTests l WHERE l.testName LIKE :testName", LabTests.class);
+            q.setParameter("testName", "%" + params.get("testName") + "%");
+        } else {
+            
+            q = session.createNamedQuery("LabTests.findAll", LabTests.class);
+        }
 
         if (params != null) {
+
             int pageSize = Integer.parseInt(params.get("pageSize"));
             int page = Integer.parseInt(params.getOrDefault("page", "1"));
             int start = (page - 1) * pageSize;
@@ -66,4 +78,21 @@ public class LabTestRepositoryImpl extends BaseRepositoryImpl<LabTests> implemen
             session.remove(test);
         }
     }
+    
+    @Override
+    public Long countLabTests(Map<String, String> params) {
+    Session session = this.factory.getObject().getCurrentSession();
+    Query<Long> q;
+    
+   
+    if (params != null && params.containsKey("testName") && !params.get("testName").isEmpty()) {
+        q = session.createQuery("SELECT COUNT(l) FROM LabTests l WHERE l.testName LIKE :testName", Long.class);
+        q.setParameter("testName", "%" + params.get("testName") + "%");
+    } else {
+        
+        q = session.createQuery("SELECT COUNT(l) FROM LabTests l", Long.class);
+    }
+    
+    return q.getSingleResult();
+}
 }

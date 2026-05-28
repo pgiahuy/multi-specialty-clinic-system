@@ -44,9 +44,14 @@ public class MedicalRecordRepositoryImpl extends BaseRepositoryImpl<MedicalRecor
     }
 
     @Override
-    public MedicalRecord addMedicalRecord(MedicalRecord m) {
+    public MedicalRecord addorUpdateMedicalRecord(MedicalRecord m) {
         Session session = this.factory.getObject().getCurrentSession();
-        session.persist(m);
+        if (m.getId()==null) {
+            session.persist(m);
+        }
+        else {
+            session.merge(m);
+        }
         return m;
     }
 
@@ -75,5 +80,14 @@ public class MedicalRecordRepositoryImpl extends BaseRepositoryImpl<MedicalRecor
         Query<MedicalRecord> q = session.createQuery("SELECT m FROM MedicalRecord m WHERE m.appointmentId.patientId.id = :patientId", MedicalRecord.class);
         q.setParameter("patientId", patientId);
         return q.getResultList();
+    }
+
+    @Override
+    public MedicalRecord getMedicalRecordByAppointmentId(Long appointmentId) {
+        Session session = this.factory.getObject().getCurrentSession();
+        Query<MedicalRecord> query = session.createQuery("SELECT m FROM MedicalRecord m WHERE m.appointmentId.id = :appointmentId", MedicalRecord.class);
+        query.setParameter("appointmentId", appointmentId);
+        
+        return query.getSingleResult();
     }
 }

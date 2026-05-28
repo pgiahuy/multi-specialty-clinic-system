@@ -16,6 +16,7 @@ public interface AppointmentRepository extends BaseRepository<Appointment>{
     
     List<Appointment> getAppointments(Map<String,String> params);
     Appointment getAppointmentById(Long id);
+   
     void addOrUpdateAppointment(Appointment a);
     boolean isPatientAlreadyBookedInSchedule(Long patientId, Long scheduleId);
 }

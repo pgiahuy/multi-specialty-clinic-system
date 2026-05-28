@@ -4,6 +4,7 @@
  */
 package com.hb.controllers;
 
+import com.hb.dto.request.MedicalRecordCreateRequest;
 import com.hb.service.MedicalRecordService;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -48,8 +50,8 @@ public class MedicalRecord {
     }
 
     @PostMapping("")
-    public String create(@RequestParam Map<String, String> params) {
-        medicalRecordService.addMedicalRecord(params);
+    public String create(@RequestBody MedicalRecordCreateRequest req) {
+        medicalRecordService.addOrUpdateMedicalRecord(req);
         return "redirect:/admin/medical-records";
     }
 
