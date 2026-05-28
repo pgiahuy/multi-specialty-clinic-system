@@ -61,7 +61,7 @@ public class MedicineBatchServiceImpl implements MedicineBatchService {
 
     @Override
     public long countMedicineBatchs(Map<String, String> params) {
-        return medicineBatchRepo.count(params, MedicineBatch.class);
+        return medicineBatchRepo.countMedicineBatchs(params);
     }
 
 }

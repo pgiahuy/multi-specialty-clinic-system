@@ -92,6 +92,10 @@
 
                     </td>
                 </tr>
+                <tr th:if="${#lists.isEmpty(areas)}">
+                    <td colspan="3" class="text-center text-muted p-4">Không tìm thấy khu vực nào trong hệ thống.
+                    </td>
+                </tr>
             </tbody>
         </table>
     </div>

@@ -86,4 +86,21 @@ public class MedicineRepositoryImpl extends BaseRepositoryImpl<Medicine> impleme
             throw new RuntimeException("Medicine not found!");
         }
     }
+
+    @Override
+    public long countMedicines(Map<String, String> params) {
+        Session session = this.factory.getObject().getCurrentSession();
+
+        StringBuilder hql = new StringBuilder("SELECT COUNT(m) FROM Medicine m WHERE 1=1");
+        if (params != null && hasText(params.get("kw"))) {
+            hql.append(" AND (m.name LIKE :kw OR m.code LIKE :kw)");
+        }
+
+        Query<Long> q = session.createQuery(hql.toString(), Long.class);
+        if (params != null && hasText(params.get("kw"))) {
+            q.setParameter("kw", "%" + params.get("kw").trim() + "%");
+        }
+
+        return q.getSingleResult();
+    }
 }

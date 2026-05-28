@@ -17,6 +17,17 @@
 
     <div class="content">
 
+        <div class="mb-3">
+            <form class="d-flex" method="get" th:action="@{/admin/appointments}">
+                <input type="text" name="kw" th:value="${kw}" class="form-control me-2"
+                    placeholder="Tìm theo tên bệnh nhân hoặc bác sĩ..." />
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-outline-primary">Tìm kiếm</button>
+                    <a th:href="@{/admin/appointments}" class="btn btn-outline-secondary ms-2">Đặt lại</a>
+                </div>
+            </form>
+        </div>
+
         <table class="table table-bordered table-hover align-middle">
             <thead class="table-primary">
                 <tr>
@@ -45,13 +56,18 @@
 
                     </td>
                 </tr>
+                <tr th:if="${#lists.isEmpty(appointments)}">
+                    <td colspan="7" class="text-center text-muted p-4">Không tìm thấy lịch hẹn nào trong hệ thống.
+                    </td>
             </tbody>
         </table>
 
     </div>
 
     <div class="d-flex justify-content-center mt-4">
-        <div th:replace="~{fragments :: pagination('/admin/appointments', ${totalPages}, ${currentPage})}"></div>
+        <div
+            th:replace="~{fragments :: pagination(${kw} != null ? '/admin/appointments?kw=' + ${kw} : '/admin/appointments', ${totalPages}, ${currentPage})}">
+        </div>
     </div>
 
     <div th:replace="base :: footer">
