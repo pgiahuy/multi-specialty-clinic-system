@@ -1,48 +1,66 @@
-
-
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
-    <head>
-        <title>Quản lý xét nghiệm</title>
 
+<head>
+    <title>Quản lý xét nghiệm</title>
     <th:block th:replace="base :: css"></th:block>
     <th:block th:replace="base :: js"></th:block>
-    <script th:src="@{/js/test.js}"></script>
+    <script th:inline="javascript">
+        window.__OPEN_LABTEST_FORM__ = false;
+    </script>
+    <script th:src="@{/js/admin-crud.js}"></script>
 </head>
 
 <body>
 
     <div th:replace="base :: header('QUẢN LÝ XÉT NGHIỆM')"></div>
-
     <div th:replace="base :: sidebar"></div>
 
-    <div class="content">
+    <div class="content mt-6">
 
+        <div class="d-flex justify-content-end mb-3">
+            <button type="button" id="toggleLabTestFormBtn" class="btn btn-success"
+                onclick="toggleCrudForm('labTestForm', 'toggleLabTestFormBtn')">
+                <i class="bi bi-plus-circle me-2"></i>Thêm xét nghiệm
+            </button>
+        </div>
 
-<!--        <form method="post" th:action="@{/admin/doctors}" enctype="multipart/form-data">
+        <form id="labTestForm" class="card p-4 mb-4 d-none" method="post" th:action="@{/admin/lab-tests}">
+            <h4 id="formTitle" class="mb-3 text-uppercase fw-bold text-primary">Thêm / Cập nhật xét nghiệm</h4>
+            <input type="hidden" name="id" id="labTestId" />
 
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" name="username" class="form-control" id="username">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Loại xét nghiệm:</label>
+                    <input type="text" name="test_name" class="form-control" id="testName" required />
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Đơn vị:</label>
+                    <input type="text" name="unit" class="form-control" id="unit" required />
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Bình thường:</label>
+                    <input type="text" name="normal_range" class="form-control" id="normalRange" required />
+                </div>
             </div>
 
-            <div class="form-group">
-                <label for="email">Email address:</label>
-                <input type="email" name="email" class="form-control" id="email">
+            <div class="d-flex gap-2 justify-content-end">
+                <button type="button" class="btn btn-secondary"
+                    onclick="toggleCrudForm('labTestForm', 'toggleLabTestFormBtn')">Hủy</button>
+                <button type="submit" id="submitFormBtn" class="btn btn-primary">Lưu thông tin</button>
             </div>
-
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" name="password" class="form-control" id="password">
+        </form>
+        <form class="row g-2 mb-3" method="get" action="" id="labTestFilterForm">
+            <div class="col-md-8">
+                <input type="text" name="kw" class="form-control"
+                    placeholder="Tìm loại xét nghiệm, đơn vị hoặc khoảng tham chiếu"
+                    th:value="${param.kw != null ? param.kw : ''}" />
             </div>
-
-            <div class="form-group">
-                <label for="avatar">Avatar</label>
-                <input type="file" name="avatar" class="form-control mb-2">
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-outline-primary">Tìm kiếm</button>
+                <a th:href="@{/admin/lab-tests}" class="btn btn-outline-secondary ms-2">Đặt lại</a>
             </div>
-
-            <button type="submit" class="btn btn-primary mb-3">Submit</button>
-        </form>-->
+        </form>
 
 
 
@@ -52,35 +70,54 @@
                     <th>Loại xét nghiệm</th>
                     <th>Đơn vị</th>
                     <th>Bình thường</th>
-                    <th></th>
+                    <th class="text-center">Hành động</th>
                 </tr>
             </thead>
 
             <tbody>
-                <tr th:each="t : ${labTests}">
-                    <td th:text="${t.testName}"></td>
-                    <td th:text="${t.unit}"></td>
-                    <td th:text="${t.normalRange}"></td>
-                    <td>
-                        <button class="btn btn-warning btn-sm">Sửa</button>
-                        <button class="btn btn-danger btn-sm"
-                                th:onclick="'deleteTests(' + ${t.id} + ')'">
+                <tr th:each="t : ${labTests}" th:id="'labtest-row-' + ${t.id}">
+                    <td th:text="${t.testName}" th:id="'lt-name-' + ${t.id}"></td>
+                    <td th:text="${t.unit}" th:id="'lt-unit-' + ${t.id}"></td>
+                    <td th:text="${t.normalRange}" th:id="'lt-range-' + ${t.id}"></td>
+                    <td class="text-center">
+                        <button class="btn btn-warning btn-sm me-1" type="button"
+                            th:onclick="|editLabTest(${t.id})|">Sửa</button>
+                        <button class="btn btn-danger btn-sm" th:data-id="${t.id}" th:data-url="@{/admin/lab-tests/}"
+                            th:data-row-prefix="'labtest-row-'"
+                            onclick="deleteCrudItem(this.dataset.id, this.dataset.url, this.dataset.rowPrefix)">
                             Xóa
                         </button>
                     </td>
                 </tr>
+                <tr th:if="${#lists.isEmpty(labTests)}">
+                    <td colspan="4" class="text-center text-muted p-4">Không tìm thấy xét nghiệm nào trong hệ thống.
+                    </td>
             </tbody>
         </table>
-
     </div>
 
     <div class="d-flex justify-content-center mt-4">
         <div th:replace="~{fragments :: pagination('/admin/lab-tests', ${totalPages}, ${currentPage})}"></div>
     </div>
 
-    <div th:replace="base :: footer">
+    <div th:replace="base :: footer"></div>
 
-    </div>
-    
+    <script th:inline="javascript">
+        initFormState(window.__OPEN_LABTEST_FORM__, 'labTestForm', 'toggleLabTestFormBtn');
+
+        function editLabTest(id) {
+            document.getElementById('labTestId').value = id;
+            document.getElementById('testName').value = document.getElementById('lt-name-' + id).innerText.trim();
+            document.getElementById('unit').value = document.getElementById('lt-unit-' + id).innerText.trim();
+            document.getElementById('normalRange').value = document.getElementById('lt-range-' + id).innerText.trim();
+            document.getElementById('formTitle').innerText = 'Cập nhật xét nghiệm (ID: ' + id + ')';
+            document.getElementById('submitFormBtn').innerText = 'Lưu thay đổi';
+            document.getElementById('labTestForm').classList.remove('d-none');
+            document.getElementById('toggleLabTestFormBtn').className = 'btn btn-secondary';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+
 </body>
+
 </html>

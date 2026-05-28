@@ -13,6 +13,7 @@ import java.time.LocalTime;
  */
 public class ShiftResponse {
     private Long id;
+    private String sessionCode;
     
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
     private LocalTime startTime;
@@ -26,8 +27,9 @@ public class ShiftResponse {
     public ShiftResponse() {
     }
 
-    public ShiftResponse(Long id, LocalTime startTime, LocalTime endTime, Integer maxPatients, Integer minPatients, String session) {
+    public ShiftResponse(Long id, String sessionCode, LocalTime startTime, LocalTime endTime, Integer maxPatients, Integer minPatients, String session) {
         this.id = id;
+        this.sessionCode = sessionCode;
         this.startTime = startTime;
         this.endTime = endTime;
         this.maxPatients = maxPatients;
@@ -47,6 +49,20 @@ public class ShiftResponse {
      */
     public void setId(Long id) {
         this.id = id;
+    }
+
+    /**
+     * @return the sessionCode
+     */
+    public String getSessionCode() {
+        return sessionCode;
+    }
+
+    /**
+     * @param sessionCode the sessionCode to set
+     */
+    public void setSessionCode(String sessionCode) {
+        this.sessionCode = sessionCode;
     }
 
     /**

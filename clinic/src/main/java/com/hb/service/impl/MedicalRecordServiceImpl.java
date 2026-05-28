@@ -75,7 +75,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 
     @Override
     public long countMedicalRecords(Map<String, String> params) {
-        return medicalRecordRepo.count(params, MedicalRecord.class);
+        return medicalRecordRepo.countMedicalRecords(params);
     }
 
     @Override

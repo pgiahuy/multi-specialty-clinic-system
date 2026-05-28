@@ -5,6 +5,7 @@
 package com.hb.pojo;
 
 import jakarta.persistence.Basic;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -41,26 +42,22 @@ import java.util.Date;
     @NamedQuery(name = "User.findByCreatedAt", query = "SELECT u FROM User u WHERE u.createdAt = :createdAt"),
     @NamedQuery(name = "User.findBySecureUrl", query = "SELECT u FROM User u WHERE u.secureUrl = :secureUrl"),
     @NamedQuery(name = "User.findByPublicId", query = "SELECT u FROM User u WHERE u.publicId = :publicId"),
-    @NamedQuery(name = "User.findByIsActive", query = "SELECT u FROM User u WHERE u.isActive = :isActive")})
+    @NamedQuery(name = "User.findByIsActive", query = "SELECT u FROM User u WHERE u.isActive = :isActive"),
+    @NamedQuery(name = "User.findByName", query = "SELECT u FROM User u WHERE u.name = :name")})
 public class User implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "id")
-    private Long id;
     // @Pattern(regexp="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", message="Invalid email")//if the field contains email address consider using this annotation to enforce field validation
     @Size(max = 100)
     @Column(name = "email")
-    private String email;
+private String email;
     @Basic(optional = false)
-    @NotNull
+    @NotNull()
     @Size(min = 1, max = 255)
     @Column(name = "password")
     private String password;
+    // @Pattern(regexp="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", message="Invalid email")//if the field contains email address consider using this annotation to enforce field validation
     @Basic(optional = false)
-    @NotNull
+    @NotNull()
     @Size(min = 1, max = 100)
     @Column(name = "username")
     private String username;
@@ -76,16 +73,37 @@ public class User implements Serializable {
     @Size(max = 255)
     @Column(name = "public_id")
     private String publicId;
-    @Lob
+    @Lob()
     @Size(max = 65535)
     @Column(name = "fcm_token")
     private String fcmToken;
     @Column(name = "is_active")
     private Boolean isActive;
+    @Size(max = 255)
+    @Column(name = "name")
+    private String name;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
+    private Collection<RefreshToken> refreshTokenCollection;
+    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id")
+    private Long id;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "senderId")
+    private Collection<ChatMessage> chatMessageCollection;
     @OneToOne(mappedBy = "userId")
     private Doctor doctor;
     @OneToMany(mappedBy = "userId")
+    private Collection<Notification> notificationCollection;
+    @OneToMany(mappedBy = "userId")
     private Collection<Patient> patientCollection;
+    @OneToMany(mappedBy = "userId")
+    private Collection<SocialAccount> socialAccountCollection;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "patientId")
+    private Collection<Conversation> conversationCollection;
+    @OneToMany(mappedBy = "receiverId")
+    private Collection<Conversation> conversationCollection1;
 
     public User() {
     }
@@ -108,37 +126,6 @@ public class User implements Serializable {
         this.id = id;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
@@ -180,6 +167,15 @@ public class User implements Serializable {
         this.isActive = isActive;
     }
 
+
+    public Collection<ChatMessage> getChatMessageCollection() {
+        return chatMessageCollection;
+    }
+
+    public void setChatMessageCollection(Collection<ChatMessage> chatMessageCollection) {
+        this.chatMessageCollection = chatMessageCollection;
+    }
+
     public Doctor getDoctor() {
         return doctor;
     }
@@ -188,12 +184,44 @@ public class User implements Serializable {
         this.doctor = doctor;
     }
 
+    public Collection<Notification> getNotificationCollection() {
+        return notificationCollection;
+    }
+
+    public void setNotificationCollection(Collection<Notification> notificationCollection) {
+        this.notificationCollection = notificationCollection;
+    }
+
     public Collection<Patient> getPatientCollection() {
         return patientCollection;
     }
 
     public void setPatientCollection(Collection<Patient> patientCollection) {
         this.patientCollection = patientCollection;
+    }
+
+    public Collection<SocialAccount> getSocialAccountCollection() {
+        return socialAccountCollection;
+    }
+
+    public void setSocialAccountCollection(Collection<SocialAccount> socialAccountCollection) {
+        this.socialAccountCollection = socialAccountCollection;
+    }
+
+    public Collection<Conversation> getConversationCollection() {
+        return conversationCollection;
+    }
+
+    public void setConversationCollection(Collection<Conversation> conversationCollection) {
+        this.conversationCollection = conversationCollection;
+    }
+
+    public Collection<Conversation> getConversationCollection1() {
+        return conversationCollection1;
+    }
+
+    public void setConversationCollection1(Collection<Conversation> conversationCollection1) {
+        this.conversationCollection1 = conversationCollection1;
     }
 
     @Override
@@ -219,6 +247,55 @@ public class User implements Serializable {
     @Override
     public String toString() {
         return "com.hb.pojo.User[ id=" + id + " ]";
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Collection<RefreshToken> getRefreshTokenCollection() {
+        return refreshTokenCollection;
+    }
+
+    public void setRefreshTokenCollection(Collection<RefreshToken> refreshTokenCollection) {
+        this.refreshTokenCollection = refreshTokenCollection;
     }
     
 }

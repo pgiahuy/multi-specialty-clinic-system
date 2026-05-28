@@ -1,20 +1,27 @@
-import { Button, Card, Form, Alert, Container, Image } from "react-bootstrap";
+import { Button, Card, Form, Alert, Container } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { useContext, useState } from 'react';
 import { jwtDecode } from "jwt-decode";
-import cookies from 'react-cookies'
-
+import cookies from "react-cookies";
 import Apis, { authApis, endpoint } from "../../configs/Apis";
 
 import MySpinner from '../../components/MySpinner';
-import { requestForToken } from "../../configs/firebaseConfig";
+
 import { formCardStyle } from "./UserStyle";
 import { MyUserContext } from "../../configs/Contexts";
+import GoogleLoginButton from "./GoogleLoginButton";
+import FacebookLoginButton from "./FacebookLoginButton";
+import { requestForToken } from "../../configs/firebaseConfig";
 
 const Login = () => {
+
+
+
     const [user, setUser] = useState({});
     const [err, setErr] = useState("");
+
     const [loading, setLoading] = useState(false);
+
     const nav = useNavigate();
     const [, dispatch] = useContext(MyUserContext);
 
@@ -50,7 +57,7 @@ const Login = () => {
                 const decoded = jwtDecode(res.data.token);
                 const role = decoded.role;
                 cookies.save("token", res.data.token);
-                
+
 
 
                 let u = await authApis().get(endpoint['current-user']);
@@ -81,6 +88,8 @@ const Login = () => {
                 setLoading(false);
             }
         }
+
+
     };
 
     return (
@@ -119,21 +128,17 @@ const Login = () => {
                         <Button
                             variant="primary"
                             type="submit"
-                            className="w-100 rounded-4 border-0 header-cta header-cta-primary" style={formCardStyle.button}
+                            className="w-100 rounded-4 border-0" style={formCardStyle.button}
                             disabled={loading}
                         >
                             {loading ? <MySpinner /> : 'Đăng nhập'}
                         </Button>
-                        <Button
-                            variant="outline-primary"
-                            type="submit"
-                            className="w-100 mt-3" style={formCardStyle.button}
-                            disabled={loading}
-                        ><Image src="/gg.png" alt="Google" style={{ width: 20, height: 20, marginRight: 8 }} />    
-                            {loading ? <MySpinner /> : 'Đăng nhập bằng tài khoản Google'}
-                        </Button>
+                        <div className="d-flex justify-content-center gap-2 mt-3 position-relative">
+                            <FacebookLoginButton />
+                            <GoogleLoginButton loading={loading} setLoading={setLoading} setErr={setErr} />
+                        </div>
                     </Form>
-                    <div className="login-footer text-center mt-4">
+                    <div className="login-footer text-center mt-5">
                         Chưa có tài khoản? <Link to="/register">Đăng ký ngay</Link>
                     </div>
                 </Card.Body>

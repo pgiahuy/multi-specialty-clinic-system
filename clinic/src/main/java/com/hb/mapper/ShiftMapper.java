@@ -20,6 +20,13 @@ public interface ShiftMapper {
     
     ShiftMapper INSTANCE = Mappers.getMapper(ShiftMapper.class);
 
+    /**
+     * Map a shift entity to its response model.
+     *
+     * @param shifts the source entity
+     * @return the mapped response
+     */
+    @Mapping(target = "sessionCode", expression = "java(shifts.getSession() != null ? shifts.getSession().name() : null)")
     @Mapping(source = "session.label", target = "session")
     ShiftResponse toResponse(Shifts shifts);
     

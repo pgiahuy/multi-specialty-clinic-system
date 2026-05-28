@@ -6,6 +6,7 @@ package com.hb.repository.impl;
 
 import com.hb.pojo.Patient;
 import com.hb.pojo.User;
+import com.hb.repository.SocialAccountRepository;
 import com.hb.repository.UserRepository;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,12 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<User> implements User
 
     @Autowired
     private LocalSessionFactoryBean factory;
+
+    @Autowired
+    private SocialAccountRepository socialAccountRepo;
+
+    @Autowired
+    private UserRepository userRepo;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
@@ -58,9 +65,9 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<User> implements User
 
         return q.getResultList();
     }
-    
+
     @Override
-    public long count(Map<String, String> params,Class<User> clazz) {
+    public long count(Map<String, String> params, Class<User> clazz) {
         Session session = this.factory.getObject().getCurrentSession();
 
         StringBuilder hql = new StringBuilder("SELECT COUNT(u) FROM User u WHERE 1=1");
@@ -138,9 +145,11 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<User> implements User
     @Override
     public User getUserByEmail(String email) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<User> q = session.createNamedQuery("User.findByEmail", User.class);
-        q.setParameter("email", email);
-        return q.getSingleResult();
+        Query<User> query = session.createQuery("SELECT u FROM User u WHERE u.email = :email", User.class);
+        query.setParameter("email", email);
+
+        List<User> users = query.getResultList();
+        return users.isEmpty() ? null : users.get(0);
     }
 
     @Override
@@ -159,6 +168,23 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<User> implements User
         q.setParameter("email", email);
 
         return q.uniqueResultOptional().orElse(null);
+    }
+
+    @Override
+    public List<User> getActiveUsers(String kw) {
+        Session session = this.factory.getObject().getCurrentSession();
+
+        String hql = "FROM User u WHERE u.isActive = true "
+                + "AND NOT EXISTS (FROM Doctor d WHERE d.userId = u) "
+                + "AND NOT EXISTS (FROM Patient p WHERE p.userId = u) "
+                + "AND (:kw IS NULL OR :kw = '' OR u.username LIKE :kw OR u.name LIKE :kw)";
+
+        Query<User> q = session.createQuery(hql, User.class);
+
+        String searchKw = (kw != null && !kw.isEmpty()) ? "%" + kw + "%" : null;
+        q.setParameter("kw", searchKw);
+
+        return q.getResultList();
     }
 
 }

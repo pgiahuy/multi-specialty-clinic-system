@@ -14,6 +14,7 @@ import java.util.Map;
  */
 public interface UserRepository extends BaseRepository<User>{
     List<User> getUsers(Map<String, String> params);
+    List<User> getActiveUsers(String kw);
     User getUserByUsername(String username);
     User getUserById(Long id);
     User getUserByEmail(String email);

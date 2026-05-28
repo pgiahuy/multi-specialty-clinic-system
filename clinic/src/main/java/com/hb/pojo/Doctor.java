@@ -16,6 +16,7 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
@@ -37,12 +38,6 @@ import java.util.Collection;
     @NamedQuery(name = "Doctor.findByRating", query = "SELECT d FROM Doctor d WHERE d.rating = :rating")})
 public class Doctor implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "id")
-    private Long id;
     @Size(max = 255)
     @Column(name = "full_name")
     private String fullName;
@@ -55,6 +50,16 @@ public class Doctor implements Serializable {
     private String gender;
     @Column(name = "is_active")
     private Boolean isActive;
+    @Size(max = 12)
+    @Column(name = "cccd")
+    private String cccd;
+
+    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id")
+    private Long id;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "rating")
     private Float rating;
@@ -63,11 +68,13 @@ public class Doctor implements Serializable {
         @JoinColumn(name = "specialty_id", referencedColumnName = "id")})
     @ManyToMany
     private Collection<Specialty> specialtyCollection;
+    @OneToOne(mappedBy = "idHod")
+    private Specialty specialty;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @OneToOne
     private User userId;
-    @OneToOne(mappedBy = "idHod")
-    private Specialty specialty;
+    @OneToMany(mappedBy = "doctorId")
+    private Collection<Schedules> schedulesCollection;
 
     public Doctor() {
     }
@@ -92,21 +99,6 @@ public class Doctor implements Serializable {
         this.fullName = fullName;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
 
     public Boolean getIsActive() {
         return isActive;
@@ -132,6 +124,14 @@ public class Doctor implements Serializable {
         this.specialtyCollection = specialtyCollection;
     }
 
+    public Specialty getSpecialty() {
+        return specialty;
+    }
+
+    public void setSpecialty(Specialty specialty) {
+        this.specialty = specialty;
+    }
+
     public User getUserId() {
         return userId;
     }
@@ -140,12 +140,12 @@ public class Doctor implements Serializable {
         this.userId = userId;
     }
 
-    public Specialty getSpecialty() {
-        return specialty;
+    public Collection<Schedules> getSchedulesCollection() {
+        return schedulesCollection;
     }
 
-    public void setSpecialty(Specialty specialty) {
-        this.specialty = specialty;
+    public void setSchedulesCollection(Collection<Schedules> schedulesCollection) {
+        this.schedulesCollection = schedulesCollection;
     }
 
     @Override
@@ -171,6 +171,31 @@ public class Doctor implements Serializable {
     @Override
     public String toString() {
         return "com.hb.pojo.Doctor[ id=" + id + " ]";
+    }
+
+ 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getCccd() {
+        return cccd;
+    }
+
+    public void setCccd(String cccd) {
+        this.cccd = cccd;
     }
     
 }

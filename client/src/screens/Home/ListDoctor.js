@@ -85,7 +85,7 @@ const ListDoctor = () => {
                                                         to={`/patient/booking?doctorId=${doc.id}`}
 
 
-                                                        className="rounded-3 border-0 header-cta header-cta-primary"
+                                                        className="rounded-3 border-0"
                                                     >
                                                         Đặt lịch khám
                                                     </Button>

@@ -5,10 +5,12 @@ const MySpinner = () => {
         <Spinner 
             as="span" 
             animation="border" 
-            size="sm" 
+            size="lg" 
             role="status" 
             aria-hidden="true"
             className="me-2"
+            variant="info"
+            
         />
     );
 };

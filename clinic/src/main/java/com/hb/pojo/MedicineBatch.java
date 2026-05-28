@@ -14,6 +14,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
@@ -21,6 +22,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.Date;
 
 /**
@@ -52,16 +54,20 @@ public class MedicineBatch implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "expiry_date")
+    @Temporal(TemporalType.DATE)
     private LocalDate expiryDate;
     @Basic(optional = false)
     @NotNull
     @Column(name = "quantity")
     private int quantity;
     @Column(name = "import_date")
+    @Temporal(TemporalType.DATE)
     private LocalDate importDate;
     @JoinColumn(name = "medicine_id", referencedColumnName = "id")
     @ManyToOne
     private Medicine medicineId;
+    @OneToMany(mappedBy = "batchId")
+    private Collection<Inventorylog> inventorylogCollection;
 
     public MedicineBatch() {
     }
@@ -123,6 +129,14 @@ public class MedicineBatch implements Serializable {
 
     public void setMedicineId(Medicine medicineId) {
         this.medicineId = medicineId;
+    }
+
+    public Collection<Inventorylog> getInventorylogCollection() {
+        return inventorylogCollection;
+    }
+
+    public void setInventorylogCollection(Collection<Inventorylog> inventorylogCollection) {
+        this.inventorylogCollection = inventorylogCollection;
     }
 
     @Override
