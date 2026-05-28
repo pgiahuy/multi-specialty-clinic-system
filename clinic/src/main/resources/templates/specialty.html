@@ -120,6 +120,9 @@
                         </button>
                     </td>
                 </tr>
+                <tr th:if="${#lists.isEmpty(specialties)}">
+                    <td colspan="5" class="text-center text-muted p-4">Không tìm thấy chuyên khoa nào trong hệ thống.
+                    </td>
             </tbody>
         </table>
     </div>

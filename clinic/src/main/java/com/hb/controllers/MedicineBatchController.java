@@ -44,6 +44,7 @@ public class MedicineBatchController {
         int pageSize = this.env.getProperty("admin.page_size", Integer.class);
         params.put("pageSize", String.valueOf(pageSize));
         model.addAttribute("medicineBatchs", this.medicineBatchService.getMedicineBatchs(params));
+        model.addAttribute("kw", params.get("kw"));
         MedicineBatchForm medicineBatchForm = new MedicineBatchForm();
         medicineBatchForm.setMedicine(new Medicine());
         model.addAttribute("medicineBatchForm", medicineBatchForm);
