@@ -135,8 +135,14 @@
 
         const specialtyDoctorSearchUrl = /*[[@{/admin/specialties/search-doctors}]]*/ '/admin/specialties/search-doctors';
 
-        async function loadDoctors(kw = '') {
-            const response = await fetch(specialtyDoctorSearchUrl + '?kw=' + encodeURIComponent(kw));
+        async function loadDoctors(kw = '', specialtyId = '') {
+            const url = new URL(specialtyDoctorSearchUrl, window.location.origin);
+            if (kw)
+                url.searchParams.set('kw', kw);
+            if (specialtyId)
+                url.searchParams.set('specialtyId', specialtyId);
+
+            const response = await fetch(url.toString());
             const items = await response.json();
             const doctorSelect = document.getElementById('hodId');
             if (!doctorSelect)
@@ -178,13 +184,15 @@
                     }
                     hodSelect.value = hodId;
                     const doctorSearchInput = document.getElementById('doctorSearchInput');
+                    const specialtyIdInput = document.getElementById('specialtyId');
                     if (doctorSearchInput) {
                         doctorSearchInput.value = hodNameHidden && hodNameHidden.value ? hodNameHidden.value : '';
-                        loadDoctors(doctorSearchInput.value);
+                        loadDoctors(doctorSearchInput.value, specialtyIdInput ? specialtyIdInput.value : '');
                     }
                 } else {
                     hodSelect.value = '';
-                    loadDoctors('');
+                    const specialtyIdInput = document.getElementById('specialtyId');
+                    loadDoctors('', specialtyIdInput ? specialtyIdInput.value : '');
                 }
             }
 
@@ -201,20 +209,26 @@
         let debounceTimer;
         document.getElementById('doctorSearchInput')?.addEventListener('input', function (e) {
             const searchTerm = e.target.value;
+            const specialtyIdInput = document.getElementById('specialtyId');
 
             clearTimeout(debounceTimer);
 
             debounceTimer = setTimeout(() => {
-                loadDoctors(searchTerm);
+                loadDoctors(searchTerm, specialtyIdInput ? specialtyIdInput.value : '');
             }, 500);
         });
 
         document.getElementById('clearDoctorSearch')?.addEventListener('click', function () {
             const inp = document.getElementById('doctorSearchInput');
+            const specialtyIdInput = document.getElementById('specialtyId');
             if (inp)
                 inp.value = '';
-            loadDoctors('');
+            loadDoctors('', specialtyIdInput ? specialtyIdInput.value : '');
         });
+
+        const specialtyIdInput = document.getElementById('specialtyId');
+        if (specialtyIdInput)
+            loadDoctors('', specialtyIdInput.value);
     </script>
 </body>
 

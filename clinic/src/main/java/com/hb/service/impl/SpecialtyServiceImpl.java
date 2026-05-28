@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.hb.repository.SpecialtyRepository;
 import com.hb.service.SpecialtyService;
+import java.util.Optional;
 
 /**
  *
@@ -58,13 +59,14 @@ public class SpecialtyServiceImpl implements SpecialtyService {
             throw new BadRequestException("Thiếu tên khoa!");
         }
 
-        if (form.getPrice()!= null) {
+        if (form.getPrice() != null) {
             s.setPrice(form.getPrice());
         } else {
             throw new BadRequestException("Thiếu phí khám bệnh!");
         }
 
         if (form.getHodId() != null) {
+            
             Doctor d = doctorRepo.getDoctorById(form.getHodId());
             s.setIdHod(d);
         }
@@ -81,5 +83,7 @@ public class SpecialtyServiceImpl implements SpecialtyService {
     public long countSpecialties(Map<String, String> params) {
         return specialtieRepo.count(params, Specialty.class);
     }
+
+   
 
 }

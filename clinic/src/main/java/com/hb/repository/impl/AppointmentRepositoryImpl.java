@@ -56,7 +56,7 @@ public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> i
                 }
             }
 
-            if (params.containsKey("date")) {
+            if (params.containsKey("date") && !params.get("date").isEmpty()) {
                 hql.append(" AND s.date = :date ");
             }
             
@@ -76,7 +76,7 @@ public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> i
                     q.setParameter("status", AppointmentStatus.PENDING);
                 }
             }
-            if (params.containsKey("date")) {
+            if (params.containsKey("date") && !params.get("date").isEmpty()) {
                 q.setParameter("date", java.sql.Date.valueOf(params.get("date")));
             }
             
@@ -93,6 +93,47 @@ public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> i
         }
 
         return q.getResultList();
+    }
+
+    @Override
+    public long count(Map<String, String> params, Class<Appointment> clazz) {
+        Session session = this.factory.getObject().getCurrentSession();
+
+        StringBuilder hql = new StringBuilder("SELECT COUNT(DISTINCT a.id) FROM Appointment a "
+                + "LEFT JOIN a.patientId p "
+                + "LEFT JOIN a.scheduleId s "
+                + "LEFT JOIN s.doctorId d WHERE 1=1 ");
+
+        if (params != null) {
+            if (params.containsKey("date")) {
+                hql.append(" AND s.date = :date ");
+            }
+            if (params.containsKey("currentUserId") && params.containsKey("currentUserRole")) {
+                String role = params.get("currentUserRole");
+                if ("ROLE_PATIENT".equals(role)) {
+                    hql.append(" AND p.userId.id = :userId ");
+                } else if ("ROLE_DOCTOR".equals(role)) {
+                    hql.append(" AND a.status != :status ");
+                    hql.append(" AND d.userId.id = :userId ");
+                }
+            }
+        }
+
+        Query<Long> q = session.createQuery(hql.toString(), Long.class);
+
+        if (params != null) {
+            if (params.containsKey("date")) {
+                q.setParameter("date", java.sql.Date.valueOf(params.get("date")));
+            }
+            if (params.containsKey("currentUserId")) {
+                q.setParameter("userId", Long.valueOf(params.get("currentUserId")));
+                if ("ROLE_DOCTOR".equals(params.get("currentUserRole"))) {
+                    q.setParameter("status", AppointmentStatus.PENDING);
+                }
+            }
+        }
+
+        return q.getSingleResult();
     }
 
     @Override

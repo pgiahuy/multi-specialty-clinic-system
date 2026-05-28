@@ -25,6 +25,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
 
+
         <div class="d-flex justify-content-end mb-3">
             <button type="button" id="toggleShiftFormBtn" class="btn btn-success"
                 onclick="toggleCrudForm('shiftForm', 'toggleShiftFormBtn')">
@@ -40,26 +41,29 @@
             <div class="row">
                 <div class="col-md-3 mb-3">
                     <label class="form-label fw-bold">Bắt đầu:</label>
-                    <input type="time" th:field="*{startTime}" class="form-control" required />
+                    <input type="time" th:field="*{startTime}" class="form-control" id="startTime" required />
                 </div>
                 <div class="col-md-3 mb-3">
                     <label class="form-label fw-bold">Kết thúc:</label>
-                    <input type="time" th:field="*{endTime}" class="form-control" required />
+                    <input type="time" th:field="*{endTime}" class="form-control" id="endTime" required />
                 </div>
                 <div class="col-md-6 mb-3">
                     <label class="form-label fw-bold">Buổi:</label>
-                    <input type="text" th:field="*{session}" class="form-control" placeholder="Ví dụ: Sáng, Chiều"
-                        required />
+                    <select th:field="*{session}" class="form-select" id="session" required>
+                        <option value="">-- Chọn buổi --</option>
+                        <option th:each="sessionItem : ${sessions}" th:value="${sessionItem}"
+                            th:text="${sessionItem.label}"></option>
+                    </select>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label class="form-label fw-bold">Bệnh nhân tối thiểu:</label>
-                    <input type="number" th:field="*{minPatients}" class="form-control" required />
+                    <input type="number" th:field="*{minPatients}" class="form-control" id="minPatients" required />
                 </div>
                 <div class="col-md-6 mb-3">
                     <label class="form-label fw-bold">Bệnh nhân tối đa:</label>
-                    <input type="number" th:field="*{maxPatients}" class="form-control" required />
+                    <input type="number" th:field="*{maxPatients}" class="form-control" id="maxPatients" required />
                 </div>
             </div>
 
@@ -69,6 +73,24 @@
                 <button type="submit" id="submitFormBtn" class="btn btn-primary">Lưu thông tin</button>
             </div>
         </form>
+
+        <form class="row g-2 mb-3" method="get" action="" id="shiftFilterForm">
+            <div class="col-md-6">
+                <select name="session" class="form-select">
+                    <option value="">-- Tìm theo buổi --</option>
+                    <option th:each="sessionItem : ${sessions}" th:value="${sessionItem.name()}"
+                        th:text="${sessionItem.label}"
+                        th:selected="${param.session != null && param.session == sessionItem.name()}">
+                    </option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <button type="submit" class="btn btn-outline-primary">Tìm kiếm</button>
+                <a th:href="@{/admin/shifts}" class="btn btn-outline-secondary ms-2">Đặt lại</a>
+            </div>
+        </form>
+
+
 
         <table class="table table-bordered table-hover align-middle shadow-sm">
             <thead class="table-primary text-center">
@@ -90,7 +112,7 @@
                     <td class="text-center" th:text="${s.maxPatients}"></td>
                     <td class="text-center">
                         <button class="btn btn-warning btn-sm"
-                            th:attr="data-id=${s.id}, data-session=${s.session}, data-min=${s.minPatients}, data-max=${s.maxPatients}"
+                            th:attr="data-id=${s.id}, data-session-code=${s.sessionCode}, data-min=${s.minPatients}, data-max=${s.maxPatients}"
                             onclick="editShift(this)">Sửa</button>
                         <button class="btn btn-danger btn-sm"
                             th:onclick="|deleteCrudItem(${s.id}, '/admin/shifts/', 'shift-row-')|">Xóa</button>
@@ -111,12 +133,12 @@
 
         function editShift(button) {
             const id = button.getAttribute('data-id');
-            const session = button.getAttribute('data-session');
+            const session = button.getAttribute('data-session-code');
             const min = button.getAttribute('data-min');
             const max = button.getAttribute('data-max');
 
             document.getElementById('shiftId').value = id;
-            document.getElementById('session').value = session;
+            document.getElementById('session').value = session || '';
             document.getElementById('minPatients').value = min;
             document.getElementById('maxPatients').value = max;
 

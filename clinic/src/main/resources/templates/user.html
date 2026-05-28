@@ -51,30 +51,37 @@
             <input type="hidden" th:field="*{id}" id="userId" />
 
             <div class="row">
-                <div class="col-md-6 mb-3">
+                <div class="col-md-4 mb-3">
                     <label for="username" class="form-label fw-bold">Tên đăng nhập:</label>
                     <input type="text" th:field="*{username}" class="form-control" id="username"
                         placeholder="Nhập tên đăng nhập..." required />
                 </div>
-                <div class="col-md-6 mb-3">
+                <div class="col-md-4 mb-3">
+                    <label for="name" class="form-label fw-bold">Họ tên:</label>
+                    <input type="text" th:field="*{name}" class="form-control" id="name"
+                        placeholder="Nhập họ tên..." />
+                </div>
+                <div class="col-md-4 mb-3">
+                <label for="avatar" class="form-label fw-bold">Ảnh đại diện:</label>
+                <input type="file" name="avatar" class="form-control" id="avatar" accept="image/*" />
+            </div>
+                
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3" id="passwordGroup">
+                <label for="password" class="form-label fw-bold">Mật khẩu:</label>
+                <input type="password" th:field="*{password}" class="form-control" id="password"
+                    placeholder="********" />
+            </div>
+            <div class="col-md-6 mb-3">
                     <label for="email" class="form-label fw-bold">Email:</label>
                     <input type="email" th:field="*{email}" class="form-control" id="email"
                         placeholder="example@gmail.com" required />
                 </div>
             </div>
 
-            <div class="mb-3" id="passwordGroup">
-                <label for="password" class="form-label fw-bold">Mật khẩu:</label>
-                <input type="password" th:field="*{password}" class="form-control" id="password"
-                    placeholder="********" />
-                <div class="form-text">Bắt buộc khi tạo mới, có thể bỏ trống khi cập nhật.</div>
-            </div>
-
-            <div class="mb-4">
-                <label for="avatar" class="form-label fw-bold">Ảnh đại diện:</label>
-                <input type="file" name="avatar" class="form-control" id="avatar" accept="image/*" />
-                <div class="form-text">Để trống nếu giữ nguyên ảnh cũ.</div>
-            </div>
+            
 
             <div class="d-flex gap-2 justify-content-end">
                 <button type="button" class="btn btn-secondary" onclick="resetAndCloseForm()">Hủy</button>
@@ -89,6 +96,7 @@
                 <thead class="table-primary text-center">
                     <tr>
                         <th>Tên tài khoản</th>
+                        <th>Họ tên</th>
                         <th>Email</th>
                         <th>Vai trò</th>
                         <th>Avatar</th>
@@ -98,7 +106,8 @@
 
                 <tbody>
                     <tr th:each="u : ${users}" th:id="'user-row-' + ${u.id}">
-                        <td th:id="'name-' + ${u.id}" th:text="${u.username}"></td>
+                        <td th:id="'name-' + ${u.id}" th:text="${u.username}" th:attr="data-fullname=${u.name}"></td>
+                        <td th:id="'fullname-' + ${u.id}" th:text="${u.name}"></td>
                         <td th:id="'email-' + ${u.id}" th:text="${u.email}"></td>
                         <td th:id="'role-' + ${u.id}" th:text="${u.role}" class="text-center"></td>
                         <td class="text-center">
@@ -110,11 +119,11 @@
                                 onclick="editUser(this)">
                                 <i class="bi bi-pencil-square"></i> Sửa
                             </button>
-                            
+
                             <button class="btn btn-danger btn-sm" th:data-id="${u.id}" th:data-url="@{/admin/users/}"
-                            th:data-row-prefix="'user-row-'"
-                            onclick="deleteCrudItem(this.dataset.id, this.dataset.url, this.dataset.rowPrefix)">
-                            <i class="bi bi-trash-fill"></i>Xóa
+                                th:data-row-prefix="'user-row-'"
+                                onclick="deleteCrudItem(this.dataset.id, this.dataset.url, this.dataset.rowPrefix)">
+                                <i class="bi bi-trash-fill"></i>Xóa
                             </button>
                         </td>
                     </tr>
@@ -161,9 +170,11 @@
             const id = button.getAttribute('data-id');
             const username = document.getElementById('name-' + id)?.innerText.trim() || '';
             const email = document.getElementById('email-' + id)?.innerText.trim() || '';
+            const fullName = document.getElementById('name-' + id)?.getAttribute('data-fullname') || '';
 
             document.getElementById('userId').value = id;
             document.getElementById('username').value = username;
+            document.getElementById('name').value = fullName;
             document.getElementById('email').value = email;
             document.getElementById('password').value = '';
 

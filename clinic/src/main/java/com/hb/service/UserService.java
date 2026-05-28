@@ -19,9 +19,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 
 public interface UserService extends UserDetailsService {
     User getUserByUsername(String username);
+    User getUserById(Long id);
     User getUserByEmail(String email);
     User saveOrUpdateUser(UserCreateRequest urq);
     List<User> getUsers(Map<String,String> params);
+    List<User> getActiveUsers(String kw);
+    
     void deleteUser(Long id);
     User processSocialLogin(GoogleIdToken.Payload payload, String fcmToken);
     User processSocialLoginFacebook(String facebookId, String email, String name);
