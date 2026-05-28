@@ -5,7 +5,7 @@ import Footer from "../../components/Footer";
 import { useContext, useEffect, useState } from "react";
 import { MyUserContext } from "../../configs/Contexts";
 import { useNavigate } from "react-router-dom";
-import { authApis, endpoint } from "../../configs/Apis";
+import { authApis, endpoint, USER_ENDPOINTS } from "../../configs/Apis";
 import { Bullseye, Eye } from "react-bootstrap-icons";
 
 const Payment = () => {
@@ -15,7 +15,7 @@ const Payment = () => {
 
     const loadPatientProfiles = async () => {
         try {
-            const res = await authApis().get(endpoint['patientProfiles']);
+            const res = await authApis().get(USER_ENDPOINTS.PATIENT_PROFILES);
             setPatientProfiles(res.data);
         } catch (err) {
             console.log(err);
@@ -44,25 +44,25 @@ const Payment = () => {
                         <Col>
                             {patientProfiles.length > 0 ? (
                                 patientProfiles.map((profile) => (
-                                    
+
                                     <Row key={profile.id} className="mb-3 align-items-center">
 
-                                        
+
                                         <Col md={11}>
                                             <ProfileCard patient={profile} />
                                         </Col>
 
-                                       
+
                                         <Col md={1} className="text-md-end text-center mt-2 mt-md-0">
                                             <Button
                                                 variant="outline-info"
                                                 size="sm"
                                                 onClick={() => nav(`/patient/payment/${profile.id}`)}
-                                                
+
                                                 title="Xem kết quả"
                                                 className="mb-5 w-100 py-2 rounded-4"
                                             >
-                                               <Eye />
+                                                <Eye />
                                             </Button>
                                         </Col>
 

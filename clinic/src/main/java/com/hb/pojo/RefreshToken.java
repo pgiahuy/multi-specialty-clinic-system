@@ -7,19 +7,18 @@ package com.hb.pojo;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.Date;
+import java.time.Instant;
 
 /**
  *
@@ -41,6 +40,7 @@ public class RefreshToken implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Basic(optional = false)
     @NotNull
@@ -50,13 +50,17 @@ public class RefreshToken implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "expiry_date")
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime expiryDate;
+    private Instant expiryDate;
     @Column(name = "created_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
     @Column(name = "revoked")
     private Boolean revoked;
+    @Size(max = 128)
+    @Column(name = "device_id")
+    private String deviceId;
+    @Size(max = 512)
+    @Column(name = "device_info")
+    private String deviceInfo;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private User userId;
@@ -68,7 +72,7 @@ public class RefreshToken implements Serializable {
         this.id = id;
     }
 
-    public RefreshToken(Long id, String token, LocalDateTime expiryDate) {
+    public RefreshToken(Long id, String token, Instant expiryDate) {
         this.id = id;
         this.token = token;
         this.expiryDate = expiryDate;
@@ -90,19 +94,19 @@ public class RefreshToken implements Serializable {
         this.token = token;
     }
 
-    public LocalDateTime getExpiryDate() {
+    public Instant getExpiryDate() {
         return expiryDate;
     }
 
-    public void setExpiryDate(LocalDateTime expiryDate) {
+    public void setExpiryDate(Instant expiryDate) {
         this.expiryDate = expiryDate;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 
@@ -112,6 +116,22 @@ public class RefreshToken implements Serializable {
 
     public void setRevoked(Boolean revoked) {
         this.revoked = revoked;
+    }
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
+    }
+
+    public String getDeviceInfo() {
+        return deviceInfo;
+    }
+
+    public void setDeviceInfo(String deviceInfo) {
+        this.deviceInfo = deviceInfo;
     }
 
     public User getUserId() {

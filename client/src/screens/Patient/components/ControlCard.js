@@ -1,5 +1,5 @@
 import { Card, Row, Col } from 'react-bootstrap';
-import { CalendarPlus, FileEarmarkMedical, PersonCircle, ClockHistory, Receipt, PersonBadge, Droplet, Clipboard2Pulse, DropletHalf } from 'react-bootstrap-icons';
+import { CalendarPlus, FileEarmarkMedical, ClockHistory, Receipt, PersonBadge, DropletHalf } from 'react-bootstrap-icons';
 import { useNavigate } from 'react-router-dom';
 
 const ControlCard = () => {

@@ -2,7 +2,7 @@ import { Container, Row, Col, Card, Modal, Button } from "react-bootstrap";
 import Header from "../../components/Header";
 import LoginRequiredModal from "../../components/LoginRequiredModal";
 import { useContext, useEffect, useState } from "react";
-import { authApis, endpoint } from "../../configs/Apis";
+import { authApis, CLINIC_ENDPOINTS, endpoint, USER_ENDPOINTS } from "../../configs/Apis";
 import MySpinner from "../../components/MySpinner";
 import MyAlert from "../../components/MyAlert";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -40,7 +40,7 @@ const BookingPage = () => {
 
     const loadBookingHistory = async () => {
         try {
-            const res = await authApis().get(endpoint['appointments']);
+            const res = await authApis().get(CLINIC_ENDPOINTS.APPOINTMENTS);
             setHistory(res.data);
         } catch (err) {
             console.log(err);
@@ -49,7 +49,7 @@ const BookingPage = () => {
 
     const loadPatientProfiles = async () => {
         try {
-            const res = await authApis().get(endpoint['patientProfiles']);
+            const res = await authApis().get(USER_ENDPOINTS.PATIENT_PROFILES);
             setPatientProfiles(res.data);
         } catch (err) {
             console.log(err);
@@ -58,7 +58,7 @@ const BookingPage = () => {
 
     const loadDoctors = async () => {
         try {
-            const res = await authApis().get(endpoint['doctors']);
+            const res = await authApis().get(CLINIC_ENDPOINTS.DOCTORS);
             setDoctors(res.data);
         } catch (err) {
             console.log(err);
@@ -67,7 +67,7 @@ const BookingPage = () => {
 
     const loadSchedules = async () => {
         try {
-            const res = await authApis().get(endpoint['schedules']);
+            const res = await authApis().get(CLINIC_ENDPOINTS.SCHEDULES);
             setSchedules(res.data);
         } catch (err) {
             console.log(err);
@@ -92,7 +92,7 @@ const BookingPage = () => {
 
         try {
             setLoading(true);
-            const res = await authApis().post(endpoint['appointments'], {
+            const res = await authApis().post(CLINIC_ENDPOINTS.APPOINTMENTS, {
                 patientId: bookingData.profile,
                 scheduleId: bookingData.scheduleId,
             });
@@ -163,7 +163,7 @@ const BookingPage = () => {
                     return;
                 }
 
-                const res = await authApis().get(endpoint['schedules'], {
+                const res = await authApis().get(CLINIC_ENDPOINTS.SCHEDULES, {
                     params: {
                         doctorId: bookingData.doctor,
                         date: bookingData.date,
@@ -234,12 +234,12 @@ const BookingPage = () => {
                             <Card className="p-4 shadow-sm mb-4">
                                 <Card.Title className="fw-bold mb-3">Thông tin đặt lịch</Card.Title>
                                 <div><MyAlert
-                                                show={alertData.show}
-                                                heading={alertData.heading}
-                                                message={alertData.message}
-                                                variant={alertData.variant}
-                                                onClose={closeAlert}
-                                            /></div>
+                                    show={alertData.show}
+                                    heading={alertData.heading}
+                                    message={alertData.message}
+                                    variant={alertData.variant}
+                                    onClose={closeAlert}
+                                /></div>
                                 <div className="mb-3">
                                     <label className="form-label">Chọn hồ sơ</label>
                                     <select className="form-select" onChange={(e) => handleFilterChange('profile', e.target.value)}>
@@ -292,7 +292,7 @@ const BookingPage = () => {
                                                                     onClick={() => {
                                                                         if (!isFull) {
                                                                             handleFilterChange('time', timeLabel);
-                                                                            handleFilterChange('scheduleId', schedule.id); 
+                                                                            handleFilterChange('scheduleId', schedule.id);
                                                                         }
                                                                     }}
                                                                     disabled={isFull}
@@ -360,7 +360,7 @@ const BookingPage = () => {
                                             <p className="fw-semibold mb-0">{bookingData.reason || "Chưa nhập"}</p>
                                         </div>
                                         <div className="text-center mt-4">
-                                            
+
                                             {loading === true ? <MySpinner /> : <button className="btn btn-primary w-100 fw-semibold rounded-4 border-0" onClick={registerAppointment}>
                                                 Xác nhận đặt lịch
                                             </button>}

@@ -1,20 +1,18 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, Col, Container, Row } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import Footer from "../../components/Footer";
 import Header from "../../components/Header";
-import { authApis, endpoint } from "../../configs/Apis";
-import { MyUserContext } from "../../configs/Contexts";
+import { authApis, endpoint, PAYMENT_ENDPOINTS } from "../../configs/Apis";
 
 const PaymentDetail = () => {
     const { patientId } = useParams();
-    const [user] = useContext(MyUserContext);
     const [payments, setPayments] = useState([]);
     const nav = useNavigate();
 
     const loadPayments = async () => {
         try {
-            const res = await authApis().get(endpoint['payments'](patientId));
+            const res = await authApis().get(PAYMENT_ENDPOINTS.HISTORY);
             setPayments(res.data);
         } catch (err) {
             console.log(err);
@@ -66,10 +64,10 @@ const PaymentDetail = () => {
 
                                                 <Card.Body className="d-flex flex-column flex-grow-1 px-4 py-4">
                                                     <div className="mb-4">
-                                                        
+
                                                         <div>
                                                             <span className="text-uppercase small text-secondary mb-2">Tổng thanh toán: </span>
-                                                            <span className="fs-5 fw-bold text-primary">{p.totalAmount.toLocaleString('vi-VN') } VNĐ</span>
+                                                            <span className="fs-5 fw-bold text-primary">{p.totalAmount.toLocaleString('vi-VN')} VNĐ</span>
                                                         </div>
                                                     </div>
 

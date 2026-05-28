@@ -1,8 +1,8 @@
-import { Table, Container, Row, Col, Button, Stack } from "react-bootstrap";
+import { Container, Row, Col, Button } from "react-bootstrap";
 import Header from "../../components/Header";
 import { useContext, useEffect, useState } from "react";
 import { MyUserContext } from "../../configs/Contexts";
-import { authApis, endpoint } from "../../configs/Apis";
+import { authApis, endpoint, USER_ENDPOINTS } from "../../configs/Apis";
 import { useNavigate } from "react-router-dom";
 import ProfileCard from "./components/ProfileCard";
 import { Eye } from 'react-bootstrap-icons';
@@ -18,7 +18,7 @@ const TestResults = () => {
 
     const loadPatientProfiles = async () => {
         try {
-            const res = await authApis().get(endpoint['patientProfiles']);
+            const res = await authApis().get(USER_ENDPOINTS.PATIENT_PROFILES);
             setPatientProfiles(res.data);
         } catch (err) {
             console.log(err);
@@ -30,10 +30,9 @@ const TestResults = () => {
         loadPatientProfiles();
     }, []);
 
-    const viewResults = (profile) => {
-        console.log("View test results for:", profile);
-        // TODO: Filter results or navigate with profile ID
-    };
+    // const viewResults = (profile) => {
+    //     console.log("View test results for:", profile);
+    // };
 
     if (!user) {
         nav('/login');
@@ -43,33 +42,33 @@ const TestResults = () => {
         <>
             <div className="d-flex flex-column min-vh-100">
                 <Header />
-            <h3 className="text-center">Lịch sử xét nghiệm</h3>
+                <h3 className="text-center">Lịch sử xét nghiệm</h3>
 
-            <Container className="mt-4">
-                <Row>
-                    <Col>
+                <Container className="mt-4">
+                    <Row>
+                        <Col>
                             {patientProfiles.length > 0 ? (
                                 patientProfiles.map((profile) => (
-                                    
+
                                     <Row key={profile.id} className="mb-3 align-items-center">
 
-                                        
+
                                         <Col md={11}>
                                             <ProfileCard patient={profile} />
                                         </Col>
 
-                                       
+
                                         <Col md={1} className="text-md-end text-center mt-2 mt-md-0">
                                             <Button
-                                            variant="outline-info"
-                                            onClick={() => nav(`/patient/test-results/${profile.id}`)}
-                                            
-                                            title="Xem kết quả"
-                                            className="mb-5 w-100 py-2 rounded-4"
-                                        >
-                                            <Eye />
-                                            
-                                        </Button>
+                                                variant="outline-info"
+                                                onClick={() => nav(`/patient/test-results/${profile.id}`)}
+
+                                                title="Xem kết quả"
+                                                className="mb-5 w-100 py-2 rounded-4"
+                                            >
+                                                <Eye />
+
+                                            </Button>
                                         </Col>
 
                                     </Row>
@@ -80,12 +79,12 @@ const TestResults = () => {
                                 </div>
                             )}
                         </Col>
-                </Row>
+                    </Row>
 
-            </Container>
-            <Footer />
+                </Container>
+                <Footer />
             </div>
-            
+
         </>
     );
 };
