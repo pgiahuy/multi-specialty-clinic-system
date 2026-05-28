@@ -4,7 +4,6 @@
  */
 package com.hb.controllers.api;
 
-import com.hb.dto.request.UserCreateRequest;
 import com.hb.dto.response.NotificationResponse;
 import com.hb.dto.response.UserResponse;
 import com.hb.mapper.NotificationMapper;
@@ -19,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;

@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { authApis, endpoint } from "../../configs/Apis";
+import { authApis, CLINIC_ENDPOINTS, endpoint, USER_ENDPOINTS } from "../../configs/Apis";
 import { exp } from "firebase/firestore/pipelines";
 import { MyUserContext } from "../../configs/Contexts";
 import { Col, Container, Row, Table } from "react-bootstrap";
@@ -27,7 +27,7 @@ const TestResultDetail = () => {
 
     const loadPatient = async () => {
         try {
-            const res = await authApis().get(endpoint['patient-profile'](patientId));
+            const res = await authApis().get(USER_ENDPOINTS.PATIENT_PROFILE_DETAIL(patientId));
             setPatient(res.data);
         } catch (err) {
             console.log(err);
@@ -37,7 +37,7 @@ const TestResultDetail = () => {
 
     const loadAppointments = async () => {
         try {
-            const res = await authApis().get(endpoint['appointments']);
+            const res = await authApis().get(USER_ENDPOINTS.APPOINTMENTS);
             setAppointments(res.data);
         }
         catch (err) {
@@ -49,7 +49,7 @@ const TestResultDetail = () => {
     const loadTestResults = async (appointmentId) => {
         try {
 
-            const res = await authApis().get(endpoint['test-results'](patientId), {
+            const res = await authApis().get(CLINIC_ENDPOINTS.TEST_RESULTS(patientId), {
                 params: {
                     appointmentId: appointmentId
                 }

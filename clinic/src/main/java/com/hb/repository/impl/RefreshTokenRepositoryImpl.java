@@ -4,9 +4,11 @@
  */
 package com.hb.repository.impl;
 
-import com.hb.pojo.User;
+import com.hb.exception.DuplicateResourceException;
+import com.hb.pojo.RefreshToken;
 import com.hb.repository.RefreshTokenRepository;
 import org.hibernate.Session;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Repository;
@@ -16,19 +18,99 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author HUY
  */
-
 @Transactional
 @Repository
-public class RefreshTokenRepositoryImpl implements RefreshTokenRepository{
-    
+public class RefreshTokenRepositoryImpl implements RefreshTokenRepository {
+
     @Autowired
     private LocalSessionFactoryBean factory;
 
     @Override
-    public void deleteByUser(User u) {
+    public void revokeByToken(String token) {
+
         Session session = this.factory.getObject().getCurrentSession();
-        
-        session.update(u);
+
+        String hql = "UPDATE RefreshToken r SET r.revoked = true WHERE r.token = :token";
+
+        session.createMutationQuery(hql)
+                .setParameter("token", token)
+                .executeUpdate();
     }
-    
+
+    @Override
+    public int revokeIfNotRevoked(String token) {
+        Session session = this.factory.getObject().getCurrentSession();
+
+        String hql = "UPDATE RefreshToken r SET r.revoked = true WHERE r.token = :token AND r.revoked = false";
+
+        int updated = session.createMutationQuery(hql)
+                .setParameter("token", token)
+                .executeUpdate();
+
+        return updated;
+    }
+
+    @Override
+    public void revokeAllByUser(Long userId) {
+        Session session = this.factory.getObject().getCurrentSession();
+
+        String hql = "UPDATE RefreshToken r SET r.revoked = true WHERE r.userId.id = :userId";
+
+        session.createMutationQuery(hql)
+                .setParameter("userId", userId)
+                .executeUpdate();
+    }
+
+    @Override
+    public void revokeByUserAndDevice(Long userId, String deviceId) {
+        Session session = this.factory.getObject().getCurrentSession();
+
+        String hql = "UPDATE RefreshToken r SET r.revoked = true WHERE r.userId.id = :userId AND r.deviceId = :deviceId";
+
+        session.createMutationQuery(hql)
+                .setParameter("userId", userId)
+                .setParameter("deviceId", deviceId)
+                .executeUpdate();
+    }
+
+    @Override
+    public RefreshToken save(RefreshToken refreshToken) {
+
+        Session session = this.factory.getObject().getCurrentSession();
+
+        try {
+            RefreshToken merged = (RefreshToken) session.merge(refreshToken);
+            return merged;
+
+        } catch (ConstraintViolationException e) {
+            throw new DuplicateResourceException("Refresh token đã tồn tại!");
+        }
+    }
+
+    @Override
+    public RefreshToken getByToken(String token) {
+
+        Session session = this.factory.getObject().getCurrentSession();
+
+        RefreshToken rt = session
+                .createNamedQuery("RefreshToken.findByToken", RefreshToken.class)
+                .setParameter("token", token).uniqueResult();
+
+        return rt;
+    }
+
+    @Override
+    public RefreshToken findByUserIdAndDeviceId(Long userId, String deviceId) {
+        Session session = this.factory.getObject().getCurrentSession();
+
+        try {
+            RefreshToken rt = session.createQuery("SELECT r FROM RefreshToken r WHERE r.userId.id = :userId AND r.deviceId = :deviceId", RefreshToken.class)
+                    .setParameter("userId", userId)
+                    .setParameter("deviceId", deviceId)
+                    .uniqueResult();
+            return rt;
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

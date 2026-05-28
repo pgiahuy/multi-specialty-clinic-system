@@ -1,9 +1,8 @@
-import { field } from "firebase/firestore/pipelines";
 import { useRef, useState } from "react";
 import { Button, Card, Container, Form, Alert } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import MySpinner from "../../components/MySpinner";
-import API, { endpoint } from "../../configs/Apis";
+import API, { endpoint, USER_ENDPOINTS } from "../../configs/Apis";
 import { formCardStyle } from "./UserStyle";
 
 const Register = () => {
@@ -31,8 +30,8 @@ const Register = () => {
     const [err, setErr] = useState();
     const nav = useNavigate();
     const [loading, setLoading] = useState(false);
-    
-    
+
+
 
     const validate = () => {
         for (let u of userInfo)
@@ -65,7 +64,7 @@ const Register = () => {
 
             try {
                 setLoading(true);
-                let res = await API.post(endpoint['register'], form, {
+                let res = await API.post(USER_ENDPOINTS.REGISTER, form, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }
