@@ -6,10 +6,15 @@ package com.hb.repository.impl;
 
 import com.hb.exception.DuplicateResourceException;
 import com.hb.exception.ResourceNotFoundException;
-import com.hb.pojo.Doctor;
 import com.hb.pojo.Specialty;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,36 +38,31 @@ public class SpecialtyRepositoryImpl extends BaseRepositoryImpl<Specialty> imple
         return value != null && !value.trim().isEmpty();
     }
 
-    
-
     @Override
     public List<Specialty> getSpecialties(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
 
-        StringBuilder hql = new StringBuilder("SELECT DISTINCT s FROM Specialty s LEFT JOIN FETCH s.doctorCollection d LEFT JOIN FETCH s.idHod hod WHERE 1=1");
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<Specialty> cq = cb.createQuery(Specialty.class);
+        Root<Specialty> root = cq.from(Specialty.class);
 
-        if (params != null && hasText(params.get("kw"))) {
-            hql.append(" AND s.name LIKE :kw");
-        }
+        root.fetch("doctorCollection", JoinType.LEFT);
+
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(cb.equal(root.get("isActive"), true));
+
         if (params != null && hasText(params.get("specialtyName"))) {
-            hql.append(" AND s.name LIKE :specialtyName");
+            predicates.add(cb.like(root.get("name").as(String.class), "%" + params.get("specialtyName").trim() + "%"));
         }
-        if (params != null && hasText(params.get("doctorName"))) {
-            hql.append(" AND hod.fullName LIKE :doctorName");
+        if (params != null && hasText(params.get("doctorId"))) {
+            Long doctorId = Long.valueOf(params.get("doctorId"));
+            predicates.add(cb.equal(root.join("doctorCollection", JoinType.LEFT).get("id"), doctorId));
         }
-        hql.append(" AND s.isActive=true");
 
-        Query<Specialty> q = session.createQuery(hql.toString(), Specialty.class);
+        cq.select(root).distinct(true);
+        cq.where(predicates.toArray(new Predicate[0]));
 
-        if (params != null && hasText(params.get("kw"))) {
-            q.setParameter("kw", "%" + params.get("kw").trim() + "%");
-        }
-        if (params != null && hasText(params.get("specialtyName"))) {
-            q.setParameter("specialtyName", "%" + params.get("specialtyName").trim() + "%");
-        }
-        if (params != null && hasText(params.get("doctorName"))) {
-            q.setParameter("doctorName", "%" + params.get("doctorName").trim() + "%");
-        }
+        Query<Specialty> q = session.createQuery(cq);
 
         if (params != null && params.containsKey("pageSize")) {
             int pageSize = Integer.parseInt(params.get("pageSize"));
@@ -77,32 +77,27 @@ public class SpecialtyRepositoryImpl extends BaseRepositoryImpl<Specialty> imple
     @Override
     public long count(Map<String, String> params, Class<Specialty> clazz) {
         Session session = this.factory.getObject().getCurrentSession();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+        Root<Specialty> root = cq.from(Specialty.class);
 
-        StringBuilder hql = new StringBuilder("SELECT COUNT(DISTINCT s.id) FROM Specialty s LEFT JOIN s.idHod hod WHERE 1=1");
+        root.join("doctorCollection", JoinType.LEFT);
 
-        if (params != null && hasText(params.get("kw"))) {
-            hql.append(" AND s.name LIKE :kw");
-        }
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(cb.equal(root.get("isActive"), true));
+
         if (params != null && hasText(params.get("specialtyName"))) {
-            hql.append(" AND s.name LIKE :specialtyName");
+            predicates.add(cb.like(root.get("name").as(String.class), "%" + params.get("specialtyName").trim() + "%"));
         }
-        if (params != null && hasText(params.get("doctorName"))) {
-            hql.append(" AND hod.fullName LIKE :doctorName");
-        }
-        hql.append(" AND s.isActive=true");
-
-        Query<Long> q = session.createQuery(hql.toString(), Long.class);
-        if (params != null && hasText(params.get("kw"))) {
-            q.setParameter("kw", "%" + params.get("kw").trim() + "%");
-        }
-        if (params != null && hasText(params.get("specialtyName"))) {
-            q.setParameter("specialtyName", "%" + params.get("specialtyName").trim() + "%");
-        }
-        if (params != null && hasText(params.get("doctorName"))) {
-            q.setParameter("doctorName", "%" + params.get("doctorName").trim() + "%");
+        if (params != null && hasText(params.get("doctorId"))) {
+            Long doctorId = Long.valueOf(params.get("doctorId"));
+            predicates.add(cb.equal(root.join("doctorCollection", JoinType.LEFT).get("id"), doctorId));
         }
 
-        return q.getSingleResult();
+        cq.select(cb.countDistinct(root));
+        cq.where(predicates.toArray(new Predicate[0]));
+
+        return session.createQuery(cq).getSingleResult();
     }
 
     @Override
@@ -149,8 +144,7 @@ public class SpecialtyRepositoryImpl extends BaseRepositoryImpl<Specialty> imple
             throw new ResourceNotFoundException("Không tìm thấy chuyên khoa!");
         }
     }
-    
-    
+
     private boolean isDoctorAlreadyHod(Long doctorId, Long currentSpecialtyId) {
         Session session = this.factory.getObject().getCurrentSession();
 

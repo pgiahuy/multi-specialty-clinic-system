@@ -37,28 +37,24 @@
                     <th>Giờ</th>
                     <th>Trạng thái</th>
                     <th>Ngày tạo</th>
-                    <th>Hành động</th>
                 </tr>
             </thead>
 
             <tbody>
                 <tr th:each="a : ${appointments}">
 
-                    <td th:text="${a.doctorId.fullName}"></td>
+                    <td th:text="${a.scheduleId.doctorId.fullName}"></td>
                     <td th:text="${a.patientId.fullName}"></td>
 
-                    <td th:text="${a.date}"></td>
-                    <td th:text="${a.timeSlot}"></td>
+                    <td th:text="${a.scheduleId.date}"></td>
+                    <td th:text="${a.scheduleId.shiftId.startTime + ' - ' + a.scheduleId.shiftId.endTime}"></td>
                     <td th:text="${a.status}"></td>
                     <td th:text="${a.createdAt}"></td>
-                    <td>
-                        <button class="btn btn-warning btn-sm">Sửa</button>
-
-                    </td>
                 </tr>
                 <tr th:if="${#lists.isEmpty(appointments)}">
-                    <td colspan="7" class="text-center text-muted p-4">Không tìm thấy lịch hẹn nào trong hệ thống.
+                    <td colspan="6" class="text-center text-muted p-4">Không tìm thấy lịch hẹn nào trong hệ thống.
                     </td>
+                </tr>
             </tbody>
         </table>
 
