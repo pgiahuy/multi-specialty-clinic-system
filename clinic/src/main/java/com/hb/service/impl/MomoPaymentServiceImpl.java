@@ -33,11 +33,9 @@ public class MomoPaymentServiceImpl implements MomoPaymentService {
     private MoMoConfigs momoConfig;
 
     @Override
-    public MoMoPaymentResponse createPayment(String orderId, long amount, String orderInfo, String extraData) throws Exception {
-
-        if (extraData == null) {
-            extraData = "";
-        }
+    public MoMoPaymentResponse createPayment(String orderId, long amount, String orderInfo) throws Exception {
+        String extraData = "";
+      
         
         String uniqueOrderId = orderId;
         String requestId = momoConfig.getPartnerCode() + System.currentTimeMillis();

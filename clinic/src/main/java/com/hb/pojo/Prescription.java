@@ -48,8 +48,7 @@ public class Prescription implements Serializable {
     @Size(max = 9)
     @Column(name = "status")
     private String status;
-    @OneToMany(mappedBy = "prescriptionId")
-    private Collection<PaymentItems> paymentItemsCollection;
+
     @JoinColumn(name = "medical_record_id", referencedColumnName = "id")
     @OneToOne
     private MedicalRecord medicalRecordId;
@@ -87,13 +86,7 @@ public class Prescription implements Serializable {
         this.status = status;
     }
 
-    public Collection<PaymentItems> getPaymentItemsCollection() {
-        return paymentItemsCollection;
-    }
-
-    public void setPaymentItemsCollection(Collection<PaymentItems> paymentItemsCollection) {
-        this.paymentItemsCollection = paymentItemsCollection;
-    }
+  
 
     public MedicalRecord getMedicalRecordId() {
         return medicalRecordId;

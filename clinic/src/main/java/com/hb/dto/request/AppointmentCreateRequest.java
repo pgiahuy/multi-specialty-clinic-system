@@ -15,19 +15,22 @@ import java.util.Date;
 
 
 public class AppointmentCreateRequest {
-
+    private Long id;
     private Long patientId;
     private Long scheduleId;
-    private Long appId;
     private AppointmentStatus status;
 
     public AppointmentCreateRequest() {
     }
 
-    public AppointmentCreateRequest(Long patientId, Long scheduleId) {
+    public AppointmentCreateRequest(Long id, Long patientId, Long scheduleId, AppointmentStatus status) {
+        this.id = id;
         this.patientId = patientId;
         this.scheduleId = scheduleId;
+        this.status = status;
     }
+
+    
 
     /**
      * @return the patientId
@@ -61,7 +64,7 @@ public class AppointmentCreateRequest {
      * @return the appId
      */
     public Long getAppId() {
-        return appId;
+        return id;
     }
 
     /**
@@ -75,7 +78,7 @@ public class AppointmentCreateRequest {
      * @param appId the appId to set
      */
     public void setAppId(Long appId) {
-        this.appId = appId;
+        this.id = appId;
     }
 
     /**

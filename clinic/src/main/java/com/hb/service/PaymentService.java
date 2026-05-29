@@ -4,8 +4,10 @@
  */
 package com.hb.service;
 
+import com.hb.enums.PaymentMethod;
 import com.hb.pojo.Appointment;
 import com.hb.pojo.Payment;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -15,23 +17,14 @@ import java.util.Map;
  */
 public interface PaymentService {
     List<Payment> getPayments(Map<String, String> params);
-//    List<Payment> getPaymentsByUserName(Map<String, String> params);
-
     Payment getPaymentById(Long id);
-
     Payment getPaymentByAppoint(Appointment appoint);
-
     void deletePayment(Long id);
-
-    Payment createPayment(Long patientId);
-
-//    void updateStatus(Long paymentId, PaymentStatus status);
-
-    Long calculateTotalFee(List<Long> itemIds);
-
-    void updateStatusPayment(Long paymentId);
-
+    Payment createPayment(Long appointmentId);
+    void confirmPaymentSuccess(Long paymentId, PaymentMethod method);
+    void confirmPaymentFailed(Long paymentId, PaymentMethod method);
     void updatePaymentTotalAmount(Payment payment);
     
     List<Payment> getPaymentByPatientId(Long patientId, Map<String, String> params);
+    BigDecimal getPaymentAmount(Long paymentId);
 }
