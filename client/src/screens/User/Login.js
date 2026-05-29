@@ -75,7 +75,6 @@ const Login = () => {
 
                 let u = await authApis().get(USER_ENDPOINTS.CURRENT_USER);
                 localStorage.setItem("user", JSON.stringify(u.data));
-                cookies.save("user", u.data, { path: '/' });
 
                 dispatch({ "type": "LOGIN", "payload": u.data });
 
