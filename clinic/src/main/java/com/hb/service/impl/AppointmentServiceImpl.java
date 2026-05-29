@@ -105,8 +105,9 @@ public class AppointmentServiceImpl implements AppointmentService {
             a = appointmentMapper.toEntity(req, patient, schedule);
 
         }
-
+        
         appointmentRepo.addOrUpdateAppointment(a);
+        
         Payment p = paymentService.createPayment(req.getPatientId());
         itemService.addAppointmentItem(p, a.getId());
         
