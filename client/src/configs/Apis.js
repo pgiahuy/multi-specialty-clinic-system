@@ -18,7 +18,7 @@ let refreshPromise = null;
 
 
 export const getDoctors = () => API.get("/z");
-export const getSpecialties = () => API.get("/specialties");
+export const getSpecialties = (params = {}) => API.get("/specialties", { params });
 export const getSchedule = () => API.get("/schedules");
 
 
@@ -38,9 +38,13 @@ export const CLINIC_ENDPOINTS = {
     ROOMS: 'rooms',
     SHIFTS: 'shifts',
     SCHEDULES: 'secure/schedules',
-    DOCTOR_APPOINTMENTS: (scheduleId) => `secure/appointments/${scheduleId}`,
+    DOCTOR_APPOINTMENTS: (scheduleId) => `secure/appointments?scheduleId=${scheduleId}`,
+    DOCTOR_CONFIRM_APPOINTMENT: (appointmentId) => `secure/appointments/${appointmentId}/confirm`,
+    PATIENT_BOOKING_APPOINTMENT: 'secure/appointments',
     TEST_RESULTS: (patientId) => `secure/test/${patientId}`,
 };
+
+
 
 export const USER_ENDPOINTS = {
     CURRENT_USER: 'secure/users/profile',
@@ -59,7 +63,7 @@ export const PAYMENT_ENDPOINTS = {
 
 export const clinicApis = {
     getDoctors: () => API.get(CLINIC_ENDPOINTS.DOCTORS),
-    getSpecialties: () => API.get(CLINIC_ENDPOINTS.SPECIALTIES),
+    getSpecialties: (params = {}) => API.get(CLINIC_ENDPOINTS.SPECIALTIES, { params }),
     getSchedule: () => authApis.get(CLINIC_ENDPOINTS.SCHEDULES),
     getDoctorAppointments: (scheduleId) => authApis().get(CLINIC_ENDPOINTS.APPOINTMENTS(scheduleId)),
     getShifts: () => API.get(CLINIC_ENDPOINTS.SHIFTS),
@@ -96,7 +100,7 @@ const setupResponseInterceptor = (instance) => {
                         const short = t => t ? `${t.slice(0, 8)}...` : null;
                         console.debug("Auth interceptor: refresh successful", { accessToken: short(accessToken), refreshToken: short(refreshToken) });
 
-                        // update default headers on both instances so future requests include the new token
+
                         const header = `Bearer ${accessToken}`;
                         instance.defaults.headers = instance.defaults.headers || {};
                         instance.defaults.headers.common = instance.defaults.headers.common || {};
@@ -122,11 +126,11 @@ const setupResponseInterceptor = (instance) => {
                     if (accessToken) {
                         const tokenHeader = `Bearer ${accessToken}`;
                         originalRequest.headers = originalRequest.headers || {};
-                        // set both capitalizations to avoid casing issues in downstream adapters
+
                         originalRequest.headers['Authorization'] = tokenHeader;
                         originalRequest.headers['authorization'] = tokenHeader;
 
-                        // ensure axios instances also carry the updated header
+
                         instance.defaults.headers = instance.defaults.headers || {};
                         instance.defaults.headers.common = instance.defaults.headers.common || {};
                         instance.defaults.headers.common['Authorization'] = tokenHeader;

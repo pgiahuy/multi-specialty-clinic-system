@@ -92,7 +92,7 @@ const BookingPage = () => {
 
         try {
             setLoading(true);
-            const res = await authApis().post(CLINIC_ENDPOINTS.APPOINTMENTS, {
+            const res = await authApis().post(CLINIC_ENDPOINTS.PATIENT_BOOKING_APPOINTMENT, {
                 patientId: bookingData.profile,
                 scheduleId: bookingData.scheduleId,
             });

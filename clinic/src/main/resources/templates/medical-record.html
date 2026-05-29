@@ -37,28 +37,21 @@
                     <th>Chuẩn đoán</th>
                     <th>Ngày tạo</th>
                     <th>Ghi chú</th>
-                    <th></th>
                 </tr>
             </thead>
 
             <tbody>
                 <tr th:each="m : ${medical_records}">
-                    <td th:text="${m.appointment.patient.fullName}"></td>
-                    <td th:text="${m.appointment.doctor.fullName}"></td>
+                    <td th:text="${m.appointmentId.patientId.fullName}"></td>
+                    <td th:text="${m.appointmentId.scheduleId.doctorId.fullName}"></td>
                     <td th:text="${m.diagnosis}"></td>
                     <td th:text="${m.createdAt}"></td>
                     <td th:text="${m.note}"></td>
-
-                    <td>
-                        <button class="btn btn-warning btn-sm">Sửa</button>
-                        <button class="btn btn-danger btn-sm" th:onclick="'deleteDoctor(' + ${m.id} + ')'">
-                            Xóa
-                        </button>
-                    </td>
                 </tr>
                 <tr th:if="${#lists.isEmpty(medical_records)}">
-                    <td colspan="6" class="text-center text-muted p-4">Không tìm thấy hồ sơ bệnh án nào trong hệ thống.
+                    <td colspan="5" class="text-center text-muted p-4">Không tìm thấy hồ sơ bệnh án nào trong hệ thống.
                     </td>
+                </tr>
             </tbody>
         </table>
 

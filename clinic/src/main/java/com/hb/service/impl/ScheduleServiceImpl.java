@@ -12,13 +12,15 @@ import com.hb.pojo.Doctor;
 import com.hb.pojo.Rooms;
 import com.hb.pojo.Schedules;
 import com.hb.pojo.Shifts;
+import com.hb.pojo.Specialty;
 import com.hb.repository.DoctorRepository;
 import com.hb.repository.RoomRepository;
 import com.hb.repository.ScheduleRepository;
 import com.hb.repository.ShiftRepository;
+import com.hb.repository.SpecialtyRepository;
 import com.hb.service.ScheduleService;
-import java.util.ArrayList;
-import java.util.Collection;
+import com.hb.service.SpecialtyService;
+
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +45,9 @@ public class ScheduleServiceImpl implements ScheduleService {
     
     @Autowired
     private RoomRepository roomRepo;
+    
+    @Autowired
+    private SpecialtyRepository specialtyRepo;
     
     @Autowired
     private ScheduleMapper scheduleMapper;
@@ -70,14 +75,18 @@ public class ScheduleServiceImpl implements ScheduleService {
         Rooms room = roomRepo.getRoomById(req.getRoomId());
         if (room == null)
             throw new ResourceNotFoundException("Không tìm thấy phòng!");
-
+        Specialty specialty = specialtyRepo.getSpecialtieById(req.getSpecialtyId());
+        if (specialty == null)
+            throw new ResourceNotFoundException("Không tìm thấy chuyên khoa!");
+        
+        
         schedule.setDoctorId(doctor);
-        schedule.setSpecialtyId(doctor.getSpecialty());
+        schedule.setSpecialtyId(specialty);
         schedule.setShiftId(shift);
         schedule.setRoomId(room);
         
 
-        Schedules s = this.scheduleRepo.addSchedule(schedule);
+        Schedules s = this.scheduleRepo.saveOrUpdate(schedule);
         return scheduleMapper.toResponse(s);
     }
 

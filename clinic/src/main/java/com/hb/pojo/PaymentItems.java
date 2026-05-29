@@ -10,6 +10,8 @@ import com.hb.enums.PaymentStatus;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -52,6 +54,7 @@ public class PaymentItems implements Serializable {
     @Column(name = "id")
     private Long id;
     @Size(max = 12)
+    @Enumerated(EnumType.STRING)
     @Column(name = "item_type")
     private PaymentItemType itemType;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
@@ -64,9 +67,11 @@ public class PaymentItems implements Serializable {
     private LocalDateTime createdAt;
     @Size(max = 7)
     @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     private PaymentStatus status;
     @Size(max = 5)
     @Column(name = "method")
+    @Enumerated(EnumType.STRING)
     private PaymentMethod method;
     @Column(name = "paid_at")
     @Temporal(TemporalType.TIMESTAMP)

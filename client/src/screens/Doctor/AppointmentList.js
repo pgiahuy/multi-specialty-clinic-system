@@ -21,7 +21,7 @@ const AppointmentList = () => {
             const response = await authApis().get(`${CLINIC_ENDPOINTS.DOCTOR_APPOINTMENTS(scheduleId)}`);
             setAppointments(response.data);
         } catch (error) {
-            console.error("Failed to load appointments:", error);
+            console.error("Lỗi khi tải danh sách lịch hẹn:", error);
         } finally {
             setLoading(false);
         }

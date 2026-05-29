@@ -34,22 +34,20 @@ public class ApiDoctorController {
 
     @Autowired
     private DoctorMapper doctorMapp;
-    
+
     @Autowired
     private Environment env;
-    
 
     @GetMapping("")
     public ResponseEntity<List<DoctorResponse>> list(@RequestParam Map<String, String> params) {
-        
+
         int page = params.containsKey("page") ? Integer.parseInt(params.get("page")) : 1;
 
         int pageSize = this.env.getProperty("admin.page_size", Integer.class);
         params.put("pageSize", String.valueOf(pageSize));
         List<Doctor> doctors = this.doctorService.getDoctors(params);
-        
+
         return ResponseEntity.ok(doctors.stream().map(this.doctorMapp::toResponse).toList());
-       
 
     }
 

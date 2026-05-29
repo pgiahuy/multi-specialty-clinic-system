@@ -74,18 +74,14 @@ public class AppointmentMapper {
     }
 
     public Appointment toEntity(AppointmentCreateRequest req, Patient patient, Schedules schedule) {
-        if (req == null) {
+        if (req == null || patient == null || schedule == null) {
             return null;
         }
-
         Appointment a = new Appointment();
-
         a.setPatientId(patient);
         a.setScheduleId(schedule);
-
         a.setStatus(AppointmentStatus.PENDING);
         a.setCreatedAt(LocalDateTime.now());
-
         return a;
     }
 }

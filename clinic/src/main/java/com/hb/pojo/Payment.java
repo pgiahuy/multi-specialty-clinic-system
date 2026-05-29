@@ -10,6 +10,8 @@ import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -52,13 +54,16 @@ public class Payment implements Serializable {
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "total_amount")
     private BigDecimal totalAmount;
+    
     @Size(max = 7)
+    @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private PaymentStatus status;
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
     @Size(max = 5)
+    @Enumerated(EnumType.STRING)
     @Column(name = "method")
     private PaymentMethod method;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "paymentId")
