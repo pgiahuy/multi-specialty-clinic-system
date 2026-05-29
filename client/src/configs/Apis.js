@@ -22,6 +22,30 @@ export const getSpecialties = (params = {}) => API.get("/specialties", { params 
 export const getSchedule = () => API.get("/schedules");
 
 
+
+export const endpoint = {
+    'register': 'auth/register',
+    'login': 'auth/login',
+    'facebook-login': '/auth/facebook',
+    'patientProfiles': '/secure/profiles',
+    'doctors': '/doctors',
+    'schedules': '/secure/schedules',
+    'notifications': '/secure/users/notifications',
+    'current-user': '/secure/users/profile',
+    'appointments': '/secure/appointments',
+    'appointment': (appointmentId) => `/secure/appointment/${appointmentId}`,
+    'create-payment': '/secure/payments/create',
+    'momo-return': '/secure/payments/momo/return',
+    'payments': (patientId) => `/secure/payments/${patientId}`,
+    'payment-items': (paymentId) => `/secure/payment-items/${paymentId}`,
+    'test-results': (patientId) => `/secure/tests/${patientId}`,
+    'lab-test': '/secure/tests',
+    'test-result-appointment': (appointmentId) => `/secure/tests/appointment/${appointmentId}`,
+    'patient-profile': (patientId) => `/secure/profile/${patientId}`,
+    'specialties': '/specialties',
+    'medical-record': (appointmentId) => `/secure/medical-records/appointment/${appointmentId}`,
+    'medical-record-update': (medicalRecordId) => `/secure/medical-records/${medicalRecordId}`
+};
 export const AUTH_ENDPOINTS = {
     REGISTER: 'auth/register',
     LOGIN: 'auth/login',

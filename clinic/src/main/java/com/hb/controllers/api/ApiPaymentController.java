@@ -4,11 +4,10 @@
  */
 package com.hb.controllers.api;
 
-import com.hb.dto.response.MoMoPaymentResponse;
+import com.hb.enums.PaymentMethod;
 import com.hb.mapper.PaymentMapper;
 import com.hb.pojo.Patient;
 import com.hb.pojo.Payment;
-import com.hb.pojo.PaymentItems;
 import com.hb.pojo.User;
 import com.hb.repository.PaymentItemRepository;
 import com.hb.service.MomoPaymentService;
@@ -16,9 +15,7 @@ import com.hb.service.PaymentItemsService;
 import com.hb.service.PaymentService;
 import com.hb.service.UserService;
 import java.security.Principal;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -50,33 +47,23 @@ public class ApiPaymentController {
     private PaymentService paymentService;
 
     @Autowired
-    private PaymentItemsService paymentItemSer;
-
-    @Autowired
-    private PaymentItemRepository itemRepo;
-
-    @Autowired
     private UserService userService;
 
     @Autowired
     private PaymentMapper payMapper;
 
-    @PostMapping("/payments/create")
-    public ResponseEntity<?> createPayment(
+    @PostMapping("/payments/pay")
+    public ResponseEntity<?> pay(
             @RequestParam("method") String method,
-            @RequestParam("itemIds") List<Long> itemIds,
+            @RequestParam("paymentId") Long paymentId,
             @RequestParam("orderInfo") String orderInfo) throws Exception {
 
-        Long totalAmount = paymentService.calculateTotalFee(itemIds);
-        String uniqueOrderId = "ORDER_" + System.currentTimeMillis();
-
-        String extraData = itemIds.stream()
-                .map(Object::toString)
-                .collect(Collectors.joining(","));
+        Long totalAmount = paymentService.getPaymentAmount(paymentId).longValue();
+        String orderId = "ORDER_" + paymentId;
 
         return switch (method.toUpperCase()) {
             case "MOMO" ->
-                ResponseEntity.ok(momoService.createPayment(uniqueOrderId, totalAmount, orderInfo, extraData));
+                ResponseEntity.ok(momoService.createPayment(orderId, totalAmount, orderInfo));
 //            case "VNPAY"   -> ResponseEntity.ok(vnpayService.createPayment(orderId, amount, orderInfo));
 //            case "ZALOPAY" -> ResponseEntity.ok(zaloPayService.createPayment(orderId, amount, orderInfo));
 //            case "COD"     -> ResponseEntity.ok(Map.of("method", "COD", "orderId", orderId));
@@ -90,62 +77,58 @@ public class ApiPaymentController {
 
         boolean valid = momoService.verifySignature(params);
         String resultCode = params.get("resultCode");
+        String orderId = params.get("orderId");
+        Long paymentId = Long.parseLong(orderId.replace("ORDER_", ""));
 
         if (valid && "0".equals(resultCode)) {
+
             String extraData = params.get("extraData");
+
             if (extraData != null && !extraData.isEmpty()) {
-                List<Long> itemIds = Arrays.stream(extraData.split(","))
-                        .map(Long::parseLong)
-                        .collect(Collectors.toList());
 
-                String transId = params.get("transId");
-
-                paymentItemSer.confirmItemsPaid(transId, "MOMO", itemIds);
+                paymentService.confirmPaymentSuccess(paymentId, PaymentMethod.MOMO);
             }
+
+        } else {
+
+            paymentService.confirmPaymentFailed(paymentId, PaymentMethod.MOMO);
         }
 
-        MoMoPaymentResponse response = new MoMoPaymentResponse();
-        response.setMessage(params.get("message"));
-        response.setAmount(Long.parseLong(params.get("amount")));
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok().body(null);
     }
 
     @PostMapping("/payments/momo/ipn")
     public ResponseEntity<?> momoIpn(@RequestBody Map<String, String> params) throws Exception {
-       
+
         boolean valid = momoService.verifySignature(params);
-        Map<String, Object> result = new HashMap<>();
+
         try {
             String resultCode = params.get("resultCode");
+            String orderId = params.get("orderId");
+            Long paymentId = Long.parseLong(orderId.replace("ORDER_", ""));
 
             if (valid && "0".equals(resultCode)) {
-                String transId = params.get("transId");
+
                 String extraData = params.get("extraData");
 
                 if (extraData != null && !extraData.isEmpty()) {
-                    List<Long> itemIds = Arrays.stream(extraData.split(","))
-                            .map(Long::parseLong)
-                            .collect(Collectors.toList());
 
-                    paymentItemSer.confirmItemsPaid(transId, "MOMO", itemIds);
+                    paymentService.confirmPaymentSuccess(paymentId, PaymentMethod.MOMO);
 
-                    PaymentItems firstItem = itemRepo.getItemById(itemIds.get(0));
-
-                    if (firstItem != null) {
-
-                        Long paymentIdInDb = firstItem.getPaymentId().getId();
-
-                        paymentService.updateStatusPayment(paymentIdInDb);
-                    }
                 }
-                result.put("resultCode", 0);
-                result.put("message", "Success");
+
+            } else {
+
+                paymentService.confirmPaymentFailed(paymentId, PaymentMethod.MOMO);
             }
+            
         } catch (Exception e) {
-            result.put("resultCode", 1);
-            result.put("message", "Error: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+
         }
-        return ResponseEntity.ok(result);
+        
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/payments/{patientId}")

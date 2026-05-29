@@ -18,7 +18,6 @@ import { MyUserContext } from "./configs/Contexts";
 import { useReducer } from "react";
 import MyUserReducers from "./reducers/MyUserReducers";
 import RegisterRecord from "./screens/Patient/RegisterRecord";
-import TestResults from "./screens/Patient/TestResults";
 import TestResultDetail from "./screens/Patient/TestResultDetail";
 import Payment from "./screens/Patient/Payment";
 import PaymentDetail from "./screens/Patient/PaymentDetail";
@@ -32,6 +31,8 @@ import Schedules from "./screens/Doctor/Schedules";
 import AppointmentList from "./screens/Doctor/AppointmentList";
 import DoctorProfile from "./screens/Doctor/DoctorProfile";
 import RegisterSchedule from "./screens/Doctor/RegisterSchedule";
+import MedicalRecord from "./screens/Doctor/MedicalRecord";
+import AssignTest from "./screens/Doctor/AssignTest";
 
 
 const initUserState = () => {
@@ -69,8 +70,7 @@ function App() {
             <Route path="/patient/register-record" element={<RegisterRecord />} />
             <Route path="/patient/booking" element={<BookingPage />} />
             <Route path="/patient/history-booking" element={<HistoryBooking />} />
-            <Route path="/patient/test-results" element={<TestResults />} />
-            <Route path="/patient/test-results/:patientId" element={<TestResultDetail />} />
+            <Route path="/patient/test-results" element={<TestResultDetail />} />
             <Route path="/patient/payment" element={<Payment />} />
             <Route path="/patient/payment/:patientId" element={<PaymentDetail />} />
             <Route path="/patient/payment-items/:paymentId" element={<PaymentItems />} />
@@ -80,6 +80,8 @@ function App() {
             <Route path="/doctor/:scheduleId/appointments" element={<AppointmentList />} />
             <Route path="/doctor/profile" element={<DoctorProfile />} />
             <Route path="/doctor/register-schedule" element={<RegisterSchedule />} />
+            <Route path="/doctor/medical-records/appointment/:appointmentId" element={<MedicalRecord />} />
+            <Route path="doctor/assign-test/:appointmentId" element={<AssignTest />} />
 
           </Routes>
 

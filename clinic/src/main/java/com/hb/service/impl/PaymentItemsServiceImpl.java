@@ -62,14 +62,13 @@ public class PaymentItemsServiceImpl implements PaymentItemsService {
         BigDecimal price = app.getScheduleId().getSpecialtyId().getPrice();
 
         PaymentItems item = new PaymentItems();
-        item.setPaymentId(payment);
+        item.setPayment(payment);
         item.setItemType(PaymentItemType.APPOINTMENT);
         item.setAmount(price);
-        item.setAppointmentId(app);
-        item.setCreatedAt(LocalDateTime.now());
-        item.setStatus(PaymentStatus.PENDING);
+        item.setReferenceId(appointmentId);
         itemRepo.addOrUpdateItem(item);
         payService.updatePaymentTotalAmount(payment);
+        
     }
 
     @Override
@@ -77,12 +76,10 @@ public class PaymentItemsServiceImpl implements PaymentItemsService {
 
         LabTests lt = labRepo.getLabTestById(testId);
         PaymentItems item = new PaymentItems();
-        item.setPaymentId(payment);
+        item.setPayment(payment);
         item.setItemType(PaymentItemType.LAB_TEST);
         item.setAmount(lt.getPrice());
-        item.setLabTestId(lt);
-        item.setCreatedAt(LocalDateTime.now());
-        item.setStatus(PaymentStatus.PENDING);
+        item.setReferenceId(testId);
         itemRepo.addOrUpdateItem(item);
         payService.updatePaymentTotalAmount(payment);
 
@@ -100,37 +97,35 @@ public class PaymentItemsServiceImpl implements PaymentItemsService {
         }
 
         PaymentItems item = new PaymentItems();
-        item.setPaymentId(payment);
+        item.setPayment(payment);
         item.setItemType(PaymentItemType.PRESCRIPTION);
         item.setAmount(total);
-        item.setPrescriptionId(pres);
-        item.setCreatedAt(LocalDateTime.now());
-        item.setStatus(PaymentStatus.PENDING);
+        item.setReferenceId(prescriptionId);
         itemRepo.addOrUpdateItem(item);
         payService.updatePaymentTotalAmount(payment);
     }
 
-    @Override
-    public void confirmItemsPaid(String transId, String method, List<Long> itemIds) {
-        for (Long id : itemIds) {
-            PaymentItems item = itemRepo.getItemById(id);
-            if (item != null) {
-                if (item.getItemType().equals(PaymentItemType.APPOINTMENT)) {
-                    Appointment a = item.getAppointmentId();
-
-                    a.setStatus(AppointmentStatus.CONFIRMED);
-
-                    appRepo.addOrUpdateAppointment(a);
-                }
-                
-                item.setStatus(PaymentStatus.SUCCESS);
-                item.setMethod(PaymentMethod.valueOf(method));
-                item.setTransId(transId);
-                item.setPaidAt(LocalDateTime.now());
-                itemRepo.addOrUpdateItem(item);
-            }
-        }
-    }
+//    @Override
+//    public void confirmItemsPaid(String transId, String method, List<Long> itemIds) {
+//        for (Long id : itemIds) {
+//            PaymentItems item = itemRepo.getItemById(id);
+//            if (item != null) {
+//                if (item.getItemType().equals(PaymentItemType.APPOINTMENT)) {
+//                    Appointment a = item.getAppointmentId();
+//
+//                    a.setStatus(AppointmentStatus.CONFIRMED);
+//
+//                    appRepo.addOrUpdateAppointment(a);
+//                }
+//                
+//                item.setStatus(PaymentStatus.SUCCESS);
+//                item.setMethod(PaymentMethod.valueOf(method));
+//                item.setTransId(transId);
+//                item.setPaidAt(LocalDateTime.now());
+//                itemRepo.addOrUpdateItem(item);
+//            }
+//        }
+//    }
 
     @Override
     public PaymentItems getPaymentItemByAppointment(Appointment appoint) {

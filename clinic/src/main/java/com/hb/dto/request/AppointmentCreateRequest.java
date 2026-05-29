@@ -27,6 +27,7 @@ public class AppointmentCreateRequest {
         this.id = id;
         this.patientId = patientId;
         this.scheduleId = scheduleId;
+        this.status = status;
     }
     
     
@@ -44,6 +45,8 @@ public class AppointmentCreateRequest {
     public void setId(Long id) {
         this.id = id;
     }
+
+    
 
     /**
      * @return the patientId

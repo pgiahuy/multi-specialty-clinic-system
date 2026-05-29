@@ -34,6 +34,7 @@ public class AppointmentMapper {
         res.setCreatedAt(a.getCreatedAt());
 
         if (a.getPatientId() != null) {
+            res.setPatientId(a.getPatientId().getId());
             res.setPatientFullName(a.getPatientId().getFullName());
         }
 

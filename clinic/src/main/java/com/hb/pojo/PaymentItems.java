@@ -5,8 +5,6 @@
 package com.hb.pojo;
 
 import com.hb.enums.PaymentItemType;
-import com.hb.enums.PaymentMethod;
-import com.hb.enums.PaymentStatus;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,18 +18,14 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.Date;
 
 /**
  *
- * @author HUY
+ * @author DELL
  */
 @Entity
 @Table(name = "payment_items")
@@ -40,11 +34,7 @@ import java.util.Date;
     @NamedQuery(name = "PaymentItems.findById", query = "SELECT p FROM PaymentItems p WHERE p.id = :id"),
     @NamedQuery(name = "PaymentItems.findByItemType", query = "SELECT p FROM PaymentItems p WHERE p.itemType = :itemType"),
     @NamedQuery(name = "PaymentItems.findByAmount", query = "SELECT p FROM PaymentItems p WHERE p.amount = :amount"),
-    @NamedQuery(name = "PaymentItems.findByCreatedAt", query = "SELECT p FROM PaymentItems p WHERE p.createdAt = :createdAt"),
-    @NamedQuery(name = "PaymentItems.findByStatus", query = "SELECT p FROM PaymentItems p WHERE p.status = :status"),
-    @NamedQuery(name = "PaymentItems.findByMethod", query = "SELECT p FROM PaymentItems p WHERE p.method = :method"),
-    @NamedQuery(name = "PaymentItems.findByPaidAt", query = "SELECT p FROM PaymentItems p WHERE p.paidAt = :paidAt"),
-    @NamedQuery(name = "PaymentItems.findByTransId", query = "SELECT p FROM PaymentItems p WHERE p.transId = :transId")})
+    @NamedQuery(name = "PaymentItems.findByReferenceId", query = "SELECT p FROM PaymentItems p WHERE p.referenceId = :referenceId")})
 public class PaymentItems implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -53,44 +43,27 @@ public class PaymentItems implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
-    @Size(max = 12)
-    @Enumerated(EnumType.STRING)
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 12)
     @Column(name = "item_type")
+    @Enumerated(EnumType.STRING)
     private PaymentItemType itemType;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Basic(optional = false)
     @NotNull
     @Column(name = "amount")
     private BigDecimal amount;
-    @Column(name = "created_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime createdAt;
-    @Size(max = 7)
-    @Column(name = "status")
-    @Enumerated(EnumType.STRING)
-    private PaymentStatus status;
-    @Size(max = 5)
-    @Column(name = "method")
-    @Enumerated(EnumType.STRING)
-    private PaymentMethod method;
-    @Column(name = "paid_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime paidAt;
-    @Size(max = 100)
-    @Column(name = "trans_id")
-    private String transId;
-    @JoinColumn(name = "appointment_id", referencedColumnName = "id")
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "reference_id")
+    private Long referenceId;
+    
     @ManyToOne
-    private Appointment appointmentId;
-    @JoinColumn(name = "lab_test_id", referencedColumnName = "id")
-    @ManyToOne
-    private LabTests labTestId;
-    @JoinColumn(name = "payment_id", referencedColumnName = "id")
-    @ManyToOne(optional = false)
-    private Payment paymentId;
-    @JoinColumn(name = "prescription_id", referencedColumnName = "id")
-    @ManyToOne
-    private Prescription prescriptionId;
+    @JoinColumn(name ="payment_id")
+    private Payment payment;
+    
+    
 
     public PaymentItems() {
     }
@@ -99,9 +72,11 @@ public class PaymentItems implements Serializable {
         this.id = id;
     }
 
-    public PaymentItems(Long id, BigDecimal amount) {
+    public PaymentItems(Long id, PaymentItemType itemType, BigDecimal amount, Long referenceId) {
         this.id = id;
+        this.itemType = itemType;
         this.amount = amount;
+        this.referenceId = referenceId;
     }
 
     public Long getId() {
@@ -128,76 +103,12 @@ public class PaymentItems implements Serializable {
         this.amount = amount;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public Long getReferenceId() {
+        return referenceId;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public PaymentStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(PaymentStatus status) {
-        this.status = status;
-    }
-
-    public PaymentMethod getMethod() {
-        return method;
-    }
-
-    public void setMethod(PaymentMethod method) {
-        this.method = method;
-    }
-
-    public LocalDateTime getPaidAt() {
-        return paidAt;
-    }
-
-    public void setPaidAt(LocalDateTime paidAt) {
-        this.paidAt = paidAt;
-    }
-
-    public String getTransId() {
-        return transId;
-    }
-
-    public void setTransId(String transId) {
-        this.transId = transId;
-    }
-
-    public Appointment getAppointmentId() {
-        return appointmentId;
-    }
-
-    public void setAppointmentId(Appointment appointmentId) {
-        this.appointmentId = appointmentId;
-    }
-
-    public LabTests getLabTestId() {
-        return labTestId;
-    }
-
-    public void setLabTestId(LabTests labTestId) {
-        this.labTestId = labTestId;
-    }
-
-    public Payment getPaymentId() {
-        return paymentId;
-    }
-
-    public void setPaymentId(Payment paymentId) {
-        this.paymentId = paymentId;
-    }
-
-    public Prescription getPrescriptionId() {
-        return prescriptionId;
-    }
-
-    public void setPrescriptionId(Prescription prescriptionId) {
-        this.prescriptionId = prescriptionId;
+    public void setReferenceId(Long referenceId) {
+        this.referenceId = referenceId;
     }
 
     @Override
@@ -223,6 +134,20 @@ public class PaymentItems implements Serializable {
     @Override
     public String toString() {
         return "com.hb.pojo.PaymentItems[ id=" + id + " ]";
+    }
+
+    /**
+     * @return the payment
+     */
+    public Payment getPayment() {
+        return payment;
+    }
+
+    /**
+     * @param payment the payment to set
+     */
+    public void setPayment(Payment payment) {
+        this.payment = payment;
     }
     
 }
