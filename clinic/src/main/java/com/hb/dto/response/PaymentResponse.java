@@ -5,8 +5,10 @@
 package com.hb.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.hb.enums.PaymentStatus;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  *
@@ -15,22 +17,37 @@ import java.time.LocalDateTime;
 public class PaymentResponse {
     private Long id;
     private String patientName;
-    private String address;
     private BigDecimal totalAmount;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
-    private LocalDateTime createdDate;
+    private LocalDateTime createdAt;
+    private PaymentStatus status;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+    private LocalDateTime paidAt;
+    private Long appointmentId;
+    private List<PaymentItemResponse> paymentItems;
+    
 
     public PaymentResponse() {
+        
     }
 
-    public PaymentResponse(Long id, String patientName, String address, BigDecimal totalAmount, LocalDateTime createdDate) {
+    public PaymentResponse(Long id, String patientName, BigDecimal totalAmount, LocalDateTime createdAt, PaymentStatus status, LocalDateTime paidAt, Long appointmentId, List<PaymentItemResponse> paymentItems) {
         this.id = id;
         this.patientName = patientName;
-        this.address = address;
         this.totalAmount = totalAmount;
-        this.createdDate = createdDate;
+        this.createdAt = createdAt;
+        this.status = status;
+        this.paidAt = paidAt;
+        this.appointmentId = appointmentId;
+        this.paymentItems = paymentItems;
     }
 
+    
+
+   
+    
+    
+    
     /**
      * @return the id
      */
@@ -59,19 +76,7 @@ public class PaymentResponse {
         this.patientName = patientName;
     }
 
-    /**
-     * @return the address
-     */
-    public String getAddress() {
-        return address;
-    }
-
-    /**
-     * @param address the address to set
-     */
-    public void setAddress(String address) {
-        this.address = address;
-    }
+    
 
     /**
      * @return the totalAmount
@@ -87,18 +92,76 @@ public class PaymentResponse {
         this.totalAmount = totalAmount;
     }
 
+   
+
     /**
-     * @return the createdDate
+     * @return the paidAt
      */
-    public LocalDateTime getCreatedDate() {
-        return createdDate;
+    public LocalDateTime getPaidAt() {
+        return paidAt;
     }
 
     /**
-     * @param createdDate the createdDate to set
+     * @param paidAt the paidAt to set
      */
-    public void setCreatedDate(LocalDateTime createdDate) {
-        this.createdDate = createdDate;
+    public void setPaidAt(LocalDateTime paidAt) {
+        this.paidAt = paidAt;
+    }
+
+    /**
+     * @return the appointmentId
+     */
+    public Long getAppointmentId() {
+        return appointmentId;
+    }
+
+    /**
+     * @param appointmentId the appointmentId to set
+     */
+    public void setAppointmentId(Long appointmentId) {
+        this.appointmentId = appointmentId;
+    }
+
+    /**
+     * @return the createdAt
+     */
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    /**
+     * @param createdAt the createdAt to set
+     */
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    /**
+     * @return the paymentItems
+     */
+    public List<PaymentItemResponse> getPaymentItems() {
+        return paymentItems;
+    }
+
+    /**
+     * @param paymentItems the paymentItems to set
+     */
+    public void setPaymentItems(List<PaymentItemResponse> paymentItems) {
+        this.paymentItems = paymentItems;
+    }
+
+    /**
+     * @return the status
+     */
+    public PaymentStatus getStatus() {
+        return status;
+    }
+
+    /**
+     * @param status the status to set
+     */
+    public void setStatus(PaymentStatus status) {
+        this.status = status;
     }
     
 }

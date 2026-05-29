@@ -6,28 +6,18 @@ package com.hb.mapper;
 
 import com.hb.dto.response.PaymentItemResponse;
 import com.hb.pojo.PaymentItems;
-import java.math.BigDecimal;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.factory.Mappers;
 
 /**
  *
  * @author DELL
  */
-@Component
-public class PaymentItemMapper {
-    public PaymentItemResponse toEntity(PaymentItems item){
-        PaymentItemResponse res = new PaymentItemResponse();
-        res.setId(item.getId());
-        res.setType(item.getItemType());
-        res.setCreatedAt(item.getCreatedAt());
-        res.setAmount(item.getAmount());
-        res.setPaidAt(item.getPaidAt());
-        res.setMethod(item.getMethod());
-        res.setStatus(item.getStatus());
-        res.setStransId(item.getTransId());
-        if(item.getLabTestId() != null) {
-            res.setTestName(item.getLabTestId().getTestName());
-        }
-        return res;
-    }
+@Mapper(componentModel = "spring")
+public interface PaymentItemMapper {
+   PaymentItemMapper INSTANCE = Mappers.getMapper(PaymentItemMapper.class);
+   
+   @Mapping(source = "payment.id", target = "paymentId")
+   PaymentItemResponse toResponse(PaymentItems paymentItem);
 }
