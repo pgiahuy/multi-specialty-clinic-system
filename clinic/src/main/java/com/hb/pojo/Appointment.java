@@ -47,7 +47,6 @@ public class Appointment implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
-    @Size(max = 11)
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private AppointmentStatus status;

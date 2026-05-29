@@ -70,6 +70,7 @@ public class Payment implements Serializable {
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
     @Size(max = 5)
+    @Enumerated(EnumType.STRING)
     @Column(name = "method")
     @Enumerated(EnumType.STRING)
     private PaymentMethod method;

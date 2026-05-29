@@ -15,19 +15,35 @@ import java.util.Date;
 
 
 public class AppointmentCreateRequest {
+    
     private Long id;
     private Long patientId;
     private Long scheduleId;
-    private AppointmentStatus status;
 
     public AppointmentCreateRequest() {
     }
 
-    public AppointmentCreateRequest(Long id, Long patientId, Long scheduleId, AppointmentStatus status) {
+    public AppointmentCreateRequest(Long id, Long patientId, Long scheduleId) {
         this.id = id;
         this.patientId = patientId;
         this.scheduleId = scheduleId;
         this.status = status;
+    }
+    
+    
+
+    /**
+     * @return the id
+     */
+    public Long getId() {
+        return id;
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(Long id) {
+        this.id = id;
     }
 
     
@@ -60,32 +76,6 @@ public class AppointmentCreateRequest {
         this.scheduleId = scheduleId;
     }
 
-    /**
-     * @return the appId
-     */
-    public Long getAppId() {
-        return id;
-    }
-
-    /**
-     * @return the status
-     */
-    public AppointmentStatus getStatus() {
-        return status;
-    }
-
-    /**
-     * @param appId the appId to set
-     */
-    public void setAppId(Long appId) {
-        this.id = appId;
-    }
-
-    /**
-     * @param status the status to set
-     */
-    public void setStatus(AppointmentStatus status) {
-        this.status = status;
-    }
+    
     
 }
