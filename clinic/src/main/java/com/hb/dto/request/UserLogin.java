@@ -12,6 +12,8 @@ public class UserLogin {
     private String username;
     private String password;
     private String fcmToken;
+    private String deviceId;
+    private String deviceInfo;
 
     public UserLogin(String username, String password, String fcmToken) {
         this.username = username;
@@ -64,6 +66,22 @@ public class UserLogin {
      */
     public void setFcmToken(String fcmToken) {
         this.fcmToken = fcmToken;
+    }
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
+    }
+
+    public String getDeviceInfo() {
+        return deviceInfo;
+    }
+
+    public void setDeviceInfo(String deviceInfo) {
+        this.deviceInfo = deviceInfo;
     }
     
     

@@ -3,7 +3,7 @@ import { NavDropdown, Badge, ListGroup, Stack } from 'react-bootstrap';
 import { Bell, CircleFill, Check2All, Trash2 } from 'react-bootstrap-icons';
 import './NotificationBox.css';
 import { onMessageListener, requestForToken } from '../configs/firebaseConfig';
-import { authApis, endpoint } from '../configs/Apis';
+import { authApis, endpoint, USER_ENDPOINTS } from '../configs/Apis';
 import cookies from 'react-cookies';
 import { useNavigate } from 'react-router-dom';
 
@@ -30,7 +30,7 @@ const NotificationBox = ({ onNavigate }) => {
 
     const fetchNotifications = async () => {
         try {
-            const res = await authApis(cookies.load('token')).get(endpoint['notifications']);
+            const res = await authApis().get(USER_ENDPOINTS.NOTIFICATIONS);
             setNotifications(res.data || []);
         } catch (err) {
             console.error("Không thể lấy thông báo:", err);
@@ -83,8 +83,7 @@ const NotificationBox = ({ onNavigate }) => {
             setNotifications(prev => prev.map(n => n.id === noti.id ? { ...n, isRead: true } : n));
 
 
-            const token = cookies.load('token');
-            await authApis(token).patch(`secure/notifications/${noti.id}/read`);
+            await authApis().patch(`secure/notifications/${noti.id}/read`);
 
 
             const targetPath = noti.path || noti.click_action || noti.data?.click_action;

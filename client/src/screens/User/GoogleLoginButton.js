@@ -1,15 +1,16 @@
 import { Button } from "react-bootstrap";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import cookies from "react-cookies";
 
-import Apis, { authApis, endpoint } from "../../configs/Apis";
-import MySpinner from "../../components/MySpinner";
+import API, { authApis, AUTH_ENDPOINTS, USER_ENDPOINTS } from "../../configs/Apis";
 import { MyUserContext } from "../../configs/Contexts";
 import "./SocialLoginButtons.css";
 
 const GoogleLoginButton = ({ loading, setLoading, setErr }) => {
+
+    const [user, setUser] = useState({})
     const nav = useNavigate();
     const [, dispatch] = useContext(MyUserContext);
 
@@ -17,20 +18,37 @@ const GoogleLoginButton = ({ loading, setLoading, setErr }) => {
         const handleGoogleLogin = async (response) => {
             setLoading(true);
             try {
-                const res = await Apis.post("/auth/google", {
+
+                let deviceId = localStorage.getItem('deviceId');
+                if (!deviceId) {
+                    deviceId = crypto?.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2) + Date.now();
+                    localStorage.setItem('deviceId', deviceId);
+                }
+                const deviceInfo = navigator.userAgent;
+
+                const res = await API.post(AUTH_ENDPOINTS.GOOGLE_LOGIN, {
                     token: response.credential,
+                    deviceId: deviceId,
+                    deviceInfo: deviceInfo
                 });
 
-                const jwt = res.data.token;
-                cookies.save("token", jwt);
+                const jwt = res.data.accessToken;
+                cookies.save("accessToken", jwt, { path: '/' });
 
-                const currentUser = await authApis().get(endpoint["current-user"]);
-                cookies.save("user", currentUser.data);
+                if (res.data.refreshToken) {
+                    cookies.save("refreshToken", res.data.refreshToken, { path: '/' });
+                }
+
+                const currentUser = await authApis().get(USER_ENDPOINTS.CURRENT_USER);
+                localStorage.setItem("user", JSON.stringify(currentUser.data));
                 dispatch({ type: "LOGIN", payload: currentUser.data });
 
                 const decoded = jwtDecode(jwt);
-                if (decoded.role === "ROLE_DOCTOR") nav("/doctor/dashboard");
-                else nav("/patient/dashboard");
+                if (decoded.role === "ROLE_DOCTOR") {
+                    nav("/doctor/dashboard");
+                } else if (decoded.role === "ROLE_PATIENT") {
+                    nav("/patient/dashboard");
+                }
             } catch (ex) {
                 setErr("Đăng nhập Google thất bại!");
             } finally {

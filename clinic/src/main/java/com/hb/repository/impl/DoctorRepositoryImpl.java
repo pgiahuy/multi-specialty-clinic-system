@@ -45,8 +45,8 @@ public class DoctorRepositoryImpl extends BaseRepositoryImpl<Doctor> implements 
         Session session = this.factory.getObject().getCurrentSession();
 
         StringBuilder hql = new StringBuilder("SELECT DISTINCT d.id FROM Doctor d LEFT JOIN d.specialtyCollection s WHERE 1=1");
-        if (hasText(params.get("specialtyName"))) {
-            hql.append(" AND s.name LIKE :sName");
+        if (hasText(params.get("specialtyId"))) {
+            hql.append(" AND s.id = :sId");
         }
         if (hasText(params.get("doctorName"))) {
             hql.append(" AND d.fullName LIKE :dName");
@@ -54,8 +54,8 @@ public class DoctorRepositoryImpl extends BaseRepositoryImpl<Doctor> implements 
         hql.append(" AND d.isActive=true");
 
         Query<Long> q = session.createQuery(hql.toString(), Long.class);
-        if (hasText(params.get("specialtyName"))) {
-            q.setParameter("sName", "%" + params.get("specialtyName").trim() + "%");
+        if (hasText(params.get("specialtyId"))) {
+            q.setParameter("sId", Long.valueOf(params.get("specialtyId")));
         }
         if (hasText(params.get("doctorName"))) {
             q.setParameter("dName", "%" + params.get("doctorName").trim() + "%");
@@ -81,8 +81,8 @@ public class DoctorRepositoryImpl extends BaseRepositoryImpl<Doctor> implements 
         Session session = this.factory.getObject().getCurrentSession();
 
         StringBuilder hql = new StringBuilder("SELECT COUNT(DISTINCT d.id) FROM Doctor d LEFT JOIN d.specialtyCollection s WHERE 1=1");
-        if (hasText(params.get("specialtyName"))) {
-            hql.append(" AND s.name LIKE :sName");
+        if (hasText(params.get("specialtyId"))) {
+            hql.append(" AND s.id = :sId");
         }
         if (hasText(params.get("doctorName"))) {
             hql.append(" AND d.fullName LIKE :dName");
@@ -91,8 +91,8 @@ public class DoctorRepositoryImpl extends BaseRepositoryImpl<Doctor> implements 
         
 
         Query<Long> q = session.createQuery(hql.toString(), Long.class);
-        if (hasText(params.get("specialtyName"))) {
-            q.setParameter("sName", "%" + params.get("specialtyName").trim() + "%");
+        if (hasText(params.get("specialtyId"))) {
+            q.setParameter("sId", Long.valueOf(params.get("specialtyId")));
         }
         if (hasText(params.get("doctorName"))) {
             q.setParameter("dName", "%" + params.get("doctorName").trim() + "%");

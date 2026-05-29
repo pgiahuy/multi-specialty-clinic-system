@@ -47,6 +47,7 @@ public class PatientRepositoryImpl extends BaseRepositoryImpl<Patient> implement
         root.fetch("userId", JoinType.LEFT);
 
         List<Predicate> predicates = new ArrayList<>();
+        predicates.add(cb.equal(root.get("isActive"), true));
         if (params != null && hasText(params.get("patientName"))) {
             String kw = "%" + params.get("patientName").trim() + "%";
             predicates.add(cb.or(
@@ -57,9 +58,9 @@ public class PatientRepositoryImpl extends BaseRepositoryImpl<Patient> implement
         if (params != null && hasText(params.get("gender"))) {
             predicates.add(cb.equal(root.get("gender"), params.get("gender").trim()));
         }
+ 
 
         cq.where(predicates.toArray(new Predicate[0]));
-        cq.where(cb.equal(root.get("isActive"), true));
         cq.orderBy(cb.desc(root.get("id")));
 
         Query<Patient> q = session.createQuery(cq);

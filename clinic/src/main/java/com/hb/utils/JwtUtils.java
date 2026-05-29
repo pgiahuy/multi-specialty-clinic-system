@@ -19,27 +19,32 @@ import java.util.Date;
  * @author DELL
  */
 public class JwtUtils {
+
     private static final String SECRET = "12345678901234567890123456789012"; // 32 ký tự (AES key)
-    private static final long EXPIRATION_MS = 86400000; // 1 ngày
+    private static final long EXPIRATION_MS = 600000; // 10 phút
 
-    public static String generateToken(String username, String role) throws Exception {
-        JWSSigner signer = new MACSigner(SECRET);
+    public static String generateToken(String username, String role) {
+        try {
+            JWSSigner signer = new MACSigner(SECRET);
 
-        JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-                .subject(username)
-                .claim("role", role)
-                .expirationTime(new Date(System.currentTimeMillis() + EXPIRATION_MS))
-                .issueTime(new Date())
-                .build();
+            JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
+                    .subject(username)
+                    .claim("role", role)
+                    .expirationTime(new Date(System.currentTimeMillis() + EXPIRATION_MS))
+                    .issueTime(new Date())
+                    .build();
 
-        SignedJWT signedJWT = new SignedJWT(
-                new JWSHeader(JWSAlgorithm.HS256),
-                claimsSet
-        );
+            SignedJWT signedJWT = new SignedJWT(
+                    new JWSHeader(JWSAlgorithm.HS256),
+                    claimsSet
+            );
 
-        signedJWT.sign(signer);
+            signedJWT.sign(signer);
 
-        return signedJWT.serialize();
+            return signedJWT.serialize();
+        } catch (Exception e) {
+            throw new RuntimeException("Cannot generate JWT", e);
+        }
     }
 
     public static String validateTokenAndGetUsername(String token) throws Exception {

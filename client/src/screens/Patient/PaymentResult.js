@@ -3,7 +3,7 @@ import Footer from "../../components/Footer";
 import Header from "../../components/Header";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { authApis, endpoint } from "../../configs/Apis";
+import { authApis, endpoint, PAYMENT_ENDPOINTS } from "../../configs/Apis";
 
 const PaymentResult = () => {
     const [paymentStatus, setPaymentStatus] = useState(null);
@@ -23,7 +23,7 @@ const PaymentResult = () => {
             }
 
             try {
-                const urlWithParams = `${endpoint['momo-return']}${searchParams}`;
+                const urlWithParams = `${PAYMENT_ENDPOINTS.MOMO_RETURN}${searchParams}`;
                 const res = await authApis().get(urlWithParams);
 
                 const urlParamsObject = new URLSearchParams(searchParams);
@@ -33,7 +33,7 @@ const PaymentResult = () => {
                 const amount = res.data.amount || urlParamsObject.get('amount');
 
                 if (paymentId) {
-                    
+
                     setInvoiceInfo({
                         orderId,
                         amount,
@@ -63,7 +63,7 @@ const PaymentResult = () => {
         <div className="container d-flex justify-content-center align-items-center" style={{ minHeight: '80vh' }}>
             <div className="card shadow border-0" style={{ maxWidth: '500px', width: '100%', borderRadius: '20px' }}>
                 <div className="card-body text-center p-5">
-                    
+
                     {paymentStatus === 'SUCCESS' && (
                         <div className="py-3">
                             <i className="bi bi-check-circle-fill text-success mb-3 d-block" style={{ fontSize: '5rem' }}></i>
@@ -98,22 +98,22 @@ const PaymentResult = () => {
                         </div>
                     )}
 
-                    
+
                     {paymentStatus === 'FAILED' && (
                         <div className="py-3">
                             <i className="bi bi-x-circle-fill text-danger mb-3 d-block" style={{ fontSize: '5rem' }}></i>
                             <h3 className="fw-bold text-danger mb-3">Giao dịch thất bại</h3>
                             <p className="text-muted mb-4">{paymentMessage}</p>
-                            
+
                             <div className="d-flex gap-2">
-                                <button 
-                                    className="btn btn-outline-secondary w-50 rounded-pill py-2" 
+                                <button
+                                    className="btn btn-outline-secondary w-50 rounded-pill py-2"
                                     onClick={() => navigate('/')}
                                 >
                                     Về trang chủ
                                 </button>
-                                <button 
-                                    className="btn btn-primary w-50 rounded-pill py-2 fw-bold" 
+                                <button
+                                    className="btn btn-primary w-50 rounded-pill py-2 fw-bold"
                                     onClick={() => navigate(-1)}
                                 >
                                     Thử lại
@@ -121,7 +121,7 @@ const PaymentResult = () => {
                             </div>
                         </div>
                     )}
-                    
+
                 </div>
             </div>
         </div>

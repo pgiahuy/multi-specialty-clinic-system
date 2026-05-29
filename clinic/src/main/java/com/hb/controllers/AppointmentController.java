@@ -4,6 +4,7 @@
  */
 package com.hb.controllers;
 
+import com.hb.enums.AppointmentStatus;
 import com.hb.service.AppointmentService;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,8 @@ public class AppointmentController {
         int pageSize = this.env.getProperty("admin.page_size", Integer.class);
         params.put("pageSize", String.valueOf(pageSize));
         model.addAttribute("appointments", this.appointmentService.getAppointments(params));
+        model.addAttribute("statuses", AppointmentStatus.values());
+        model.addAttribute("kw", params.get("kw"));
 
         long totalAppointments = appointmentService.countAppointments(params);
         int totalPages = (int) Math.ceil((double) totalAppointments / pageSize);

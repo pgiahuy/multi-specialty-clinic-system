@@ -5,6 +5,7 @@
 package com.hb.controllers;
 
 import com.hb.dto.request.form.ShiftForm;
+import com.hb.enums.SessionShift;
 import com.hb.service.ShiftService;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,7 @@ public class ShiftController {
 
         model.addAttribute("shifts", this.shiftService.getShifts(params));
         model.addAttribute("shiftForm", new ShiftForm());
+        model.addAttribute("sessions", SessionShift.values());
 
         long totalShifts = shiftService.countShifts(params);
         int totalPages = (int) Math.ceil((double) totalShifts / pageSize);

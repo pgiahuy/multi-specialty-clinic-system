@@ -1,8 +1,8 @@
-    
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
-    <head>
-        <title>Quản lý lịch hẹn</title>
+
+<head>
+    <title>Quản lý lịch hẹn</title>
 
     <th:block th:replace="base :: css"></th:block>
     <th:block th:replace="base :: js"></th:block>
@@ -17,6 +17,16 @@
 
     <div class="content">
 
+        <div class="mb-3">
+            <form class="d-flex" method="get" th:action="@{/admin/appointments}">
+                <input type="text" name="kw" th:value="${kw}" class="form-control me-2"
+                    placeholder="Tìm theo tên bệnh nhân hoặc bác sĩ..." />
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-outline-primary">Tìm kiếm</button>
+                    <a th:href="@{/admin/appointments}" class="btn btn-outline-secondary ms-2">Đặt lại</a>
+                </div>
+            </form>
+        </div>
 
         <table class="table table-bordered table-hover align-middle">
             <thead class="table-primary">
@@ -34,8 +44,8 @@
             <tbody>
                 <tr th:each="a : ${appointments}">
 
-                    <td th:text="${a.doctor.fullName}"></td>
-                    <td th:text="${a.patient.fullName}"></td>
+                    <td th:text="${a.doctorId.fullName}"></td>
+                    <td th:text="${a.patientId.fullName}"></td>
 
                     <td th:text="${a.date}"></td>
                     <td th:text="${a.timeSlot}"></td>
@@ -43,20 +53,26 @@
                     <td th:text="${a.createdAt}"></td>
                     <td>
                         <button class="btn btn-warning btn-sm">Sửa</button>
-                       
+
                     </td>
                 </tr>
+                <tr th:if="${#lists.isEmpty(appointments)}">
+                    <td colspan="7" class="text-center text-muted p-4">Không tìm thấy lịch hẹn nào trong hệ thống.
+                    </td>
             </tbody>
         </table>
 
     </div>
 
     <div class="d-flex justify-content-center mt-4">
-        <div th:replace="~{fragments :: pagination('/admin/appointments', ${totalPages}, ${currentPage})}"></div>
+        <div
+            th:replace="~{fragments :: pagination(${kw} != null ? '/admin/appointments?kw=' + ${kw} : '/admin/appointments', ${totalPages}, ${currentPage})}">
+        </div>
     </div>
 
     <div th:replace="base :: footer">
 
     </div>
 </body>
+
 </html>

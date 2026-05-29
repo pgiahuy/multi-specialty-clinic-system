@@ -1,8 +1,8 @@
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
 
-    <head>
-        <title>Quản lý Bác sĩ</title>
+<head>
+    <title>Quản lý Bác sĩ</title>
     <th:block th:replace="~{base :: css}"></th:block>
     <th:block th:replace="~{base :: js}"></th:block>
     <script th:inline="javascript">
@@ -29,7 +29,7 @@
 
         <div class="d-flex justify-content-end mb-3">
             <button type="button" id="toggleDoctorFormBtn" class="btn btn-success"
-                    onclick="toggleCrudForm('doctorForm', 'toggleDoctorFormBtn')">
+                onclick="toggleCrudForm('doctorForm', 'toggleDoctorFormBtn')">
                 <i class="bi bi-plus-circle me-2"></i>Thêm bác sĩ mới
             </button>
         </div>
@@ -37,11 +37,11 @@
         <form class="row g-2 mb-3" method="get" action="" id="doctorFilterForm">
             <div class="col-md-4">
                 <input type="text" name="doctorName" class="form-control" placeholder="Tìm bác sĩ"
-                       th:value="${param.doctorName != null ? param.doctorName : ''}" />
+                    th:value="${param.doctorName != null ? param.doctorName : ''}" />
             </div>
             <div class="col-md-4">
                 <input type="text" name="specialtyName" class="form-control" placeholder="Tìm theo chuyên khoa"
-                       th:value="${param.specialtyName != null ? param.specialtyName : ''}" />
+                    th:value="${param.specialtyName != null ? param.specialtyName : ''}" />
             </div>
             <div class="col-md-4">
                 <button type="submit" class="btn btn-outline-primary">Tìm kiếm</button>
@@ -50,98 +50,132 @@
         </form>
 
         <form id="doctorForm" th:class="${openForm} ? 'card p-4 mb-4' : 'card p-4 mb-4 d-none'" method="post"
-              th:object="${doctorForm}" th:action="@{/admin/doctors}">
+            th:object="${doctorForm}" th:action="@{/admin/doctors}">
             <h4 id="formTitle" class="mb-3 text-uppercase fw-bold text-primary">Thêm bác sĩ mới</h4>
             <input type="hidden" th:field="*{id}" id="doctorId" />
 
             <div class="row">
-                <div class="col-md-6 mb-3">
+                <div class="col-md-4 mb-3">
                     <label class="form-label fw-bold">Họ tên:</label>
-                    <input type="text" th:field="*{fullName}" class="form-control" id="fullName" required />
+                    <input type="text" th:field="*{fullName}" class="form-control" id="fullName"
+                        placeholder="Nhập họ tên bác sĩ" required />
                 </div>
-                <div class="col-md-6 mb-3">
-                    <label class="form-label fw-bold">Chọn User:</label>
-                    <div class="input-group mb-2">
+
+                <div class="col-md-3 mb-3">
+                    <label class="form-label fw-bold"><i class="bi bi-card-id me-1"></i>CCCD:</label>
+                    <input type="text" maxlength="12" th:field="*{cccd}" class="form-control" id="cccd"
+                        placeholder="12 chữ số" required />
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label class="form-label fw-bold"></i>Giới tính:</label>
+                    <select th:field="*{gender}" class="form-select" id="gender" required>
+                        <option value="">-- Chọn --</option>
+                        <option value="Nam">Nam</option>
+                        <option value="Nữ">Nữ</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label fw-bold">User:</label>
+                    <div class="input-group">
                         <input type="text" id="userSearchInput" class="form-control" placeholder="Tìm user...">
-                        <button type="button" class="btn btn-outline-secondary" id="clearUserSearch">X</button>
+                        <button type="button" class="btn btn-outline-secondary" id="clearUserSearch"><i
+                                class="bi bi-x"></i></button>
                     </div>
-                    <select th:field="*{userId}" class="form-select" id="userId">
+                    <input type="hidden" id="prefilledUserId" th:value="${prefilledUserId}" />
+                    <input type="hidden" id="prefilledUserName" th:value="${prefilledUserName}" />
+                    <select th:field="*{userId}" class="form-select mt-2" id="userId">
                         <option value="">-- Chọn tài khoản --</option>
                         <option th:each="u : ${users}" th:value="${u.id}" th:text="${u.username}"></option>
                     </select>
                 </div>
             </div>
-
-            <div class="mb-3">
-                <label class="form-label fw-bold">Chuyên khoa:</label>
-                <div class="mb-2">
-                    <input type="text" id="specSearch" class="form-control" placeholder="Tìm chuyên khoa...">
-                </div>
-                <div class="border p-2 rounded" id="specList">
-                    <div class="form-check form-check-inline" th:each="s : ${specialties}">
-                        <input class="form-check-input" type="checkbox" th:value="${s.id}" th:field="*{specialtyIds}">
-                        <label class="form-check-label" th:text="${s.name}"></label>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Chuyên khoa:</label>
+                    <div class="input-group mb-2">
+                        <input type="text" id="specSearch" class="form-control" placeholder="Tìm chuyên khoa...">
+                        <button type="button" class="btn btn-outline-secondary" id="clearSpecSearch"><i
+                                class="bi bi-x"></i></button>
+                    </div>
+                    <div class="border p-2 rounded bg-light" id="specList" style="max-height: 150px; overflow-y: auto;">
+                        <div class="form-check form-check-inline" th:each="s : ${specialties}">
+                            <input class="form-check-input" type="checkbox" th:value="${s.id}"
+                                th:field="*{specialtyIds}">
+                            <label class="form-check-label" th:text="${s.name}"></label>
+                        </div>
                     </div>
                 </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Thông tin:</label>
+                    <textarea th:field="*{description}" class="form-control" id="description" rows="5"
+                        placeholder="Mô tả kinh nghiệm, quá trình công tác..."></textarea>
+                </div>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label fw-bold">Giới tính:</label>
-                <select name="gender" class="form-select" id="gender" required>
-                    <option value="">-- Chọn giới tính --</option>
-                    <option value="Nam">Nam</option>
-                    <option value="Nữ">Nữ</option>
-                </select>
-            </div>
-
-            <div class="d-flex gap-2 justify-content-end">
+            <div class="d-flex gap-2 justify-content-end border-top pt-3">
                 <button type="button" class="btn btn-secondary"
-                        onclick="toggleCrudForm('doctorForm', 'toggleDoctorFormBtn')">Hủy</button>
-                <button type="submit" id="submitFormBtn" class="btn btn-primary">Lưu thông tin</button>
+                    onclick="toggleCrudForm('doctorForm', 'toggleDoctorFormBtn')">Hủy</button>
+                <button type="submit" id="submitFormBtn" class="btn btn-primary px-4">Lưu dữ liệu</button>
             </div>
         </form>
 
-        <table class="table table-bordered table-hover align-middle shadow-sm">
-            <thead class="table-primary text-center">
-                <tr>
-                    <th>Họ tên</th>
-                    <th>Chuyên khoa</th>
-                    <th>Giới tính</th>
-                    <th>Tài khoản</th>
-                    <th>Hành động</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="d : ${doctors}" th:id="'doc-row-' + ${d.id}">
-                    <td th:id="'name-' + ${d.id}">
-                        <span th:text="${d.fullName}"></span>
-                        <input type="hidden" th:each="s : ${d.specialtyCollection}"
-                               th:id="'spec-id-' + ${d.id} + '-' + ${s.id}" th:value="${s.id}" />
-                        <input type="hidden" th:id="'user-id-' + ${d.id}"
-                               th:value="${d.userId != null ? d.userId.id : ''}">
-                        <input type="hidden" th:id="'user-name-' + ${d.id}"
-                               th:value="${d.userId != null ? d.userId.username : ''}">
-                        <input type="hidden" th:id="'gender-' + ${d.id}" th:value="${d.gender}">
-                    </td>
-                    <td>
-                        <span th:each="s : ${d.specialtyCollection}" class="badge bg-info text-dark me-1"
-                              th:text="${s.name}"></span>
-                    </td>
-                    <td th:text="${d.gender}"></td>
-                    <td th:text="${d.userId != null ? d.userId.username : 'Chưa có'}"></td>
-                    <td class="text-center">
-                        <button class="btn btn-warning btn-sm" th:onclick="|editDoctor(${d.id})|">Sửa</button>
-                        <button class="btn btn-danger btn-sm" 
-                                    th:data-id="${d.id}"
-                                    th:data-url="@{/admin/doctors/}"
-                                    th:data-row-prefix="'doctor-row-'"
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle shadow-sm">
+                <thead class="table-primary text-center">
+                    <tr>
+                        <th>Họ tên</th>
+                        <th>CCCD</th>
+                        <th>Chuyên khoa</th>
+                        <th>Thông tin</th>
+                        <th>Giới tính</th>
+                        <th>Tài khoản</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="d : ${doctors}" th:id="'doctor-row-' + ${d.id}">
+                        <td th:id="'name-' + ${d.id}">
+                            <span class="text-dark doctor-name-txt" th:text="${d.fullName}"></span>
+                            <input type="hidden" th:each="s : ${d.specialtyCollection}"
+                                th:id="'spec-id-' + ${d.id} + '-' + ${s.id}" th:value="${s.id}" />
+                            <input type="hidden" th:id="'user-id-' + ${d.id}"
+                                th:value="${d.userId != null ? d.userId.id : ''}">
+                            <input type="hidden" th:id="'user-name-' + ${d.id}"
+                                th:value="${d.userId != null ? d.userId.username : ''}">
+                            <input type="hidden" th:id="'gender-' + ${d.id}" th:value="${d.gender}">
+                        </td>
+                        <td class="text-center" th:id="'cccd-' + ${d.id}" th:text="${d.cccd}"></td>
+                        <td>
+                            <div class="d-flex flex-wrap gap-1">
+                                <span th:each="s : ${d.specialtyCollection}" class="badge bg-info text-dark"
+                                    th:text="${s.name}"></span>
+                            </div>
+                        </td>
+                        <td th:id="'description-' + ${d.id}" th:text="${d.description}"></td>
+                        <td class="text-center" th:text="${d.gender}"></td>
+                        <td class="text-center">
+                            <span th:if="${d.userId != null}" th:text="${d.userId.username}"></span>
+                            <small th:if="${d.userId == null}" class="text-muted italic">Chưa liên kết</small>
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group">
+                                <button class="btn btn-warning btn-sm me-1" th:onclick="|editDoctor(${d.id})|">
+                                    <i class="bi bi-pencil-square"></i> Sửa
+                                </button>
+                                <button class="btn btn-danger btn-sm" th:data-id="${d.id}"
+                                    th:data-url="@{/admin/doctors/}" th:data-row-prefix="'doctor-row-'"
                                     onclick="deleteCrudItem(this.dataset.id, this.dataset.url, this.dataset.rowPrefix)">
-                                 <i class="bi bi-trash-fill"></i>Xóa
-                            </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+                                    <i class="bi bi-trash"></i> Xóa
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(doctors)}">
+                        <td colspan="7" class="text-center text-muted py-4">Không tìm thấy bác sĩ nào</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <div class="d-flex justify-content-center mt-1">
@@ -163,7 +197,11 @@
             if (!userSelect)
                 return;
 
-            const selectedValue = userSelect.value;
+            const prefilledIdInput = document.getElementById('prefilledUserId');
+            const selectedValue = userSelect.value || (prefilledIdInput ? prefilledIdInput.value : '');
+            const prefilledNameInput = document.getElementById('prefilledUserName');
+            const prefilledName = prefilledNameInput ? prefilledNameInput.value : '';
+
             userSelect.innerHTML = '<option value="">-- Chọn tài khoản --</option>';
             items.forEach(item => {
                 const option = document.createElement('option');
@@ -171,8 +209,17 @@
                 option.textContent = item.username;
                 userSelect.appendChild(option);
             });
-            if (selectedValue)
+
+            if (selectedValue) {
+                const matchedOption = userSelect.querySelector('option[value="' + selectedValue + '"]');
+                if (!matchedOption) {
+                    const fallback = document.createElement('option');
+                    fallback.value = selectedValue;
+                    fallback.textContent = prefilledName || ('User #' + selectedValue);
+                    userSelect.appendChild(fallback);
+                }
                 userSelect.value = selectedValue;
+            }
         }
 
         async function loadSpecialties(kw = '', selectedIds = []) {
@@ -208,10 +255,14 @@
         }
 
         function editDoctor(id) {
-            const fullName = document.getElementById('name-' + id).innerText;
+            const fullName = document.querySelector(`#name-${id} .doctor-name-txt`).innerText;
+            const cccd = document.getElementById('cccd-' + id).innerText;
+            const description = document.getElementById('description-' + id).innerText;
 
             document.getElementById('doctorId').value = id;
             document.getElementById('fullName').value = fullName;
+            document.getElementById('cccd').value = cccd;
+            document.getElementById('description').value = description;
 
             const genderHidden = document.getElementById('gender-' + id);
             const genderSelect = document.getElementById('gender');
@@ -232,17 +283,30 @@
             const specInputs = document.querySelectorAll('[id^="spec-id-' + id + '-"]');
             if (specInputs && specInputs.length) {
                 specInputs.forEach(i => checkedIds.push(i.value));
-            } else {
-                const specIdsHidden = document.getElementById('spec-ids-' + id);
-                checkedIds = specIdsHidden && specIdsHidden.value ? specIdsHidden.value.split(',') : [];
             }
 
             const userIdHidden = document.getElementById('user-id-' + id);
             const userNameHidden = document.getElementById('user-name-' + id);
+            const prefilledUserIdInput = document.getElementById('prefilledUserId');
+            const prefilledUserNameInput = document.getElementById('prefilledUserName');
             const userSearchInput = document.getElementById('userSearchInput');
             if (userSearchInput) {
                 userSearchInput.value = userNameHidden && userNameHidden.value ? userNameHidden.value : '';
-                loadUsers(userSearchInput.value);
+            }
+
+            if (userIdHidden && userIdHidden.value) {
+                const uid = String(userIdHidden.value).trim();
+                if (prefilledUserIdInput) {
+                    prefilledUserIdInput.value = uid;
+                }
+                if (prefilledUserNameInput) {
+                    prefilledUserNameInput.value = userNameHidden && userNameHidden.value ? userNameHidden.value : '';
+                }
+
+                const userSelect = document.getElementById('userId');
+                if (userSelect) {
+                    userSelect.value = uid;
+                }
             }
 
             const specSearchInput = document.getElementById('specSearch');
@@ -254,9 +318,9 @@
                 const userSelect = document.getElementById('userId');
                 if (userSelect) {
                     const uid = String(userIdHidden.value).trim();
+                    const fallbackText = userNameHidden && userNameHidden.value ? userNameHidden.value : ('User #' + uid);
                     const matchedOption = userSelect.querySelector('option[value="' + uid + '"]');
                     if (!matchedOption) {
-                        const fallbackText = userNameHidden && userNameHidden.value ? userNameHidden.value : ('User #' + uid);
                         const option = document.createElement('option');
                         option.value = uid;
                         option.text = fallbackText;
@@ -266,16 +330,26 @@
                 }
             }
 
-            window.scrollTo({top: 0, behavior: 'smooth'});
+            if (userSearchInput) {
+                loadUsers(userSearchInput.value);
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         document.getElementById('clearUserSearch')?.addEventListener('click', function () {
             const inp = document.getElementById('userSearchInput');
-            if (inp)
-                inp.value = '';
+            if (inp) inp.value = '';
             loadUsers('');
         });
-        
+
+        document.getElementById('clearSpecSearch')?.addEventListener('click', function () {
+            const inp = document.getElementById('specSearch');
+            if (inp) inp.value = '';
+            const checkedIds = Array.from(document.querySelectorAll('#doctorForm input[type="checkbox"]:checked')).map(cb => cb.value);
+            loadSpecialties('', checkedIds);
+        });
+
         function debounce(func, delay) {
             let timer;
             return function (...args) {
@@ -298,7 +372,11 @@
             debouncedLoadSpecialties(e.target.value);
         });
 
-    
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUsers();
+            const checkedIds = Array.from(document.querySelectorAll('#doctorForm input[type="checkbox"]:checked')).map(cb => cb.value);
+            loadSpecialties('', checkedIds);
+        });
 
     </script>
 </body>

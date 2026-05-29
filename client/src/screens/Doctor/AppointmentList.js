@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Footer from "../../components/Footer";
 import Header from "../../components/Header";
-import { authApis, endpoint } from "../../configs/Apis";
+import { authApis, CLINIC_ENDPOINTS, endpoint } from "../../configs/Apis";
 import { useNavigate, useParams } from "react-router-dom";
 import { Badge, Button, Container, Table } from "react-bootstrap";
 import MySpinner from "../../components/MySpinner";
@@ -19,7 +19,7 @@ const AppointmentList = () => {
     const loadAppointments = async (scheduleId) => {
         try {
             setLoading(true);
-            const response = await authApis().get(`${endpoint['appointments']}?scheduleId=${scheduleId}`);
+            const response = await authApis().get(`${CLINIC_ENDPOINTS.DOCTOR_APPOINTMENTS(scheduleId)}`);
             setAppointments(response.data);
         } catch (error) {
             console.error("Failed to load appointments:", error);
@@ -59,7 +59,7 @@ const AppointmentList = () => {
             <div className="d-flex flex-column min-vh-100">
                 <Header />
                 <Container className="py-4">
-                    <h3 className="mb-4 text-center">Danh sách khám</h3>
+                    <h3 className="mb-4 text-center">DAN SÁCH LỊCH HẸN</h3>
                     {loading ? (
                         <div className="text-center">
                             <MySpinner />

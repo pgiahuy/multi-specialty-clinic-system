@@ -5,15 +5,12 @@
 package com.hb.controllers.api;
 
 import com.hb.dto.response.ShiftResponse;
-import com.hb.mapper.ShiftMapper;
 import com.hb.service.ShiftService;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,7 +40,7 @@ public class ApiShiftController {
 
         int pageSize = this.env.getProperty("admin.page_size", Integer.class);
         params.put("pageSize", String.valueOf(pageSize));
-        List<ShiftResponse> res = shiftService.getShifts(params);
+        List<ShiftResponse> res = shiftService.getShifts(null);
         return ResponseEntity.ok(res);
     }
     
