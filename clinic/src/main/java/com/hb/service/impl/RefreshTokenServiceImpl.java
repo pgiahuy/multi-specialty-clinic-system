@@ -17,8 +17,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,7 +34,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     private UserService userService;
 
     @Override
-    public RefreshToken createRefreshToken(Long userId) {
+    public RefreshToken generateRefreshToken(Long userId, String deviceId, String deviceInfo,  Instant oldExpiryDate) {
 
         User user = userService.getUserById(userId);
 
@@ -45,117 +43,71 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         refreshToken.setUserId(user);
         refreshToken.setToken(UUID.randomUUID().toString());
         refreshToken.setRevoked(false);
-        refreshToken.setCreatedAt(Instant.now());
-        refreshToken.setExpiryDate(Instant.now().plus(7, ChronoUnit.DAYS));
-
-        return refreshTokenRepo.save(refreshToken);
-    }
-
-    @Override
-    public RefreshToken createOrUpdateRefreshToken(Long userId, String deviceId, String deviceInfo) {
-
-        User user = userService.getUserById(userId);
-
-        // try to find existing token for this device
-        RefreshToken existing = refreshTokenRepo.findByUserIdAndDeviceId(userId, deviceId);
-
-        if (existing != null) {
-            existing.setToken(UUID.randomUUID().toString());
-            existing.setRevoked(false);
-            existing.setCreatedAt(Instant.now());
-            existing.setExpiryDate(Instant.now().plus(7, ChronoUnit.DAYS));
-            existing.setDeviceInfo(deviceInfo);
-            return refreshTokenRepo.save(existing);
-        }
-
-        RefreshToken refreshToken = new RefreshToken();
-
-        refreshToken.setUserId(user);
-        refreshToken.setToken(UUID.randomUUID().toString());
-        refreshToken.setRevoked(false);
-        refreshToken.setCreatedAt(Instant.now());
-        refreshToken.setExpiryDate(Instant.now().plus(7, ChronoUnit.DAYS));
-        refreshToken.setDeviceId(deviceId);
+        refreshToken.setCreatedAt(LocalDateTime.now());
+        refreshToken.setDeviceId(deviceId); 
         refreshToken.setDeviceInfo(deviceInfo);
-
+        
+        if (oldExpiryDate == null) {
+            refreshToken.setExpiryDate(Instant.now().plus(7, ChronoUnit.DAYS));
+        }else{
+            refreshToken.setExpiryDate(oldExpiryDate );
+        }
+       
         return refreshTokenRepo.save(refreshToken);
     }
 
+   
+  
+
     @Override
-    public RefreshToken verifyRefreshToken(String token) {
+    public AuthResponse refresh(String token) {
 
-        RefreshToken refreshToken = refreshTokenRepo.getByToken(token);
-
-        if (refreshToken == null) {
+        RefreshToken rt = refreshTokenRepo.getByToken(token);
+        if (rt == null) {
             throw new ResourceNotFoundException("Refresh token không tồn tại!");
         }
         
-        if (refreshToken.getRevoked() == true) {
+        Instant oldExpiryDate = rt.getExpiryDate();
+
+        if(Boolean.TRUE.equals(rt.getRevoked())){
+            refreshTokenRepo.revokeAllByUser(rt.getUserId().getId());
             throw new DuplicateResourceException("Refresh token đã thu hồi!");
-        }
-
-        if (refreshToken.getExpiryDate().isBefore(Instant.now())) {
-            refreshTokenRepo.revokeByToken(token);
-            throw new DuplicateResourceException("Refresh token đã hết hạn!");
-        }
-
-        return refreshToken;
-    }
-
-    @Override
-    public AuthResponse refresh(String token){
-
-        RefreshToken rt = refreshTokenRepo.getByToken(token);
-
-        if (rt == null) {
-            throw new ResourceNotFoundException("Refresh token không tồn tại!");
         }
 
 
         if (rt.getExpiryDate().isBefore(Instant.now())) {
             refreshTokenRepo.revokeByToken(token);
-            throw new DuplicateResourceException("Refresh token đã hết hạn!");
+            throw new DuplicateResourceException("Refresh token đã hết hạn. Vui lòng đăng nhập lại!");
         }
-
-        int updated = refreshTokenRepo.revokeIfNotRevoked(token);
-
-        if (updated == 0) {
-            Long userId = rt.getUserId().getId();
-            refreshTokenRepo.revokeAllByUser(userId);
-            throw new DuplicateResourceException("Refresh token đã hết hạn!");
-        }
-
+        
         User user = rt.getUserId();
 
-        RefreshToken newRt = createOrUpdateRefreshToken(user.getId(), rt.getDeviceId(), rt.getDeviceInfo());
+        RefreshToken newRt = generateRefreshToken(user.getId(), rt.getDeviceId(), rt.getDeviceInfo(), oldExpiryDate);
         String accessToken = JwtUtils.generateToken(user.getUsername(), user.getRole());
+        
+        refreshTokenRepo.revokeByToken(token);
 
         return new AuthResponse(accessToken, newRt.getToken());
     }
 
-    @Override
-    public void revokeByToken(String token) {
-        this.refreshTokenRepo.revokeByToken(token);
-    }
 
+    
     @Override
-    public void revokeByUserAndDevice(Long userId, String deviceId) {
-        this.refreshTokenRepo.revokeByUserAndDevice(userId, deviceId);
-    }
-
-    @Override
-    public void revokeByRefreshToken(String refreshToken) {
-        RefreshToken rt = refreshTokenRepo.getByToken(refreshToken);
+    public void revokeLogout(String token) {
+        RefreshToken rt = refreshTokenRepo.getByToken(token);
         if (rt != null) {
             Long userId = rt.getUserId().getId();
             String deviceId = rt.getDeviceId();
             if (deviceId != null) {
                 refreshTokenRepo.revokeByUserAndDevice(userId, deviceId);
             } else {
-
-                refreshTokenRepo.revokeByToken(refreshToken);
+                refreshTokenRepo.revokeByToken(token);
             }
         }
     }
+
+
+
+    
 
 }

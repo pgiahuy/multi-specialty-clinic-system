@@ -26,6 +26,25 @@ public class RefreshTokenRepositoryImpl implements RefreshTokenRepository {
     private LocalSessionFactoryBean factory;
 
     @Override
+    public RefreshToken getByToken(String token) {
+
+        Session session = this.factory.getObject().getCurrentSession();
+        RefreshToken rt = session
+                .createNamedQuery("RefreshToken.findByToken", RefreshToken.class)
+                .setParameter("token", token).uniqueResult();
+
+        return rt;
+    }
+
+    @Override
+    public RefreshToken save(RefreshToken refreshToken) {
+        Session session = this.factory.getObject().getCurrentSession();
+        session.persist(refreshToken);
+        return refreshToken;
+
+    }
+
+    @Override
     public void revokeByToken(String token) {
 
         Session session = this.factory.getObject().getCurrentSession();
@@ -35,19 +54,6 @@ public class RefreshTokenRepositoryImpl implements RefreshTokenRepository {
         session.createMutationQuery(hql)
                 .setParameter("token", token)
                 .executeUpdate();
-    }
-
-    @Override
-    public int revokeIfNotRevoked(String token) {
-        Session session = this.factory.getObject().getCurrentSession();
-
-        String hql = "UPDATE RefreshToken r SET r.revoked = true WHERE r.token = :token AND r.revoked = false";
-
-        int updated = session.createMutationQuery(hql)
-                .setParameter("token", token)
-                .executeUpdate();
-
-        return updated;
     }
 
     @Override
@@ -74,43 +80,16 @@ public class RefreshTokenRepositoryImpl implements RefreshTokenRepository {
     }
 
     @Override
-    public RefreshToken save(RefreshToken refreshToken) {
-
+    public Boolean tokenIsExist(String token) {
         Session session = this.factory.getObject().getCurrentSession();
 
-        try {
-            RefreshToken merged = (RefreshToken) session.merge(refreshToken);
-            return merged;
+        String hql = "SELECT COUNT(rt) FROM RefreshToken rt WHERE rt.token = :token";
 
-        } catch (ConstraintViolationException e) {
-            throw new DuplicateResourceException("Refresh token đã tồn tại!");
-        }
+        Long count = session.createQuery(hql, Long.class)
+                .setParameter("token", token)
+                .getSingleResult();
+
+        return count > 0;
     }
 
-    @Override
-    public RefreshToken getByToken(String token) {
-
-        Session session = this.factory.getObject().getCurrentSession();
-
-        RefreshToken rt = session
-                .createNamedQuery("RefreshToken.findByToken", RefreshToken.class)
-                .setParameter("token", token).uniqueResult();
-
-        return rt;
-    }
-
-    @Override
-    public RefreshToken findByUserIdAndDeviceId(Long userId, String deviceId) {
-        Session session = this.factory.getObject().getCurrentSession();
-
-        try {
-            RefreshToken rt = session.createQuery("SELECT r FROM RefreshToken r WHERE r.userId.id = :userId AND r.deviceId = :deviceId", RefreshToken.class)
-                    .setParameter("userId", userId)
-                    .setParameter("deviceId", deviceId)
-                    .uniqueResult();
-            return rt;
-        } catch (Exception e) {
-            return null;
-        }
-    }
 }

@@ -24,6 +24,8 @@ const Header = () => {
         } catch (err) {
             console.error('Logout revoke failed:', err);
         } finally {
+            cookies.remove('accessToken', { path: '/' });
+            cookies.remove('refreshToken', { path: '/' });
             localStorage.removeItem("user");
             dispatch({ type: "LOGOUT" });
             navigate("/");
@@ -124,8 +126,7 @@ const Header = () => {
                                         onError={(e) => e.target.src = '/default-avatar.png'}
                                     />
                                 </span>
-                            }
-                        >
+                            }>
                             <NavDropdown.Item onClick={() => navigate('/patient/profile')}>Cập nhật thông tin</NavDropdown.Item>
                             <NavDropdown.Item onClick={() => navigate('/user/change-password')}>Đổi mật khẩu</NavDropdown.Item>
                             <NavDropdown.Divider />
