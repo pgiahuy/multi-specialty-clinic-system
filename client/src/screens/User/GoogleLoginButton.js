@@ -1,5 +1,5 @@
 import { Button } from "react-bootstrap";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import cookies from "react-cookies";
@@ -9,6 +9,8 @@ import { MyUserContext } from "../../configs/Contexts";
 import "./SocialLoginButtons.css";
 
 const GoogleLoginButton = ({ loading, setLoading, setErr }) => {
+
+    const [user, setUser] = useState({})
     const nav = useNavigate();
     const [, dispatch] = useContext(MyUserContext);
 
@@ -38,7 +40,7 @@ const GoogleLoginButton = ({ loading, setLoading, setErr }) => {
                 }
 
                 const currentUser = await authApis().get(USER_ENDPOINTS.CURRENT_USER);
-                cookies.save("user", currentUser.data, { path: '/' });
+                localStorage.setItem("user", JSON.stringify(currentUser.data));
                 dispatch({ type: "LOGIN", payload: currentUser.data });
 
                 const decoded = jwtDecode(jwt);

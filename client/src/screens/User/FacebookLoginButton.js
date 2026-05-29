@@ -33,7 +33,7 @@ const FacebookLoginButton = () => {
             if (res.data.refreshToken) cookies.save('refreshToken', res.data.refreshToken, { path: '/' });
 
             const currentUser = await authApis().get(USER_ENDPOINTS.CURRENT_USER);
-            cookies.save('user', currentUser.data, { path: '/' });
+            localStorage.setItem("user", JSON.stringify(currentUser.data));
             dispatch({ type: 'LOGIN', payload: currentUser.data });
 
             const decoded = jwtDecode(res.data.accessToken);
