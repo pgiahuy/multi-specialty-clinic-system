@@ -13,9 +13,9 @@ import com.hb.pojo.RefreshToken;
 public interface RefreshTokenRepository {
     RefreshToken save(RefreshToken refreshToken);
     RefreshToken getByToken(String token);
+    
+    Boolean tokenIsExist(String token);
     void revokeByToken(String token);
-    int revokeIfNotRevoked(String token);
-    RefreshToken findByUserIdAndDeviceId(Long userId, String deviceId);
     void revokeAllByUser(Long userId);
     void revokeByUserAndDevice(Long userId, String deviceId);
     

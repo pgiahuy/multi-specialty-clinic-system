@@ -19,6 +19,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 /**
  *
@@ -52,7 +53,7 @@ public class RefreshToken implements Serializable {
     @Column(name = "expiry_date")
     private Instant expiryDate;
     @Column(name = "created_at")
-    private Instant createdAt;
+    private LocalDateTime createdAt;
     @Column(name = "revoked")
     private Boolean revoked;
     @Size(max = 128)
@@ -102,11 +103,11 @@ public class RefreshToken implements Serializable {
         this.expiryDate = expiryDate;
     }
 
-    public Instant getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Instant createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 

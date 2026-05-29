@@ -79,7 +79,7 @@ public class ApiAuthController {
                 User user = userService.getUserByUsername(u.getUsername());
                 String deviceId = u.getDeviceId();
                 String deviceInfo = u.getDeviceInfo();
-                RefreshToken rt = refreshTokenService.createOrUpdateRefreshToken(user.getId(), deviceId, deviceInfo);
+                RefreshToken rt = refreshTokenService.generateRefreshToken(user.getId(), deviceId, deviceInfo, null);
                 String refreshToken = rt.getToken();
                 AuthResponse res = new AuthResponse(token, refreshToken);
               
@@ -118,7 +118,7 @@ public class ApiAuthController {
             String accessToken = JwtUtils.generateToken(user.getUsername(), role);
             String deviceId = params.get("deviceId");
             String deviceInfo = params.get("deviceInfo");
-            RefreshToken rt = refreshTokenService.createOrUpdateRefreshToken(user.getId(), deviceId, deviceInfo);
+            RefreshToken rt = refreshTokenService.generateRefreshToken(user.getId(), deviceId, deviceInfo,null);
 
             return ResponseEntity.ok(new AuthResponse(accessToken, rt.getToken()));
 
@@ -143,7 +143,7 @@ public class ApiAuthController {
 
         String deviceId = params.get("deviceId");
         String deviceInfo = params.get("deviceInfo");
-        RefreshToken rt = refreshTokenService.createOrUpdateRefreshToken(user.getId(), deviceId, deviceInfo);
+        RefreshToken rt = refreshTokenService.generateRefreshToken(user.getId(), deviceId, deviceInfo,null);
 
         String accessToken = JwtUtils.generateToken(user.getUsername(), user.getRole());
 
@@ -158,7 +158,7 @@ public class ApiAuthController {
                 return ResponseEntity.badRequest().body("refreshToken is required");
             }
 
-            refreshTokenService.revokeByRefreshToken(refreshToken);
+            refreshTokenService.revokeLogout(refreshToken);
             return ResponseEntity.ok().body("Logged out");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi máy chủ!");

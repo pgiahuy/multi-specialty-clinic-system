@@ -6,6 +6,7 @@ package com.hb.service;
 
 import com.hb.dto.response.AuthResponse;
 import com.hb.pojo.RefreshToken;
+import java.time.Instant;
 
 
 /**
@@ -13,12 +14,8 @@ import com.hb.pojo.RefreshToken;
  * @author HUY
  */
 public interface RefreshTokenService {
-    RefreshToken createRefreshToken(Long userId);
-    RefreshToken createOrUpdateRefreshToken(Long userId, String deviceId, String deviceInfo);
-    RefreshToken verifyRefreshToken(String token);
+    RefreshToken generateRefreshToken(Long userId, String deviceId, String deviceInfo, Instant oldExpiryDate);
     AuthResponse refresh(String token);
-    void revokeByToken(String token);
-    void revokeByUserAndDevice(Long userId, String deviceId);
-    void revokeByRefreshToken(String refreshToken);
+    void revokeLogout(String token);
     
 }
