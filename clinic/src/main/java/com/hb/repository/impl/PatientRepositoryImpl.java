@@ -58,6 +58,7 @@ public class PatientRepositoryImpl extends BaseRepositoryImpl<Patient> implement
         if (params != null && hasText(params.get("gender"))) {
             predicates.add(cb.equal(root.get("gender"), params.get("gender").trim()));
         }
+ 
 
         cq.where(predicates.toArray(new Predicate[0]));
         cq.orderBy(cb.desc(root.get("id")));

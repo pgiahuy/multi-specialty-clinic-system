@@ -1,4 +1,5 @@
 import axios from "axios";
+import { Shift } from "react-bootstrap-icons";
 
 import cookies from 'react-cookies'
 
@@ -56,9 +57,12 @@ export const AUTH_ENDPOINTS = {
 
 export const CLINIC_ENDPOINTS = {
     DOCTORS: 'doctors',
+    PATIENTS: 'patients',
     SPECIALTIES: 'specialties',
+    ROOMS: 'rooms',
+    SHIFTS: 'shifts',
     SCHEDULES: 'secure/schedules',
-    APPOINTMENTS: 'secure/appointments',
+    DOCTOR_APPOINTMENTS: (scheduleId) => `secure/appointments/${scheduleId}`,
     TEST_RESULTS: (patientId) => `secure/test/${patientId}`,
 };
 
@@ -81,6 +85,8 @@ export const clinicApis = {
     getDoctors: () => API.get(CLINIC_ENDPOINTS.DOCTORS),
     getSpecialties: () => API.get(CLINIC_ENDPOINTS.SPECIALTIES),
     getSchedule: () => authApis.get(CLINIC_ENDPOINTS.SCHEDULES),
+    getDoctorAppointments: (scheduleId) => authApis().get(CLINIC_ENDPOINTS.APPOINTMENTS(scheduleId)),
+    getShifts: () => API.get(CLINIC_ENDPOINTS.SHIFTS),
 };
 
 

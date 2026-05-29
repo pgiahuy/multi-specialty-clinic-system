@@ -26,11 +26,13 @@
     letter-spacing: 0.08em;
     color: #0d6efd;
     transition: transform 0.2s ease, color 0.2s ease;
+    cursor: pointer;
 }
 
 .header-brand:hover {
     color: #1e7ff7;
     transform: translateY(-1px);
+    cursor: pointer;
 }
 
 .header-navlink,
@@ -50,6 +52,10 @@
     border: none;
     box-shadow: 0 24px 54px rgba(15, 23, 42, 0.12);
     min-width: 210px;
+}
+
+#user-nav-dropdown.dropdown-toggle::after {
+    display: none !important;
 }
 
 .header-cta {
