@@ -19,15 +19,10 @@ public class PaymentItemMapper {
         PaymentItemResponse res = new PaymentItemResponse();
         res.setId(item.getId());
         res.setType(item.getItemType());
-        res.setCreatedAt(item.getCreatedAt());
+       
         res.setAmount(item.getAmount());
-        res.setPaidAt(item.getPaidAt());
-        res.setMethod(item.getMethod());
-        res.setStatus(item.getStatus());
-        res.setStransId(item.getTransId());
-        if(item.getLabTestId() != null) {
-            res.setTestName(item.getLabTestId().getTestName());
-        }
+       
+        
         return res;
     }
 }

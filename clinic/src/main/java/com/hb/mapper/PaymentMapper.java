@@ -6,24 +6,20 @@ package com.hb.mapper;
 
 import com.hb.dto.response.PaymentResponse;
 import com.hb.pojo.Payment;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.factory.Mappers;
 
 /**
  *
  * @author DELL
  */
-@Component
-public class PaymentMapper {
-    public PaymentResponse toResponse(Payment p) {
-        PaymentResponse res = new PaymentResponse();
-        res.setId(p.getId());
-        res.setCreatedDate(p.getCreatedAt());
-        res.setTotalAmount(p.getTotalAmount());
-        
-        if (p.getPatientId() != null) {
-            res.setPatientName(p.getPatientId().getFullName());
-            res.setAddress(p.getPatientId().getAddress());
-        }
-        return res;
-    }
+@Mapper
+public interface PaymentMapper {
+    PaymentMapper INSTANCE = Mappers.getMapper(PaymentMapper.class);
+    
+    @Mapping(source = "appointment.patientId.fullName", target = "patientName")
+    @Mapping(source = "appointment.id", target = "appointmentId")        
+    PaymentResponse toResponse(Payment payment);
+    
 }

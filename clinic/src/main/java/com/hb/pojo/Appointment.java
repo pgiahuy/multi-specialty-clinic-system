@@ -68,6 +68,10 @@ public class Appointment implements Serializable {
     private Collection<LabResults> labResultsCollection;
     @OneToOne(mappedBy = "appointmentId")
     private Conversation conversation;
+    @OneToMany(mappedBy = "appointment")
+    private Collection<Payment> payments;
+    
+    
 
     public Appointment() {
     }
@@ -171,6 +175,20 @@ public class Appointment implements Serializable {
     @Override
     public String toString() {
         return "com.hb.pojo.Appointment[ id=" + id + " ]";
+    }
+
+    /**
+     * @return the payments
+     */
+    public Collection<Payment> getPayments() {
+        return payments;
+    }
+
+    /**
+     * @param payments the payments to set
+     */
+    public void setPayments(Collection<Payment> payments) {
+        this.payments = payments;
     }
     
 }

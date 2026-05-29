@@ -15,22 +15,29 @@ import java.time.LocalDateTime;
 public class PaymentResponse {
     private Long id;
     private String patientName;
-    private String address;
     private BigDecimal totalAmount;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private LocalDateTime createdDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+    private LocalDateTime paidAt;
+    private Long appointmentId;
+    
 
     public PaymentResponse() {
+        
     }
 
-    public PaymentResponse(Long id, String patientName, String address, BigDecimal totalAmount, LocalDateTime createdDate) {
+    public PaymentResponse(Long id, String patientName, String address, BigDecimal totalAmount, LocalDateTime createdDate, LocalDateTime paidAt, Long appointmentId) {
         this.id = id;
         this.patientName = patientName;
-        this.address = address;
         this.totalAmount = totalAmount;
         this.createdDate = createdDate;
+        this.paidAt = paidAt;
+        this.appointmentId = appointmentId;
     }
-
+    
+    
+    
     /**
      * @return the id
      */
@@ -59,19 +66,7 @@ public class PaymentResponse {
         this.patientName = patientName;
     }
 
-    /**
-     * @return the address
-     */
-    public String getAddress() {
-        return address;
-    }
-
-    /**
-     * @param address the address to set
-     */
-    public void setAddress(String address) {
-        this.address = address;
-    }
+    
 
     /**
      * @return the totalAmount
@@ -99,6 +94,34 @@ public class PaymentResponse {
      */
     public void setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
+    }
+
+    /**
+     * @return the paidAt
+     */
+    public LocalDateTime getPaidAt() {
+        return paidAt;
+    }
+
+    /**
+     * @param paidAt the paidAt to set
+     */
+    public void setPaidAt(LocalDateTime paidAt) {
+        this.paidAt = paidAt;
+    }
+
+    /**
+     * @return the appointmentId
+     */
+    public Long getAppointmentId() {
+        return appointmentId;
+    }
+
+    /**
+     * @param appointmentId the appointmentId to set
+     */
+    public void setAppointmentId(Long appointmentId) {
+        this.appointmentId = appointmentId;
     }
     
 }
