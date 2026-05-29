@@ -26,7 +26,7 @@ const Schedules = () => {
                 setSelectedDate(dates[0]);
             }
         } catch (error) {
-            console.error("Failed to load schedules:", error);
+            console.error("Lỗi khi lấy danh sách lịch làm việc:", error);
         } finally {
             setLoading(false);
         }
@@ -81,7 +81,7 @@ const Schedules = () => {
                 {loading ? (
                     <div className="text-center py-5"><MySpinner /></div>
                 ) : schedules.length === 0 ? (
-                    <div className="text-center text-muted py-5 bg-white rounded-4 shadow-sm">
+                    <div className="text-center text-muted py-5 bg-white rounded-4 shadow-sm ">
                         Chưa có lịch làm việc nào.
                     </div>
                 ) : (

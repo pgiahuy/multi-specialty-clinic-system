@@ -7,11 +7,11 @@ const ControlCard = () => {
 
 
     const navItems = [
-        { title: 'Đăng ký lịch làm việc', icon: <CalendarPlus size={30} className="text-primary mb-2" />, path: '/patient/booking' },
+        { title: 'Đăng ký lịch làm việc', icon: <CalendarPlus size={30} className="text-primary mb-2" />, path: '/doctor/register-schedule' },
         { title: 'Lịch làm việc', icon: <PersonBadge size={30} className="text-success mb-2" />, path: '/doctor/schedules' },
-        { title: 'Kê đơn thuốc', icon: <Receipt size={30} className="text-success mb-2" />, path: '/ho-so' },
-        { title: 'Bệnh nhân', icon: <FileEarmarkMedical size={30} className="text-info mb-2" />, path: '/chuyen-khoa' },
-        { title: 'Tư vấn', icon: <ClockHistory size={30} className="text-warning mb-2" />, path: '/lich-hen' },
+        { title: 'Kê đơn thuốc', icon: <Receipt size={30} className="text-success mb-2" />, path: '/doctor/prescriptions' },
+        { title: 'Bệnh nhân', icon: <FileEarmarkMedical size={30} className="text-info mb-2" />, path: '/doctor/patients' },
+        { title: 'Tư vấn', icon: <ClockHistory size={30} className="text-warning mb-2" />, path: '/doctor/consultations' },
     ];
 
     const navItemStyle = {

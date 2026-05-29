@@ -10,6 +10,7 @@ import Register from "./screens/User/Register";
 import DoctorDashboard from "./screens/Doctor/DoctorDashboard";
 import PatientDashboard from "./screens/Patient/PatientDashboard";
 import PatientProfile from "./screens/Patient/PatientProfile";
+import PatientAccount from "./screens/Patient/PatientAccount";
 import Prescriptions from "./screens/Patient/Prescriptions";
 import AllNotifications from "./screens/User/AllNotifications";
 import BookingPage from "./screens/Patient/Booking";
@@ -29,6 +30,8 @@ import HistoryBooking from "./screens/Patient/BookingHistory";
 import ListDoctor from "./screens/Home/ListDoctor";
 import Schedules from "./screens/Doctor/Schedules";
 import AppointmentList from "./screens/Doctor/AppointmentList";
+import DoctorProfile from "./screens/Doctor/DoctorProfile";
+import RegisterSchedule from "./screens/Doctor/RegisterSchedule";
 
 
 const initUserState = () => {
@@ -62,6 +65,7 @@ function App() {
             <Route path="/patient/notifications" element={<AllNotifications />} />
             <Route path="/patient/prescriptions" element={<Prescriptions />} />
             <Route path="/patient/profiles" element={<PatientProfile />} />
+            <Route path="/patient/account" element={<PatientAccount />} />
             <Route path="/patient/register-record" element={<RegisterRecord />} />
             <Route path="/patient/booking" element={<BookingPage />} />
             <Route path="/patient/history-booking" element={<HistoryBooking />} />
@@ -74,6 +78,8 @@ function App() {
             <Route path="/doctors" element={<ListDoctor />} />
             <Route path="/doctor/schedules" element={<Schedules />} />
             <Route path="/doctor/:scheduleId/appointments" element={<AppointmentList />} />
+            <Route path="/doctor/profile" element={<DoctorProfile />} />
+            <Route path="/doctor/register-schedule" element={<RegisterSchedule />} />
 
           </Routes>
 

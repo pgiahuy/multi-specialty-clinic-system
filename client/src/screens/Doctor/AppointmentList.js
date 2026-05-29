@@ -18,7 +18,7 @@ const AppointmentList = () => {
     const loadAppointments = async (scheduleId) => {
         try {
             setLoading(true);
-            const response = await authApis().get(`${CLINIC_ENDPOINTS.APPOINTMENTS}?scheduleId=${scheduleId}`);
+            const response = await authApis().get(`${CLINIC_ENDPOINTS.DOCTOR_APPOINTMENTS(scheduleId)}`);
             setAppointments(response.data);
         } catch (error) {
             console.error("Failed to load appointments:", error);
@@ -58,7 +58,7 @@ const AppointmentList = () => {
             <div className="d-flex flex-column min-vh-100">
                 <Header />
                 <Container className="py-4">
-                    <h3 className="mb-4 text-center">Danh sách khám</h3>
+                    <h3 className="mb-4 text-center">DAN SÁCH LỊCH HẸN</h3>
                     {loading ? (
                         <div className="text-center">
                             <MySpinner />

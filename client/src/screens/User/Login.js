@@ -77,7 +77,7 @@ const Login = () => {
                 localStorage.setItem("user", JSON.stringify(u.data));
 
                 dispatch({ "type": "LOGIN", "payload": u.data });
-
+                console.log("Login successful, user data:", u.data);
 
                 setTimeout(async () => {
                     if (role === 'ROLE_DOCTOR') {

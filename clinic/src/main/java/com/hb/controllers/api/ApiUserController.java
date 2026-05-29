@@ -4,8 +4,12 @@
  */
 package com.hb.controllers.api;
 
+import com.hb.dto.response.DoctorResponse;
+import com.hb.dto.response.PatientResponse;
 import com.hb.dto.response.NotificationResponse;
 import com.hb.dto.response.UserResponse;
+import com.hb.mapper.DoctorMapper;
+import com.hb.mapper.PatientMapper;
 import com.hb.mapper.NotificationMapper;
 import com.hb.pojo.Notification;
 import com.hb.pojo.User;
@@ -26,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -41,6 +46,12 @@ public class ApiUserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private DoctorMapper doctorMapper;
+
+    @Autowired
+    private PatientMapper patientMapper;
 
     @Autowired
     private Environment env;
@@ -64,12 +75,28 @@ public class ApiUserController {
 
     @GetMapping("/users/profile")
     @ResponseBody
+    @Transactional(readOnly = true)
     public ResponseEntity<UserResponse> getProfile(Principal principal) {
         User user = this.userService.getUserByUsername(principal.getName());
         UserResponse resp = new UserResponse();
         
         resp.setUsername(user.getUsername());
+        resp.setEmail(user.getEmail());
         resp.setAvatar(user.getSecureUrl());
+        resp.setRole(user.getRole());
+
+        if (user.getDoctor() != null) {
+            DoctorResponse doctorProfile = doctorMapper.toResponse(user.getDoctor());
+            resp.setDoctorProfile(doctorProfile);
+        }
+
+        if (user.getPatientCollection() != null) {
+            List<PatientResponse> patientProfiles = user.getPatientCollection()
+                    .stream()
+                    .map(patientMapper::toResponse)
+                    .toList();
+            resp.setPatientProfiles(patientProfiles);
+        }
 
         return new ResponseEntity<>(resp, HttpStatus.OK);
         

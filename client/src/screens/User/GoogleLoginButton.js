@@ -44,8 +44,11 @@ const GoogleLoginButton = ({ loading, setLoading, setErr }) => {
                 dispatch({ type: "LOGIN", payload: currentUser.data });
 
                 const decoded = jwtDecode(jwt);
-                if (decoded.role === "ROLE_DOCTOR") nav("/doctor/dashboard");
-                else nav("/patient/dashboard");
+                if (decoded.role === "ROLE_DOCTOR") {
+                    nav("/doctor/dashboard");
+                } else if (decoded.role === "ROLE_PATIENT") {
+                    nav("/patient/dashboard");
+                }
             } catch (ex) {
                 setErr("Đăng nhập Google thất bại!");
             } finally {
