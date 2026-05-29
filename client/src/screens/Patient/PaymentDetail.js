@@ -67,7 +67,7 @@ const PaymentDetail = () => {
 
                                                         <div>
                                                             <span className="text-uppercase small text-secondary mb-2">Tổng thanh toán: </span>
-                                                            <span className="fs-5 fw-bold text-primary">{p.totalAmount.toLocaleString('vi-VN')} VNĐ</span>
+                                                            <span className="fs-5 fw-bold text-primary">{(p.totalAmount || 0).toLocaleString('vi-VN')} VNĐ</span>
                                                         </div>
                                                     </div>
 
