@@ -3,7 +3,7 @@ import { Alert, Badge, Button, Card, Col, Container, Form, Row, Table } from "re
 import Footer from "../../components/Footer";
 import Header from "../../components/Header";
 import MySpinner from "../../components/MySpinner";
-import API, { authApis, CLINIC_ENDPOINTS } from "../../configs/Apis";
+import API, { authApis, CLINIC_ENDPOINTS, USER_ENDPOINTS } from "../../configs/Apis";
 import { useNavigate } from "react-router-dom";
 
 const RegisterSchedule = () => {
@@ -11,9 +11,12 @@ const RegisterSchedule = () => {
     const [shifts, setShifts] = useState([]);
     const [rooms, setRooms] = useState([]);
     const [schedules, setSchedules] = useState([]);
+    const [specialties, setSpecialties] = useState([]);
+    const [doctorId, setDoctorId] = useState(null);
     const [loadingShifts, setLoadingShifts] = useState(false);
     const [loadingRooms, setLoadingRooms] = useState(false);
     const [loadingSchedules, setLoadingSchedules] = useState(false);
+    const [loadingSpecialties, setLoadingSpecialties] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
@@ -21,6 +24,7 @@ const RegisterSchedule = () => {
         date: "",
         shiftId: "",
         roomId: "",
+        specialtyId: "",
         maxPatients: "",
     });
 
@@ -54,6 +58,39 @@ const RegisterSchedule = () => {
         }
     };
 
+    const loadCurrentDoctor = async () => {
+        try {
+            const response = await authApis().get(USER_ENDPOINTS.CURRENT_USER);
+            const currentDoctorId = response.data?.doctorProfile?.id || null;
+            setDoctorId(currentDoctorId);
+            return currentDoctorId;
+        } catch (error) {
+            console.error("Lỗi khi lấy thông tin bác sĩ hiện tại:", error);
+            setErrorMessage("Không tải được thông tin bác sĩ hiện tại.");
+            return null;
+        }
+    };
+
+    const loadSpecialties = async (targetDoctorId) => {
+        if (!targetDoctorId) {
+            setSpecialties([]);
+            return;
+        }
+
+        try {
+            setLoadingSpecialties(true);
+            const response = await API.get(CLINIC_ENDPOINTS.SPECIALTIES, {
+                params: { doctorId: targetDoctorId },
+            });
+            setSpecialties(response.data || []);
+        } catch (error) {
+            console.error("Lỗi khi lấy danh sách chuyên khoa:", error);
+            setErrorMessage("Không tải được danh sách chuyên khoa của bác sĩ.");
+        } finally {
+            setLoadingSpecialties(false);
+        }
+    };
+
     const loadRooms = async () => {
         try {
             setLoadingRooms(true);
@@ -68,6 +105,10 @@ const RegisterSchedule = () => {
     };
 
     useEffect(() => {
+        (async () => {
+            const currentDoctorId = await loadCurrentDoctor();
+            await loadSpecialties(currentDoctorId);
+        })();
         loadShifts();
         loadRooms();
         loadSchedules();
@@ -84,7 +125,7 @@ const RegisterSchedule = () => {
     };
 
     const validateForm = () => {
-        if (!formData.date || !formData.shiftId || !formData.roomId || !formData.maxPatients) {
+        if (!formData.date || !formData.shiftId || !formData.roomId || !formData.specialtyId || !formData.maxPatients) {
             setErrorMessage("Vui lòng nhập đầy đủ thông tin đăng ký.");
             return false;
         }
@@ -115,6 +156,7 @@ const RegisterSchedule = () => {
                 date: formData.date,
                 shiftId: Number(formData.shiftId),
                 roomId: Number(formData.roomId),
+                specialtyId: Number(formData.specialtyId),
                 maxPatients: Number(formData.maxPatients),
             });
 
@@ -123,6 +165,7 @@ const RegisterSchedule = () => {
                 date: "",
                 shiftId: "",
                 roomId: "",
+                specialtyId: "",
                 maxPatients: "",
             });
             loadSchedules();
@@ -218,6 +261,31 @@ const RegisterSchedule = () => {
                                                 </option>
                                             ))}
                                         </Form.Select>
+                                    </Form.Group>
+
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Chuyên khoa</Form.Label>
+                                        <Form.Select
+                                            name="specialtyId"
+                                            value={formData.specialtyId}
+                                            onChange={handleChange}
+                                            required
+                                            disabled={loadingSpecialties || doctorId == null}
+                                        >
+                                            <option value="">-- Chọn chuyên khoa --</option>
+                                            {specialties.map(specialty => (
+                                                <option key={specialty.id} value={specialty.id}>
+                                                    {specialty.name}
+                                                </option>
+                                            ))}
+                                        </Form.Select>
+                                        <Form.Text className="text-muted">
+                                            {doctorId == null
+                                                ? "Đang tải thông tin bác sĩ..."
+                                                : specialties.length === 0
+                                                    ? "Bác sĩ chưa được gán chuyên khoa nào."
+                                                    : "Chỉ hiển thị chuyên khoa thuộc bác sĩ đang đăng nhập."}
+                                        </Form.Text>
                                     </Form.Group>
 
                                     <Form.Group className="mb-3">
