@@ -4,13 +4,19 @@
  */
 package com.hb.dto.response;
 
+import java.util.List;
+
 /**
  *
  * @author DELL
  */
 public class UserResponse {
     private String username;
+    private String email;
     private String avatar;
+    private String role;
+    private DoctorResponse doctorProfile;
+    private List<PatientResponse> patientProfiles;
 
     public UserResponse() {
     }
@@ -47,6 +53,38 @@ public class UserResponse {
      */
     public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public DoctorResponse getDoctorProfile() {
+        return doctorProfile;
+    }
+
+    public void setDoctorProfile(DoctorResponse doctorProfile) {
+        this.doctorProfile = doctorProfile;
+    }
+
+    public List<PatientResponse> getPatientProfiles() {
+        return patientProfiles;
+    }
+
+    public void setPatientProfiles(List<PatientResponse> patientProfiles) {
+        this.patientProfiles = patientProfiles;
     }
     
     
