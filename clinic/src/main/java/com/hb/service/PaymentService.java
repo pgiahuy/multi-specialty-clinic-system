@@ -24,6 +24,7 @@ public interface PaymentService {
     void confirmPaymentSuccess(Long paymentId, PaymentMethod method);
     void confirmPaymentFailed(Long paymentId, PaymentMethod method);
     void updatePaymentTotalAmount(Payment payment);
+    
     List<Payment> getPaymentByPatientId(Long patientId, Map<String, String> params);
     BigDecimal getPaymentAmount(Long paymentId);
 }

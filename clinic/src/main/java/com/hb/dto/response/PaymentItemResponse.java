@@ -15,18 +15,18 @@ public class PaymentItemResponse {
     private Long id;
     private Long paymentId;
     private PaymentItemType type;
-    private String itemName;
+    
     private BigDecimal amount;
    
 
     public PaymentItemResponse() {
     }
 
-    public PaymentItemResponse(Long id, Long paymentId, PaymentItemType type, String itemName, BigDecimal amount) {
+    public PaymentItemResponse(Long id, Long paymentId, PaymentItemType type, BigDecimal amount) {
         this.id = id;
         this.paymentId = paymentId;
         this.type = type;
-        this.itemName = itemName;
+        
         this.amount = amount;
     }
     
@@ -93,19 +93,6 @@ public class PaymentItemResponse {
         this.paymentId = paymentId;
     }
 
-    /**
-     * @return the itemName
-     */
-    public String getItemName() {
-        return itemName;
-    }
-
-    /**
-     * @param itemName the itemName to set
-     */
-    public void setItemName(String itemName) {
-        this.itemName = itemName;
-    }
 
     
     

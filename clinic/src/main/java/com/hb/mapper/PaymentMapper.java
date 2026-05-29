@@ -14,7 +14,7 @@ import org.mapstruct.factory.Mappers;
  *
  * @author DELL
  */
-@Mapper
+@Mapper(componentModel = "spring", uses = {PaymentItemMapper.class})
 public interface PaymentMapper {
     PaymentMapper INSTANCE = Mappers.getMapper(PaymentMapper.class);
     

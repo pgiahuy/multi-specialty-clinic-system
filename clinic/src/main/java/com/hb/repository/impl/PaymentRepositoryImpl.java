@@ -140,7 +140,11 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     public List<Payment> getPaymentByPatientId(Long patientId, Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
         
-        StringBuilder hql = new StringBuilder("FROM Payment p WHERE p.patientId.id = :patientId");
+       StringBuilder hql = new StringBuilder(
+            "SELECT DISTINCT p FROM Payment p " +
+            "LEFT JOIN FETCH p.paymentItems " + 
+            "WHERE p.appointment.patientId.id = :patientId"
+        );
         String startDate = params.get("startDate");
         String endDate = params.get("endDate");
         

@@ -56,8 +56,7 @@ public class Appointment implements Serializable {
     private LocalDateTime createdAt;
     @OneToOne(mappedBy = "appointmentId")
     private MedicalRecord medicalRecord;
-    @OneToMany(mappedBy = "appointmentId")
-    private Collection<PaymentItems> paymentItemsCollection;
+    
     @JoinColumn(name = "patient_id", referencedColumnName = "id")
     @ManyToOne
     private Patient patientId;
@@ -72,7 +71,6 @@ public class Appointment implements Serializable {
     private Collection<Payment> payments;
     
     
-
     public Appointment() {
     }
 
@@ -112,13 +110,6 @@ public class Appointment implements Serializable {
         this.medicalRecord = medicalRecord;
     }
 
-    public Collection<PaymentItems> getPaymentItemsCollection() {
-        return paymentItemsCollection;
-    }
-
-    public void setPaymentItemsCollection(Collection<PaymentItems> paymentItemsCollection) {
-        this.paymentItemsCollection = paymentItemsCollection;
-    }
 
     public Patient getPatientId() {
         return patientId;

@@ -30,6 +30,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -76,12 +77,12 @@ public class Payment implements Serializable {
     @Column(name="paid_at")
     private LocalDateTime paidAt;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "appointment_id", referencedColumnName = "id")
     private Appointment appointment;
     
-    @OneToMany(mappedBy = "payment", fetch = FetchType.LAZY)
-    private Collection<PaymentItems> paymentItems;
+    @OneToMany(mappedBy = "payment")
+    private List<PaymentItems> paymentItems;
 
     public Payment() {
     }
@@ -193,14 +194,14 @@ public class Payment implements Serializable {
     /**
      * @return the paymentItems
      */
-    public Collection<PaymentItems> getPaymentItems() {
+    public List<PaymentItems> getPaymentItems() {
         return paymentItems;
     }
 
     /**
      * @param paymentItems the paymentItems to set
      */
-    public void setPaymentItems(Collection<PaymentItems> paymentItems) {
+    public void setPaymentItems(List<PaymentItems> paymentItems) {
         this.paymentItems = paymentItems;
     }
     

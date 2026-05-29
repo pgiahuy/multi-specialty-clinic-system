@@ -1,102 +1,53 @@
 import { useEffect, useState } from "react";
-import { authApis, endpoint, PAYMENT_ENDPOINTS } from "../../configs/Apis";
+import { authApis, PAYMENT_ENDPOINTS } from "../../configs/Apis";
 import { useParams } from "react-router-dom";
-import { Button, Card, Col, Container, Modal, Row, Tab, Tabs } from "react-bootstrap";
+import { Button, Card, Col, Container, Modal, Row } from "react-bootstrap";
 import Footer from "../../components/Footer";
 import Header from "../../components/Header";
 
 const PaymentItems = () => {
-
     const { paymentId } = useParams();
-    const [paymentItems, setPaymentItems] = useState([]);
+    const [payment, setPayment] = useState(null); // Đổi thành lưu 1 object Payment duy nhất
     const [showPaymentModal, setShowPaymentModal] = useState(false);
-    const [selectedInvoice, setSelectedInvoice] = useState(null);
     const [selectedMethod, setSelectedMethod] = useState('MOMO');
-    const [activeTab, setActiveTab] = useState('pending');
 
-    const loadPaymentItems = async () => {
+    const loadPayment = async () => {
         try {
-            const res = await authApis().get(PAYMENT_ENDPOINTS.ITEMS(paymentId));
-            setPaymentItems(res.data);
+            // Thay đổi URL cho phù hợp với API lấy 1 hóa đơn của bạn
+            // Ví dụ: GET /api/secure/payments/23
+            const res = await authApis().get(`secure/payments/${paymentId}`);
+            setPayment(res.data);
         } catch (err) {
             console.log(err);
         }
     };
 
-
     useEffect(() => {
-        loadPaymentItems();
-    }, []);
-
-
-    const groupedInvoicesObject = paymentItems.reduce((acc, item) => {
-        const type = item.type;
-
-        if (!acc[type]) {
-            acc[type] = {
-                type: type,
-                status: item.status,
-                createdAt: item.createdAt,
-                paidAt: item.paidAt,
-                method: item.method,
-                stransId: item.stransId,
-                totalAmount: 0,
-                count: 0,
-                details: []
-            };
-        }
-
-        acc[type].totalAmount += item.amount;
-        acc[type].count += 1;
-
-
-        const serviceName = item.testName || (type === 'APPOINTMENT' ? 'Khám chuyên khoa' : 'Dịch vụ y tế');
-
-
-        acc[type].details.push({
-            id: item.id,
-            name: serviceName,
-            price: item.amount
-        });
-
-        return acc;
-    }, {});
-
-    const invoicesArray = Object.values(groupedInvoicesObject);
-    const unpaidInvoices = invoicesArray.filter(invoice => invoice.status === 'PENDING');
-    const paidInvoices = invoicesArray.filter(invoice => invoice.status !== 'PENDING');
+        loadPayment();
+    }, [paymentId]);
 
     const translateType = (type) => {
         switch (type) {
             case 'APPOINTMENT': return 'Phí khám bệnh';
             case 'LAB_TEST': return 'Phí xét nghiệm';
             case 'PRESCRIPTION': return 'Tiền thuốc';
-            default: return type;
+            default: return 'Dịch vụ y tế';
         }
     };
 
-
     const handleConfirmPayment = async () => {
-
-        if (!selectedInvoice || !selectedInvoice.details) {
-            alert("Dữ liệu hóa đơn không hợp lệ!");
-            return;
-        }
+        if (!payment) return;
 
         try {
-
-            const itemIds = selectedInvoice.details.map(detail => detail.id);
-
-
-            const orderInfo = `Thanh toán ${translateType(selectedInvoice.type).toLowerCase()}`;
+            const orderInfo = `Thanh toán hóa đơn #${payment.id}`;
 
             const formData = new URLSearchParams();
             formData.append("method", selectedMethod);
             formData.append("orderInfo", orderInfo);
-
-
-            itemIds.forEach(id => formData.append("itemIds", id));
-
+            
+            // Ở Backend mới, bạn chỉ cần gửi paymentId xuống là đủ, 
+            // không cần gửi 1 nùi itemIds như lúc trước nữa!
+            formData.append("paymentId", payment.id);
 
             const res = await authApis().post(PAYMENT_ENDPOINTS.CREATE, formData, {
                 headers: {
@@ -104,28 +55,23 @@ const PaymentItems = () => {
                 }
             });
 
-
             const payUrl = res.data.payUrl;
             if (payUrl) {
-
                 setShowPaymentModal(false);
-                window.location.href = payUrl;
+                window.location.href = payUrl; // Chuyển hướng sang MoMo/VNPay
             } else {
-                console.error("Không có payUrl trong kết quả:", res.data);
                 alert("Không thể tạo giao dịch. Vui lòng thử lại!");
             }
-
         } catch (err) {
             console.error("Lỗi gọi API thanh toán:", err);
-            alert("Lỗi kết nối đến máy chủ thanh toán. Hãy kiểm tra lại mạng hoặc thử lại sau.");
+            alert("Lỗi kết nối đến máy chủ thanh toán.");
         }
     };
 
-    const openPaymentModal = (invoice) => {
-        setSelectedInvoice(invoice);
-        setSelectedMethod('MOMO');
-        setShowPaymentModal(true);
-    };
+    // Nếu dữ liệu chưa load xong thì hiện Loading
+    if (!payment) {
+        return <div className="text-center mt-5">Đang tải dữ liệu...</div>;
+    }
 
     return (
         <>
@@ -133,122 +79,76 @@ const PaymentItems = () => {
                 <Header />
                 <main className="flex-grow-1 py-5">
                     <Container>
-                        <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-end mb-4 gap-3 border-bottom pb-3">
-                            <div>
-                                <h2 className="fw-bold mb-1">Danh sách hóa đơn</h2>
-
-                            </div>
-
+                        <div className="mb-4 border-bottom pb-3">
+                            <h2 className="fw-bold mb-1">Chi tiết hóa đơn #{payment.id}</h2>
+                            <p className="text-muted mb-0">Ngày tạo: {payment.createdAt || payment.createdDate}</p>
                         </div>
 
-                        <Card className="shadow-sm rounded-4 border-0 overflow-hidden mb-4">
-                            <Card.Body className="p-0">
-                                <Tabs
-                                    activeKey={activeTab}
-                                    onSelect={(k) => setActiveTab(k)}
-                                    className="nav-pills px-3 py-2 border border-1 rounded-4 bg-white"
-                                    variant="pills"
-                                    mountOnEnter
-                                    unmountOnExit
-                                >
-                                    <Tab tabClassName="rounded-pill px-4 py-2 me-2 fw-semibold" eventKey="pending" title={`Chưa thanh toán (${unpaidInvoices.length})`}>
-                                        <Row className="g-4 mt-3 px-3 pb-4">
-                                            {paymentItems.length === 0 ? (
-                                                <Col>
-                                                    <div className="text-center p-5 bg-white rounded border shadow-sm">
-                                                        <h5 className="text-muted">Hiện chưa có hóa đơn nào.</h5>
-                                                    </div>
-                                                </Col>
-                                            ) : unpaidInvoices.length === 0 ? (
-                                                <Col>
-                                                    <div className="text-center p-5 bg-white rounded border shadow-sm">
-                                                        <h5 className="text-muted">Không có hóa đơn chưa thanh toán.</h5>
-                                                    </div>
-                                                </Col>
-                                            ) : unpaidInvoices.map((invoice, index) => (
-                                                <Col key={index} xs={12} md={6} lg={4}>
-                                                    <Card className="h-100 shadow border-0 rounded-4" style={{ border: '1px solid rgba(13,110,253,0.12)' }}>
-                                                        <Card.Body>
-                                                            <div className="d-flex justify-content-between align-items-start mb-3">
-                                                                <div>
-                                                                    <div className="text-uppercase text-primary small fw-bold mb-2">{translateType(invoice.type)}</div>
-                                                                    <div className="fs-4 fw-bold">{invoice.totalAmount.toLocaleString('vi-VN')} VNĐ</div>
-                                                                </div>
-                                                                <span className="badge bg-warning text-dark py-2 px-3 rounded-pill">Chưa thanh toán</span>
-                                                            </div>
-                                                            <div className="mb-3 p-3 bg-light rounded-4">
-                                                                <div className="text-muted small mb-2">Chi tiết dịch vụ</div>
-                                                                {invoice.details?.map((detail, idx) => (
-                                                                    <div key={idx} className="d-flex justify-content-between mb-2">
-                                                                        <span className="text-truncate pe-2" title={detail.name}>{detail.name}</span>
-                                                                        <span className="fw-semibold">{detail.price.toLocaleString('vi-VN')} VNĐ</span>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                            <div className="mb-3 text-muted small">
-                                                                <div className="d-flex justify-content-between mb-2"><span>Ngày tạo</span><span>{invoice.createdAt}</span></div>
-                                                                {invoice.method && <div className="d-flex justify-content-between"><span>Phương thức</span><span>{invoice.method}</span></div>}
-                                                            </div>
-                                                        </Card.Body>
-                                                        <Card.Footer className="d-flex justify-content-end bg-transparent border-0 mt-auto px-0 pb-0 pt-3">
-                                                            <Button variant="primary" className="mb-3 me-3 w-50 rounded-4 fw-bold border-0 " style={{ minHeight: '48px' }} onClick={() => openPaymentModal(invoice)}>
-                                                                Thanh toán ngay
-                                                            </Button>
-                                                        </Card.Footer>
-                                                    </Card>
-                                                </Col>
-                                            ))}
-                                        </Row>
-                                    </Tab>
-                                    <Tab tabClassName="rounded-pill px-4 py-2 me-2 fw-semibold" eventKey="paid" title={`Đã thanh toán (${paidInvoices.length})`}>
-                                        <Row className="g-4 mt-3 px-3 pb-4">
-                                            {paymentItems.length === 0 ? (
-                                                <Col>
-                                                    <div className="text-center p-5 bg-white rounded border shadow-sm">
-                                                        <h5 className="text-muted">Hiện chưa có hóa đơn nào.</h5>
-                                                    </div>
-                                                </Col>
-                                            ) : paidInvoices.length === 0 ? (
-                                                <Col>
-                                                    <div className="text-center p-5 bg-white rounded border shadow-sm">
-                                                        <h5 className="text-muted">Không có hóa đơn đã thanh toán.</h5>
-                                                    </div>
-                                                </Col>
-                                            ) : paidInvoices.map((invoice, index) => (
-                                                <Col key={index} xs={12} md={6} lg={4}>
-                                                    <Card className="h-100 shadow border-0 rounded-4" style={{ border: '1px solid rgba(33,37,41,0.08)' }}>
-                                                        <Card.Body>
-                                                            <div className="d-flex justify-content-between align-items-start mb-3">
-                                                                <div>
-                                                                    <div className="text-uppercase text-secondary small fw-bold mb-2">{translateType(invoice.type)}</div>
-                                                                    <div className="fs-4 fw-bold text-success">{invoice.totalAmount.toLocaleString('vi-VN')} VNĐ</div>
-                                                                </div>
-                                                                <span className="badge bg-success py-2 px-3 rounded-pill">Đã thanh toán</span>
-                                                            </div>
-                                                            <div className="mb-3 p-3 bg-light rounded-4">
-                                                                <div className="text-muted small mb-2">Chi tiết dịch vụ</div>
-                                                                {invoice.details?.map((detail, idx) => (
-                                                                    <div key={idx} className="d-flex justify-content-between mb-2">
-                                                                        <span className="text-truncate pe-2" title={detail.name}>{detail.name}</span>
-                                                                        <span className="fw-semibold">{detail.price.toLocaleString('vi-VN')} VNĐ</span>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                            <div className="mb-3 text-muted small">
-                                                                <div className="d-flex justify-content-between mb-2"><span className="fw-bold">Ngày tạo</span><span>{invoice.createdAt}</span></div>
-                                                                {invoice.paidAt && <div className="d-flex justify-content-between"><span className="fw-bold">Ngày thanh toán</span><span>{invoice.paidAt}</span></div>}
-                                                                {invoice.method && <div className="d-flex justify-content-between"><span className="fw-bold">Phương thức</span><span>{invoice.method}</span></div>}
-                                                            </div>
-                                                        </Card.Body>
+                        <Row className="justify-content-center">
+                            <Col xs={12} md={8} lg={6}>
+                                <Card className="shadow border-0 rounded-4" style={{ border: '1px solid rgba(13,110,253,0.12)' }}>
+                                    <Card.Body className="p-4">
+                                        <div className="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+                                            <div>
+                                                <div className="text-uppercase text-secondary small fw-bold mb-1">Tổng thanh toán</div>
+                                                <div className={`fs-3 fw-bold ${payment.status === 'SUCCESS' ? 'text-success' : 'text-primary'}`}>
+                                                    {(payment.totalAmount || 0).toLocaleString('vi-VN')} VNĐ
+                                                </div>
+                                            </div>
+                                            <span className={`badge py-2 px-3 rounded-pill ${payment.status === 'SUCCESS' ? 'bg-success' : payment.status === 'PENDING' ? 'bg-warning text-dark' : 'bg-danger'}`}>
+                                                {payment.status === 'SUCCESS' ? 'ĐÃ THANH TOÁN' : payment.status === 'PENDING' ? 'CHỜ THANH TOÁN' : 'THẤT BẠI'}
+                                            </span>
+                                        </div>
 
-                                                    </Card>
-                                                </Col>
+                                        <div className="mb-4">
+                                            <div className="text-muted small fw-bold mb-3 text-uppercase">Danh sách dịch vụ</div>
+                                            
+                                            {/* Render trực tiếp payment.paymentItems do Backend đã gộp sẵn */}
+                                            {payment.paymentItems && payment.paymentItems.map((item, idx) => (
+                                                <div key={item.id || idx} className="d-flex justify-content-between mb-3 align-items-center bg-light p-2 rounded-3">
+                                                    <div>
+                                                        <div className="fw-semibold">{item.itemName || item.testName}</div>
+                                                        <div className="text-muted small">{translateType(item.type)}</div>
+                                                    </div>
+                                                    <div className="fw-bold">
+                                                        {(item.amount || item.price || 0).toLocaleString('vi-VN')} VNĐ
+                                                    </div>
+                                                </div>
                                             ))}
-                                        </Row>
-                                    </Tab>
-                                </Tabs>
-                            </Card.Body>
-                        </Card>
+                                        </div>
+
+                                        {payment.paidAt && (
+                                            <div className="text-muted small border-top pt-3">
+                                                <div className="d-flex justify-content-between mb-2">
+                                                    <span className="fw-bold">Ngày thanh toán:</span>
+                                                    <span>{payment.paidAt}</span>
+                                                </div>
+                                                <div className="d-flex justify-content-between">
+                                                    <span className="fw-bold">Phương thức:</span>
+                                                    <span>{payment.method || 'Tiền mặt'}</span>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </Card.Body>
+
+                                    {/* Chỉ hiện nút Thanh toán nếu trạng thái là PENDING */}
+                                    {payment.status === 'PENDING' && (
+                                        <Card.Footer className="bg-transparent border-0 px-4 pb-4 pt-0">
+                                            <Button 
+                                                variant="primary" 
+                                                className="w-100 rounded-4 fw-bold border-0 shadow-sm" 
+                                                style={{ minHeight: '50px', fontSize: '1.1rem' }} 
+                                                onClick={() => setShowPaymentModal(true)}
+                                            >
+                                                Thanh toán ngay
+                                            </Button>
+                                        </Card.Footer>
+                                    )}
+                                </Card>
+                            </Col>
+                        </Row>
+
+                        {/* Modal Chọn Phương Thức Thanh Toán (Giữ nguyên như của bạn) */}
                         <Modal
                             show={showPaymentModal}
                             onHide={() => setShowPaymentModal(false)}
@@ -259,13 +159,11 @@ const PaymentItems = () => {
                             <Modal.Header closeButton className="border-bottom-0 pb-0">
                                 <Modal.Title className="fw-bold">Chọn phương thức thanh toán</Modal.Title>
                             </Modal.Header>
-                            <Modal.Body className="pt-2 px-4 pb-4 bg-white">
-
-
+                            <Modal.Body className="pt-3 px-4 pb-4 bg-white">
                                 <div className="d-grid gap-3">
                                     <label
                                         className={`border rounded-4 p-3 d-flex align-items-center gap-3 transition-all ${selectedMethod === 'MOMO' ? 'border-primary bg-light' : 'border-secondary-subtle bg-white'}`}
-                                        style={{ cursor: 'pointer', boxShadow: selectedMethod === 'MOMO' ? '0 10px 30px rgba(13,110,253,0.08)' : 'none' }}
+                                        style={{ cursor: 'pointer' }}
                                     >
                                         <input
                                             type="radio"
@@ -284,7 +182,7 @@ const PaymentItems = () => {
 
                                     <label
                                         className={`border rounded-4 p-3 d-flex align-items-center gap-3 transition-all ${selectedMethod === 'VNPAY' ? 'border-primary bg-light' : 'border-secondary-subtle bg-white'}`}
-                                        style={{ cursor: 'pointer', boxShadow: selectedMethod === 'VNPAY' ? '0 10px 30px rgba(13,110,253,0.08)' : 'none' }}
+                                        style={{ cursor: 'pointer' }}
                                     >
                                         <input
                                             type="radio"
@@ -313,10 +211,8 @@ const PaymentItems = () => {
                         </Modal>
                     </Container>
                 </main>
-
                 <Footer />
             </div>
-
         </>
     );
 };
