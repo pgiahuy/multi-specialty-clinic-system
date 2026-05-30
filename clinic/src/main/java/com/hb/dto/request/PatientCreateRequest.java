@@ -4,6 +4,7 @@
  */
 package com.hb.dto.request;
 
+import com.hb.enums.PatientRelationship;
 import java.time.LocalDate;
 import java.util.Date;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -22,20 +23,24 @@ public class PatientCreateRequest {
     private LocalDate dob;
     private String phone;
     private String address;
+    private PatientRelationship relationship;
     
 
     public PatientCreateRequest() {
+        
     }
 
-    public PatientCreateRequest(String cccd, String fullName, String gender, LocalDate dob, String phone,String address) {
+    public PatientCreateRequest(String cccd, String fullName, String gender, LocalDate dob, String phone, String address, PatientRelationship relationship) {
         this.cccd = cccd;
         this.fullName = fullName;
         this.gender = gender;
         this.dob = dob;
         this.phone = phone;
-        
         this.address = address;
+        this.relationship = relationship;
     }
+
+    
 
     /**
      * @return the fullName
@@ -120,6 +125,20 @@ public class PatientCreateRequest {
      */
     public void setCccd(String cccd) {
         this.cccd = cccd;
+    }
+
+    /**
+     * @return the relationship
+     */
+    public PatientRelationship getRelationship() {
+        return relationship;
+    }
+
+    /**
+     * @param relationship the relationship to set
+     */
+    public void setRelationship(PatientRelationship relationship) {
+        this.relationship = relationship;
     }
     
 }

@@ -34,6 +34,7 @@ export const endpoint = {
     'current-user': '/secure/users/profile',
     'appointments': '/secure/appointments',
     'appointment': (appointmentId) => `/secure/appointment/${appointmentId}`,
+    "appointment-patient": (patientId) => `/secure/appointments/patient/${patientId}`,
     'create-payment': '/secure/payments/create',
     'momo-return': '/secure/payments/momo/return',
     'payments': (patientId) => `/secure/payments/${patientId}`,
@@ -67,6 +68,7 @@ export const CLINIC_ENDPOINTS = {
     DOCTOR_CONFIRM_APPOINTMENT: (appointmentId) => `secure/appointments/${appointmentId}/confirm`,
     PATIENT_BOOKING_APPOINTMENT: 'secure/appointments',
     TEST_RESULTS: (patientId) => `secure/test/${patientId}`,
+    TEST_RESULTS_APPOINTMENT: (appointmentId) => `secure/tests/appointment/${appointmentId}`,
 };
 
 
@@ -76,6 +78,15 @@ export const USER_ENDPOINTS = {
     NOTIFICATIONS: 'secure/users/notifications',
     PATIENT_PROFILES: 'secure/profiles',
     PATIENT_PROFILE_DETAIL: (patientId) => `secure/profile/${patientId}`,
+};
+
+
+export const APPOINTMENT_ENDPOINTS = {
+    APPOINTMENTS: 'secure/appointments',
+    APPOINTMENT_DETAIL: (appointmentId) => `secure/appointment/${appointmentId}`,
+    APPOINTMENTS_BY_PATIENT: (patientId) => `secure/appointments/patient/${patientId}`,
+    CREATE_APPOINTMENT: 'secure/appointments',
+    CONFIRM_APPOINTMENT: (appointmentId) => `secure/appointments/${appointmentId}/confirm`,
 };
 
 export const PAYMENT_ENDPOINTS = {

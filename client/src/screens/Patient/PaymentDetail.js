@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import Footer from "../../components/Footer";
 import Header from "../../components/Header";
 import { authApis, PAYMENT_ENDPOINTS, USER_ENDPOINTS } from "../../configs/Apis";
+import MySpinner from "../../components/MySpinner";
 
 const PaymentDetail = () => {
     const { patientId } = useParams();
@@ -17,6 +18,15 @@ const PaymentDetail = () => {
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('MOMO');
     const [currentInvoice, setCurrentInvoice] = useState(null);
+    const [fromDate, setFromDate] = useState(() => {
+        const date = new Date();
+        date.setMonth(date.getMonth() - 1);
+        return date.toISOString().slice(0, 10);
+    });
+    const [toDate, setToDate] = useState(() => {
+        const date = new Date();
+        return date.toISOString().slice(0, 10);
+    });
     const [testDetails, setTestDetails] = useState([]);
     const [testNamesMap, setTestNamesMap] = useState({});
 
@@ -41,14 +51,19 @@ const PaymentDetail = () => {
         }
     };
 
-    const loadPayments = async (id) => {
+    const loadPayments = async (id, startDate, endDate) => {
         if (!id) {
             setPayments([]);
             return;
         }
         setLoadingPayments(true);
         try {
-            const res = await authApis().get(PAYMENT_ENDPOINTS.HISTORY(id));
+            const params = {};
+            if (startDate) params.startDate = startDate;
+            if (endDate) params.endDate = endDate;
+            const res = await authApis().get(PAYMENT_ENDPOINTS.HISTORY(id), {
+                params
+            });
             setPayments(res.data || []);
             loadTestNames(res.data);
         } catch (err) {
@@ -103,9 +118,9 @@ const PaymentDetail = () => {
     useEffect(() => {
         if (patientId) {
             setSelectedPatientId(String(patientId));
-            loadPayments(patientId);
+            loadPayments(patientId, fromDate, toDate);
         }
-    }, [patientId]);
+    }, [patientId, fromDate, toDate]);
 
     const handlePatientChange = (event) => {
         const value = event.target.value;
@@ -134,7 +149,7 @@ const PaymentDetail = () => {
         const type = String(item?.itemType || '').toUpperCase();
 
         if (type === 'LAB_TEST') {
-            
+
             if (item.referenceId && testNamesMap[item.referenceId]) {
                 return testNamesMap[item.referenceId];
             }
@@ -168,9 +183,27 @@ const PaymentDetail = () => {
         }
     };
 
+    const isPaymentInRange = (payment) => {
+        const rawDate = payment.createdDate || payment.createdAt || '';
+        const invoiceDate = rawDate
+            ? new Date(rawDate + 'T00:00:00')
+            : null;
+        if (!invoiceDate || Number.isNaN(invoiceDate.getTime())) return true;
+
+        if (fromDate) {
+            const from = new Date(fromDate + 'T00:00:00');
+            if (invoiceDate < from) return false;
+        }
+        if (toDate) {
+            const to = new Date(toDate + 'T23:59:59');
+            if (invoiceDate > to) return false;
+        }
+        return true;
+    };
+
     const filteredPayments = payments.filter((payment) => {
-        if (activeTab === 'paid') return isPaidInvoice(payment);
-        return !isPaidInvoice(payment);
+        if (activeTab === 'paid' ? !isPaidInvoice(payment) : isPaidInvoice(payment)) return false;
+        return isPaymentInRange(payment);
     });
 
     const handlePayClick = (payment) => {
@@ -216,14 +249,14 @@ const PaymentDetail = () => {
                 );
                 setShowPaymentModal(false);
                 setCurrentInvoice(null);
-                
+
             }
 
         } catch (error) {
             console.error("Lỗi thanh toán:", error);
 
-            
-            
+
+
         }
     };
 
@@ -237,141 +270,174 @@ const PaymentDetail = () => {
             <div className="d-flex flex-column min-vh-100 bg-light">
                 <Header />
 
-                <main className="flex-grow-1 py-5">
-                    <Container>
-                        <div className="mb-4 pb-3 border-bottom">
-                            <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-end gap-3">
+
+                <Container className="py-4">
+                    <style>{`.nav-pills .nav-link{transition: transform .12s ease, box-shadow .12s ease; cursor: pointer;}
+                                .nav-pills .nav-link:hover{transform: translateY(-4px); box-shadow: 0 10px 30px rgba(13,110,253,0.12);} 
+                                .nav-pills .nav-link.active{transform: none; box-shadow: none;}`}</style>
+
+                    <div className="mb-4 pb-3 border-bottom">
+                        <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3">
+
+
+                            <div>
+                                <h2 className="fw-bold mb-2 text-primary">Danh sách hóa đơn</h2>
+                            </div>
+
+
+                            <div className="d-flex flex-column flex-md-row align-items-md-end gap-3">
+
+
                                 <div>
-                                    <h2 className="fw-bold mb-2 text-primary">Danh sách hóa đơn</h2>
+                                    <Form.Label className="small text-muted mb-1">Bệnh nhân</Form.Label>
+                                    {loadingProfiles ? (
+                                        <div className="d-flex align-items-center gap-2 py-2 px-3 bg-white rounded shadow-sm" style={{ width: '250px' }}>
+                                            <MySpinner />
+                                        </div>
+                                    ) : (
+                                        <Form.Select
+                                            value={selectedPatientId}
+                                            className="rounded-3 shadow-sm px-3"
+                                            style={{ minWidth: '250px' }}
+                                            onChange={handlePatientChange}
+                                            aria-label="Chọn hồ sơ bệnh nhân"
+                                        >
+                                            <option value="">---Chọn hồ sơ bệnh nhân---</option>
+                                            {patientProfiles.map((profile) => (
+                                                <option key={profile.id} value={profile.id}>
+                                                    {profileLabel(profile)}
+                                                </option>
+                                            ))}
+                                        </Form.Select>
+                                    )}
                                 </div>
-                            </div>
-                            <div className="w-100 w-md-auto">
-                                {loadingProfiles ? (
-                                    <div className="d-flex align-items-center gap-2 py-2 px-3 bg-white rounded shadow-sm">
-                                        <Spinner animation="border" size="sm" />
-                                        <span className="text-muted">Đang tải hồ sơ...</span>
-                                    </div>
-                                ) : (
-                                    <Form.Select value={selectedPatientId} style={{ maxWidth: '250px' }} onChange={handlePatientChange} aria-label="Chọn hồ sơ bệnh nhân">
-                                        <option value="">---Chọn hồ sơ bệnh nhân---</option>
-                                        {patientProfiles.map((profile) => (
-                                            <option key={profile.id} value={profile.id}>
-                                                {profileLabel(profile)}
-                                            </option>
-                                        ))}
-                                    </Form.Select>
-                                )}
+
+
+                                <div>
+                                    <Form.Label className="small text-muted mb-1">Từ ngày</Form.Label>
+                                    <Form.Control
+                                        type="date"
+                                        value={fromDate}
+                                        className="rounded-3 shadow-sm px-3"
+                                        onChange={(e) => setFromDate(e.target.value)}
+                                        style={{ width: '160px' }}
+                                    />
+                                </div>
+
+
+                                <div>
+                                    <Form.Label className="small text-muted mb-1">Đến ngày</Form.Label>
+                                    <Form.Control
+                                        type="date"
+                                        value={toDate}
+                                        className="rounded-3 shadow-sm px-3"
+                                        onChange={(e) => setToDate(e.target.value)}
+                                        style={{ width: '160px' }}
+                                    />
+                                </div>
+
                             </div>
                         </div>
+                    </div>
 
-                        <div className="mb-3">
-                            <Tabs
-                                activeKey={activeTab}
-                                onSelect={(key) => setActiveTab(key)}
-                                className="nav-pills px-1 py-1 rounded-4 bg-white"
-                                style={{ boxShadow: '0 12px 30px rgba(13,110,253,0.04)' }}
-                            >
-                                <Tab eventKey="unpaid" title="Chưa thanh toán" tabClassName="rounded-pill px-3 py-2" />
-                                <Tab eventKey="paid" title="Đã thanh toán" tabClassName="rounded-pill px-3 py-2" />
-                            </Tabs>
-                        </div>
 
-                        <Row className="g-4">
-                            {loadingPayments ? (
-                                <Col>
-                                    <div className="text-center p-5 bg-white rounded border shadow-sm">
-                                        <Spinner animation="border" />
-                                        <div className="text-muted mt-3">Đang tải hóa đơn...</div>
-                                    </div>
+                    <div className="mb-4 d-flex justify-content-start">
+                        <Tabs
+                            activeKey={activeTab}
+                            onSelect={(key) => setActiveTab(key)}
+                            className="nav-pills px-1 py-1 rounded-4 bg-white d-inline-flex"
+                            style={{ boxShadow: '0 12px 30px rgba(13,110,253,0.04)' }}
+                        >
+                            <Tab eventKey="unpaid" title="Chưa thanh toán" tabClassName="rounded-pill px-3 py-2" />
+                            <Tab eventKey="paid" title="Đã thanh toán" tabClassName="rounded-pill px-3 py-2" />
+                        </Tabs>
+                    </div>
+
+                    <Row className="g-4">
+                        {loadingPayments ? (
+                            <Col>
+                                <div className="text-center p-5 bg-white rounded border shadow-sm">
+                                    <MySpinner />
+                                    <div className="text-muted mt-3">Đang tải hóa đơn...</div>
+                                </div>
+                            </Col>
+                        ) : filteredPayments.length === 0 ? (
+                            <Col>
+                                <div className="text-center text-muted py-5">
+                                    Không có hóa đơn phù hợp.
+                                </div>
+                            </Col>
+                        ) : (
+                            filteredPayments.map((p) => (
+                                <Col key={p.id} xs={12} md={6} lg={4}>
+                                    <Card className="h-100 shadow-sm border-0" style={{ borderRadius: '20px', overflow: 'hidden' }}>
+                                        <div className="h-100 d-flex flex-column bg-white">
+                                            <Card.Header className="bg-white border-0 pt-4 px-4 pb-2">
+                                                <div className="d-flex justify-content-between align-items-start">
+
+
+                                                    <div>
+                                                        <div className="text-success fw-bold fs-5 mb-1">
+                                                            {getInvoiceTitle(p)}
+                                                        </div>
+                                                        <div className="text-muted small">
+                                                            <i className="bi bi-calendar-event me-2"></i>
+                                                            {p.createdDate || p.createdAt || 'Không có ngày'}
+                                                        </div>
+                                                    </div>
+
+
+                                                    <div>
+                                                        <Badge bg={p.status === 'SUCCESS' ? 'success' : 'warning'} className="rounded-pill px-3 py-2 text-white">
+                                                            {p.status === 'SUCCESS' ? 'ĐÃ THANH TOÁN' : 'CHỜ THANH TOÁN'}
+                                                        </Badge>
+                                                    </div>
+
+                                                </div>
+                                            </Card.Header>
+
+
+                                            <Card.Body className="d-flex flex-column px-4 py-3">
+
+                                                <div className="mb-2">
+                                                    {p.paymentItems && p.paymentItems.length > 0 && String(p.paymentItems[0].itemType).toUpperCase() === 'APPOINTMENT' && (
+                                                        <Button
+                                                            variant="primary"
+                                                            className="rounded-4 px-3 py-2 w-100 fw-medium"
+                                                            onClick={() => navigate(`/appointment/${p.paymentItems[0].referenceId}`)}
+                                                        >
+                                                            Xem chi tiết
+                                                        </Button>
+                                                    )}
+                                                </div>
+
+                                                <div className="mt-auto pt-3 border-top">
+                                                    <div className="d-flex justify-content-between align-items-center mb-3">
+                                                        <span className="text-uppercase small fw-bold text-secondary">Tổng cộng:</span>
+                                                        <span className="fs-5 fw-bold text-primary">
+                                                            {(p.totalAmount || 0).toLocaleString('vi-VN')} đ
+                                                        </span>
+                                                    </div>
+
+                                                    {!isPaidInvoice(p) && activeTab === 'unpaid' &&
+                                                        <Button
+                                                            variant="primary"
+                                                            className="w-100 rounded-pill py-2"
+                                                            onClick={() => handlePayClick(p)}
+                                                        >
+                                                            Thanh toán
+                                                        </Button>
+                                                    }
+                                                </div>
+                                            </Card.Body>
+                                        </div>
+                                    </Card>
                                 </Col>
-                            ) : filteredPayments.length === 0 ? (
-                                <Col>
-                                    <div className="text-center p-5 bg-white rounded border shadow-sm">
-                                        <h5 className="text-muted">Không có hóa đơn phù hợp.</h5>
-                                    </div>
-                                </Col>
-                            ) : (
-                                filteredPayments.map((p) => (
-                                    <Col key={p.id} xs={12} md={6} lg={4}>
-                                        <Card className="h-100 shadow-sm border-0" style={{ borderRadius: '20px', overflow: 'hidden' }}>
-                                            <div className="h-100 d-flex flex-column bg-white">
-                                                <Card.Header className="bg-white border-0 pt-4 px-4 pb-2">
-                                                    <div className="d-flex justify-content-between align-items-start">
+                            ))
+                        )}
+                    </Row>
+                </Container>
 
-
-                                                        <div>
-                                                            <div className="text-success fw-bold fs-5 mb-1">
-                                                                {getInvoiceTitle(p)}
-                                                            </div>
-                                                            <div className="text-muted small">
-                                                                <i className="bi bi-calendar-event me-2"></i>
-                                                                {p.createdDate || p.createdAt || 'Không có ngày'}
-                                                            </div>
-                                                        </div>
-
-
-                                                        <div>
-                                                            <Badge bg={p.status === 'SUCCESS' ? 'success' : 'warning'} className="rounded-pill px-3 py-2 text-dark">
-                                                                {p.status === 'SUCCESS' ? 'ĐÃ THANH TOÁN' : 'CHỜ THANH TOÁN'}
-                                                            </Badge>
-                                                        </div>
-
-                                                    </div>
-                                                </Card.Header>
-
-
-                                                <Card.Body className="d-flex flex-column px-4 py-3">
-                                                    <div className="mb-4 flex-grow-1">
-                                                        <div className="fw-semibold text-secondary mb-3 small text-uppercase">Chi tiết dịch vụ</div>
-                                                        {p.paymentItems && p.paymentItems.length > 0 ? (
-                                                            <ul className="list-unstyled mb-0">
-                                                                {p.paymentItems.map((item, idx) => (
-                                                                    <li key={item.id || idx} className="mb-2 pb-2 border-bottom border-light">
-                                                                        <div className="d-flex justify-content-between align-items-start">
-                                                                            <div className="text-dark small fw-semibold pe-2">
-                                                                                • {getItemLabel(item)}
-                                                                            </div>
-                                                                            <div className="text-muted small text-end fw-bold">
-                                                                                {(item.amount || 0).toLocaleString('vi-VN')} đ
-                                                                            </div>
-                                                                        </div>
-                                                                    </li>
-                                                                ))}
-                                                            </ul>
-                                                        ) : (
-                                                            <div className="text-muted small fst-italic">Không có chi tiết.</div>
-                                                        )}
-                                                    </div>
-
-                                                    <div className="mt-auto pt-3 border-top">
-                                                        <div className="d-flex justify-content-between align-items-center mb-3">
-                                                            <span className="text-uppercase small fw-bold text-secondary">Tổng cộng:</span>
-                                                            <span className="fs-5 fw-bold text-primary">
-                                                                {(p.totalAmount || 0).toLocaleString('vi-VN')} đ
-                                                            </span>
-                                                        </div>
-
-                                                        {!isPaidInvoice(p) && activeTab === 'unpaid' ? (
-                                                            <Button
-                                                                variant="primary"
-                                                                className="w-100 rounded-pill py-2"
-                                                                onClick={() => handlePayClick(p)}
-                                                            >
-                                                                Thanh toán
-                                                            </Button>
-                                                        ) : (
-                                                            <div className="text-end text-success fw-semibold small">Đã thanh toán</div>
-                                                        )}
-                                                    </div>
-                                                </Card.Body>
-                                            </div>
-                                        </Card>
-                                    </Col>
-                                ))
-                            )}
-                        </Row>
-                    </Container>
-                </main>
 
                 <Footer />
 
@@ -380,18 +446,18 @@ const PaymentDetail = () => {
                         <Modal.Title className="fw-bold fs-5">Xác nhận thanh toán</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                       
-                        
+
+
                         <div className="mb-4">
                             <div className="small text-muted mb-2">Chọn phương thức thanh toán</div>
 
-                           
+
                             <div
                                 className={`d-flex align-items-center p-3 mb-2 border rounded-3 ${selectedPaymentMethod === 'CASH' ? 'border-primary bg-primary bg-opacity-10' : 'bg-white'}`}
                                 style={{ cursor: 'pointer', transition: 'all 0.2s' }}
                                 onClick={() => setSelectedPaymentMethod('CASH')}
                             >
-                               
+
                                 <div className="flex-grow-1">
                                     <div className="fw-bold text-dark">Tiền mặt tại quầy</div>
                                     <div className="small text-muted">Thanh toán trực tiếp cho thu ngân</div>
@@ -401,13 +467,13 @@ const PaymentDetail = () => {
                                 </div>
                             </div>
 
-                           
+
                             <div
                                 className={`d-flex align-items-center p-3 border rounded-3 ${selectedPaymentMethod === 'MOMO' ? 'border-danger bg-danger bg-opacity-10' : 'bg-white'}`}
                                 style={{ cursor: 'pointer', transition: 'all 0.2s' }}
                                 onClick={() => setSelectedPaymentMethod('MOMO')}
                             >
-                                
+
                                 <div className="flex-grow-1">
                                     <div className="fw-bold" style={{ color: '#a50064' }}>Ví điện tử MoMo</div>
                                     <div className="small text-muted">Thanh toán quét mã QR</div>

@@ -15,6 +15,7 @@ import com.hb.service.AppointmentService;
 import com.hb.service.PaymentItemsService;
 import com.hb.service.PaymentService;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +67,7 @@ public class PaymentServiceImpl implements PaymentService {
         p.setAppointment(appointment);
         p.setStatus(PaymentStatus.PENDING);
         p.setTotalAmount(BigDecimal.ONE);
-        p.setCreatedAt(LocalDateTime.now());
+        p.setCreatedAt(LocalDate.now());
         paymentRepo.addOrUpdatePayment(p);
 
         return p;

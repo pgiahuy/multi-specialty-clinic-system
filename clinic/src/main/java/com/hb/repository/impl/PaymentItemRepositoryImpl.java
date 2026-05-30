@@ -8,7 +8,12 @@ import com.hb.pojo.Appointment;
 import com.hb.pojo.Payment;
 import com.hb.pojo.PaymentItems;
 import com.hb.repository.PaymentItemRepository;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
@@ -99,24 +104,27 @@ public class PaymentItemRepositoryImpl implements PaymentItemRepository {
         }
 
         if (startDate != null && !startDate.isEmpty() && endDate != null && !endDate.isEmpty()) {
-            hql.append(" AND p.paidAt BETWEEN :startDate AND :endDate");
+            hql.append(" AND p.createdAt >= :startDate AND p.createdAt < :endDate");
         }
 
         Query<PaymentItems> query = session.createQuery(hql.toString(), PaymentItems.class);
         query.setParameter("paymentId", paymentId);
-        
-        
+
         if (status != null && status.isEmpty()) {
             query.setParameter("status", status);
         }
 
         if (startDate != null && !startDate.isEmpty() && endDate != null && !endDate.isEmpty()) {
 
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            query.setParameter("startDate", LocalDateTime.parse(startDate, formatter));
-            query.setParameter("endDate", LocalDateTime.parse(endDate, formatter));
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+            LocalDate start = LocalDate.parse(startDate, formatter);
+            LocalDate end = LocalDate.parse(endDate, formatter);
+
+            query.setParameter("startDate", start);
+            query.setParameter("endDate", end.plusDays(1));
         }
-        
+
         return query.getResultList();
     }
 
