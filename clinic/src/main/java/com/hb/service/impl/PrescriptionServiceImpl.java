@@ -2,17 +2,17 @@ package com.hb.service.impl;
 
 import com.hb.dto.request.PrescriptionCreateRequest;
 import com.hb.dto.request.PrescriptionItemCreateRequest;
+import com.hb.enums.IventoryLogType;
 import com.hb.enums.PrescriptionStatus;
 import com.hb.exception.BadRequestException;
 import com.hb.exception.ResourceNotFoundException;
-import com.hb.pojo.Inventorylog;
+import com.hb.pojo.InventoryLog;
 import com.hb.pojo.MedicalRecord;
 import com.hb.pojo.Medicine;
 import com.hb.pojo.MedicineBatch;
 import com.hb.pojo.Prescription;
 import com.hb.pojo.PrescriptionItem;
 import com.hb.pojo.User;
-import com.hb.repository.InventorylogRepository;
 import com.hb.repository.MedicalRecordRepository;
 import com.hb.repository.MedicineBatchRepository;
 import com.hb.repository.MedicineRepository;
@@ -30,6 +30,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.hb.repository.InventoryLogRepository;
 
 @Service
 public class PrescriptionServiceImpl implements PrescriptionService {
@@ -45,7 +46,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
     @Autowired
     private MedicineRepository medicineRepo;
     @Autowired
-    private InventorylogRepository inventoryLogRepo;
+    private InventoryLogRepository inventoryLogRepo;
     @Autowired
     private MedicineBatchRepository medicineBatchRepo;
 
@@ -140,7 +141,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Prescription createPrescription(PrescriptionCreateRequest req) {
+    public Prescription createPrescription(PrescriptionCreateRequest req, String username) {
         this.validateReq(req);
         Prescription p;
 
@@ -223,14 +224,14 @@ public class PrescriptionServiceImpl implements PrescriptionService {
 
                 medicineBatchRepo.saveOrUpdate(batch);
 
-                Inventorylog log = new Inventorylog();
+                InventoryLog log = new InventoryLog();
                 log.setMedicineId(m);
                 log.setBatchId(batch);
                 log.setChangeAmount(-qtyDeducted);            
-                log.setReason("PRESCRIPTION_EXPORT");
+                log.setReason(IventoryLogType.PRESCRIPTION_EXPORT.getLabel());
                 log.setReferenceId(p.getId());
                 log.setCreatedAt(LocalDateTime.now());
-                log.setCreatedBy("SYSTEM_AUTO");
+                log.setCreatedBy(username);
 
                 inventoryLogRepo.createInventoryLog(log);
             }

@@ -4,18 +4,23 @@
  */
 package com.hb.repository.impl;
 
-import com.hb.pojo.Inventorylog;
-import com.hb.repository.InventorylogRepository;
+import com.hb.pojo.InventoryLog;
 import java.util.Map;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
+import com.hb.repository.InventoryLogRepository;
+import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Repository;
 
 /**
  *
  * @author HUY
  */
-public class InventorylogRepositoryImpl implements InventorylogRepository{
+
+@Repository
+@Transactional
+public class InventoryLogRepositoryImpl implements InventoryLogRepository{
 
     @Autowired  
     private LocalSessionFactoryBean factory;
@@ -23,13 +28,13 @@ public class InventorylogRepositoryImpl implements InventorylogRepository{
     
 
     @Override
-    public void createInventoryLog(Inventorylog log) {
+    public void createInventoryLog(InventoryLog log) {
         Session session = this.factory.getObject().getCurrentSession();
         session.persist(log);
     }
 
     @Override
-    public long count(Map<String, String> params, Class<Inventorylog> clazz) {
+    public long count(Map<String, String> params, Class<InventoryLog> clazz) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
     

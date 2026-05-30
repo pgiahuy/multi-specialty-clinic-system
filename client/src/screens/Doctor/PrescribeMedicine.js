@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Button, Card, Col, Container, Form, InputGroup, Row, Table } from "react-bootstrap";
-import { ArrowLeft, XCircleFill } from "react-bootstrap-icons";
+import { Button, ButtonGroup, Badge, Card, Col, Container, Form, InputGroup, Row, Table } from "react-bootstrap";
+import { ArrowLeft, Plus, PlusSquare, PlusSquareFill, XCircleFill, Save, CheckCircle, XSquareFill, TwitterX, XSquare } from "react-bootstrap-icons";
 import Footer from "../../components/Footer";
 import Header from "../../components/Header";
 import { authApis, CLINIC_ENDPOINTS, clinicApis } from "../../configs/Apis";
@@ -29,8 +29,35 @@ const PrescribeMedicine = () => {
     const medicineLoadMoreRef = useRef(null);
 
     const stickyStyle = { top: "75px" };
-    const scrollableStyle = { maxHeight: "62vh", overflowY: "auto", paddingRight: "6px" };
-    const actionBtnClass = "btn-sm rounded-pill fw-semibold px-3";
+    const scrollableStyle = { paddingRight: "6px" };
+    const smallInputStyle = { maxWidth: "76px", margin: "0 auto" };
+    const noteInputStyle = { minWidth: "110px", resize: "none", fontSize: "0.9rem" };
+    const searchRowStyle = { fontSize: "0.92rem", lineHeight: 1.08 };
+
+    const prescriptionTotals = useMemo(() => {
+        const totalQuantity = prescriptionItems.reduce((sum, it) => sum + (Number(it.quantity) || 0), 0);
+        return { totalItems: prescriptionItems.length, totalQuantity };
+    }, [prescriptionItems]);
+
+
+    const getAgeFromBirthYear = (birthValue) => {
+        if (!birthValue) {
+            return "N/A";
+        }
+
+        const birthText = String(birthValue).trim();
+        const yearMatch = birthText.match(/\b(19|20)\d{2}\b/);
+        const birthYear = yearMatch ? Number.parseInt(yearMatch[0], 10) : Number.parseInt(birthText, 10);
+
+        if (!Number.isFinite(birthYear)) {
+            return "N/A";
+        }
+
+        const currentYear = new Date().getFullYear();
+        const age = currentYear - birthYear;
+
+        return age >= 0 ? `${age}` : "N/A";
+    };
 
     const loadMedicines = async ({ kw = "", page = 1, replace = true } = {}) => {
         try {
@@ -210,6 +237,8 @@ const PrescribeMedicine = () => {
                     unit: medicine.unit || "Viên",
                     totalStock: medicine.totalStock ?? 0,
                     quantity: 1,
+                    daysToUse: 7,
+                    note: "",
                 },
             ];
         });
@@ -232,6 +261,20 @@ const PrescribeMedicine = () => {
                     quantity: Math.min(parsedValue, maxQuantity),
                 };
             })
+        );
+    };
+
+    const updatePrescriptionDays = (medicineId, value) => {
+        const parsedValue = Math.max(1, Number.parseInt(value, 10) || 1);
+
+        setPrescriptionItems((currentItems) =>
+            currentItems.map((item) => (item.id !== medicineId ? item : { ...item, daysToUse: parsedValue }))
+        );
+    };
+
+    const updatePrescriptionNote = (medicineId, value) => {
+        setPrescriptionItems((currentItems) =>
+            currentItems.map((item) => (item.id !== medicineId ? item : { ...item, note: value }))
         );
     };
 
@@ -259,6 +302,8 @@ const PrescribeMedicine = () => {
                 items: prescriptionItems.map((item) => ({
                     medicineId: item.id,
                     quantity: item.quantity,
+                    daysToUse: item.daysToUse,
+                    note: item.note,
                 })),
             };
 
@@ -287,15 +332,14 @@ const PrescribeMedicine = () => {
         <div className="d-flex flex-column min-vh-100 bg-light">
             <Header />
 
-            <Container className="py-4 flex-grow-1" style={{ maxWidth: "95%" }}>
-                <Row className="g-4">
-                    <Col xs={12} lg={6}>
-                        <div className="d-flex flex-column gap-4">
-
-
+            <Container className="py-3 flex-grow-1" style={{ maxWidth: "96%" }}>
+                <Row className="g-2">
+                    <Col xs={12} lg={5} >
+                        <div className="d-flex flex-column gap-3" >
                             <Card className="border-0 shadow-sm rounded-3">
-                                <Card.Body className="p-3">
-                                    <div className="bg-light p-2 border mb-3 rounded-2">
+
+                                <Card.Body className="p-2">
+                                    <div className="bg-light p-2 border mb-1 rounded-2">
                                         <Row className="g-2 align-items-center">
                                             <InputGroup size="md">
                                                 <Form.Control
@@ -309,11 +353,11 @@ const PrescribeMedicine = () => {
                                             </InputGroup>
                                         </Row>
                                     </div>
+                                    {statusMessage ? <div className="alert alert-success py-1 small mb-1">{statusMessage}</div> : null}
 
-                                    <div className="mb-3">
+                                    <div className="mb-2">
 
-                                        {isBrowsingMedicines ? (
-                                            <div className="text-muted small mb-2">Để trống ô tìm kiếm để xem danh sách thuốc theo từng trang.</div>
+                                        {isBrowsingMedicines ? (<>  </>
                                         ) : searching ? (
                                             <div className="text-muted small">Đang tìm thuốc...</div>
                                         ) : searchResults.length === 0 ? (
@@ -322,50 +366,58 @@ const PrescribeMedicine = () => {
 
                                         <div
                                             ref={medicineListContainerRef}
-                                            className="border rounded-2 bg-white"
-                                            style={{ maxHeight: "65vh", overflowY: "auto" }}
+                                            className="border rounded-2 bg-white thin-scrollbar "
+                                            style={{ maxHeight: "70vh", overflowY: "auto" }}
                                         >
-                                            {searchResults.length > 0 ? (
-                                                <Table responsive borderless className="align-middle table-hover table-sm mb-0">
-                                                    <thead className="table-light border-bottom text-secondary small">
-                                                        <tr>
-                                                            <th className="text-center" style={{ width: "50px", position: "sticky", top: 0, zIndex: 3, background: "#f8f9fa" }}>STT</th>
-                                                            <th style={{ position: "sticky", top: 0, zIndex: 3, background: "#f8f9fa" }}>Tên thuốc</th>
-                                                            <th className="text-center" style={{ width: "100px", position: "sticky", top: 0, zIndex: 3, background: "#f8f9fa" }}>Tồn kho</th>
-                                                            <th className="text-center" style={{ width: "120px", position: "sticky", top: 0, zIndex: 3, background: "#f8f9fa" }}>Đơn vị</th>
-                                                            <th style={{ width: "110px", position: "sticky", top: 0, zIndex: 3, background: "#f8f9fa" }}></th>
-                                                        </tr>
-                                                    </thead>
+                                            <Table borderless className="align-middle table-hover table-sm mb-0">
+                                                <thead className="table-light border-bottom text-secondary small sticky-top top-0">                                                    <tr>
+                                                    <th className="text-center" style={{ width: "50px", position: "sticky", top: 0, zIndex: 3, background: "#f8f9fa" }}>STT</th>
+                                                    <th style={{ position: "sticky", top: 0, zIndex: 3, background: "#f8f9fa" }}>Tên thuốc</th>
+                                                    <th className="text-center" style={{ width: "4rem", position: "sticky", top: 0, zIndex: 3, background: "#f8f9fa" }}>Kho</th>
+                                                    <th className="text-center" style={{ width: "4rem", position: "sticky", top: 0, zIndex: 3, background: "#f8f9fa" }}>Đơn vị</th>
+                                                    <th style={{ width: "3rem", position: "sticky", top: 0, zIndex: 3, background: "#f8f9fa" }}></th>
+                                                </tr>
+                                                </thead>
+                                                {searchResults.length > 0 ? (
+
                                                     <tbody>
                                                         {searchResults.map((medicine, index) => {
                                                             const added = prescriptionItems.some((item) => item.id === medicine.id);
 
                                                             return (
-                                                                <tr key={medicine.id}>
-                                                                    <td className="text-center text-muted small">{index + 1}</td>
-                                                                    <td>
+                                                                <tr key={medicine.id} style={searchRowStyle}>
+                                                                    <td className="text-center text-muted small py-1">{index + 1}</td>
+                                                                    <td className="py-1">
                                                                         <div className="fw-bold text-dark">{medicine.name}</div>
                                                                         <small className="text-muted">{medicine.code || "Không có mã"}</small>
                                                                     </td>
-                                                                    <td className="text-center fw-semibold">{medicine.totalStock ?? 0}</td>
-                                                                    <td className="text-center small text-secondary">{medicine.unit || "Viên"}</td>
-                                                                    <td className="text-end">
+                                                                    <td className="text-center text-muted small fw-semibold py-1">
+                                                                        {medicine.totalStock ?? 0}
+                                                                    </td>
+                                                                    <td className="text-center small py-1">
+                                                                        {medicine.unit || "Viên"}
+                                                                    </td>
+                                                                    <td className="text-end py-1">
                                                                         <Button
-                                                                            size="sm"
-                                                                            variant={added ? "outline-secondary" : "outline-primary"}
+                                                                            size="md"
+                                                                            variant="link"
                                                                             onClick={() => addMedicineToPrescription(medicine)}
                                                                             disabled={medicine.totalStock !== undefined && medicine.totalStock <= 0}
+                                                                            className={added ? "text-success p-0" : "text-primary p-0"}
+                                                                            style={{ padding: 0, minWidth: "3rem" }}
+                                                                            title={added ? "Đã thêm" : "Thêm"}
                                                                         >
-                                                                            {added ? "Đã thêm" : "Thêm"}
+                                                                            {added ? <CheckCircle size={18} /> : <PlusSquareFill size={18} />}
                                                                         </Button>
                                                                     </td>
                                                                 </tr>
                                                             );
                                                         })}
                                                     </tbody>
-                                                </Table>
-                                            ) : null}
 
+                                                ) : null}
+
+                                            </Table>
                                             {isBrowsingMedicines ? (
                                                 <div ref={medicineLoadMoreRef} className="py-2 text-center text-muted small border-top">
                                                     {loadingMoreMedicines ? "Đang tải thêm thuốc..." : hasMoreMedicines ? "Cuộn xuống để tải thêm" : "Đã hiển thị hết danh sách"}
@@ -374,108 +426,156 @@ const PrescribeMedicine = () => {
                                         </div>
                                     </div>
 
-                                    {statusMessage ? <div className="alert alert-success py-2 small mb-0">{statusMessage}</div> : null}
+
                                 </Card.Body>
                             </Card>
                         </div>
                     </Col>
 
-                    <Col xs={12} lg={6}>
-                        <Card className="border-0 shadow-sm rounded-3 bg-white">
-                            <Card.Body className="bg-dark text-white fw-bold py-3 border-0 d-flex justify-content-between align-items-center">
-                                <span className="small tracking-wide">THÔNG TIN LÂM SÀNG</span>
-                                <span className="badge bg-secondary fw-semibold rounded-pill">BA#{medicalRecord?.id}</span>
-                            </Card.Body>
 
-                            <Card.Body className="p-3 d-flex flex-row" style={scrollableStyle}>
-                                <Col lg={4}>
-                                    <div className="text-muted small mb-1">Bệnh nhân tiếp nhận</div>
-                                    <div className="fw-bold text-primary fs-5">{medicalRecord?.patientName}</div>
-                                    <div className="small mt-1 fw-medium">Giới tính: {medicalRecord?.gender}</div>
-                                    <div className="small mt-1 fw-medium">Ngày sinh: {medicalRecord?.dob}</div>
-                                </Col>
+                    <Col xs={12} lg={7}>
+                        <Card className="border-0 shadow-sm rounded-3 h-100" style={{ minHeight: "78vh" }}>
+                            <Card.Body className="p-2 p-xl-3 d-flex flex-column gap-3" style={scrollableStyle}>
+                                <div className="clinical-meta p-3 bg-light border border-light-subtle rounded-2">
+                                    <div className="row g-3">
 
-                                <Col lg={8}>
-                                    <div>
-                                        <div className="small mb-1">Chẩn đoán bệnh lý</div>
-                                        <div className="p-2 bg-light border border-secondary-subtle text-dark rounded-0 fw-semibold small">
-                                            {medicalRecord?.diagnosis || "Chưa có kết luận chẩn đoán"}
-                                        </div>
+                                        <Col xs={12} md={5} className="d-flex flex-column justify-content-center border-end-md">
+                                            <div className="d-flex align-items-center gap-2 mb-2">
+                                                <span className="badge bg-primary-subtle text-primary fw-bold text-uppercase" style={{ fontSize: "0.75rem" }}>
+                                                    Thông tin lâm sàng
+                                                </span>
+                                                <span className="text-muted fw-bold small">BA #{medicalRecord?.id}</span>
+                                            </div>
+
+                                            <h5 className="patient-name fw-bold text-dark mb-1">
+                                                {medicalRecord?.patientName || "—"}
+                                            </h5>
+
+                                            <div className="patient-meta text-secondary small">
+                                                <span className="fw-medium">{medicalRecord?.gender || "N/A"}</span>
+                                                &nbsp;&nbsp; -&nbsp;&nbsp;&nbsp;
+                                                <span>{getAgeFromBirthYear(medicalRecord?.dob)} tuổi</span>
+                                            </div>
+                                        </Col>
+
+
+                                        <Col xs={12} md={7}>
+                                            <div className="d-flex flex-column gap-2">
+
+                                                <div className="clinical-card p-2 bg-white border border-light-subtle rounded-2 small">
+                                                    <div className="fw-bold text-secondary mb-1" style={{ fontSize: "0.8rem" }}>
+                                                        Chẩn đoán bệnh lý
+                                                    </div>
+                                                    <div className="text-secondary ps-1" style={{ whiteSpace: 'pre-line', fontSize: "0.825rem" }}>
+                                                        {medicalRecord?.diagnosis || "Chưa có kết luận chẩn đoán"}
+                                                    </div>
+                                                </div>
+                                                <div className="clinical-card p-2 bg-white border border-light-subtle rounded-2 small">
+                                                    <div className="fw-bold text-muted mb-1" style={{ fontSize: "0.8rem" }}>
+                                                        Ghi chú lâm sàng
+                                                    </div>
+                                                    <div className="text-muted ps-1" style={{ whiteSpace: 'pre-line', fontSize: "0.825rem" }}>
+                                                        {medicalRecord?.note || "Không có ghi chú bổ sung từ hồ sơ bệnh án."}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </Col>
                                     </div>
+                                </div>
 
-                                    <div className="mb-2 mt-3">
-                                        <div className="small mb-1">Ghi chú</div>
-                                        <div className="p-2 bg-light border border-light-subtle text-muted rounded-0 small" style={{ whiteSpace: "pre-line" }}>
-                                            {medicalRecord?.note || "Không có ghi chú bổ sung từ hồ sơ bệnh án."}
-                                        </div>
-                                    </div>
-                                </Col>
-                            </Card.Body>
-                        </Card>
-
-                        <Card className="border-0 shadow-sm rounded-3 sticky-top" style={stickyStyle}>
-                            <Card.Header className="bg-white border-bottom py-3 px-3">
-                                <h5 className="mb-0 fw-bold text-dark small tracking-wide text-uppercase">Toa thuốc hiện tại</h5>
-                            </Card.Header>
-
-                            <Card.Body className="p-3" style={scrollableStyle}>
-                                <div className="mb-3">
+                                <div>
                                     {prescriptionItems.length === 0 ? (
-                                        <div className="p-4 border rounded-2 bg-white text-muted small text-center">
-                                            Chưa có thuốc nào trong toa. Hãy tìm thuốc ở cột bên trái và thêm vào danh sách.
+                                        <div className="p-3 border rounded-2 bg-white text-muted small text-center">
+                                            Chưa có thuốc nào trong toa. Hãy tìm thuốc và thêm vào toa.
                                         </div>
                                     ) : (
-                                        <Table responsive borderless className="align-middle border table-hover table-sm mb-0">
-                                            <thead className="table-light border-bottom text-secondary small">
-                                                <tr>
-                                                    <th style={{ width: "50px" }} className="text-center">STT</th>
-                                                    <th>Tên thuốc</th>
-                                                    <th style={{ width: "130px" }} className="text-center">Số lượng</th>
-                                                    <th style={{ width: "120px" }} className="text-center">Đơn vị</th>
-                                                    <th style={{ width: "50px" }}></th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {prescriptionItems.map((medicine, index) => (
-                                                    <tr key={medicine.id}>
-                                                        <td className="text-center text-muted small">{index + 1}</td>
-                                                        <td>
-                                                            <div className="fw-bold text-dark">{medicine.name}</div>
-                                                            <small className="text-muted">Tồn kho: {medicine.totalStock}</small>
-                                                        </td>
-                                                        <td>
-                                                            <Form.Control
-                                                                type="number"
-                                                                min={1}
-                                                                max={medicine.totalStock > 0 ? medicine.totalStock : undefined}
-                                                                value={medicine.quantity}
-                                                                onChange={(e) => updatePrescriptionQuantity(medicine.id, e.target.value)}
-                                                                className="text-center"
-                                                            />
-                                                        </td>
-                                                        <td className="text-center fw-semibold">{medicine.unit}</td>
-                                                        <td>
-                                                            <Button variant="link" className="text-danger p-0" onClick={() => removePrescriptionItem(medicine.id)}>
-                                                                <XCircleFill size={18} />
-                                                            </Button>
-                                                        </td>
+                                        <div style={{ overflowX: "auto" }} className="rounded-1 border">
+                                            <Table responsive borderless striped className="prescription-table align-middle table-hover table-sm mb-0  rounded-1">
+                                                <thead className="table-light border-bottom text-secondary small">
+                                                    <tr>
+                                                        <th style={{ width: "3rem" }} className="text-center py-2">STT</th>
+                                                        <th className="py-2">Tên thuốc</th>
+                                                        <th style={{ width: "5rem" }} className="text-center py-2">SL</th>
+                                                        <th style={{ width: "5rem" }} className="text-center py-2 px-0">Ngày dùng</th>
+                                                        <th style={{ width: "180px" }} className="text-center py-2">Ghi chú</th>
+                                                        <th style={{ width: "5rem" }} className="text-center py-2">Đơn vị</th>
+                                                        <th style={{ width: "50px" }} className="py-2"></th>
                                                     </tr>
-                                                ))}
-                                            </tbody>
-                                        </Table>
+                                                </thead>
+                                                <tbody>
+                                                    {prescriptionItems.map((medicine, index) => (
+                                                        <tr key={medicine.id}>
+                                                            <td className="text-center text-muted small py-1">{index + 1}</td>
+                                                            <td className="py-1">
+                                                                <div className="small fw-semibold text-dark">{medicine.name}</div>
+                                                            </td>
+                                                            <td className="text-center py-1">
+                                                                <Form.Control
+                                                                    type="text"
+                                                                    inputMode="numeric"
+                                                                    pattern="[0-9]*"
+                                                                    value={medicine.quantity}
+                                                                    onChange={(e) => updatePrescriptionQuantity(medicine.id, e.target.value)}
+                                                                    className="text-center qty-input p-1"
+                                                                    aria-label={`Số lượng ${medicine.name}`}
+                                                                />
+                                                            </td>
+                                                            <td className="text-center py-1">
+                                                                <Form.Control
+                                                                    type="text"
+                                                                    inputMode="numeric"
+                                                                    pattern="[0-9]*"
+                                                                    value={medicine.daysToUse}
+                                                                    onChange={(e) => updatePrescriptionDays(medicine.id, e.target.value)}
+                                                                    className="text-center qty-input p-1"
+                                                                    aria-label={`Ngày dùng ${medicine.name}`}
+                                                                />
+                                                            </td>
+                                                            <td className="py-1">
+                                                                <Form.Control
+                                                                    as="textarea"
+                                                                    rows={1}
+                                                                    maxLength={200}
+                                                                    value={medicine.note}
+                                                                    onChange={(e) => updatePrescriptionNote(medicine.id, e.target.value)}
+                                                                    placeholder="Ghi chú"
+                                                                    className="note-input p-1"
+                                                                />
+                                                            </td>
+                                                            <td className="text-center fw-semibold small py-1">{medicine.unit}</td>
+                                                            <td className="py-1">
+                                                                <Button variant="link" className="text-danger p-0" onClick={() => removePrescriptionItem(medicine.id)}>
+                                                                    <XSquareFill size={17} />
+                                                                </Button>
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </Table>
+                                        </div>
                                     )}
                                 </div>
 
-                                <div className="d-flex justify-content-end gap-2 pt-3 border-top mt-3">
-                                    <Button variant="outline-secondary" className={actionBtnClass} onClick={() => navigate(-1)} disabled={saving}>
-                                        Hủy bỏ
-                                    </Button>
-                                    <Button variant="primary" className={actionBtnClass} onClick={() => handleSavePrescription(true)} disabled={saving}>
-                                        {saving ? "Đang lưu..." : "Lưu nháp"}
-                                    </Button>
-                                    <Button variant="success" className={`px-4 ${actionBtnClass}`} onClick={() => handleSavePrescription(false)} disabled={saving}>
-                                        {saving ? "Đang lưu..." : "Lưu"}
-                                    </Button>
+                                <div className="mt-auto p-2 d-flex flex-wrap justify-content-between align-items-center gap-3" style={{ position: 'sticky', bottom: 0, zIndex: 5, background: '#fff', boxShadow: '0 -6px 18px rgba(16,24,40,0.03)' }}>
+                                    <div className="text-muted small">
+                                        Tổng mục: <strong className="text-dark">{prescriptionTotals.totalItems}</strong>
+                                        &nbsp;·&nbsp;
+                                        Tổng SL: <strong className="text-dark">{prescriptionTotals.totalQuantity}</strong>
+                                    </div>
+                                    <div className="">
+
+                                        <ButtonGroup aria-label="prescription-actions " className="d-flex flex-wrap justify-content-end gap-2">
+                                            <Button className="rounded-2 me-3" variant="outline-secondary" onClick={() => navigate(-1)} disabled={saving}>
+                                                Hủy bỏ
+                                            </Button>
+                                            <Button className="rounded-2" variant="primary" onClick={() => handleSavePrescription(true)} disabled={saving}>
+                                                {saving ? "Đang lưu..." : "Lưu nháp"}
+                                            </Button>
+                                            <Button variant="success" className="px-4 rounded-2" onClick={() => handleSavePrescription(false)} disabled={saving}>
+                                                {saving ? "Đang lưu..." : "Lưu"}
+                                            </Button>
+                                        </ButtonGroup>
+                                    </div>
                                 </div>
                             </Card.Body>
                         </Card>
@@ -484,7 +584,7 @@ const PrescribeMedicine = () => {
             </Container>
 
             <Footer />
-        </div>
+        </div >
     );
 };
 

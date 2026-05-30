@@ -4,13 +4,13 @@
  */
 package com.hb.repository;
 
-import com.hb.pojo.Inventorylog;
+import com.hb.pojo.InventoryLog;
 
 /**
  *
  * @author HUY
  */
-public interface InventorylogRepository extends BaseRepository<Inventorylog>{
-    void createInventoryLog(Inventorylog log);
+public interface InventoryLogRepository extends BaseRepository<InventoryLog>{
+    void createInventoryLog(InventoryLog log);
     
 }

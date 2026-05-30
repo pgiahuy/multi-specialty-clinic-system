@@ -6,9 +6,9 @@ package com.hb.repository.impl;
 
 import com.hb.pojo.Appointment;
 import com.hb.pojo.Patient;
+import com.hb.pojo.Schedules;
 import com.hb.repository.StatsRepository;
 
-import jakarta.ejb.Schedule;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Join;
@@ -16,7 +16,6 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +43,7 @@ public class StatsRepositoryImpl implements StatsRepository {
         Root<Appointment> rootApp = q.from(Appointment.class);
 
         Join<Appointment, Patient> joinPatient = rootApp.join("patientId");
-        Join<Appointment, Schedule> joinSchedule = rootApp.join("scheduleId");
+        Join<Appointment, Schedules> joinSchedule = rootApp.join("scheduleId");
 
         Predicate p1 = b.between(joinSchedule.get("date"), fromDate, toDate);
         Predicate p2 = b.equal(rootApp.get("status"), "COMPLETED");
@@ -69,7 +68,7 @@ public class StatsRepositoryImpl implements StatsRepository {
         Root<Appointment> rootApp = q.from(Appointment.class);
 
         Join<Appointment, Patient> joinPatient = rootApp.join("patientId");
-        Join<Appointment, Schedule> joinSchedule = rootApp.join("scheduleId");
+        Join<Appointment, Schedules> joinSchedule = rootApp.join("scheduleId");
 
         Predicate p1 = b.between(joinSchedule.get("date"), fromDate, toDate);
         Predicate p2 = b.equal(rootApp.get("status"), "COMPLETED");
@@ -94,7 +93,7 @@ public class StatsRepositoryImpl implements StatsRepository {
         Root<Appointment> rootApp = q.from(Appointment.class);
 
         Join<Appointment, Patient> joinPatient = rootApp.join("patientId");
-        Join<Appointment, Schedule> joinSchedule = rootApp.join("scheduleId");
+        Join<Appointment, Schedules> joinSchedule = rootApp.join("scheduleId");
 
         Predicate p1 = b.between(joinSchedule.get("date"), fromDate, toDate);
         Predicate p2 = b.equal(rootApp.get("status"), "COMPLETED");

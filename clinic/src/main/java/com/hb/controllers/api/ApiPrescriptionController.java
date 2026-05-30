@@ -50,8 +50,8 @@ public class ApiPrescriptionController {
     private Environment env;
     
     @PostMapping("/prescriptions")
-    public ResponseEntity<PrescriptionResponse> create(@RequestBody  PrescriptionCreateRequest req){
-        Prescription p =  this.prescriptionService.createPrescription(req);
+    public ResponseEntity<PrescriptionResponse> create(@RequestBody  PrescriptionCreateRequest req, Principal principal){
+        Prescription p =  this.prescriptionService.createPrescription(req, principal.getName());
         PrescriptionResponse res = PrescriptionMapper.INSTANCE.toResponse(p);
         return ResponseEntity.status(HttpStatus.CREATED).body(res);
     }
