@@ -6,6 +6,7 @@ package com.hb.service;
 
 import com.hb.dto.request.MedicalRecordCreateRequest;
 import com.hb.pojo.MedicalRecord;
+import com.hb.pojo.User;
 import java.util.List;
 import java.util.Map;
 
@@ -22,4 +23,5 @@ public interface MedicalRecordService {
     void deleteMedicalRecord(Long id);
     long countMedicalRecords(Map<String, String> params);
     boolean checkAccessControll (String username, Long patientId);
+    boolean checkAccessControll (User user,Long medicalRecordId);
 }

@@ -23,6 +23,7 @@ public interface PrescriptionMapper {
     @Mapping(source = "medicalRecordId.appointmentId.patientId.fullName", target = "patientName")
     @Mapping(source = "prescriptionItemCollection", target = "items")
     @Mapping(source = "medicalRecordId.note", target = "note")
+    @Mapping(source = "medicalRecordId.diagnosis", target = "diagnosis")
     PrescriptionResponse toResponse(Prescription prescription);
     
 }

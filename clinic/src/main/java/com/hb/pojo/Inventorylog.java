@@ -15,35 +15,27 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  *
  * @author HUY
  */
 @Entity
-@Table(name = "inventorylog")
+@Table(name = "inventory_log")
 @NamedQueries({
-    @NamedQuery(name = "Inventorylog.findAll", query = "SELECT i FROM Inventorylog i"),
-    @NamedQuery(name = "Inventorylog.findById", query = "SELECT i FROM Inventorylog i WHERE i.id = :id"),
-    @NamedQuery(name = "Inventorylog.findByChangeAmount", query = "SELECT i FROM Inventorylog i WHERE i.changeAmount = :changeAmount"),
-    @NamedQuery(name = "Inventorylog.findByReason", query = "SELECT i FROM Inventorylog i WHERE i.reason = :reason"),
-    @NamedQuery(name = "Inventorylog.findByReferenceId", query = "SELECT i FROM Inventorylog i WHERE i.referenceId = :referenceId"),
-    @NamedQuery(name = "Inventorylog.findByCreatedAt", query = "SELECT i FROM Inventorylog i WHERE i.createdAt = :createdAt"),
-    @NamedQuery(name = "Inventorylog.findByCreatedBy", query = "SELECT i FROM Inventorylog i WHERE i.createdBy = :createdBy")})
-public class Inventorylog implements Serializable {
+    @NamedQuery(name = "InventoryLog.findAll", query = "SELECT i FROM InventoryLog i"),
+    @NamedQuery(name = "InventoryLog.findById", query = "SELECT i FROM InventoryLog i WHERE i.id = :id"),
+    @NamedQuery(name = "InventoryLog.findByChangeAmount", query = "SELECT i FROM InventoryLog i WHERE i.changeAmount = :changeAmount"),
+    @NamedQuery(name = "InventoryLog.findByReason", query = "SELECT i FROM InventoryLog i WHERE i.reason = :reason"),
+    @NamedQuery(name = "InventoryLog.findByReferenceId", query = "SELECT i FROM InventoryLog i WHERE i.referenceId = :referenceId"),
+    @NamedQuery(name = "InventoryLog.findByCreatedAt", query = "SELECT i FROM InventoryLog i WHERE i.createdAt = :createdAt"),
+    @NamedQuery(name = "InventoryLog.findByCreatedBy", query = "SELECT i FROM InventoryLog i WHERE i.createdBy = :createdBy")})
+public class InventoryLog implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "id")
-    private Long id;
     @Basic(optional = false)
     @NotNull
     @Column(name = "change_amount")
@@ -54,12 +46,19 @@ public class Inventorylog implements Serializable {
     @Column(name = "reason")
     private String reason;
     @Column(name = "reference_id")
-    private Integer referenceId;
+    private Long referenceId;
     @Column(name = "created_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt;
+    private LocalDateTime createdAt;
+    @Size(max = 255)
     @Column(name = "created_by")
-    private Integer createdBy;
+    private String createdBy;
+
+    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id")
+    private Long id;
     @JoinColumn(name = "medicine_id", referencedColumnName = "id")
     @ManyToOne
     private Medicine medicineId;
@@ -67,14 +66,14 @@ public class Inventorylog implements Serializable {
     @ManyToOne
     private MedicineBatch batchId;
 
-    public Inventorylog() {
+    public InventoryLog() {
     }
 
-    public Inventorylog(Long id) {
+    public InventoryLog(Long id) {
         this.id = id;
     }
 
-    public Inventorylog(Long id, int changeAmount, String reason) {
+    public InventoryLog(Long id, int changeAmount, String reason) {
         this.id = id;
         this.changeAmount = changeAmount;
         this.reason = reason;
@@ -96,37 +95,24 @@ public class Inventorylog implements Serializable {
         this.changeAmount = changeAmount;
     }
 
-    public String getReason() {
-        return reason;
-    }
 
-    public void setReason(String reason) {
-        this.reason = reason;
-    }
-
-    public Integer getReferenceId() {
+    public Long getReferenceId() {
         return referenceId;
     }
 
-    public void setReferenceId(Integer referenceId) {
+    public void setReferenceId(Long referenceId) {
         this.referenceId = referenceId;
     }
 
-    public Date getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Integer getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(Integer createdBy) {
-        this.createdBy = createdBy;
-    }
+   
 
     public Medicine getMedicineId() {
         return medicineId;
@@ -154,10 +140,10 @@ public class Inventorylog implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Inventorylog)) {
+        if (!(object instanceof InventoryLog)) {
             return false;
         }
-        Inventorylog other = (Inventorylog) object;
+        InventoryLog other = (InventoryLog) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -166,7 +152,26 @@ public class Inventorylog implements Serializable {
 
     @Override
     public String toString() {
-        return "com.hb.pojo.Inventorylog[ id=" + id + " ]";
+        return "com.hb.pojo.InventoryLog[ id=" + id + " ]";
+    }
+
+ 
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
+   
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
     }
     
 }

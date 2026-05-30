@@ -65,6 +65,8 @@ public class ApiMedicalRecordController {
         MedicalRecord record = medicalRecordService.addOrUpdateMedicalRecord(req);
         return ResponseEntity.ok(recordMapper.toResponse(record));
     }
+    
+    
 
     @GetMapping("/medical-records")
     public ResponseEntity<List<MedicalRecordResponse>> list(@RequestParam Map<String, String> params, Principal principal) {
@@ -79,8 +81,23 @@ public class ApiMedicalRecordController {
         List<MedicalRecord> res = medicalRecordService.getMedicalRecords(params);
         return ResponseEntity.ok(res.stream().map(MedicalRecordMapper.INSTANCE::toResponse).toList());
     }
+    
+    @GetMapping("/medical-records/{id}")
+    public ResponseEntity<MedicalRecordResponse> getById(@PathVariable("id") Long id,Principal principal) {
+        String userName = principal.getName();
+        User u = userService.getUserByUsername(userName);
+        boolean isAccess = medicalRecordService.checkAccessControll(u, id);
+        
+        if (!isAccess) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
 
-    @GetMapping("/medical-records/{patient-id}")
+        MedicalRecord res = medicalRecordService.getMedicalRecordById(id);
+
+        return ResponseEntity.ok(MedicalRecordMapper.INSTANCE.toResponse(res));
+    }
+
+    @GetMapping("/medical-records/patient/{patient-id}")
     public ResponseEntity<List<MedicalRecordResponse>> getByPatientId(@PathVariable("patient-id") Long patienId, Principal principal) {
         String userName = principal.getName();
         boolean isAccess = medicalRecordService.checkAccessControll(userName, patienId);
@@ -100,8 +117,5 @@ public class ApiMedicalRecordController {
         return ResponseEntity.ok(MedicalRecordMapper.INSTANCE.toResponse(res));
     }
 
-    @GetMapping("/medical-records/{id}")
-    public ResponseEntity<MedicalRecordResponse> getById(@PathVariable Long id) {
-        return null;
-    }
+    
 }
