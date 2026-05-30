@@ -79,7 +79,7 @@ export const USER_ENDPOINTS = {
 };
 
 export const PAYMENT_ENDPOINTS = {
-    CREATE: 'secure/payments/create',
+    PAY: 'secure/payments/pay',
     MOMO_RETURN: 'secure/payments/momo/return',
     HISTORY: (patientId) => `secure/payments/${patientId}`,
     ITEMS: (paymentId) => `secure/payment-items/${paymentId}`,
