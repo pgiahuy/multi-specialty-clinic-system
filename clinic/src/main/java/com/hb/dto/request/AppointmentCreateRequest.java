@@ -5,9 +5,6 @@
 package com.hb.dto.request;
 
 
-import com.hb.enums.AppointmentStatus;
-import java.util.Date;
-
 /**
  *
  * @author HUY
@@ -27,7 +24,6 @@ public class AppointmentCreateRequest {
         this.id = id;
         this.patientId = patientId;
         this.scheduleId = scheduleId;
-        this.status = status;
     }
     
     
@@ -47,7 +43,6 @@ public class AppointmentCreateRequest {
     }
 
     
-
     /**
      * @return the patientId
      */

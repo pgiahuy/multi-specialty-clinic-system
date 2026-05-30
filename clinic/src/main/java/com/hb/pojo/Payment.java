@@ -70,7 +70,6 @@ public class Payment implements Serializable {
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
     @Size(max = 5)
-    @Enumerated(EnumType.STRING)
     @Column(name = "method")
     @Enumerated(EnumType.STRING)
     private PaymentMethod method;
@@ -82,7 +81,7 @@ public class Payment implements Serializable {
     @JoinColumn(name = "appointment_id", referencedColumnName = "id")
     private Appointment appointment;
     
-    @OneToMany(mappedBy = "payment")
+    @OneToMany(mappedBy = "paymentId")
     private List<PaymentItems> paymentItems;
 
     public Payment() {
