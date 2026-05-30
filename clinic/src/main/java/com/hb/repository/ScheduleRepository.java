@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public interface ScheduleRepository extends BaseRepository<Schedules>{
     List<Schedules> getSchedules(Map<String,String> params);
-    Schedules addSchedule(Schedules d);
+    Schedules saveOrUpdate(Schedules d);
     Schedules getScheduleById(Long id);
     void deleteSchedule(Long id);
     

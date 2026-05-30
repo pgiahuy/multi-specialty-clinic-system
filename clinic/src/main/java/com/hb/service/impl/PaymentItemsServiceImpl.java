@@ -15,6 +15,7 @@ import com.hb.pojo.Payment;
 import com.hb.pojo.PaymentItems;
 import com.hb.pojo.Prescription;
 import com.hb.pojo.PrescriptionItem;
+import com.hb.exception.ResourceNotFoundException;
 import com.hb.repository.AppointmentRepository;
 import com.hb.repository.LabTestRepository;
 import com.hb.repository.PaymentItemRepository;
@@ -54,6 +55,9 @@ public class PaymentItemsServiceImpl implements PaymentItemsService {
     @Override
     public void addAppointmentItem(Payment payment, Long appointmentId) {
         Appointment app = appRepo.getAppointmentById(appointmentId);
+        if (app == null || app.getScheduleId() == null || app.getScheduleId().getSpecialtyId() == null) {
+            throw new ResourceNotFoundException("Không tìm thấy chuyên khoa của lịch khám!");
+        }
 
         BigDecimal price = app.getScheduleId().getSpecialtyId().getPrice();
 

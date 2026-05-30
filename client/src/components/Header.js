@@ -49,12 +49,12 @@ const Header = () => {
     return (
         <Navbar
             expand="lg"
-            className="header-navbar"
+            className="header-navbar p-0"
             sticky="top"
-            style={{ zIndex: 1030 }}
+            style={{ zIndex: 1050 }}
         >
-            <Container fluid className="m-0 ps-5 pe-4 py-2">
-                <Navbar.Brand className="header-brand mb-0" onClick={() => navigate('/')}>
+            <Container fluid className="m-0 ps-5 pe-4 py-2 pt-1 pb-1">
+                <Navbar.Brand className="header-brand mb-0 " onClick={() => navigate('/')}>
                     OU-Clinic
                 </Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -76,7 +76,7 @@ const Header = () => {
 
 
                         {user && user.role === 'ROLE_PATIENT' && (
-                            <Nav.Link className="header-navlink" onClick={() => navigate('/patient/appointments')}>
+                            <Nav.Link className="header-navlink" onClick={() => navigate('/doctors')}>
                                 Bác sĩ
                             </Nav.Link>
                         )}
