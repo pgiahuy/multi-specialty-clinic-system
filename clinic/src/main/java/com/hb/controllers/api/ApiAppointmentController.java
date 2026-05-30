@@ -8,6 +8,7 @@ import com.hb.dto.request.AppointmentCreateRequest;
 import com.hb.dto.response.AppointmentResponse;
 import com.hb.mapper.AppointmentMapper;
 import com.hb.pojo.Appointment;
+
 import com.hb.pojo.User;
 
 import com.hb.service.AppointmentService;
@@ -26,7 +27,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -53,64 +53,69 @@ public class ApiAppointmentController {
 
     @Autowired
     private UserService userService;
+    
+
 
     @PostMapping("/secure/appointments")
     public ResponseEntity<AppointmentResponse> register(@RequestBody AppointmentCreateRequest req) {
-        AppointmentResponse a = this.appointmentService.addOrUpdateAppointment(req);
+        AppointmentResponse a = this.appointmentService.registerAppointment(req);
         return new ResponseEntity<>(a, HttpStatus.CREATED);
     }
 
     @GetMapping("/secure/appointments")
     public ResponseEntity<?> list(@RequestParam Map<String, String> params, Principal principal) {
-        try {
-            User u = userService.getUserByUsername(principal.getName());
+        User u = userService.getUserByUsername(principal.getName());
 
-            if (u != null) {
-                params.put("currentUserId", String.valueOf(u.getId()));
-                params.put("currentUserRole", u.getRole());
-            }
-            int pageSize = this.env.getProperty("admin.page_size", Integer.class, 10);
-            params.put("pageSize", String.valueOf(pageSize));
-
-            List<Appointment> res = appointmentService.getAppointments(params);
-            return ResponseEntity.ok(res.stream().map(appMapper::toResponse).toList());
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Lỗi hệ thống: " + e.getMessage());
+        if (u != null) {
+            params.put("currentUserId", String.valueOf(u.getId()));
+            params.put("currentUserRole", u.getRole());
         }
+        int pageSize = this.env.getProperty("admin.page_size", Integer.class, 10);
+        params.put("pageSize", String.valueOf(pageSize));
+
+        List<Appointment> res = appointmentService.getAppointments(params);
+        return ResponseEntity.ok(res.stream().map(appMapper::toResponse).toList());
     }
+
+
+    @GetMapping("/secure/appointment/{id}")
+    public ResponseEntity<AppointmentResponse> getAppointment(@PathVariable(value = "id") Long id) {
+        Appointment res = this.appointmentService.getAppointmentById(id);
+        return ResponseEntity.ok(appMapper.toResponse(res));
+    }
+
     
+
    
 
-    @PutMapping("/secure/appointments/{id}")
-    public ResponseEntity<?> update(@PathVariable("id") Long id,
-            @RequestBody AppointmentCreateRequest req,
-            Principal principal) {
-        try {
-            User currentUser = userService.getUserByUsername(principal.getName());
-            String role = currentUser.getRole();
-            Appointment appoint = appointmentService.getAppointmentById(id);
+    @PostMapping("/secure/appointments/{id}/confirm")
+    public ResponseEntity<?> update(@PathVariable("id") Long id, Principal principal) {
 
-            if (appoint == null) {
-                return ResponseEntity.status(404).body("Không tìm thấy lịch hẹn!");
+        User currentUser = userService.getUserByUsername(principal.getName());
+        Appointment appointment = appointmentService.getAppointmentById(id);
+
+        if (appointment == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy lịch hẹn!");
+        }
+
+        boolean isOwner = false;
+        
+        if ("ROLE_DOCTOR".equals(currentUser.getRole())) {
+            if (appointment.getScheduleId() != null && appointment.getScheduleId().getDoctorId() != null) {
+                isOwner = appointment.getScheduleId().getDoctorId().getUserId().getId().equals(currentUser.getId());
             }
+        }
 
-            boolean isOwner = false;
+        if (!isOwner) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Không có quyền xác nhận lịch hẹn!");
+        }
 
-            if ("ROLE_PATIENT".equals(role)) {
-                isOwner = appoint.getPatientId().getUserId().getId().equals(currentUser.getId());
-            } else if ("ROLE_DOCTOR".equals(role)) {
-                isOwner = appoint.getScheduleId().getDoctorId().getUserId().getId().equals(currentUser.getId());
-            }
+        boolean confirmed = this.appointmentService.doctorConfirmAppointment(id);
 
-            if (!isOwner) {
-                return ResponseEntity.status(403).body("Không thể thay đổi lịch hẹn");
-            }
-            req.setAppId(id);
-            AppointmentResponse updatedApp = this.appointmentService.addOrUpdateAppointment(req);
-            return ResponseEntity.ok(updatedApp);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body("Lỗi cập nhật: " + e.getMessage());
+        if (confirmed) {
+            return ResponseEntity.ok("Xác nhận lịch hẹn thành công!");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Xác nhận lịch hẹn thất bại hoặc lịch đã được xử lý trước đó!");
         }
     }
 }

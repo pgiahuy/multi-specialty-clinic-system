@@ -22,9 +22,9 @@ public interface PaymentItemsService {
     
     void addPrescriptionItem(Payment payment, Long prescriptionId);
     
-    void confirmItemsPaid(String transId, String method, List<Long> itemIds);
+//    void confirmItemsPaid(String transId, String method, List<Long> itemIds);
     
-    PaymentItems getPaymentItemByAppointment(Appointment appoint);
+    PaymentItems getPaymentItemByAppointment(Long  appointmentId);
     
     List<PaymentItems> getPaymentItemsByPaymentId(Long paymentId, Map<String, String> params);
 }

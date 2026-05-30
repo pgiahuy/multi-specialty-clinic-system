@@ -15,6 +15,7 @@ import java.util.Map;
  */
 public interface LabTestResultRepository {
     LabResults getLabResultById(Long id);
+    List<LabResults> getLabResultsByAppointment(Long appointmentId);
     void addOrUpdateTestResult(LabResults lr);
     List<LabResults> getTestResults(Long patientId, Map<String, String> params);
 }

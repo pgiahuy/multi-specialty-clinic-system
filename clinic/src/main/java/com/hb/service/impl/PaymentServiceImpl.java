@@ -4,13 +4,14 @@
  */
 package com.hb.service.impl;
 
+import com.hb.enums.PaymentMethod;
 import com.hb.enums.PaymentStatus;
 import com.hb.pojo.Appointment;
-import com.hb.pojo.Patient;
 import com.hb.pojo.Payment;
 import com.hb.pojo.PaymentItems;
 import com.hb.repository.PaymentItemRepository;
 import com.hb.repository.PaymentRepository;
+import com.hb.service.AppointmentService;
 import com.hb.service.PaymentItemsService;
 import com.hb.service.PaymentService;
 import java.math.BigDecimal;
@@ -32,6 +33,9 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Autowired
     private PaymentItemsService itemService;
+    
+    @Autowired
+    private AppointmentService appointService;
 
     @Autowired
     private PaymentItemRepository itemRepo;
@@ -56,56 +60,23 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public Payment createPayment(Long patientId) {
+    public Payment createPayment(Appointment appointment) {
         Payment p = new Payment();
 
-        p.setPatientId(new Patient(patientId));
+        p.setAppointment(appointment);
         p.setStatus(PaymentStatus.PENDING);
+        p.setTotalAmount(BigDecimal.ONE);
         p.setCreatedAt(LocalDateTime.now());
         paymentRepo.addOrUpdatePayment(p);
 
         return p;
     }
 
-    @Override
-    public void updateStatusPayment(Long paymentId) {
-
-        Payment p = paymentRepo.getPaymentById(paymentId);
-        if (p != null) {
-
-            List<PaymentItems> allItems = itemRepo.getItemsByPaymentId(paymentId);
-            boolean isAllPaid = allItems.stream()
-                    .allMatch(item -> PaymentStatus.SUCCESS.equals(item.getStatus()));
-
-            if (isAllPaid) {
-                p = paymentRepo.getPaymentById(paymentId);
-                p.setStatus(PaymentStatus.SUCCESS);
-                paymentRepo.addOrUpdatePayment(p);
-            }
-        }
-    }
 
     @Override
-    public Long calculateTotalFee(List<Long> itemIds) {
-
-        long total = 0L;
-
-        for (Long itemId : itemIds) {
-            PaymentItems item = itemRepo.getItemById(itemId);
-
-            if (item != null && item.getAmount() != null) {
-
-                total += item.getAmount().longValue();
-            }
-        }
-
-        return total;
-    }
-
-    @Override
-    public Payment getPaymentByAppoint(Appointment appoint) {
-        PaymentItems item = itemService.getPaymentItemByAppointment(appoint);
-        return this.paymentRepo.getPaymentById(item.getPaymentId().getId());
+    public Payment getPaymentByAppoint(Long appointmentId) {
+        PaymentItems item = itemService.getPaymentItemByAppointment(appointmentId);
+        return this.paymentRepo.getPaymentById(item.getPayment().getId());
     }
 
     @Override
@@ -128,6 +99,41 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public List<Payment> getPaymentByPatientId(Long patientId, Map<String, String> params) {
         return this.paymentRepo.getPaymentByPatientId(patientId, params);
+    }
+    
+    
+    @Override
+    public BigDecimal getPaymentAmount(Long paymentId) {
+        Payment p = paymentRepo.getPaymentById(paymentId);
+        return p.getTotalAmount();
+    }
+
+    @Override
+    public void confirmPaymentSuccess(Long paymentId, PaymentMethod method) {
+        Payment p = paymentRepo.getPaymentById(paymentId);
+        if (p.getStatus() == PaymentStatus.SUCCESS) {
+            return;
+        }
+        
+        p.setStatus(PaymentStatus.SUCCESS);
+        p.setMethod(method);
+        p.setPaidAt(LocalDateTime.now());
+        
+        paymentRepo.addOrUpdatePayment(p);
+    }
+
+    @Override
+    public void confirmPaymentFailed(Long paymentId, PaymentMethod method) {
+        Payment p = paymentRepo.getPaymentById(paymentId);
+        if (p.getStatus() == PaymentStatus.SUCCESS) {
+            return;
+        }
+        
+        p.setStatus(PaymentStatus.FAILURE);
+        p.setMethod(method);
+        p.setPaidAt(LocalDateTime.now());
+        
+        paymentRepo.addOrUpdatePayment(p);
     }
 
 }

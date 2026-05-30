@@ -24,26 +24,24 @@ public class ScheduleCreateRequest {
     @NotNull
     private Integer maxPatients;
     @NotNull
+    private Long specialtyId;
+    @NotNull
     private Long roomId;
     @NotNull
     private Long shiftId;
     private Long doctorId;
-    
 
     public ScheduleCreateRequest() {
     }
 
-    public ScheduleCreateRequest(LocalDate date, Integer maxPatients, Long roomId, Long shiftId, Long doctorId) {
+    public ScheduleCreateRequest(LocalDate date, Integer maxPatients, Long SpecialtyId, Long roomId, Long shiftId, Long doctorId) {
         this.date = date;
         this.maxPatients = maxPatients;
+        this.specialtyId = SpecialtyId;
         this.roomId = roomId;
         this.shiftId = shiftId;
         this.doctorId = doctorId;
     }
-
-    
-    
-   
 
     /**
      * @return the date
@@ -60,17 +58,31 @@ public class ScheduleCreateRequest {
     }
 
     /**
-     * @return the maxPetients
+     * @return the maxPatients
      */
     public Integer getMaxPatients() {
         return maxPatients;
     }
 
     /**
-     * @param maxPatients the maxPetients to set
+     * @param maxPatients the maxPatients to set
      */
     public void setMaxPatients(Integer maxPatients) {
         this.maxPatients = maxPatients;
+    }
+
+    /**
+     * @return the SpecialtyId
+     */
+    public Long getSpecialtyId() {
+        return specialtyId;
+    }
+
+    /**
+     * @param SpecialtyId the SpecialtyId to set
+     */
+    public void setSpecialtyId(Long specialtyId) {
+        this.specialtyId = specialtyId;
     }
 
     /**
@@ -116,5 +128,7 @@ public class ScheduleCreateRequest {
     }
     
     
+    
+
     
 }

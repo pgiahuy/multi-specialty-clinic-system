@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Container, Row, Col, Card, Button, Spinner, Image, Form } from "react-bootstrap";
-import { Link } from "react-router-dom";
-import { authApis, endpoint } from "../../configs/Apis";
+import { Link, useNavigate } from "react-router-dom";
+import { authApis, CLINIC_ENDPOINTS, endpoint } from "../../configs/Apis";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { formCardStyle } from "../User/UserStyle";
@@ -9,17 +9,22 @@ import { formCardStyle } from "../User/UserStyle";
 const ListDoctor = () => {
     const [doctors, setDoctors] = useState([]);
     const [loading, setLoading] = useState(false);
+    const nav = useNavigate();
 
     const loadDoctors = async () => {
         try {
             setLoading(true);
-            const res = await authApis().get(endpoint["doctors"]);
+            const res = await authApis().get(CLINIC_ENDPOINTS.DOCTORS);
             setDoctors(res.data || []);
         } catch (err) {
             console.log(err);
         } finally {
             setLoading(false);
         }
+    };
+
+    const openDoctorDetail = (doctorId) => {
+        nav(`/doctor/detail/${doctorId}`);
     };
 
     useEffect(() => {
@@ -36,8 +41,8 @@ const ListDoctor = () => {
                             <Row>
                                 <Col md={8}>
                                     <Form.Group className="mb-4">
-                                        <Form.Control placeholder="Tìm kiếm bác sĩ..."/>
-                                        
+                                        <Form.Control placeholder="Tìm kiếm bác sĩ..." />
+
                                     </Form.Group>
                                 </Col>
                                 <Col md={4}>
@@ -68,7 +73,13 @@ const ListDoctor = () => {
                                         <Card.Body className="d-flex flex-column">
                                             <div className="d-flex align-items-center gap-3 mb-3">
                                                 <div className="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center" style={{ width: 56, height: 56 }}>
-                                                    <Image src={doc.avatar || '/doctor-default.png'} alt={doc.fullName} className="rounded-circle" style={{ width: 48, height: 48, objectFit: 'cover' }} />
+                                                    <Image
+                                                        src={doc.avatar || '/doctor-avatar.png'}
+                                                        alt={doc.fullName}
+                                                        className="rounded-circle"
+                                                        style={{ width: 48, height: 48, objectFit: 'cover' }}
+                                                        onError={(e) => { e.target.src = '/doctor-avatar.png'; }}
+                                                    />
                                                 </div>
                                                 <div>
                                                     <div className="fw-bold">{doc.fullName || doc.name}</div>
@@ -79,7 +90,9 @@ const ListDoctor = () => {
                                             <div className="mt-auto d-flex justify-content-between align-items-center">
 
                                                 <div>
-                                                    <Button variant="outline-primary" className="me-2 rounded-3">Xem hồ sơ</Button>
+                                                    <Button variant="outline-primary" className="me-2 rounded-3" onClick={() => openDoctorDetail(doc.id)}>
+                                                        Xem hồ sơ
+                                                    </Button>
                                                     <Button
                                                         as={Link}
                                                         to={`/patient/booking?doctorId=${doc.id}`}

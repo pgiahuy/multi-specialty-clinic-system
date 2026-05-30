@@ -19,7 +19,7 @@ public interface PaymentItemRepository {
     List<PaymentItems> getItemsByPayment(Payment payment);
     List<PaymentItems> getPaymentItems(Map<String,String> params);
     PaymentItems getItemById(Long id);
-    PaymentItems getItemByAppointment(Appointment appoint);
+    PaymentItems getItemByAppointment(Long appointmentId);
     void addOrUpdateItem(PaymentItems item);
     void deleteItem(Long id);
     List<PaymentItems> getItemsByPaymentId(Long paymentId, Map<String, String> params);

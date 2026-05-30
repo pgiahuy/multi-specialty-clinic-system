@@ -65,58 +65,48 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
-    public AppointmentResponse addOrUpdateAppointment(AppointmentCreateRequest req) {
+    public AppointmentResponse registerAppointment(AppointmentCreateRequest req) {
 
-        Appointment a = new Appointment();
-
-        if (req.getAppId() != null) {
-            a = appointmentRepo.getAppointmentById(req.getAppId());
-            if (a == null) {
-                throw new ResourceNotFoundException("Appointment not found!");
-            }
-
-            if (req.getStatus() != null) {
-                a.setStatus(req.getStatus());
-            }
-            
-        } else {
-            Patient patient = patientRepo.getPatientById(req.getPatientId());
-            if (patient == null) {
-                throw new ResourceNotFoundException("Patient not found!");
-            }
-            
-            Schedules schedule = scheduleRepo.getScheduleById(req.getScheduleId());
-            if (schedule == null) {
-                throw new ResourceNotFoundException("Schedule not found!");
-            }
-            
-            boolean isAlreadyBooked = appointmentRepo.isPatientAlreadyBookedInSchedule(req.getPatientId(), req.getScheduleId());
-            if (isAlreadyBooked) {
-                throw new DuplicateResourceException("Bạn đã đăng ký khám ca này rồi!"); 
-            }
-            
-            if (schedule.getCurrentPatients() >= schedule.getMaxPatients()) {
-                throw new FullSlotException("Rất tiếc, ca khám này đã đủ số lượng người đăng ký!");
-            }
-
-            schedule.setCurrentPatients(schedule.getCurrentPatients() + 1);
-            scheduleRepo.addSchedule(schedule);
-
-            a = appointmentMapper.toEntity(req, patient, schedule);
-
+        Patient patient = patientRepo.getPatientById(req.getPatientId());
+        if (patient == null) {
+            throw new ResourceNotFoundException("Không tìm thấy bệnh nhân!");
         }
+        Schedules schedule = scheduleRepo.getScheduleById(req.getScheduleId());
+        if (schedule == null) {
+            throw new ResourceNotFoundException("Không tìm thấy lịch khám!");
+        }
+        boolean isAlreadyBooked = appointmentRepo.isPatientAlreadyBookedInSchedule(req.getPatientId(), req.getScheduleId());
+        
+        if (isAlreadyBooked) {
+            throw new DuplicateResourceException("Bạn đã đăng ký khám ca này rồi!");
+        }
+        if (schedule.getCurrentPatients() >= schedule.getMaxPatients()) {
+            throw new FullSlotException("Rất tiếc, ca khám này đã đủ số lượng người đăng ký!");
+        }
+        schedule.setCurrentPatients(schedule.getCurrentPatients() + 1);
+        scheduleRepo.saveOrUpdate(schedule);
 
-        appointmentRepo.addOrUpdateAppointment(a);
-        Payment p = paymentService.createPayment(req.getPatientId());
+        Appointment appointment = appointmentMapper.toEntity(req, patient, schedule);
+
+        appointmentRepo.addOrUpdateAppointment(appointment);
+        
+        Payment p = paymentService.createPayment(a);
         itemService.addAppointmentItem(p, a.getId());
         
         return appointmentMapper.toResponse(a);
 
     }
+    
+    
 
     @Override
     public long countAppointments(Map<String, String> params) {
         return appointmentRepo.countAppointments(params);
+    }
+
+    @Override
+    public boolean doctorConfirmAppointment(Long appointmentId) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
 }

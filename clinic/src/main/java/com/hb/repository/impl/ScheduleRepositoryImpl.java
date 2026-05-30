@@ -103,7 +103,7 @@ public class ScheduleRepositoryImpl extends BaseRepositoryImpl<Schedules> implem
     }
 
     @Override
-    public Schedules addSchedule(Schedules s) {
+    public Schedules saveOrUpdate(Schedules s) {
         Session session = this.factory.getObject().getCurrentSession();
 
         if (s.getId() == null) {

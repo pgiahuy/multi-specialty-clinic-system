@@ -47,7 +47,6 @@ public class Appointment implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
-    @Size(max = 11)
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private AppointmentStatus status;
@@ -56,8 +55,7 @@ public class Appointment implements Serializable {
     private LocalDateTime createdAt;
     @OneToOne(mappedBy = "appointmentId")
     private MedicalRecord medicalRecord;
-    @OneToMany(mappedBy = "appointmentId")
-    private Collection<PaymentItems> paymentItemsCollection;
+    
     @JoinColumn(name = "patient_id", referencedColumnName = "id")
     @ManyToOne
     private Patient patientId;
@@ -68,7 +66,10 @@ public class Appointment implements Serializable {
     private Collection<LabResults> labResultsCollection;
     @OneToOne(mappedBy = "appointmentId")
     private Conversation conversation;
-
+    @OneToMany(mappedBy = "appointment")
+    private Collection<Payment> payments;
+    
+    
     public Appointment() {
     }
 
@@ -108,13 +109,6 @@ public class Appointment implements Serializable {
         this.medicalRecord = medicalRecord;
     }
 
-    public Collection<PaymentItems> getPaymentItemsCollection() {
-        return paymentItemsCollection;
-    }
-
-    public void setPaymentItemsCollection(Collection<PaymentItems> paymentItemsCollection) {
-        this.paymentItemsCollection = paymentItemsCollection;
-    }
 
     public Patient getPatientId() {
         return patientId;
@@ -171,6 +165,20 @@ public class Appointment implements Serializable {
     @Override
     public String toString() {
         return "com.hb.pojo.Appointment[ id=" + id + " ]";
+    }
+
+    /**
+     * @return the payments
+     */
+    public Collection<Payment> getPayments() {
+        return payments;
+    }
+
+    /**
+     * @param payments the payments to set
+     */
+    public void setPayments(Collection<Payment> payments) {
+        this.payments = payments;
     }
     
 }

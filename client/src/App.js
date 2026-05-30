@@ -10,6 +10,7 @@ import Register from "./screens/User/Register";
 import DoctorDashboard from "./screens/Doctor/DoctorDashboard";
 import PatientDashboard from "./screens/Patient/PatientDashboard";
 import PatientProfile from "./screens/Patient/PatientProfile";
+import PatientAccount from "./screens/Patient/PatientAccount";
 import Prescriptions from "./screens/Patient/Prescriptions";
 import AllNotifications from "./screens/User/AllNotifications";
 import BookingPage from "./screens/Patient/Booking";
@@ -17,11 +18,9 @@ import { MyUserContext } from "./configs/Contexts";
 import { useReducer } from "react";
 import MyUserReducers from "./reducers/MyUserReducers";
 import RegisterRecord from "./screens/Patient/RegisterRecord";
-import TestResults from "./screens/Patient/TestResults";
 import TestResultDetail from "./screens/Patient/TestResultDetail";
-import Payment from "./screens/Patient/Payment";
 import PaymentDetail from "./screens/Patient/PaymentDetail";
-import PaymentItems from "./screens/Patient/PaymentItems";
+
 import PaymentResult from "./screens/Patient/PaymentResult";
 import { jwtDecode } from "jwt-decode";
 import cookies from 'react-cookies'
@@ -29,10 +28,16 @@ import HistoryBooking from "./screens/Patient/BookingHistory";
 import ListDoctor from "./screens/Home/ListDoctor";
 import Schedules from "./screens/Doctor/Schedules";
 import AppointmentList from "./screens/Doctor/AppointmentList";
+import DoctorProfile from "./screens/Doctor/DoctorProfile";
+import RegisterSchedule from "./screens/Doctor/RegisterSchedule";
+import MedicalRecord from "./screens/Doctor/MedicalRecord";
+import AssignTest from "./screens/Doctor/AssignTest";
+import DoctorDetail from "./screens/Doctor/DoctorDetail";
+
 
 const initUserState = () => {
-    const savedUser = localStorage.getItem("user");
-    return savedUser ? JSON.parse(savedUser) : null;
+  const savedUser = localStorage.getItem("user");
+  return savedUser ? JSON.parse(savedUser) : null;
 };
 
 function App() {
@@ -61,19 +66,24 @@ function App() {
             <Route path="/patient/notifications" element={<AllNotifications />} />
             <Route path="/patient/prescriptions" element={<Prescriptions />} />
             <Route path="/patient/profiles" element={<PatientProfile />} />
+            <Route path="/patient/account" element={<PatientAccount />} />
             <Route path="/patient/register-record" element={<RegisterRecord />} />
             <Route path="/patient/booking" element={<BookingPage />} />
             <Route path="/patient/history-booking" element={<HistoryBooking />} />
-            <Route path="/patient/test-results" element={<TestResults />} />
-            <Route path="/patient/test-results/:patientId" element={<TestResultDetail />} />
-            <Route path="/patient/payment" element={<Payment />} />
-            <Route path="/patient/payment/:patientId" element={<PaymentDetail />} />
-            <Route path="/patient/payment-items/:paymentId" element={<PaymentItems />} />
+            <Route path="/patient/test-results" element={<TestResultDetail />} />
+            
+            <Route path="/patient/payment/:patientId?" element={<PaymentDetail />} />
+            
             <Route path="/patient/payment-result" element={<PaymentResult />} />
             <Route path="/doctors" element={<ListDoctor />} />
-            <Route path= "/doctor/schedules" element={<Schedules />} />
-            <Route path= "/doctor/:scheduleId/appointments" element={<AppointmentList />} />
-            
+            <Route path="/doctor/schedules" element={<Schedules />} />
+            <Route path="/doctor/:scheduleId/appointments" element={<AppointmentList />} />
+            <Route path="/doctor/profile" element={<DoctorProfile />} />
+            <Route path="/doctor/detail/:doctorId" element={<DoctorDetail />} />
+            <Route path="/doctor/register-schedule" element={<RegisterSchedule />} />
+            <Route path="/doctor/medical-records/appointment/:appointmentId" element={<MedicalRecord />} />
+            <Route path="doctor/assign-test/:appointmentId" element={<AssignTest />} />
+
           </Routes>
 
         </Container>

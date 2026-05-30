@@ -115,7 +115,12 @@ public class DoctorRepositoryImpl extends BaseRepositoryImpl<Doctor> implements 
     @Override
     public Doctor getDoctorById(Long id) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<Doctor> q = session.createNamedQuery("Doctor.findById", Doctor.class);
+        Query<Doctor> q = session.createQuery(
+                "SELECT DISTINCT d FROM Doctor d "
+                + "LEFT JOIN FETCH d.specialtyCollection "
+                + "LEFT JOIN FETCH d.userId "
+                + "WHERE d.id = :id",
+                Doctor.class);
         q.setParameter("id", id);
         return q.getSingleResult();
     }

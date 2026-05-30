@@ -17,6 +17,7 @@ import java.util.Map;
 public interface AppointmentService {
     List<Appointment> getAppointments(Map<String,String> params);
     Appointment getAppointmentById(Long id);
-    AppointmentResponse addOrUpdateAppointment(AppointmentCreateRequest req);
+    AppointmentResponse registerAppointment(AppointmentCreateRequest req);
     long countAppointments(Map<String,String> params);
+    boolean doctorConfirmAppointment(Long appointmentId);
 }

@@ -50,7 +50,7 @@ public class LabTestResultRepositoryImpl implements LabTestResultRepository {
     public List<LabResults> getTestResults(Long patientId, Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
 
-        StringBuilder hql = new StringBuilder("SELECT l FROM LabResults l JOIN FETCH l.testId WHERE l.patientId.id = :patientId");
+        StringBuilder hql = new StringBuilder("SELECT l FROM LabResults l JOIN FETCH l.testId WHERE l.appointmentId.patientId.id = :patientId");
 
         String appointmentIdStr = params.get("appointmentId");
         if (appointmentIdStr != null && !appointmentIdStr.isEmpty()) {
@@ -80,6 +80,15 @@ public class LabTestResultRepositoryImpl implements LabTestResultRepository {
 
         return query.getResultList();
 
+    }
+
+    @Override
+    public List<LabResults> getLabResultsByAppointment(Long appointmentId) {
+        Session session = this.factory.getObject().getCurrentSession();
+        Query<LabResults> query = session.createQuery("SELECT r FROM LabResults r WHERE appointmentId.id = :appointmentId", LabResults.class);
+        
+        query.setParameter("appointmentId", appointmentId);
+        return query.getResultList();
     }
 
 }

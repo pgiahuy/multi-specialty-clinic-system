@@ -4,6 +4,8 @@
  */
 package com.hb.dto.response;
 
+import java.util.List;
+
 /**
  *
  * @author DELL
@@ -13,19 +15,19 @@ public class DoctorResponse {
     private String avatar;
     private String fullName;
     private String description;
-    private String specialty;
+    private List<SpecialtyResponse> specialtiesOfDoctor;
     private String email;
     private String gender;
 
     public DoctorResponse() {
     }
 
-    public DoctorResponse(Long id, String avatar, String fullName, String description, String specialty, String email, String gender) {
+    public DoctorResponse(Long id, String avatar, String fullName, String description, List<SpecialtyResponse> specialtiesOfDoctor, String email, String gender) {
         this.id = id;
         this.avatar = avatar;
         this.fullName = fullName;
         this.description = description;
-        this.specialty = specialty;
+        this.specialtiesOfDoctor = specialtiesOfDoctor;
         this.email = email;
         this.gender = gender;
     }
@@ -87,17 +89,17 @@ public class DoctorResponse {
     }
 
     /**
-     * @return the specialty
+     * @return the specialtiesOfDoctor
      */
-    public String getSpecialty() {
-        return specialty;
+    public List<SpecialtyResponse> getSpecialtiesOfDoctor() {
+        return specialtiesOfDoctor;
     }
 
     /**
-     * @param specialty the specialty to set
+     * @param specialtiesOfDoctor the specialtiesOfDoctor to set
      */
-    public void setSpecialty(String specialty) {
-        this.specialty = specialty;
+    public void setSpecialtiesOfDoctor(List<SpecialtyResponse> specialtiesOfDoctor) {
+        this.specialtiesOfDoctor = specialtiesOfDoctor;
     }
 
     /**
@@ -127,10 +129,7 @@ public class DoctorResponse {
     public void setGender(String gender) {
         this.gender = gender;
     }
-    
 
-    
-   
     
     
 }

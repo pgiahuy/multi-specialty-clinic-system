@@ -86,10 +86,8 @@ public class Patient implements Serializable {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @ManyToOne
     private User userId;
-    @OneToMany(mappedBy = "patientId")
-    private Collection<LabResults> labResultsCollection;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "patientId")
-    private Collection<Payment> paymentCollection;
+    
+    
 
     public Patient() {
     }
@@ -187,21 +185,8 @@ public class Patient implements Serializable {
         this.userId = userId;
     }
 
-    public Collection<LabResults> getLabResultsCollection() {
-        return labResultsCollection;
-    }
-
-    public void setLabResultsCollection(Collection<LabResults> labResultsCollection) {
-        this.labResultsCollection = labResultsCollection;
-    }
-
-    public Collection<Payment> getPaymentCollection() {
-        return paymentCollection;
-    }
-
-    public void setPaymentCollection(Collection<Payment> paymentCollection) {
-        this.paymentCollection = paymentCollection;
-    }
+  
+   
 
     @Override
     public int hashCode() {

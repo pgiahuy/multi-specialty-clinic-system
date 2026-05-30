@@ -1,6 +1,6 @@
 import { Container, ListGroup, Badge, Spinner, Button } from "react-bootstrap";
 import { useEffect, useState } from "react";
-import { authApis, endpoint } from "../../configs/Apis";
+import { authApis, endpoint, USER_ENDPOINTS } from "../../configs/Apis";
 import cookies from 'react-cookies';
 import { Bell, CircleFill } from "react-bootstrap-icons";
 import Header from "../../components/Header";
@@ -12,7 +12,7 @@ const AllNotifications = () => {
 
     const fetchAllNotifications = async () => {
         try {
-            const res = await authApis().get(endpoint['notifications'], {
+            const res = await authApis().get(USER_ENDPOINTS.NOTIFICATIONS, {
                 params: { page: page, page_size: 20 }
             });
 

@@ -17,6 +17,7 @@ import com.hb.service.LabTestResultService;
 import com.hb.service.LabTestService;
 import com.hb.service.PaymentItemsService;
 import com.hb.service.PaymentService;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +59,8 @@ public class LabTestResultServiceImpl implements LabTestResultService {
             labResult = labResultRepo.getLabResultById(request.getId());
             labResult.setResultValue(request.getResult());
             labResult.setIsAbnormal(request.getIsNormal());
+            labResultRepo.addOrUpdateTestResult(labResult);
+            return labResult;
         }
         
         labResult = new LabResults();
@@ -66,13 +69,11 @@ public class LabTestResultServiceImpl implements LabTestResultService {
         LabTests test = testService.getLabTestById(request.getTestId());
         if (a != null && test != null) {
             labResult = resultMapper.toEntity(request, a, test);
-            
-            Payment payment = payService.getPaymentByAppoint(a);
-        
-            itemService.addLabTestItems(payment, test.getId());
+            labResultRepo.addOrUpdateTestResult(labResult);
+           
         }
         
-       labResultRepo.addOrUpdateTestResult(labResult);
+       
        return labResult;
     }
 
@@ -80,10 +81,21 @@ public class LabTestResultServiceImpl implements LabTestResultService {
     @Transactional
     public List<LabResults> addMutipleTest(List<LabTestResultRequest> reqs) {   
         List<LabResults> savedResults = new ArrayList<>();
-        for (LabTestResultRequest req : reqs) {
-            LabResults r = this.addOrUpdateTestResult(req);   
+        Appointment a = appointSer.getAppointmentById(reqs.get(0).getAppointId());
+        Payment payment = payService.createPayment(a);
+        
+       for (LabTestResultRequest req : reqs) {
+           
+            LabResults r = this.addOrUpdateTestResult(req);
             savedResults.add(r);
+            
+           
+            if (req.getId() == null) {
+                LabTests test = testService.getLabTestById(req.getTestId());
+                itemService.addLabTestItems(payment, test.getId());
+            }
         }
+        
         return savedResults;
     }
 
@@ -91,6 +103,11 @@ public class LabTestResultServiceImpl implements LabTestResultService {
     public List<LabTestResultResponse> getTestResults(Long patientId, Map<String, String> params) {
         List<LabResults> res = labResultRepo.getTestResults(patientId, params);
         return res.stream().map(resultMapper::toResponse).toList();
+    }
+
+    @Override
+    public List<LabResults> getLabResultsesByAppointmentId(Long appointmentId) {
+        return this.labResultRepo.getLabResultsByAppointment(appointmentId);
     }
 
     

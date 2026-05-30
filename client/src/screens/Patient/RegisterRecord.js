@@ -1,10 +1,9 @@
 import { Alert, Button, Card, Container, Form } from "react-bootstrap";
-import { Link } from "react-bootstrap-icons";
 import MySpinner from "../../components/MySpinner";
 import Header from "../../components/Header";
 import { formCardStyle } from "../User/UserStyle";
 import { useState } from "react";
-import { authApis, endpoint } from "../../configs/Apis";
+import { authApis, endpoint, USER_ENDPOINTS } from "../../configs/Apis";
 import { useNavigate } from "react-router-dom";
 import Footer from "../../components/Footer";
 
@@ -46,7 +45,7 @@ const RegisterRecord = () => {
 
     const validate = () => {
         for (let u of patientInfo)
-            if (!patient[u.field] || patient[u.field].toString().trim() === ""){ 
+            if (!patient[u.field] || patient[u.field].toString().trim() === "") {
                 setErr(`Vui lòng nhập ${u.title}!`);
                 return false;
             }
@@ -94,7 +93,7 @@ const RegisterRecord = () => {
             try {
                 setLoading(true);
 
-                let res = await authApis().post(endpoint['patientProfiles'], form);
+                let res = await authApis().post(USER_ENDPOINTS.PATIENT_PROFILES, form);
 
                 if (res.status === 201) {
                     nav('/patient/profiles');

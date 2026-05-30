@@ -19,4 +19,5 @@ public interface LabTestResultService {
     LabResults addOrUpdateTestResult(LabTestResultRequest request);
     List<LabResults> addMutipleTest(List<LabTestResultRequest> req);
     List<LabTestResultResponse> getTestResults(Long patientId, Map<String, String> params);
+    List<LabResults> getLabResultsesByAppointmentId(Long appointmentId);
 }

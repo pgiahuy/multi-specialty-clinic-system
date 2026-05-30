@@ -18,6 +18,7 @@ public class AppointmentResponse {
     private String status;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private LocalDateTime createdAt;
+    private Long patientId;
     private String patientFullName;
     private String doctorFullName;
     private String specialtyName;
@@ -30,10 +31,11 @@ public class AppointmentResponse {
     public AppointmentResponse() {
     }
 
-    public AppointmentResponse(Long id,String status, LocalDateTime createdAt, String patientFullName, String doctorFullName, String specialtyName, String appointmentDate, String session, String timeSlot, String roomName, String areaName) {
-        this.id =   id;
+    public AppointmentResponse(Long id, String status, LocalDateTime createdAt, Long patientId, String patientFullName, String doctorFullName, String specialtyName, String appointmentDate, String session, String timeSlot, String roomName, String areaName) {
+        this.id = id;
         this.status = status;
         this.createdAt = createdAt;
+        this.patientId = patientId;
         this.patientFullName = patientFullName;
         this.doctorFullName = doctorFullName;
         this.specialtyName = specialtyName;
@@ -43,6 +45,10 @@ public class AppointmentResponse {
         this.roomName = roomName;
         this.areaName = areaName;
     }
+
+    
+
+    
 
     /**
      * @return the status
@@ -196,6 +202,20 @@ public class AppointmentResponse {
      */
     public void setId(Long id) {
         this.id = id;
+    }
+
+    /**
+     * @return the patientId
+     */
+    public Long getPatientId() {
+        return patientId;
+    }
+
+    /**
+     * @param patientId the patientId to set
+     */
+    public void setPatientId(Long patientId) {
+        this.patientId = patientId;
     }
     
 

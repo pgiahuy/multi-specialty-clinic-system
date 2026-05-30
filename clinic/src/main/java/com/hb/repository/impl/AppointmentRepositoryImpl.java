@@ -6,10 +6,19 @@ package com.hb.repository.impl;
 
 import com.hb.enums.AppointmentStatus;
 import com.hb.pojo.Appointment;
+import com.hb.pojo.Patient;
+import com.hb.pojo.Schedules;
 import com.hb.repository.AppointmentRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,73 +44,67 @@ public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> i
     @Override
     public List<Appointment> getAppointments(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<Appointment> cq = cb.createQuery(Appointment.class);
+        Root<Appointment> root = cq.from(Appointment.class);
 
-        StringBuilder hql = new StringBuilder("SELECT DISTINCT a FROM Appointment a "
-                + "LEFT JOIN FETCH a.patientId p "
-                + "LEFT JOIN FETCH a.scheduleId s "
-                + "LEFT JOIN FETCH s.doctorId d "
-                + "LEFT JOIN FETCH s.shiftId sh "
-                + "LEFT JOIN FETCH s.roomId r "
-                + "LEFT JOIN FETCH r.areaId "
-                + "LEFT JOIN FETCH a.medicalRecord "
-                + "WHERE 1=1 ");
+        root.fetch("patientId", JoinType.LEFT);
+        Join<Appointment, Patient> patientJoin = root.join("patientId", JoinType.LEFT);
+
+        root.fetch("scheduleId", JoinType.LEFT);
+        Join<Appointment, Schedules> scheduleJoin = root.join("scheduleId", JoinType.LEFT);
+        scheduleJoin.fetch("doctorId", JoinType.LEFT);
+        scheduleJoin.fetch("shiftId", JoinType.LEFT);
+        scheduleJoin.fetch("roomId", JoinType.LEFT);
+
+        Join<Schedules, ?> doctorJoin = scheduleJoin.join("doctorId", JoinType.LEFT);
+
+        List<Predicate> predicates = new ArrayList<>();
 
         if (params != null) {
             if (params.containsKey("currentUserId") && params.containsKey("currentUserRole")) {
                 String role = params.get("currentUserRole");
 
                 if ("ROLE_PATIENT".equals(role)) {
-
-                    hql.append(" AND p.userId.id = :userId ");
-
+                    predicates.add(cb.equal(patientJoin.get("userId").get("id"), Long.valueOf(params.get("currentUserId"))));
                 } else if ("ROLE_DOCTOR".equals(role)) {
-                    hql.append(" AND a.status != :status ");
-                    hql.append(" AND d.userId.id = :userId ");
+                    predicates.add(cb.equal(doctorJoin.get("userId").get("id"), Long.valueOf(params.get("currentUserId"))));
                 }
+            }
+          
+
+            if (hasText(params.get("status"))) {
+                predicates.add(cb.equal(root.get("status"), AppointmentStatus.valueOf(params.get("status").trim().toUpperCase())));
             }
 
             if (params.containsKey("date") && !params.get("date").isEmpty()) {
-                hql.append(" AND s.date = :date ");
+                predicates.add(cb.equal(scheduleJoin.get("date"), java.sql.Date.valueOf(params.get("date"))));
             }
 
             if (hasText(params.get("kw"))) {
-                hql.append(" AND (p.fullName LIKE :kw OR d.fullName LIKE :kw)");
-            }
-            
-            if (params.containsKey("scheduleId")) {
-                hql.append(" AND s.id = :scheduleId");
+                String kw = "%" + params.get("kw").trim() + "%";
+                predicates.add(cb.or(
+                        cb.like(patientJoin.get("fullName").as(String.class), kw),
+                        cb.like(doctorJoin.get("fullName").as(String.class), kw)
+                ));
             }
 
+            if (params.containsKey("scheduleId")) {
+                predicates.add(cb.equal(scheduleJoin.get("id"), Long.valueOf(params.get("scheduleId"))));
+            }
         }
 
-        Query<Appointment> q = session.createQuery(hql.toString(), Appointment.class);
+        cq.select(root).distinct(true);
+        cq.where(predicates.toArray(new Predicate[0]));
+        cq.orderBy(cb.desc(root.get("id")));
 
-        if (params != null) {
-            if (params.containsKey("currentUserId")) {
-                q.setParameter("userId", Long.valueOf(params.get("currentUserId")));
+        Query<Appointment> q = session.createQuery(cq);
 
-                if ("ROLE_DOCTOR".equals(params.get("currentUserRole"))) {
-                    q.setParameter("status", AppointmentStatus.PENDING);
-                }
-            }
-            if (params.containsKey("date") && !params.get("date").isEmpty()) {
-                q.setParameter("date", java.sql.Date.valueOf(params.get("date")));
-            }
-
-            if (hasText(params.get("kw"))) {
-                q.setParameter("kw", "%" + params.get("kw").trim() + "%");
-            }
-            
-            if (params.containsKey("scheduleId")) {
-                q.setParameter("scheduleId",Long.valueOf(params.get("scheduleId")));
-            }
-
-            if (params.containsKey("pageSize")) {
-                int pageSize = Integer.parseInt(params.get("pageSize"));
-                int page = Integer.parseInt(params.getOrDefault("page", "1"));
-                q.setFirstResult((page - 1) * pageSize);
-                q.setMaxResults(pageSize);
-            }
+        if (params != null && params.containsKey("pageSize")) {
+            int pageSize = Integer.parseInt(params.get("pageSize"));
+            int page = Integer.parseInt(params.getOrDefault("page", "1"));
+            q.setFirstResult((page - 1) * pageSize);
+            q.setMaxResults(pageSize);
         }
 
         return q.getResultList();
@@ -128,14 +131,19 @@ public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> i
             if (hasText(params.get("kw"))) {
                 hql.append(" AND (p.fullName LIKE :kw OR d.fullName LIKE :kw)");
             }
+            if (params.containsKey("scheduleId")) {
+                hql.append(" AND s.id = :scheduleId ");
+            }
             if (params.containsKey("currentUserId") && params.containsKey("currentUserRole")) {
                 String role = params.get("currentUserRole");
                 if ("ROLE_PATIENT".equals(role)) {
                     hql.append(" AND p.userId.id = :userId ");
                 } else if ("ROLE_DOCTOR".equals(role)) {
-                    hql.append(" AND a.status != :status ");
                     hql.append(" AND d.userId.id = :userId ");
                 }
+            }
+            if (hasText(params.get("status"))) {
+                hql.append(" AND a.status = :status ");
             }
         }
 
@@ -148,11 +156,14 @@ public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> i
             if (hasText(params.get("kw"))) {
                 q.setParameter("kw", "%" + params.get("kw").trim() + "%");
             }
+            if (params.containsKey("scheduleId")) {
+                q.setParameter("scheduleId", Long.valueOf(params.get("scheduleId")));
+            }
             if (params.containsKey("currentUserId")) {
                 q.setParameter("userId", Long.valueOf(params.get("currentUserId")));
-                if ("ROLE_DOCTOR".equals(params.get("currentUserRole"))) {
-                    q.setParameter("status", AppointmentStatus.PENDING);
-                }
+            }
+            if (hasText(params.get("status"))) {
+                q.setParameter("status", AppointmentStatus.valueOf(params.get("status").trim().toUpperCase()));
             }
         }
 
@@ -164,7 +175,9 @@ public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> i
         Session session = this.factory.getObject().getCurrentSession();
         Query<Appointment> q = session.createNamedQuery("Appointment.findById", Appointment.class);
         q.setParameter("id", id);
-        return q.getSingleResult();
+
+        List<Appointment> appointments = q.getResultList();
+        return appointments.isEmpty() ? null : appointments.get(0);
     }
 
     @Override
@@ -188,7 +201,9 @@ public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> i
         query.setParameter("scheduleId", scheduleId);
 
         Long count = query.uniqueResult();
-        return count != null && count > 0; 
+        return count > 0; 
     }
+
+    
 
 }
