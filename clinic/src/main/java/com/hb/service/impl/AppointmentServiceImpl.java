@@ -90,10 +90,10 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         appointmentRepo.addOrUpdateAppointment(appointment);
         
-        Payment p = paymentService.createPayment(a);
-        itemService.addAppointmentItem(p, a.getId());
+        Payment p = paymentService.createPayment(appointment);
+        itemService.addAppointmentItem(p, appointment.getId());
         
-        return appointmentMapper.toResponse(a);
+        return appointmentMapper.toResponse(appointment);
 
     }
     
