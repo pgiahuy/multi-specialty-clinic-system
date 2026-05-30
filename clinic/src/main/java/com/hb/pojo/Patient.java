@@ -86,8 +86,7 @@ public class Patient implements Serializable {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @ManyToOne
     private User userId;
-    @OneToMany(mappedBy = "patientId")
-    private Collection<LabResults> labResultsCollection;
+    
     
 
     public Patient() {
@@ -186,14 +185,7 @@ public class Patient implements Serializable {
         this.userId = userId;
     }
 
-    public Collection<LabResults> getLabResultsCollection() {
-        return labResultsCollection;
-    }
-
-    public void setLabResultsCollection(Collection<LabResults> labResultsCollection) {
-        this.labResultsCollection = labResultsCollection;
-    }
-
+  
    
 
     @Override

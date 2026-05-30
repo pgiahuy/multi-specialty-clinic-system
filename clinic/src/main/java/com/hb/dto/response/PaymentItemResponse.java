@@ -14,22 +14,25 @@ import java.math.BigDecimal;
 public class PaymentItemResponse {
     private Long id;
     private Long paymentId;
-    private PaymentItemType type;
-    
+    private PaymentItemType itemType;
     private BigDecimal amount;
+    private Long referenceId;
+    
+    
    
 
     public PaymentItemResponse() {
     }
 
-    public PaymentItemResponse(Long id, Long paymentId, PaymentItemType type, BigDecimal amount) {
+    public PaymentItemResponse(Long id, Long paymentId, PaymentItemType itemType, BigDecimal amount, Long referenceId) {
         this.id = id;
         this.paymentId = paymentId;
-        this.type = type;
-        
+        this.itemType = itemType;
         this.amount = amount;
+        this.referenceId = referenceId;
     }
-    
+
+   
     
     /**
      * @return the id
@@ -45,23 +48,7 @@ public class PaymentItemResponse {
         this.id = id;
     }
 
-    /**
-     * @return the type
-     */
-    public PaymentItemType getType() {
-        return type;
-    }
-
-    /**
-     * @param type the type to set
-     */
-    public void setType(PaymentItemType type) {
-        this.type = type;
-    }
-
-    /**
-     * @return the status
-     */
+   
    
 
     /**
@@ -91,6 +78,34 @@ public class PaymentItemResponse {
      */
     public void setPaymentId(Long paymentId) {
         this.paymentId = paymentId;
+    }
+
+    /**
+     * @return the itemType
+     */
+    public PaymentItemType getItemType() {
+        return itemType;
+    }
+
+    /**
+     * @param itemType the itemType to set
+     */
+    public void setItemType(PaymentItemType itemType) {
+        this.itemType = itemType;
+    }
+
+    /**
+     * @return the referenceId
+     */
+    public Long getReferenceId() {
+        return referenceId;
+    }
+
+    /**
+     * @param referenceId the referenceId to set
+     */
+    public void setReferenceId(Long referenceId) {
+        this.referenceId = referenceId;
     }
 
 

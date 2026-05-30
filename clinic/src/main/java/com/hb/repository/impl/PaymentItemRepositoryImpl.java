@@ -65,10 +65,10 @@ public class PaymentItemRepositoryImpl implements PaymentItemRepository {
     }
 
     @Override
-    public PaymentItems getItemByAppointment(Appointment appoint) {
+    public PaymentItems getItemByAppointment(Long appointmentId) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<PaymentItems> q = session.createQuery("FROM PaymentItems p WHERE p.appointmentId = :appointment", PaymentItems.class);
-        q.setParameter("appointment", appoint);
+        Query<PaymentItems> q = session.createQuery("FROM PaymentItems p WHERE p.referenceId = :appointmentId", PaymentItems.class);
+        q.setParameter("appointmentId", appointmentId);
 
         return q.getSingleResult();
     }
@@ -77,7 +77,7 @@ public class PaymentItemRepositoryImpl implements PaymentItemRepository {
     public List<PaymentItems> getItemsByPayment(Payment payment) {
         Session session = this.factory.getObject().getCurrentSession();
 
-        String hql = "FROM PaymentItems p WHERE p.paymentId = :payment";
+        String hql = "FROM PaymentItems p WHERE p.payment = :payment";
         Query<PaymentItems> query = session.createQuery(hql, PaymentItems.class);
         query.setParameter("payment", payment);
 
@@ -88,7 +88,7 @@ public class PaymentItemRepositoryImpl implements PaymentItemRepository {
     public List<PaymentItems> getItemsByPaymentId(Long paymentId, Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
 
-        StringBuilder hql = new StringBuilder("From PaymentItems p WHERE p.paymentId.id = :paymentId");
+        StringBuilder hql = new StringBuilder("From PaymentItems p WHERE p.payment.id = :paymentId");
 
         String status = params.get("status");
         String startDate = params.get("startDate");

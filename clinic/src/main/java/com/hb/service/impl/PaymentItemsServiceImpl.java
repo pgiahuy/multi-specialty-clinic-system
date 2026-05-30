@@ -124,8 +124,8 @@ public class PaymentItemsServiceImpl implements PaymentItemsService {
 //    }
 
     @Override
-    public PaymentItems getPaymentItemByAppointment(Appointment appoint) {
-        return this.itemRepo.getItemByAppointment(appoint);
+    public PaymentItems getPaymentItemByAppointment(Long  appointmentId) {
+        return this.itemRepo.getItemByAppointment(appointmentId);
     }
 
     @Override
