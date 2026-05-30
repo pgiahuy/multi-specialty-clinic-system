@@ -120,4 +120,11 @@ public class ApiLabTestController {
     }
     
     
+    @GetMapping("/test/{id}")
+    public ResponseEntity<LabTestResponse> getLabTest(@PathVariable(value="id") Long id) {
+        LabTests res = testService.getLabTestById(id);
+        return ResponseEntity.ok(LabTestMapper.INSTANCE.toResponse(res));
+    }
+    
+    
 }

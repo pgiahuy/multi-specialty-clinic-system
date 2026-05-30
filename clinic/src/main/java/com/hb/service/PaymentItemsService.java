@@ -24,7 +24,7 @@ public interface PaymentItemsService {
     
 //    void confirmItemsPaid(String transId, String method, List<Long> itemIds);
     
-    PaymentItems getPaymentItemByAppointment(Appointment appoint);
+    PaymentItems getPaymentItemByAppointment(Long  appointmentId);
     
     List<PaymentItems> getPaymentItemsByPaymentId(Long paymentId, Map<String, String> params);
 }
