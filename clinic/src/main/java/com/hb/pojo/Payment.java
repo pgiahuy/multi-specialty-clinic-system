@@ -27,6 +27,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
@@ -61,8 +62,8 @@ public class Payment implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "created_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime createdAt;
+   
+    private LocalDate createdAt;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 7)
@@ -91,7 +92,7 @@ public class Payment implements Serializable {
         this.id = id;
     }
 
-    public Payment(Long id, BigDecimal totalAmount, LocalDateTime createdAt, PaymentStatus status) {
+    public Payment(Long id, BigDecimal totalAmount, LocalDate createdAt, PaymentStatus status) {
         this.id = id;
         this.totalAmount = totalAmount;
         this.createdAt = createdAt;
@@ -114,11 +115,11 @@ public class Payment implements Serializable {
         this.totalAmount = totalAmount;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public LocalDate getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(LocalDate createdAt) {
         this.createdAt = createdAt;
     }
 

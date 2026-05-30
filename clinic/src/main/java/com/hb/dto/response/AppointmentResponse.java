@@ -5,6 +5,8 @@
 package com.hb.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -17,11 +19,12 @@ public class AppointmentResponse {
     private Long id;
     private String status;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
-    private LocalDateTime createdAt;
+    private LocalDate createdAt;
     private Long patientId;
     private String patientFullName;
     private String doctorFullName;
     private String specialtyName;
+    private BigDecimal price;
     private String appointmentDate;
     private String session;
     private String timeSlot;
@@ -31,7 +34,7 @@ public class AppointmentResponse {
     public AppointmentResponse() {
     }
 
-    public AppointmentResponse(Long id, String status, LocalDateTime createdAt, Long patientId, String patientFullName, String doctorFullName, String specialtyName, String appointmentDate, String session, String timeSlot, String roomName, String areaName) {
+    public AppointmentResponse(Long id, String status, LocalDate createdAt, Long patientId, String patientFullName, String doctorFullName, String specialtyName, BigDecimal price, String appointmentDate, String session, String timeSlot, String roomName, String areaName) {
         this.id = id;
         this.status = status;
         this.createdAt = createdAt;
@@ -39,16 +42,13 @@ public class AppointmentResponse {
         this.patientFullName = patientFullName;
         this.doctorFullName = doctorFullName;
         this.specialtyName = specialtyName;
+        this.price = price;
         this.appointmentDate = appointmentDate;
         this.session = session;
         this.timeSlot = timeSlot;
         this.roomName = roomName;
         this.areaName = areaName;
     }
-
-    
-
-    
 
     /**
      * @return the status
@@ -67,14 +67,14 @@ public class AppointmentResponse {
     /**
      * @return the createdAt
      */
-    public LocalDateTime getCreatedAt() {
+    public LocalDate getCreatedAt() {
         return createdAt;
     }
 
     /**
      * @param createdAt the createdAt to set
      */
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(LocalDate createdAt) {
         this.createdAt = createdAt;
     }
 
@@ -216,6 +216,20 @@ public class AppointmentResponse {
      */
     public void setPatientId(Long patientId) {
         this.patientId = patientId;
+    }
+
+    /**
+     * @return the price
+     */
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    /**
+     * @param price the price to set
+     */
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
     
 

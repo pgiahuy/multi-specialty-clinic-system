@@ -35,6 +35,7 @@ import AssignTest from "./screens/Doctor/AssignTest";
 import DoctorDetail from "./screens/Doctor/DoctorDetail";
 import CreateMedicalRecord from "./screens/Doctor/CreateMedicalRecord";
 import PrescribeMedicine from "./screens/Doctor/PrescribeMedicine";
+import AppointmentDetail from "./screens/Patient/AppointmentDetail";
 
 
 const initUserState = () => {
@@ -86,6 +87,7 @@ function App() {
             <Route path="/doctor/appointments/:appointmentId/medical-record" element={<MedicalRecord />} />
             <Route path="/doctor/assign-test/:appointmentId" element={<AssignTest />} />
             <Route path="/doctor/prescribe/:medicalRecordId" element={<PrescribeMedicine />} />
+            <Route path="/appointment/:appointmentId" element={<AppointmentDetail />} />
 
           </Routes>
 
