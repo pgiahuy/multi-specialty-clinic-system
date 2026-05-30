@@ -5,7 +5,9 @@
 package com.hb.repository.impl;
 
 import com.hb.pojo.Medicine;
+import com.hb.pojo.MedicineBatch;
 import com.hb.repository.MedicineRepository;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import org.hibernate.Session;
@@ -23,12 +25,26 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class MedicineRepositoryImpl extends BaseRepositoryImpl<Medicine> implements MedicineRepository {
 
- 
     @Autowired
     private LocalSessionFactoryBean factory;
 
     private boolean hasText(String value) {
         return value != null && !value.trim().isEmpty();
+    }
+
+    @Override
+    public List<MedicineBatch> getAvailableBatches(Long medicineId, LocalDate minExpiryDate) {
+        Session session = this.factory.getObject().getCurrentSession();
+        String hql = "SELECT mb FROM MedicineBatch mb "
+                + "WHERE mb.medicineId.id = :medicineId "
+                + "AND mb.quantity > 0 "
+                + "AND mb.expiryDate >= :minExpiryDate "
+                + "ORDER BY mb.expiryDate ASC, mb.importDate ASC"; // FIFO: Hạn gần xếp trước
+
+        return session.createQuery(hql, MedicineBatch.class)
+                .setParameter("medicineId", medicineId)
+                .setParameter("minExpiryDate", minExpiryDate)
+                .getResultList();
     }
 
     @Override
@@ -63,7 +79,7 @@ public class MedicineRepositoryImpl extends BaseRepositoryImpl<Medicine> impleme
         if (m.getId() == null) {
             session.persist(m);
             return m;
-        }else{
+        } else {
             return session.merge(m);
         }
     }

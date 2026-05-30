@@ -20,7 +20,6 @@ import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 /**
  *
@@ -37,23 +36,24 @@ import java.util.Date;
     @NamedQuery(name = "LabResults.findByCreatedAt", query = "SELECT l FROM LabResults l WHERE l.createdAt = :createdAt")})
 public class LabResults implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "id")
-    private Long id;
     @Size(max = 50)
     @Column(name = "result_value")
     private String resultValue;
-    @Column(name = "is_abnormal")
-    private Boolean isAbnormal;
     @Size(max = 255)
     @Column(name = "pdf_url")
     private String pdfUrl;
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
+
+    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id")
+    private Long id;
+    @Column(name = "is_abnormal")
+    private Boolean isAbnormal;
     @JoinColumn(name = "appointment_id", referencedColumnName = "id")
     @ManyToOne
     private Appointment appointmentId;
@@ -151,5 +151,7 @@ public class LabResults implements Serializable {
     public String toString() {
         return "com.hb.pojo.LabResults[ id=" + id + " ]";
     }
+
+   
     
 }

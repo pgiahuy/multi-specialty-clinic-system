@@ -15,6 +15,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 
 /**
@@ -29,14 +31,22 @@ import java.io.Serializable;
     @NamedQuery(name = "PrescriptionItem.findByQuantity", query = "SELECT p FROM PrescriptionItem p WHERE p.quantity = :quantity")})
 public class PrescriptionItem implements Serializable {
 
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "quantity")
+    private int quantity;
+    @Column(name = "days_to_use")
+    private Integer daysToUse;
+    @Size(max = 255)
+    @Column(name = "note")
+    private String note;
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
-    @Column(name = "quantity")
-    private Integer quantity;
     @JoinColumn(name = "medicine_id", referencedColumnName = "id")
     @ManyToOne
     private Medicine medicineId;
@@ -59,13 +69,6 @@ public class PrescriptionItem implements Serializable {
         this.id = id;
     }
 
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
 
     public Medicine getMedicineId() {
         return medicineId;
@@ -106,6 +109,30 @@ public class PrescriptionItem implements Serializable {
     @Override
     public String toString() {
         return "com.hb.pojo.PrescriptionItem[ id=" + id + " ]";
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public Integer getDaysToUse() {
+        return daysToUse;
+    }
+
+    public void setDaysToUse(Integer daysToUse) {
+        this.daysToUse = daysToUse;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
     }
     
 }

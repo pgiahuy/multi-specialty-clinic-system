@@ -82,9 +82,9 @@ public class PaymentItemRepositoryImpl implements PaymentItemRepository {
     public List<PaymentItems> getItemsByPayment(Payment payment) {
         Session session = this.factory.getObject().getCurrentSession();
 
-        String hql = "FROM PaymentItems p WHERE p.payment = :payment";
+        String hql = "FROM PaymentItems p WHERE p.paymentId = :paymentId";
         Query<PaymentItems> query = session.createQuery(hql, PaymentItems.class);
-        query.setParameter("payment", payment);
+        query.setParameter("paymentId", payment);
 
         return query.getResultList();
     }
@@ -93,7 +93,7 @@ public class PaymentItemRepositoryImpl implements PaymentItemRepository {
     public List<PaymentItems> getItemsByPaymentId(Long paymentId, Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
 
-        StringBuilder hql = new StringBuilder("From PaymentItems p WHERE p.payment.id = :paymentId");
+        StringBuilder hql = new StringBuilder("From PaymentItems p WHERE p.paymentId.id = :paymentId");
 
         String status = params.get("status");
         String startDate = params.get("startDate");

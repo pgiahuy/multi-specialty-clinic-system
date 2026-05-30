@@ -7,7 +7,6 @@ package com.hb.repository.impl;
 import com.hb.enums.PaymentMethod;
 import com.hb.enums.PaymentStatus;
 import com.hb.pojo.Payment;
-import com.hb.pojo.PaymentItems;
 import com.hb.repository.PaymentRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -41,7 +40,7 @@ public class PaymentRepositoryImpl implements PaymentRepository {
         Session session = this.factory.getObject().getCurrentSession();
 
         return session.createQuery(
-                "SELECT p FROM Payment p JOIN p.appointmentId a JOIN a.patient pt JOIN pt.userId u "
+                "SELECT p FROM Payment p JOIN p.appointmentId a JOIN a.patientId pt JOIN pt.userId u "
                 + "WHERE u.username = :username",
                 Payment.class
         )
