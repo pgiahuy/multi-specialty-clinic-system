@@ -118,4 +118,13 @@ public class ApiAppointmentController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Xác nhận lịch hẹn thất bại hoặc lịch đã được xử lý trước đó!");
         }
     }
+    
+    
+    @GetMapping("/secure/appointments/patient/{patientId}")
+    public ResponseEntity<List<AppointmentResponse>> getAppointByPatientId(@PathVariable(value="patientId") Long patientId,
+            @RequestParam Map<String, String> params) {
+        List<Appointment> res = appointmentService.getAppointmentsByPatientId(patientId, params);
+        return ResponseEntity.ok(res.stream().map(appMapper::toResponse).toList());
+        
+    }
 }

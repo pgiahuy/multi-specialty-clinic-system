@@ -35,6 +35,19 @@ const RegisterRecord = () => {
         field: "address",
         title: "Địa chỉ",
         type: "text",
+    }, {
+        field: "realtionship",
+        title: "Mối quan hệ với chủ tài khoản",
+        type: "select",
+        options: [
+            { value: "SELF", label: "Tôi" },
+            { value: "PARENT", label: "Ba/Mẹ" },
+            { value: "GRANDPARENT", label: "Ông/Bà" },
+            { value: "SIBLING", label: "Anh/Chị/Em" },
+            { value: "CHILD", label: "Con" },
+            { value: "SPOUSE", label: "Vợ/Chồng" },
+            { value: "OTHER", label: "Khác" }
+        ]
     }];
 
     const [patient, setPatient] = useState({});
@@ -118,29 +131,45 @@ const RegisterRecord = () => {
                             <h3 className="mb-4 text-center text-primary">Thêm hồ sơ bệnh nhân</h3>
                             {err && <Alert variant="danger">{err}</Alert>}
                             <Form onSubmit={addRecord}>
-                                {patientInfo.map(u => <Form.Floating key={u.field} className="mb-3">
-                                    {u.type === "select" ? (
-                                        <Form.Select
-                                            style={formCardStyle.input}
-                                            value={patient[u.field] || ""}
-                                            onChange={(e) => setPatient({ ...patient, [u.field]: e.target.value })}
-                                        >
-                                            <option value="">{u.title}</option>
-                                            {u.options.map(opt => (
-                                                <option key={opt} value={opt}>{opt}</option>
-                                            ))}
-                                        </Form.Select>
-                                    ) : (
-                                        <Form.Control
-                                            style={formCardStyle.input}
-                                            type={u.type}
-                                            placeholder={u.title}
-                                            value={patient[u.field] || ""}
-                                            onChange={(e) => setPatient({ ...patient, [u.field]: e.target.value })}
-                                        />
-                                    )}
-                                    <Form.Label>{u.title}</Form.Label>
-                                </Form.Floating>)}
+                                {patientInfo.map(u =>
+                                    <Form.Floating key={u.field} className="mb-3">
+                                        {u.type === "select" ? (
+                                            <Form.Select
+                                                style={formCardStyle.input}
+                                                value={patient[u.field] || ""}
+                                                onChange={(e) => setPatient({ ...patient, [u.field]: e.target.value })}
+                                            >
+                                                <option value="">{u.title}</option>
+
+                                                
+                                                {u.options.map((opt, index) => {
+                                                
+                                                    const isObject = typeof opt === 'object' && opt !== null;
+
+                                                   
+                                                    const optValue = isObject ? opt.value : opt;
+                                                    const optLabel = isObject ? opt.label : opt;
+
+                                                    return (
+                                                        <option key={index} value={optValue}>
+                                                            {optLabel}
+                                                        </option>
+                                                    );
+                                                })}
+                                                
+
+                                            </Form.Select>
+                                        ) : (
+                                            <Form.Control
+                                                style={formCardStyle.input}
+                                                type={u.type}
+                                                placeholder={u.title}
+                                                value={patient[u.field] || ""}
+                                                onChange={(e) => setPatient({ ...patient, [u.field]: e.target.value })}
+                                            />
+                                        )}
+                                        <Form.Label>{u.title}</Form.Label>
+                                    </Form.Floating>)}
 
 
                                 <Form.Group className="mb-3 text-center " controlId="button" >

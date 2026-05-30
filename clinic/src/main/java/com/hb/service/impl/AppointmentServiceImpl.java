@@ -109,4 +109,9 @@ public class AppointmentServiceImpl implements AppointmentService {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
+    @Override
+    public List<Appointment> getAppointmentsByPatientId(Long patientId, Map<String, String> params) {
+       return appointmentRepo.getAppointmentByPatientId(patientId, params);
+    }
+
 }
