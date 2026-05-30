@@ -61,11 +61,12 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public Payment createPayment(Long appointmentId) {
+    public Payment createPayment(Appointment appointment) {
         Payment p = new Payment();
 
-        p.setAppointment(appointService.getAppointmentById(appointmentId));
+        p.setAppointment(appointment);
         p.setStatus(PaymentStatus.PENDING);
+        p.setTotalAmount(BigDecimal.ONE);
         p.setCreatedAt(LocalDateTime.now());
         paymentRepo.addOrUpdatePayment(p);
 
@@ -74,8 +75,8 @@ public class PaymentServiceImpl implements PaymentService {
 
 
     @Override
-    public Payment getPaymentByAppoint(Appointment appoint) {
-        PaymentItems item = itemService.getPaymentItemByAppointment(appoint);
+    public Payment getPaymentByAppoint(Long appointmentId) {
+        PaymentItems item = itemService.getPaymentItemByAppointment(appointmentId);
         return this.paymentRepo.getPaymentById(item.getPayment().getId());
     }
 
