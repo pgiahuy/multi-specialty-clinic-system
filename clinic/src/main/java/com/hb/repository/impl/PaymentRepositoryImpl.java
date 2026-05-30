@@ -9,6 +9,7 @@ import com.hb.enums.PaymentStatus;
 import com.hb.pojo.Payment;
 import com.hb.pojo.PaymentItems;
 import com.hb.repository.PaymentRepository;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -160,9 +161,13 @@ public class PaymentRepositoryImpl implements PaymentRepository {
         
          if (startDate != null && !startDate.isEmpty() && endDate != null && !endDate.isEmpty()) {
 
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            query.setParameter("startDate", LocalDateTime.parse(startDate, formatter));
-            query.setParameter("endDate", LocalDateTime.parse(endDate, formatter));
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate start = LocalDate.parse(startDate, formatter);
+            LocalDate end = LocalDate.parse(endDate, formatter);
+            
+         
+            query.setParameter("startDate", start);
+            query.setParameter("endDate", end.plusDays(1));
         }
         
         return query.getResultList();

@@ -17,7 +17,6 @@ const PatientProfile = () => {
     const handleEdit = (profile) => {
         let dataToEdit = { ...profile };
 
-
         if (dataToEdit.dob && dataToEdit.dob.includes("/")) {
             const parts = dataToEdit.dob.split("/");
             if (parts.length === 3) {
@@ -47,14 +46,14 @@ const PatientProfile = () => {
 
     const handleSaveChanges = async () => {
         try {
-            console.log("ID đang sửa là: ", editData.id);
-
-            alert("Cập nhật thành công!");
+            
+            const res = await authApis().put(USER_ENDPOINTS.PATIENT_PROFILE_DETAIL(editData.id), editData);
+            
             setShowEditModal(false);
             loadPatientProfiles();
         } catch (error) {
             console.error(error);
-            alert("Có lỗi xảy ra khi cập nhật!");
+            
         }
     };
 
@@ -70,10 +69,7 @@ const PatientProfile = () => {
 
 
     const handleDelete = (profile) => {
-        if (window.confirm(`Bạn có chắc chắn muốn xóa hồ sơ của ${profile.fullName} không?`)) {
-
-            console.log("Delete profile:", profile);
-        }
+       alert('Chưa có xóa được đâu!');
     };
 
     useEffect(() => {
@@ -86,51 +82,37 @@ const PatientProfile = () => {
             <div className="d-flex flex-column min-vh-100">
                 <Header />
 
-                <Container style={{ width: '80%' }} className="mt-3">
+                <Container style={{ width: '80%' }} className="py-4">
+                    <div className="mb-4 pb-3 border-bottom">
+                        <div className="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3">
 
-                    <Stack direction="horizontal" gap={3} className="mb-4 align-items-end border-bottom pb-3">
-                        <div>
-                            <h4 className="fw-bold mb-0 text-dark">
-                                Danh sách hồ sơ sức khỏe
-                            </h4>
 
+                            <div>
+                                <h2 className="fw-bold mb-0 text-primary">Danh sách hồ sơ</h2>
+                            </div>
+
+                            <Button
+                                variant="primary"
+                                className="ms-auto d-flex align-items-center gap-2 shadow-sm py-2 px-3 rounded-4 border-0 "
+                                style={{ borderRadius: '10px' }}
+                                onClick={() => navigate('/patient/register-record')}
+                            >
+                                <PlusLg /> <span>Thêm hồ sơ mới</span>
+                            </Button>
                         </div>
-
-                        <Button
-                            variant="primary"
-                            className="ms-auto d-flex align-items-center gap-2 shadow-sm py-2 px-3 rounded-4 border-0 "
-                            style={{ borderRadius: '10px' }}
-                            onClick={() => navigate('/patient/register-record')}
-                        >
-                            <PlusLg /> <span>Thêm hồ sơ mới</span>
-                        </Button>
-                    </Stack>
+                    </div>
 
 
                     <Row>
                         <Col>
                             {patientProfiles.length > 0 ? (
                                 patientProfiles.map((profile) => (
-
-                                    <Row key={profile.id} className="mb-3 align-items-center">
-
-
-                                        <Col md={11}>
-                                            <ProfileCard patient={profile} />
-                                        </Col>
-
-
-                                        <Col md={1} className="text-md-end text-center mt-2 mt-md-0">
-                                            <Button variant="outline-info" className="mb-5 w-100 py-2" onClick={() => handleEdit(profile)}>
-                                                <PencilSquare />
-
-                                            </Button>
-                                            <Button variant="outline-danger" className="mt-5 mt-md-0 w-100 py-2" onClick={() => handleDelete(profile)}>
-                                                <Trash />
-                                            </Button>
-                                        </Col>
-
-                                    </Row>
+                                    <ProfileCard
+                                        key={profile.id}
+                                        patient={profile}
+                                        onEdit={() => handleEdit(profile)}
+                                        onDelete={() => handleDelete(profile)}
+                                    />
                                 ))
                             ) : (
                                 <div className="text-center py-5 bg-light rounded-3 border-dashed">

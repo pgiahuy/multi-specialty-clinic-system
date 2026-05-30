@@ -11,6 +11,7 @@ import com.hb.pojo.Appointment;
 import com.hb.pojo.Patient;
 import com.hb.pojo.Schedules;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -32,6 +33,7 @@ public class AppointmentMapper {
         res.setId(a.getId());
         res.setStatus(a.getStatus() != null ? a.getStatus().name() : null);
         res.setCreatedAt(a.getCreatedAt());
+        
 
         if (a.getPatientId() != null) {
             res.setPatientId(a.getPatientId().getId());
@@ -58,6 +60,7 @@ public class AppointmentMapper {
                     res.setSession(shift.getSession().getLabel());
                 }
                 res.setTimeSlot(String.valueOf(shift.getStartTime()) + " - " + String.valueOf(shift.getEndTime()));
+                res.setPrice(s.getSpecialtyId().getPrice());
             }
 
             if (s.getRoomId() != null) {
@@ -82,7 +85,7 @@ public class AppointmentMapper {
         a.setPatientId(patient);
         a.setScheduleId(schedule);
         a.setStatus(AppointmentStatus.PENDING);
-        a.setCreatedAt(LocalDateTime.now());
+        a.setCreatedAt(LocalDate.now());
         return a;
     }
 }

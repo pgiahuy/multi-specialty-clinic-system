@@ -7,6 +7,7 @@ package com.hb.dto.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hb.enums.PaymentStatus;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class PaymentResponse {
     private String patientName;
     private BigDecimal totalAmount;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
-    private LocalDateTime createdAt;
+    private LocalDate createdAt;
     private PaymentStatus status;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private LocalDateTime paidAt;
@@ -31,7 +32,7 @@ public class PaymentResponse {
         
     }
 
-    public PaymentResponse(Long id, String patientName, BigDecimal totalAmount, LocalDateTime createdAt, PaymentStatus status, LocalDateTime paidAt, Long appointmentId, List<PaymentItemResponse> paymentItems) {
+    public PaymentResponse(Long id, String patientName, BigDecimal totalAmount, LocalDate createdAt, PaymentStatus status, LocalDateTime paidAt, Long appointmentId, List<PaymentItemResponse> paymentItems) {
         this.id = id;
         this.patientName = patientName;
         this.totalAmount = totalAmount;
@@ -125,14 +126,14 @@ public class PaymentResponse {
     /**
      * @return the createdAt
      */
-    public LocalDateTime getCreatedAt() {
+    public LocalDate getCreatedAt() {
         return createdAt;
     }
 
     /**
      * @param createdAt the createdAt to set
      */
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(LocalDate createdAt) {
         this.createdAt = createdAt;
     }
 
