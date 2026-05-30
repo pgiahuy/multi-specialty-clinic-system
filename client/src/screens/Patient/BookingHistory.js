@@ -8,6 +8,10 @@ import MySpinner from "../../components/MySpinner";
 
 const getStatusVariant = (status) => {
     switch ((status || "").toLowerCase()) {
+        case "un_paid":
+        case "chưa thanh toán":
+        case "chua thanh toan":
+            return "warning";
         case "đã hoàn thành":
         case "completed":
             return "success";
@@ -91,7 +95,7 @@ const HistoryBooking = () => {
         const s = String(status).toLowerCase();
         switch (filter) {
             case 'pending':
-                return s.includes('pending') || s.includes('đang chờ');
+                return s.includes('pending') || s.includes('un_paid') || s.includes('đang chờ') || s.includes('chưa thanh toán');
             case 'confirmed':
                 return s.includes('confirmed') || s.includes('đã xác nhận');
             case 'completed':

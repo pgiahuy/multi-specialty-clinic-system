@@ -11,15 +11,20 @@ package com.hb.dto.request;
 public class PrescriptionItemCreateRequest {
     private Long medicineId;
     private int quantity;
+    private int daysToUse;
+    private String note;
 
     public PrescriptionItemCreateRequest() {
     }
 
-    public PrescriptionItemCreateRequest(Long medicineId, int quantity) {
+    public PrescriptionItemCreateRequest(Long medicineId, int quantity, int daysToUse, String note) {
         this.medicineId = medicineId;
         this.quantity = quantity;
+        this.daysToUse = daysToUse;
+        this.note = note;
     }
 
+    
     
     /**
      * @return the medicineId
@@ -47,6 +52,34 @@ public class PrescriptionItemCreateRequest {
      */
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    /**
+     * @return the daysToUse
+     */
+    public int getDaysToUse() {
+        return daysToUse;
+    }
+
+    /**
+     * @param daysToUse the daysToUse to set
+     */
+    public void setDaysToUse(int daysToUse) {
+        this.daysToUse = daysToUse;
+    }
+
+    /**
+     * @return the note
+     */
+    public String getNote() {
+        return note;
+    }
+
+    /**
+     * @param note the note to set
+     */
+    public void setNote(String note) {
+        this.note = note;
     }
     
     

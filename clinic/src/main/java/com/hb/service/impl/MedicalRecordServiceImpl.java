@@ -5,15 +5,17 @@
 package com.hb.service.impl;
 
 import com.hb.dto.request.MedicalRecordCreateRequest;
-import com.hb.enums.AppointmentStatus;
 import com.hb.exception.ResourceNotFoundException;
-import com.hb.mapper.MedicalRecordMapper;
 import com.hb.pojo.Appointment;
+import com.hb.pojo.Doctor;
 import com.hb.pojo.MedicalRecord;
 import com.hb.pojo.Patient;
+import com.hb.pojo.User;
 import com.hb.repository.AppointmentRepository;
+import com.hb.repository.DoctorRepository;
 import com.hb.repository.MedicalRecordRepository;
 import com.hb.repository.PatientRepository;
+import com.hb.repository.UserRepository;
 import com.hb.service.MedicalRecordService;
 import java.util.Date;
 import java.util.List;
@@ -32,6 +34,12 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
     private MedicalRecordRepository medicalRecordRepo;
 
     @Autowired
+    private UserRepository userRepo;
+    
+    @Autowired
+    private DoctorRepository doctorRepo;
+    
+    @Autowired
     private PatientRepository patientRepo;
 
     @Autowired
@@ -41,25 +49,22 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
     public MedicalRecord addOrUpdateMedicalRecord(MedicalRecordCreateRequest req) {
         MedicalRecord m;
 
-        if (medicalRecordRepo.getMedicalRecordById(req.getId()) != null) {
+        if (req.getId() != null) {
             m = medicalRecordRepo.getMedicalRecordById(req.getId());
 
-            if (!req.getDiagnosis().isEmpty()) {
-                m.setDiagnosis(req.getDiagnosis());
-            }
-
-            if (!req.getNote().isEmpty()) {
-                m.setNote(req.getNote());
-            }
         } else {
             m = new MedicalRecord();
-
-            Appointment appointment = appointmentRepo.getAppointmentById(req.getAppointId());
+            Appointment appointment = appointmentRepo.getAppointmentById(req.getAppointmentId());
             m.setAppointmentId(appointment);
             m.setCreatedAt(new Date());
-
-            appointment.setStatus(AppointmentStatus.IN_PROGRESS);
             appointmentRepo.addOrUpdateAppointment(appointment);
+        }
+        if (!req.getDiagnosis().isEmpty()) {
+            m.setDiagnosis(req.getDiagnosis());
+        }
+
+        if (!req.getNote().isEmpty()) {
+            m.setNote(req.getNote());
         }
 
         return this.medicalRecordRepo.addorUpdateMedicalRecord(m);
@@ -89,10 +94,14 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
     public boolean checkAccessControll(String username, Long patientId) {
         Patient p = patientRepo.getPatientById(patientId);
         if (p == null) {
-            throw new ResourceNotFoundException("Patient not found!");
+            throw new ResourceNotFoundException("Không tìm thấy bệnh nhân!");
         }
-
         return p.getUserId().getUsername().equals(username);
+    }
+
+    @Override
+    public boolean checkAccessControll(User user,Long medicalRecordId) {
+        return this.medicalRecordRepo.checkAccessControll(user, medicalRecordId);
     }
 
     @Override
@@ -117,4 +126,5 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
         return this.medicalRecordRepo.getMedicalRecordByAppointmentId(appointmentId);
 
     }
+
 }

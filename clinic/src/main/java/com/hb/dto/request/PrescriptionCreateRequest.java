@@ -11,13 +11,15 @@ import java.util.List;
  * @author HUY
  */
 public class PrescriptionCreateRequest {
+    private Long id;
     private Long medicalRecordId; 
     private List<PrescriptionItemCreateRequest> items;
 
     public PrescriptionCreateRequest() {
     }
 
-    public PrescriptionCreateRequest(Long medicalRecordId, List<PrescriptionItemCreateRequest> items) {
+    public PrescriptionCreateRequest(Long id,Long medicalRecordId, List<PrescriptionItemCreateRequest> items) {
+        this.id = id;
         this.medicalRecordId = medicalRecordId;
         this.items = items;
     }
@@ -50,6 +52,20 @@ public class PrescriptionCreateRequest {
      */
     public void setItems(List<PrescriptionItemCreateRequest> items) {
         this.items = items;
+    }
+
+    /**
+     * @return the id
+     */
+    public Long getId() {
+        return id;
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(Long id) {
+        this.id = id;
     }
     
     

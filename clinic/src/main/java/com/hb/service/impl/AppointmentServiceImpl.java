@@ -9,6 +9,7 @@ import com.hb.dto.response.AppointmentResponse;
 import com.hb.exception.DuplicateResourceException;
 import com.hb.exception.FullSlotException;
 import com.hb.exception.ResourceNotFoundException;
+import com.hb.enums.AppointmentStatus;
 import com.hb.mapper.AppointmentMapper;
 import com.hb.pojo.Appointment;
 import com.hb.pojo.Patient;
@@ -106,7 +107,34 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     public boolean doctorConfirmAppointment(Long appointmentId) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        Appointment appointment = appointmentRepo.getAppointmentById(appointmentId);
+        if (appointment == null) {
+            throw new ResourceNotFoundException("Appointment not found!");
+        }
+
+        if (appointment.getStatus() != AppointmentStatus.PENDING) {
+            return false;
+        }
+
+        appointment.setStatus(AppointmentStatus.CONFIRMED);
+        appointmentRepo.addOrUpdateAppointment(appointment);
+        return true;
+    }
+
+    @Override
+    public boolean doctorStartAppointment(Long appointmentId) {
+        Appointment appointment = appointmentRepo.getAppointmentById(appointmentId);
+        if (appointment == null) {
+            throw new ResourceNotFoundException("Appointment not found!");
+        }
+
+        if (appointment.getStatus() != AppointmentStatus.CONFIRMED) {
+            return false;
+        }
+
+        appointment.setStatus(AppointmentStatus.IN_PROGRESS);
+        appointmentRepo.addOrUpdateAppointment(appointment);
+        return true;
     }
 
     @Override

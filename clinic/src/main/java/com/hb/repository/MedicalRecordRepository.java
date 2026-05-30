@@ -5,6 +5,7 @@
 package com.hb.repository;
 
 import com.hb.pojo.MedicalRecord;
+import com.hb.pojo.User;
 import java.util.List;
 import java.util.Map;
 
@@ -20,5 +21,6 @@ public interface MedicalRecordRepository extends BaseRepository<MedicalRecord>{
     MedicalRecord getMedicalRecordByAppointmentId(Long appointmentId);
     List<MedicalRecord> getMedicalRecordsByPatientId(Long patientId);
     void deleteMedicalRecord(Long id);
+    boolean checkAccessControll(User user, Long medicalRecordId);
     
 }

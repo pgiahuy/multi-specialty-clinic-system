@@ -17,6 +17,7 @@ public class PrescriptionResponse {
     private Long id;
     private String doctorName;
     private String patientName;
+    private String diagnosis;
     private String note;
     private List<PrescriptionItemResponse> items;
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
@@ -108,6 +109,20 @@ public class PrescriptionResponse {
      */
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    /**
+     * @return the diagnosis
+     */
+    public String getDiagnosis() {
+        return diagnosis;
+    }
+
+    /**
+     * @param diagnosis the diagnosis to set
+     */
+    public void setDiagnosis(String diagnosis) {
+        this.diagnosis = diagnosis;
     }
     
     
