@@ -44,7 +44,8 @@ export const endpoint = {
     'patient-profile': (patientId) => `/secure/profile/${patientId}`,
     'specialties': '/specialties',
     'medical-record': (appointmentId) => `/secure/medical-records/appointment/${appointmentId}`,
-    'medical-record-update': (medicalRecordId) => `/secure/medical-records/${medicalRecordId}`
+    'medical-record-update': (medicalRecordId) => `/secure/medical-records/${medicalRecordId}`,
+    'test': (testId) => `/secure/test/${testId}`,
 };
 export const AUTH_ENDPOINTS = {
     REGISTER: 'auth/register',

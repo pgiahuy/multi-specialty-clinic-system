@@ -19,9 +19,8 @@ import { useReducer } from "react";
 import MyUserReducers from "./reducers/MyUserReducers";
 import RegisterRecord from "./screens/Patient/RegisterRecord";
 import TestResultDetail from "./screens/Patient/TestResultDetail";
-import Payment from "./screens/Patient/Payment";
 import PaymentDetail from "./screens/Patient/PaymentDetail";
-import PaymentItems from "./screens/Patient/PaymentItems";
+
 import PaymentResult from "./screens/Patient/PaymentResult";
 import { jwtDecode } from "jwt-decode";
 import cookies from 'react-cookies'
@@ -71,9 +70,9 @@ function App() {
             <Route path="/patient/booking" element={<BookingPage />} />
             <Route path="/patient/history-booking" element={<HistoryBooking />} />
             <Route path="/patient/test-results" element={<TestResultDetail />} />
-            <Route path="/patient/payment" element={<Payment />} />
-            <Route path="/patient/payment/:patientId" element={<PaymentDetail />} />
-            <Route path="/patient/payment-items/:paymentId" element={<PaymentItems />} />
+            
+            <Route path="/patient/payment/:patientId?" element={<PaymentDetail />} />
+            
             <Route path="/patient/payment-result" element={<PaymentResult />} />
             <Route path="/doctors" element={<ListDoctor />} />
             <Route path="/doctor/schedules" element={<Schedules />} />

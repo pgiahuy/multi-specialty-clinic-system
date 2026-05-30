@@ -60,9 +60,7 @@ public class LabResults implements Serializable {
     @JoinColumn(name = "test_id", referencedColumnName = "id")
     @ManyToOne
     private LabTests testId;
-    @JoinColumn(name = "patient_id", referencedColumnName = "id")
-    @ManyToOne
-    private Patient patientId;
+    
 
     public LabResults() {
     }
@@ -127,13 +125,7 @@ public class LabResults implements Serializable {
         this.testId = testId;
     }
 
-    public Patient getPatientId() {
-        return patientId;
-    }
-
-    public void setPatientId(Patient patientId) {
-        this.patientId = patientId;
-    }
+   
 
     @Override
     public int hashCode() {
