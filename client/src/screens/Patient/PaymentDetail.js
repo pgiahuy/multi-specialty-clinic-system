@@ -15,7 +15,7 @@ const PaymentDetail = () => {
     const [loadingPayments, setLoadingPayments] = useState(false);
     const [activeTab, setActiveTab] = useState('unpaid');
     const [showPaymentModal, setShowPaymentModal] = useState(false);
-    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('CASH');
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('MOMO');
     const [currentInvoice, setCurrentInvoice] = useState(null);
     const [testDetails, setTestDetails] = useState([]);
     const [testNamesMap, setTestNamesMap] = useState({});
@@ -134,7 +134,7 @@ const PaymentDetail = () => {
         const type = String(item?.itemType || '').toUpperCase();
 
         if (type === 'LAB_TEST') {
-            // Lấy tên từ State, nếu chưa load xong thì hiện "Phí xét nghiệm", load xong sẽ tự đổi tên
+            
             if (item.referenceId && testNamesMap[item.referenceId]) {
                 return testNamesMap[item.referenceId];
             }
@@ -179,14 +179,52 @@ const PaymentDetail = () => {
         setShowPaymentModal(true);
     };
 
-    const handleConfirmPayment = () => {
+    const handleConfirmPayment = async () => {
         if (!currentInvoice) {
             setShowPaymentModal(false);
             return;
         }
-        setPayments((prev) => prev.map((payment) => payment.id === currentInvoice.id ? { ...payment, status: 'SUCCESS' } : payment));
-        setShowPaymentModal(false);
-        setCurrentInvoice(null);
+
+        try {
+
+            const formData = new URLSearchParams();
+            formData.append("method", selectedPaymentMethod);
+            formData.append("paymentId", currentInvoice.id);
+            formData.append("orderInfo", `Thanh toan hoa don ${currentInvoice.id}`);
+
+
+            const res = await authApis().post(PAYMENT_ENDPOINTS.PAY, formData, {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            });
+
+
+
+            const payUrl = res.data.payUrl || res.data.shortLink;
+
+            if (payUrl) {
+
+                setShowPaymentModal(false);
+                window.location.href = payUrl;
+            } else {
+
+                setPayments((prev) =>
+                    prev.map((payment) =>
+                        payment.id === currentInvoice.id ? { ...payment, status: 'SUCCESS' } : payment
+                    )
+                );
+                setShowPaymentModal(false);
+                setCurrentInvoice(null);
+                
+            }
+
+        } catch (error) {
+            console.error("Lỗi thanh toán:", error);
+
+            
+            
+        }
     };
 
     const closePaymentModal = () => {
@@ -260,7 +298,7 @@ const PaymentDetail = () => {
                                                 <Card.Header className="bg-white border-0 pt-4 px-4 pb-2">
                                                     <div className="d-flex justify-content-between align-items-start">
 
-                                                        {/* Cột trái: Gồm Tiêu đề và Ngày tháng nằm dưới */}
+
                                                         <div>
                                                             <div className="text-success fw-bold fs-5 mb-1">
                                                                 {getInvoiceTitle(p)}
@@ -271,7 +309,7 @@ const PaymentDetail = () => {
                                                             </div>
                                                         </div>
 
-                                                        {/* Cột phải: Badge Trạng thái */}
+
                                                         <div>
                                                             <Badge bg={p.status === 'SUCCESS' ? 'success' : 'warning'} className="rounded-pill px-3 py-2 text-dark">
                                                                 {p.status === 'SUCCESS' ? 'ĐÃ THANH TOÁN' : 'CHỜ THANH TOÁN'}
@@ -338,37 +376,65 @@ const PaymentDetail = () => {
                 <Footer />
 
                 <Modal show={showPaymentModal} onHide={closePaymentModal} centered>
-                    <Modal.Header closeButton>
-                        <Modal.Title>Chọn phương thức thanh toán</Modal.Title>
+                    <Modal.Header closeButton className="border-0 pb-0">
+                        <Modal.Title className="fw-bold fs-5">Xác nhận thanh toán</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <div className="mb-3">
-                            <div className="small text-muted">Hóa đơn</div>
-                            <div className="fw-semibold">#{currentInvoice?.id || '-'}</div>
-                        </div>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Phương thức</Form.Label>
-                            <Form.Select
-                                value={selectedPaymentMethod}
-                                onChange={(event) => setSelectedPaymentMethod(event.target.value)}
+                       
+                        
+                        <div className="mb-4">
+                            <div className="small text-muted mb-2">Chọn phương thức thanh toán</div>
+
+                           
+                            <div
+                                className={`d-flex align-items-center p-3 mb-2 border rounded-3 ${selectedPaymentMethod === 'CASH' ? 'border-primary bg-primary bg-opacity-10' : 'bg-white'}`}
+                                style={{ cursor: 'pointer', transition: 'all 0.2s' }}
+                                onClick={() => setSelectedPaymentMethod('CASH')}
                             >
-                                <option value="CASH">Tiền mặt</option>
-                                <option value="CARD">Thẻ ngân hàng</option>
-                                <option value="MOMO">Momo</option>
-                                <option value="ZALOPAY">ZaloPay</option>
-                            </Form.Select>
-                        </Form.Group>
+                               
+                                <div className="flex-grow-1">
+                                    <div className="fw-bold text-dark">Tiền mặt tại quầy</div>
+                                    <div className="small text-muted">Thanh toán trực tiếp cho thu ngân</div>
+                                </div>
+                                <div>
+                                    <Form.Check type="radio" checked={selectedPaymentMethod === 'CASH'} readOnly />
+                                </div>
+                            </div>
+
+                           
+                            <div
+                                className={`d-flex align-items-center p-3 border rounded-3 ${selectedPaymentMethod === 'MOMO' ? 'border-danger bg-danger bg-opacity-10' : 'bg-white'}`}
+                                style={{ cursor: 'pointer', transition: 'all 0.2s' }}
+                                onClick={() => setSelectedPaymentMethod('MOMO')}
+                            >
+                                
+                                <div className="flex-grow-1">
+                                    <div className="fw-bold" style={{ color: '#a50064' }}>Ví điện tử MoMo</div>
+                                    <div className="small text-muted">Thanh toán quét mã QR</div>
+                                </div>
+                                <div>
+                                    <Form.Check type="radio" checked={selectedPaymentMethod === 'MOMO'} readOnly style={{ accentColor: '#a50064' }} />
+                                </div>
+                            </div>
+                        </div>
+
                         <div className="border rounded-3 p-3 bg-light">
-                            <div className="small text-muted">Số tiền cần thanh toán</div>
-                            <div className="fw-bold fs-5">{(currentInvoice?.totalAmount || 0).toLocaleString('vi-VN')} đ</div>
+                            <div className="small text-muted text-center mb-1">Số tiền cần thanh toán</div>
+                            <div className="fw-bold fs-3 text-center text-primary">
+                                {(currentInvoice?.totalAmount || 0).toLocaleString('vi-VN')} đ
+                            </div>
                         </div>
                     </Modal.Body>
-                    <Modal.Footer className="justify-content-between">
-                        <Button variant="outline-secondary" onClick={closePaymentModal}>
-                            Hủy
+                    <Modal.Footer className="justify-content-between border-0 pt-0">
+                        <Button variant="outline-secondary" className="px-4 rounded-pill" onClick={closePaymentModal}>
+                            Hủy bỏ
                         </Button>
-                        <Button variant="primary" onClick={handleConfirmPayment}>
-                            Xác nhận thanh toán
+                        <Button
+                            className="px-4 rounded-pill fw-bold border-0 text-white"
+                            style={{ backgroundColor: selectedPaymentMethod === 'MOMO' ? '#a50064' : '#0d6efd' }}
+                            onClick={handleConfirmPayment}
+                        >
+                            Thanh toán ngay
                         </Button>
                     </Modal.Footer>
                 </Modal>

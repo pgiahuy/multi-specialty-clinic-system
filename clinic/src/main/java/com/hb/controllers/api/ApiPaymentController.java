@@ -59,14 +59,24 @@ public class ApiPaymentController {
             @RequestParam("orderInfo") String orderInfo) throws Exception {
 
         Long totalAmount = paymentService.getPaymentAmount(paymentId).longValue();
-        String orderId = "ORDER_" + paymentId;
+        String orderId = "ORDER_" + paymentId + "_" + System.currentTimeMillis();
 
         return switch (method.toUpperCase()) {
             case "MOMO" ->
                 ResponseEntity.ok(momoService.createPayment(orderId, totalAmount, orderInfo));
-//            case "VNPAY"   -> ResponseEntity.ok(vnpayService.createPayment(orderId, amount, orderInfo));
-//            case "ZALOPAY" -> ResponseEntity.ok(zaloPayService.createPayment(orderId, amount, orderInfo));
-//            case "COD"     -> ResponseEntity.ok(Map.of("method", "COD", "orderId", orderId));
+            case "CASH" -> {
+                Payment payment = paymentService.getPaymentById(paymentId);
+                if (payment == null) {
+                    
+                    ResponseEntity.badRequest().body("Không tìm thấy hóa đơn!");
+                }
+
+                paymentService.confirmPaymentSuccess(paymentId, PaymentMethod.CASH);
+
+               
+                yield ResponseEntity.ok(Map.of("message", "Thanh toán thành công cập nhật DB", "status", "SUCCESS"));
+            }
+
             default ->
                 ResponseEntity.badRequest().body("Phương thức không hỗ trợ");
         };
@@ -78,7 +88,8 @@ public class ApiPaymentController {
         boolean valid = momoService.verifySignature(params);
         String resultCode = params.get("resultCode");
         String orderId = params.get("orderId");
-        Long paymentId = Long.parseLong(orderId.replace("ORDER_", ""));
+        String[] parts = orderId.split("_");
+        Long paymentId = Long.parseLong(parts[1]);
 
         if (valid && "0".equals(resultCode)) {
 
@@ -105,7 +116,8 @@ public class ApiPaymentController {
         try {
             String resultCode = params.get("resultCode");
             String orderId = params.get("orderId");
-            Long paymentId = Long.parseLong(orderId.replace("ORDER_", ""));
+            String[] parts = orderId.split("_");
+            Long paymentId = Long.parseLong(parts[1]);
 
             if (valid && "0".equals(resultCode)) {
 
@@ -121,13 +133,13 @@ public class ApiPaymentController {
 
                 paymentService.confirmPaymentFailed(paymentId, PaymentMethod.MOMO);
             }
-            
+
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
 
         }
-        
+
         return ResponseEntity.noContent().build();
     }
 
