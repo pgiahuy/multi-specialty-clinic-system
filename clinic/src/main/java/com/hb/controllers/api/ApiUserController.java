@@ -84,6 +84,7 @@ public class ApiUserController {
         resp.setEmail(user.getEmail());
         resp.setAvatar(user.getSecureUrl());
         resp.setRole(user.getRole());
+        resp.setName(user.getName());
 
         if (user.getDoctor() != null) {
             DoctorResponse doctorProfile = doctorMapper.toResponse(user.getDoctor());

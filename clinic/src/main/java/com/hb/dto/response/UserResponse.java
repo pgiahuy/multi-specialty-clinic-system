@@ -12,6 +12,7 @@ import java.util.List;
  */
 public class UserResponse {
     private String username;
+    private String name;
     private String email;
     private String avatar;
     private String role;
@@ -25,6 +26,8 @@ public class UserResponse {
         this.username = username;
         this.avatar = avatar;
     }
+    
+    
     
     
     /**
@@ -85,6 +88,20 @@ public class UserResponse {
 
     public void setPatientProfiles(List<PatientResponse> patientProfiles) {
         this.patientProfiles = patientProfiles;
+    }
+
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
     }
     
     

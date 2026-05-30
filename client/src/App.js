@@ -32,6 +32,7 @@ import DoctorProfile from "./screens/Doctor/DoctorProfile";
 import RegisterSchedule from "./screens/Doctor/RegisterSchedule";
 import MedicalRecord from "./screens/Doctor/MedicalRecord";
 import AssignTest from "./screens/Doctor/AssignTest";
+import DoctorDetail from "./screens/Doctor/DoctorDetail";
 
 
 const initUserState = () => {
@@ -78,6 +79,7 @@ function App() {
             <Route path="/doctor/schedules" element={<Schedules />} />
             <Route path="/doctor/:scheduleId/appointments" element={<AppointmentList />} />
             <Route path="/doctor/profile" element={<DoctorProfile />} />
+            <Route path="/doctor/detail/:doctorId" element={<DoctorDetail />} />
             <Route path="/doctor/register-schedule" element={<RegisterSchedule />} />
             <Route path="/doctor/medical-records/appointment/:appointmentId" element={<MedicalRecord />} />
             <Route path="doctor/assign-test/:appointmentId" element={<AssignTest />} />

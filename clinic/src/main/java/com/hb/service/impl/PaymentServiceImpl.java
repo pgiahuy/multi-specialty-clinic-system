@@ -7,7 +7,6 @@ package com.hb.service.impl;
 import com.hb.enums.PaymentMethod;
 import com.hb.enums.PaymentStatus;
 import com.hb.pojo.Appointment;
-import com.hb.pojo.Patient;
 import com.hb.pojo.Payment;
 import com.hb.pojo.PaymentItems;
 import com.hb.repository.PaymentItemRepository;

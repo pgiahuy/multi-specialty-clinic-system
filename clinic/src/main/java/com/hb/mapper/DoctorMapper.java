@@ -6,6 +6,7 @@ package com.hb.mapper;
 
 import com.hb.dto.response.DoctorResponse;
 import com.hb.pojo.Doctor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class DoctorMapper {
+    @Autowired  
+    private SpecialtyMapper specMapper;
 
     public DoctorResponse toResponse(Doctor d) {
         if (d == null) {
@@ -27,15 +30,9 @@ public class DoctorMapper {
         res.setDescription(d.getDescription());
         res.setGender(d.getGender());
 
-        
-        if (d.getSpecialty() != null) {
-            res.setSpecialty(d.getSpecialty().getName());
-        } else if (d.getSpecialtyCollection() != null && !d.getSpecialtyCollection().isEmpty()) {
-            
-            res.setSpecialty(d.getSpecialtyCollection().iterator().next().getName());
-        }
-
-       
+  
+        res.setSpecialtiesOfDoctor(d.getSpecialtyCollection().stream().map(specMapper::toResponse).toList());
+ 
         if (d.getUserId() != null) {
             res.setEmail(d.getUserId().getEmail());
             res.setAvatar(d.getUserId().getSecureUrl());

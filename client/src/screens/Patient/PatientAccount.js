@@ -8,6 +8,8 @@ import { authApis, USER_ENDPOINTS } from "../../configs/Apis";
 const PatientAccount = () => {
     const [profile, setProfile] = useState(null);
     const [err, setErr] = useState("");
+    const displayName = profile?.name || profile?.username || "Bệnh nhân";
+    const patientInitial = displayName.trim().charAt(0).toUpperCase();
 
     const loadProfile = async () => {
         try {
@@ -41,35 +43,62 @@ const PatientAccount = () => {
                                 ) : (
                                     <Row className="g-4 align-items-center">
                                         <Col md={4} className="text-center">
-                                            <img
-                                                src={profile?.avatar || "/default-avatar.png"}
-                                                alt="avatar"
-                                                className="rounded-circle mb-3"
-                                                style={{ width: 120, height: 120, objectFit: "cover" }}
-                                                onError={(e) => { e.target.src = "/default-avatar.png"; }}
-                                            />
+                                            {profile?.avatar ? (
+                                                <img
+                                                    src={profile.avatar}
+                                                    alt="avatar"
+                                                    className="rounded-circle mb-3"
+                                                    style={{ width: 120, height: 120, objectFit: "cover" }}
+                                                    onError={(e) => {
+                                                        e.target.style.display = "none";
+                                                        const fallback = e.target.nextElementSibling;
+                                                        if (fallback) fallback.style.display = "flex";
+                                                    }}
+                                                />
+                                            ) :
+                                                <div
+                                                    className="rounded-circle mb-3 mx-auto d-flex align-items-center justify-content-center bg-light text-primary fw-bold border"
+                                                    style={{
+                                                        width: 120,
+                                                        height: 120,
+                                                        fontSize: "44px",
+                                                        lineHeight: 1,
+                                                        display: profile?.avatar ? "none" : "flex"
+                                                    }}
+                                                >
+                                                    {patientInitial}
+                                                </div>}
                                             <div>
-                                                <Badge bg="primary" className="rounded-pill px-3 py-2">{profile?.role || "ROLE_PATIENT"}</Badge>
+                                                <Badge bg="primary" className="rounded-pill px-3 py-2">{profile?.role == "ROLE_PATIENT" ? "Bệnh nhân" : "Chưa xác định"}</Badge>
                                             </div>
                                         </Col>
                                         <Col md={8}>
                                             <Row className="g-3">
                                                 <Col md={6}>
                                                     <div className="text-muted small">Tên đăng nhập</div>
-                                                    <div className="fw-semibold">{profile?.username || "-"}</div>
+                                                    {profile?.username ? (
+                                                        <div className="fw-semibold">{profile.username}</div>
+                                                    ) : (
+                                                        <div style={{ fontSize: "0.75rem" }} className="text-muted ">{"Chưa cập nhật"}</div>
+                                                    )}
+                                                </Col>
+                                                <Col md={6}>
+                                                    <div className="text-muted small">Tên người dùng</div>
+                                                    {profile?.name ? (
+                                                        <div className="fw-semibold">{profile.name}</div>
+                                                    ) : (
+                                                        <div style={{ fontSize: "0.75rem" }} className="text-muted ">{"Chưa cập nhật"}</div>
+                                                    )}
                                                 </Col>
                                                 <Col md={6}>
                                                     <div className="text-muted small">Email</div>
-                                                    <div className="fw-semibold d-flex align-items-center gap-2"><Envelope size={14} />{profile?.email || "-"}</div>
+                                                    {profile?.email ? (
+                                                        <div className="fw-semibold d-flex align-items-center gap-2"><Envelope size={14} />{profile.email}</div>
+                                                    ) : (
+                                                        <div style={{ fontSize: "0.75rem" }} className="text-muted">{"Chưa cập nhật"}</div>
+                                                    )}
                                                 </Col>
-                                                <Col md={6}>
-                                                    <div className="text-muted small">Vai trò</div>
-                                                    <div className="fw-semibold"><ShieldLock size={14} className="me-1" />{profile?.role || "-"}</div>
-                                                </Col>
-                                                <Col md={12}>
-                                                    <div className="text-muted small">Ảnh đại diện</div>
-                                                    <div className="fw-semibold text-truncate">{profile?.avatar || "-"}</div>
-                                                </Col>
+
                                             </Row>
                                         </Col>
                                     </Row>
