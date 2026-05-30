@@ -71,9 +71,7 @@ public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> i
                     predicates.add(cb.equal(doctorJoin.get("userId").get("id"), Long.valueOf(params.get("currentUserId"))));
                 }
             }
-            if (params.containsKey("patientId")) {
-                hql.append(" AND a.patientId.id = :patientId");
-            }
+          
 
             if (hasText(params.get("status"))) {
                 predicates.add(cb.equal(root.get("status"), AppointmentStatus.valueOf(params.get("status").trim().toUpperCase())));
@@ -177,7 +175,9 @@ public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> i
         Session session = this.factory.getObject().getCurrentSession();
         Query<Appointment> q = session.createNamedQuery("Appointment.findById", Appointment.class);
         q.setParameter("id", id);
-        return q.getSingleResult();
+
+        List<Appointment> appointments = q.getResultList();
+        return appointments.isEmpty() ? null : appointments.get(0);
     }
 
     @Override

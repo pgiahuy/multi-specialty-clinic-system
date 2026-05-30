@@ -4,11 +4,7 @@
  */
 package com.hb.service.impl;
 
-import com.hb.enums.AppointmentStatus;
 import com.hb.enums.PaymentItemType;
-import com.hb.enums.PaymentMethod;
-import com.hb.enums.PaymentStatus;
-import com.hb.mapper.AppointmentMapper;
 import com.hb.pojo.Appointment;
 import com.hb.pojo.LabTests;
 import com.hb.pojo.Payment;
@@ -20,11 +16,9 @@ import com.hb.repository.AppointmentRepository;
 import com.hb.repository.LabTestRepository;
 import com.hb.repository.PaymentItemRepository;
 import com.hb.repository.PrescriptionRepository;
-import com.hb.service.AppointmentService;
 import com.hb.service.PaymentItemsService;
 import com.hb.service.PaymentService;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -61,7 +61,7 @@ public class PaymentItems implements Serializable {
     
     @ManyToOne
     @JoinColumn(name ="payment_id")
-    private Payment payment;
+    private Payment paymentId;
     
     
 
@@ -140,14 +140,14 @@ public class PaymentItems implements Serializable {
      * @return the payment
      */
     public Payment getPayment() {
-        return payment;
+        return paymentId;
     }
 
     /**
      * @param payment the payment to set
      */
-    public void setPayment(Payment payment) {
-        this.payment = payment;
+    public void setPayment(Payment paymentId) {
+        this.paymentId = paymentId;
     }
     
 }
