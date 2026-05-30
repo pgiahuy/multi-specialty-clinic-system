@@ -65,8 +65,15 @@ export const CLINIC_ENDPOINTS = {
     SCHEDULES: 'secure/schedules',
     DOCTOR_APPOINTMENTS: (scheduleId) => `secure/appointments?scheduleId=${scheduleId}`,
     DOCTOR_CONFIRM_APPOINTMENT: (appointmentId) => `secure/appointments/${appointmentId}/confirm`,
+    DOCTOR_START_APPOINTMENT: (appointmentId) => `secure/appointments/${appointmentId}/start`,
+    CREATE_MEDICAL_RECORD: 'secure/medical-records',
     PATIENT_BOOKING_APPOINTMENT: 'secure/appointments',
     TEST_RESULTS: (patientId) => `secure/test/${patientId}`,
+    APPOINTMENT_BY_ID: (id) => `secure/appointment/${id}`,
+    MEDICAL_RECORD_BY_ID: (id) => `secure/medical-records/${id}`,
+    MEDICAL_RECORD_BY_PATIENT_ID: (id) => `secure/medical-records/patient/${id}`,
+    MEDICINES: 'secure/medicines',
+    PRESCRIPTIONS: 'secure/prescriptions',
 };
 
 
@@ -92,6 +99,8 @@ export const clinicApis = {
     getSchedule: () => authApis.get(CLINIC_ENDPOINTS.SCHEDULES),
     getDoctorAppointments: (scheduleId) => authApis().get(CLINIC_ENDPOINTS.APPOINTMENTS(scheduleId)),
     getShifts: () => API.get(CLINIC_ENDPOINTS.SHIFTS),
+    getMedicines: (params = {}) => authApis().get(CLINIC_ENDPOINTS.MEDICINES, { params }),
+    createPrescription: (payload) => authApis().post(CLINIC_ENDPOINTS.PRESCRIPTIONS, payload),
 };
 
 

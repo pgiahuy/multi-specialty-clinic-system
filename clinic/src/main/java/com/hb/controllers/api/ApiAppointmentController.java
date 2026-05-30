@@ -70,6 +70,7 @@ public class ApiAppointmentController {
             params.put("currentUserId", String.valueOf(u.getId()));
             params.put("currentUserRole", u.getRole());
         }
+
         int pageSize = this.env.getProperty("admin.page_size", Integer.class, 10);
         params.put("pageSize", String.valueOf(pageSize));
 
@@ -84,9 +85,6 @@ public class ApiAppointmentController {
         return ResponseEntity.ok(appMapper.toResponse(res));
     }
 
-    
-
-   
 
     @PostMapping("/secure/appointments/{id}/confirm")
     public ResponseEntity<?> update(@PathVariable("id") Long id, Principal principal) {
@@ -116,6 +114,33 @@ public class ApiAppointmentController {
             return ResponseEntity.ok("Xác nhận lịch hẹn thành công!");
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Xác nhận lịch hẹn thất bại hoặc lịch đã được xử lý trước đó!");
+        }
+    }
+
+    @PostMapping("/secure/appointments/{id}/start")
+    public ResponseEntity<?> start(@PathVariable("id") Long id, Principal principal) {
+
+        User currentUser = userService.getUserByUsername(principal.getName());
+        Appointment appointment = appointmentService.getAppointmentById(id);
+
+        boolean isOwner = false;
+
+        if ("ROLE_DOCTOR".equals(currentUser.getRole())) {
+            if (appointment.getScheduleId() != null && appointment.getScheduleId().getDoctorId() != null) {
+                isOwner = appointment.getScheduleId().getDoctorId().getUserId().getId().equals(currentUser.getId());
+            }
+        }
+
+        if (!isOwner) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Không có quyền bắt đầu khám!");
+        }
+
+        boolean started = this.appointmentService.doctorStartAppointment(id);
+
+        if (started) {
+            return ResponseEntity.ok("Bắt đầu khám thành công!");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Chỉ có thể bắt đầu khám khi lịch hẹn đang ở trạng thái đã xác nhận!");
         }
     }
 }

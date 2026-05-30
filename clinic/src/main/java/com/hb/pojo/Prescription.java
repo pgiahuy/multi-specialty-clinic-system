@@ -4,9 +4,12 @@
  */
 package com.hb.pojo;
 
+import com.hb.enums.PrescriptionStatus;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -16,12 +19,10 @@ import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Date;
 
 /**
  *
@@ -36,6 +37,13 @@ import java.util.Date;
     @NamedQuery(name = "Prescription.findByStatus", query = "SELECT p FROM Prescription p WHERE p.status = :status")})
 public class Prescription implements Serializable {
 
+    @Size(max = 9)
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private PrescriptionStatus status;
+    @Column(name = "public_at")
+    private LocalDateTime publicAt;
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,11 +51,7 @@ public class Prescription implements Serializable {
     @Column(name = "id")
     private Long id;
     @Column(name = "created_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt;
-    @Size(max = 9)
-    @Column(name = "status")
-    private String status;
+    private LocalDateTime createdAt;
 
     @JoinColumn(name = "medical_record_id", referencedColumnName = "id")
     @OneToOne
@@ -70,21 +74,14 @@ public class Prescription implements Serializable {
         this.id = id;
     }
 
-    public Date getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
 
   
 
@@ -127,6 +124,22 @@ public class Prescription implements Serializable {
     @Override
     public String toString() {
         return "com.hb.pojo.Prescription[ id=" + id + " ]";
+    }
+
+    public PrescriptionStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(PrescriptionStatus status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getPublicAt() {
+        return publicAt;
+    }
+
+    public void setPublicAt(LocalDateTime publicAt) {
+        this.publicAt = publicAt;
     }
     
 }

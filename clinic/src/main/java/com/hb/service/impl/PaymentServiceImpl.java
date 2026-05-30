@@ -6,11 +6,13 @@ package com.hb.service.impl;
 
 import com.hb.enums.PaymentMethod;
 import com.hb.enums.PaymentStatus;
+import com.hb.enums.AppointmentStatus;
 import com.hb.pojo.Appointment;
 import com.hb.pojo.Payment;
 import com.hb.pojo.PaymentItems;
 import com.hb.repository.PaymentItemRepository;
 import com.hb.repository.PaymentRepository;
+import com.hb.repository.AppointmentRepository;
 import com.hb.service.AppointmentService;
 import com.hb.service.PaymentItemsService;
 import com.hb.service.PaymentService;
@@ -39,6 +41,9 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Autowired
     private PaymentItemRepository itemRepo;
+
+    @Autowired
+    private AppointmentRepository appointmentRepo;
 
     @Override
     public List<Payment> getPayments(Map<String, String> params) {
@@ -120,6 +125,11 @@ public class PaymentServiceImpl implements PaymentService {
         p.setPaidAt(LocalDateTime.now());
         
         paymentRepo.addOrUpdatePayment(p);
+
+        if (p.getAppointment() != null) {
+            p.getAppointment().setStatus(AppointmentStatus.PENDING);
+            appointmentRepo.addOrUpdateAppointment(p.getAppointment());
+        }
     }
 
     @Override

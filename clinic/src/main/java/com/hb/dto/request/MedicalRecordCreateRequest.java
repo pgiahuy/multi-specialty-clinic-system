@@ -10,16 +10,16 @@ package com.hb.dto.request;
  */
 public class MedicalRecordCreateRequest {
     private Long id;
-    private Long appointId;
+    private Long appointmentId;
     private String diagnosis;
     private String note;
 
     public MedicalRecordCreateRequest() {
     }
 
-    public MedicalRecordCreateRequest(Long id, Long appointId, String diagnosis, String note) {
+    public MedicalRecordCreateRequest(Long id, Long appointmentId, String diagnosis, String note) {
         this.id = id;
-        this.appointId = appointId;
+        this.appointmentId = appointmentId;
         this.diagnosis = diagnosis;
         this.note = note;
     }
@@ -28,15 +28,15 @@ public class MedicalRecordCreateRequest {
     /**
      * @return the appointId
      */
-    public Long getAppointId() {
-        return appointId;
+    public Long getAppointmentId() {
+        return appointmentId;
     }
 
     /**
      * @param appointId the appointId to set
      */
-    public void setAppointId(Long appointId) {
-        this.appointId = appointId;
+    public void setAppointmentId(Long appointmentId) {
+        this.appointmentId = appointmentId;
     }
 
 

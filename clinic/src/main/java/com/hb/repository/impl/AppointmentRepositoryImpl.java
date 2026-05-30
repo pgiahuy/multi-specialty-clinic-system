@@ -91,6 +91,9 @@ public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> i
 
             if (params.containsKey("scheduleId")) {
                 predicates.add(cb.equal(scheduleJoin.get("id"), Long.valueOf(params.get("scheduleId"))));
+                if ("ROLE_DOCTOR".equals(params.get("currentUserRole"))) {
+                    predicates.add(cb.notEqual(root.get("status"), AppointmentStatus.UN_PAID));
+                }
             }
         }
 

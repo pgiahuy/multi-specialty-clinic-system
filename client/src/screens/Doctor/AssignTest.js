@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { authApis, endpoint } from "../../configs/Apis";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
@@ -21,6 +21,7 @@ const AssignTest = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [searchInput, setSearchInput] = useState('');
     const [appointment, setAppointment] = useState(null);
+    const navigate = useNavigate();
 
     const loadAppointment = async () => {
         try {
@@ -124,13 +125,14 @@ const AssignTest = () => {
 
             const response = await authApis().post(endpoint['lab-test'], payload);
             if (response.status === 200 || response.status === 201) {
-                console.log("Chỉ định xét nghiệm thành công");
-                setSelectedTests(new Set());
-            }
-            
-        } catch (error) {
+                alert("Chỉ định xét nghiệm thành công!");
 
-            console.error("Chỉ định xét nghiệm thất bại:", error);
+                navigate(-1);
+            }
+
+        } catch (error) {
+            alert("Chỉ định xét nghiệm thất bại. Vui lòng thử lại!");
+
         } finally {
             setIsSaving(false);
         }

@@ -64,16 +64,12 @@ public class LabTestResultServiceImpl implements LabTestResultService {
         }
         
         labResult = new LabResults();
-        
         Appointment a = appointSer.getAppointmentById(request.getAppointId());
         LabTests test = testService.getLabTestById(request.getTestId());
         if (a != null && test != null) {
             labResult = resultMapper.toEntity(request, a, test);
             labResultRepo.addOrUpdateTestResult(labResult);
-           
         }
-        
-       
        return labResult;
     }
 

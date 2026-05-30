@@ -31,9 +31,11 @@ public class PrescriptionRepositoryImpl extends BaseRepositoryImpl<Prescription>
     public List<Prescription> getPrescriptions(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
 
-        StringBuilder hql = new StringBuilder("SELECT p FROM Prescription p "
+        StringBuilder hql = new StringBuilder("SELECT DISTINCT p FROM Prescription p "
                 + "JOIN FETCH p.medicalRecordId mr "
                 + "JOIN mr.appointmentId a "
+                + "LEFT JOIN FETCH p.prescriptionItemCollection items "
+                + "LEFT JOIN FETCH items.medicineId m "
                 + "WHERE 1=1");
 
         String role = params.get("currentUserRole");
@@ -45,7 +47,7 @@ public class PrescriptionRepositoryImpl extends BaseRepositoryImpl<Prescription>
             hql.append(" AND a.scheduleId.doctorId.userId.id = :userId");
         }
 
-        Query q = session.createQuery(hql.toString(), Prescription.class);
+        Query<Prescription> q = session.createQuery(hql.toString(), Prescription.class);
 
         if (role != null && userId != null) {
             q.setParameter("userId", Long.parseLong(userId));
@@ -62,16 +64,27 @@ public class PrescriptionRepositoryImpl extends BaseRepositoryImpl<Prescription>
     }
 
     @Override
-    public Prescription addPrescription(Prescription m) {
+    public Prescription saveOrUpdate(Prescription m) {
         Session session = this.factory.getObject().getCurrentSession();
-        session.persist(m);
-        return m;
+        if (m.getId() == null) {
+            session.persist(m);
+            return m;
+        } else {
+            return session.merge(m);
+        }
     }
 
     @Override
     public Prescription getPrescriptionById(Long id) {
         Session session = this.factory.getObject().getCurrentSession();
-        return session.get(Prescription.class, id);
+
+        String hql = "SELECT DISTINCT p FROM Prescription p "
+                   + "LEFT JOIN FETCH p.prescriptionItemCollection items "
+                   + "LEFT JOIN FETCH items.medicineId "
+                   + "WHERE p.id = :id";
+        return session.createQuery(hql, Prescription.class)
+                .setParameter("id", id)
+                .uniqueResult();
     }
 
     @Override
