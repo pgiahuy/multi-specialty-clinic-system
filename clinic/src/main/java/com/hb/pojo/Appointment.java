@@ -24,6 +24,7 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
@@ -51,8 +52,7 @@ public class Appointment implements Serializable {
     @Enumerated(EnumType.STRING)
     private AppointmentStatus status;
     @Column(name = "created_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime createdAt;
+    private LocalDate createdAt;
     @OneToOne(mappedBy = "appointmentId")
     private MedicalRecord medicalRecord;
     
@@ -93,11 +93,11 @@ public class Appointment implements Serializable {
         this.status = status;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public LocalDate getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(LocalDate createdAt) {
         this.createdAt = createdAt;
     }
 
