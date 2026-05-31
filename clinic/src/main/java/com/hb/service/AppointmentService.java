@@ -7,6 +7,8 @@ package com.hb.service;
 import com.hb.dto.request.AppointmentCreateRequest;
 import com.hb.dto.response.AppointmentResponse;
 import com.hb.pojo.Appointment;
+import com.hb.pojo.Schedules;
+import com.hb.pojo.User;
 import java.util.List;
 import java.util.Map;
 
@@ -22,4 +24,6 @@ public interface AppointmentService {
     boolean doctorConfirmAppointment(Long appointmentId);
     boolean doctorStartAppointment(Long appointmentId);
     List<Appointment> getAppointmentsByPatientId(Long patientId, Map<String, String> params);
+    void cancelAppointment(Long appointmentId, User u);
+    boolean isDuplicateTimeAppointment(Long patientId, Long scheduleId);
 }
