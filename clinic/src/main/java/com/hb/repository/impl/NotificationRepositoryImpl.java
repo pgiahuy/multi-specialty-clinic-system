@@ -9,6 +9,7 @@ import com.hb.repository.NotificationRepository;
 import java.util.List;
 import java.util.Map;
 import org.hibernate.Session;
+import org.hibernate.query.MutationQuery;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -23,8 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @Transactional
 public class NotificationRepositoryImpl implements NotificationRepository {
-
-
     @Autowired
     private LocalSessionFactoryBean factory;
 
@@ -61,26 +60,25 @@ public class NotificationRepositoryImpl implements NotificationRepository {
     }
 
     @Override
-    public void deleteNotification(Long id) {
+    public void deleteNotification(Notification n) {
         Session session = this.factory.getObject().getCurrentSession();
-
-        Notification n = session.get(Notification.class, id);
-
-        if (n != null) {
-            session.remove(n);
-        } else {
-            throw new RuntimeException("Notification not found!");
-        }
+        session.remove(n);
     }
 
     @Override
     public void markAsRead(Long id) {
-        System.out.println("heheheheh-1");
         Session session = this.factory.getObject().getCurrentSession();
-        Query<Notification> q = session.createQuery("UPDATE Notification n SET n.isRead = true WHERE n.id = :id");
+        MutationQuery q = session.createMutationQuery("UPDATE Notification n SET n.isRead = true WHERE n.id = :id");
         q.setParameter("id", id);
-        System.out.println("heheheheh-2");
         q.executeUpdate();
-        System.out.println("heheheheh-OK");
+    }
+
+    @Override
+    public void markAllAsRead(String username) {
+        Session session = this.factory.getObject().getCurrentSession();
+        MutationQuery q = session.createMutationQuery("UPDATE Notification n SET n.isRead = true"
+            + " WHERE n.userId.username = :username AND n.isRead = false");
+        q.setParameter("username", username);
+        q.executeUpdate();
     }
 }

@@ -16,6 +16,7 @@ public class DoctorResponse {
     private String fullName;
     private String description;
     private List<SpecialtyResponse> specialtiesOfDoctor;
+    private double rating;  
     private String email;
     private String gender;
 
@@ -128,6 +129,20 @@ public class DoctorResponse {
      */
     public void setGender(String gender) {
         this.gender = gender;
+    }
+
+    /**
+     * @return the rating
+     */
+    public double getRating() {
+        return rating;
+    }
+
+    /**
+     * @param rating the rating to set
+     */
+    public void setRating(double rating) {
+        this.rating = rating;
     }
 
     

@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.security.core.GrantedAuthority;
@@ -54,6 +55,7 @@ public class UserServiceImpl implements UserService {
     private CloudinaryService cloudinaryService;
 
     @Autowired
+    @Lazy
     private BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
