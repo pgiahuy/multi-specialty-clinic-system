@@ -29,7 +29,7 @@ import java.util.Date;
 
 /**
  *
- * @author DELL
+ * @author HUY
  */
 @Entity
 @Table(name = "prescription")
@@ -48,14 +48,12 @@ public class Prescription implements Serializable {
     @Column(name = "id")
     private Long id;
     @Column(name = "created_at")
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
     @Size(max = 9)
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private PrescriptionStatus status;
     @Column(name = "public_at")
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime publicAt;
     @OneToMany(mappedBy = "prescriptionId")
     private Collection<PrescriptionItem> prescriptionItemCollection;

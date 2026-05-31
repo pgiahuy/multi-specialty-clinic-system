@@ -21,16 +21,19 @@ import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Date;
 
 /**
  *
- * @author DELL
+ * @author HUY
  */
 @Entity
 @Table(name = "payment")
@@ -59,7 +62,6 @@ public class Payment implements Serializable {
     @NotNull
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 7)
@@ -71,12 +73,13 @@ public class Payment implements Serializable {
     @Enumerated(EnumType.STRING)
     private PaymentMethod method;
     @Column(name = "paid_at")
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime paidAt;
     @JoinColumn(name = "appointment_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Appointment appointmentId;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "paymentId")
-    private Collection<PaymentItems> paymentItemsCollection;
+    private Collection<PaymentItem> paymentItemCollection;
 
     public Payment() {
     }
@@ -148,12 +151,12 @@ public class Payment implements Serializable {
         this.appointmentId = appointmentId;
     }
 
-    public Collection<PaymentItems> getPaymentItemsCollection() {
-        return paymentItemsCollection;
+    public Collection<PaymentItem> getPaymentItemCollection() {
+        return paymentItemCollection;
     }
 
-    public void setPaymentItemsCollection(Collection<PaymentItems> paymentItemsCollection) {
-        this.paymentItemsCollection = paymentItemsCollection;
+    public void setPaymentItemCollection(Collection<PaymentItem> paymentItemCollection) {
+        this.paymentItemCollection = paymentItemCollection;
     }
 
     @Override
@@ -180,5 +183,5 @@ public class Payment implements Serializable {
     public String toString() {
         return "com.hb.pojo.Payment[ id=" + id + " ]";
     }
-    
+
 }

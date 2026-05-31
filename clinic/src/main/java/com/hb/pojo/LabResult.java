@@ -22,24 +22,23 @@ import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
 
 /**
  *
- * @author DELL
+ * @author HUY
  */
 @Entity
-@Table(name = "lab_results")
+@Table(name = "lab_result")
 @NamedQueries({
-    @NamedQuery(name = "LabResults.findAll", query = "SELECT l FROM LabResults l"),
-    @NamedQuery(name = "LabResults.findByStatus", query = "SELECT l FROM LabResults l WHERE l.status = :status"),
-    @NamedQuery(name = "LabResults.findByCreatedAt", query = "SELECT l FROM LabResults l WHERE l.createdAt = :createdAt"),
-    @NamedQuery(name = "LabResults.findByTestAt", query = "SELECT l FROM LabResults l WHERE l.testAt = :testAt"),
-    @NamedQuery(name = "LabResults.findById", query = "SELECT l FROM LabResults l WHERE l.id = :id")})
-public class LabResults implements Serializable {
+    @NamedQuery(name = "LabResult.findAll", query = "SELECT l FROM LabResult l"),
+    @NamedQuery(name = "LabResult.findByStatus", query = "SELECT l FROM LabResult l WHERE l.status = :status"),
+    @NamedQuery(name = "LabResult.findByCreatedAt", query = "SELECT l FROM LabResult l WHERE l.createdAt = :createdAt"),
+    @NamedQuery(name = "LabResult.findByTestAt", query = "SELECT l FROM LabResult l WHERE l.testAt = :testAt"),
+    @NamedQuery(name = "LabResult.findById", query = "SELECT l FROM LabResult l WHERE l.id = :id")})
+public class LabResult implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Size(max = 10)
@@ -52,26 +51,26 @@ public class LabResults implements Serializable {
     private LocalDateTime createdAt;
     @Column(name = "test_at")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date testAt;
+    private LocalDateTime testAt;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "labResultsId")
-    private Collection<LabResultDetails> labResultDetailsCollection;
     @JoinColumn(name = "appointment_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Appointment appointmentId;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "labResultsId")
+    private Collection<LabResultDetail> labResultDetailCollection;
 
-    public LabResults() {
+    public LabResult() {
     }
 
-    public LabResults(Long id) {
+    public LabResult(Long id) {
         this.id = id;
     }
 
-    public LabResults(Long id, LocalDateTime createdAt) {
+    public LabResult(Long id, LocalDateTime createdAt) {
         this.id = id;
         this.createdAt = createdAt;
     }
@@ -92,11 +91,11 @@ public class LabResults implements Serializable {
         this.createdAt = createdAt;
     }
 
-    public Date getTestAt() {
+    public LocalDateTime getTestAt() {
         return testAt;
     }
 
-    public void setTestAt(Date testAt) {
+    public void setTestAt(LocalDateTime testAt) {
         this.testAt = testAt;
     }
 
@@ -108,20 +107,20 @@ public class LabResults implements Serializable {
         this.id = id;
     }
 
-    public Collection<LabResultDetails> getLabResultDetailsCollection() {
-        return labResultDetailsCollection;
-    }
-
-    public void setLabResultDetailsCollection(Collection<LabResultDetails> labResultDetailsCollection) {
-        this.labResultDetailsCollection = labResultDetailsCollection;
-    }
-
     public Appointment getAppointmentId() {
         return appointmentId;
     }
 
     public void setAppointmentId(Appointment appointmentId) {
         this.appointmentId = appointmentId;
+    }
+
+    public Collection<LabResultDetail> getLabResultDetailCollection() {
+        return labResultDetailCollection;
+    }
+
+    public void setLabResultDetailCollection(Collection<LabResultDetail> labResultDetailCollection) {
+        this.labResultDetailCollection = labResultDetailCollection;
     }
 
     @Override
@@ -134,10 +133,10 @@ public class LabResults implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof LabResults)) {
+        if (!(object instanceof LabResult)) {
             return false;
         }
-        LabResults other = (LabResults) object;
+        LabResult other = (LabResult) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -146,7 +145,7 @@ public class LabResults implements Serializable {
 
     @Override
     public String toString() {
-        return "com.hb.pojo.LabResults[ id=" + id + " ]";
+        return "com.hb.pojo.LabResult[ id=" + id + " ]";
     }
     
 }

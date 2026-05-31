@@ -7,7 +7,6 @@ package com.hb.service;
 import com.hb.dto.request.AppointmentCreateRequest;
 import com.hb.dto.response.AppointmentResponse;
 import com.hb.pojo.Appointment;
-import com.hb.pojo.Schedules;
 import com.hb.pojo.User;
 import java.util.List;
 import java.util.Map;

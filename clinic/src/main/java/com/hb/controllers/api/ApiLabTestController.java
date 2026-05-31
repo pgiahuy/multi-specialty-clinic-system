@@ -10,8 +10,8 @@ import com.hb.dto.response.LabTestResultResponse;
 import com.hb.exception.ForbiddenException;
 import com.hb.mapper.LabTestMapper;
 import com.hb.mapper.LabTestResultMapper;
-import com.hb.pojo.LabResults;
-import com.hb.pojo.LabTests;
+import com.hb.pojo.LabResult;
+import com.hb.pojo.LabTest;
 import com.hb.pojo.Patient;
 import com.hb.pojo.User;
 import com.hb.service.LabTestResultService;
@@ -58,7 +58,7 @@ public class ApiLabTestController {
 
     @PostMapping("/tests")
     public ResponseEntity<List<LabTestResultResponse>> create(@RequestBody List<LabTestResultRequest> reqs, Principal principal) {
-        List<LabResults> res = testResultService.addMutipleTest(reqs);
+        List<LabResult> res = testResultService.addMutipleTest(reqs);
         List<LabTestResultResponse> responseList = res.stream()
                 .map(testResultMapper::toResponse)
                 .toList();
@@ -96,14 +96,14 @@ public class ApiLabTestController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         
-        List<LabResults> res = this.testResultService.getLabResultsesByAppointmentId(appointmentId);
+        List<LabResult> res = this.testResultService.getLabResultsesByAppointmentId(appointmentId);
         return ResponseEntity.ok(res.stream().map(testResultMapper::toResponse).toList());
     }
     
     
     @GetMapping("/tests")
     public ResponseEntity<?> list(@RequestParam Map<String, String> params) {
-        List<LabTests> res = this.testService.getLabTests(params);
+        List<LabTest> res = this.testService.getLabTests(params);
         long total = this.testService.countLabTests(params);
         
         
@@ -122,7 +122,7 @@ public class ApiLabTestController {
     
     @GetMapping("/test/{id}")
     public ResponseEntity<LabTestResponse> getLabTest(@PathVariable(value="id") Long id) {
-        LabTests res = testService.getLabTestById(id);
+        LabTest res = testService.getLabTestById(id);
         return ResponseEntity.ok(LabTestMapper.INSTANCE.toResponse(res));
     }
     

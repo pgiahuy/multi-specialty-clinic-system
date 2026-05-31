@@ -50,7 +50,7 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     public List<Payment> getPayments(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
         StringBuilder hql = new StringBuilder("SELECT p FROM Payment p "
-                + "JOIN FETCH p.paymentItems i "
+                + "JOIN FETCH p.paymentItem i "
                 + "JOIN FETCH p.appointment a "
                 + "JOIN FETCH a.patientId WHERE 1=1");
 
@@ -168,7 +168,7 @@ public class PaymentRepositoryImpl implements PaymentRepository {
 
         StringBuilder hql = new StringBuilder(
                 "SELECT DISTINCT p FROM Payment p "
-                + "LEFT JOIN FETCH p.paymentItems "
+                + "LEFT JOIN FETCH p.paymentItem "
                 + "WHERE p.appointment.patientId.id = :patientId"
         );
         String startDate = params.get("startDate");

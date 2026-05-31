@@ -23,7 +23,7 @@ import java.util.Collection;
 
 /**
  *
- * @author DELL
+ * @author HUY
  */
 @Entity
 @Table(name = "specialty")
@@ -52,14 +52,16 @@ public class Specialty implements Serializable {
     @Column(name = "price")
     private BigDecimal price;
     @Column(name = "is_active")
-    private Boolean isActive;
+    private boolean isActive;
     @ManyToMany(mappedBy = "specialtyCollection")
     private Collection<Doctor> doctorCollection;
     @JoinColumn(name = "id_hod", referencedColumnName = "id")
     @OneToOne
     private Doctor idHod;
     @OneToMany(mappedBy = "specialtyId")
-    private Collection<Schedules> schedulesCollection;
+    private Collection<Room> roomCollection;
+    @OneToMany(mappedBy = "specialtyId")
+    private Collection<Schedule> scheduleCollection;
 
     public Specialty() {
     }
@@ -98,11 +100,11 @@ public class Specialty implements Serializable {
         this.price = price;
     }
 
-    public Boolean getIsActive() {
+    public boolean getIsActive() {
         return isActive;
     }
 
-    public void setIsActive(Boolean isActive) {
+    public void setIsActive(boolean isActive) {
         this.isActive = isActive;
     }
 
@@ -122,12 +124,20 @@ public class Specialty implements Serializable {
         this.idHod = idHod;
     }
 
-    public Collection<Schedules> getSchedulesCollection() {
-        return schedulesCollection;
+    public Collection<Room> getRoomCollection() {
+        return roomCollection;
     }
 
-    public void setSchedulesCollection(Collection<Schedules> schedulesCollection) {
-        this.schedulesCollection = schedulesCollection;
+    public void setRoomCollection(Collection<Room> roomCollection) {
+        this.roomCollection = roomCollection;
+    }
+
+    public Collection<Schedule> getScheduleCollection() {
+        return scheduleCollection;
+    }
+
+    public void setScheduleCollection(Collection<Schedule> scheduleCollection) {
+        this.scheduleCollection = scheduleCollection;
     }
 
     @Override

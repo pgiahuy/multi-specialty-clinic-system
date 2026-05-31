@@ -5,7 +5,7 @@
 package com.hb.mapper;
 
 import com.hb.dto.response.ShiftResponse;
-import com.hb.pojo.Shifts;
+import com.hb.pojo.Shift;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -20,14 +20,9 @@ public interface ShiftMapper {
     
     ShiftMapper INSTANCE = Mappers.getMapper(ShiftMapper.class);
 
-    /**
-     * Map a shift entity to its response model.
-     *
-     * @param shifts the source entity
-     * @return the mapped response
-     */
-    @Mapping(target = "sessionCode", expression = "java(shifts.getSession() != null ? shifts.getSession().name() : null)")
+
+    @Mapping(target = "sessionCode", expression = "java(shift.getSession() != null ? shift.getSession().name() : null)")
     @Mapping(source = "session.label", target = "session")
-    ShiftResponse toResponse(Shifts shifts);
+    ShiftResponse toResponse(Shift shift);
     
 }

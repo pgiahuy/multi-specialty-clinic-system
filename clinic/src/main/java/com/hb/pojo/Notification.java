@@ -25,7 +25,7 @@ import java.util.Date;
 
 /**
  *
- * @author DELL
+ * @author HUY
  */
 @Entity
 @Table(name = "notification")
@@ -51,7 +51,7 @@ public class Notification implements Serializable {
     @Column(name = "content")
     private String content;
     @Column(name = "is_read")
-    private Boolean isRead;
+    private boolean isRead;
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;

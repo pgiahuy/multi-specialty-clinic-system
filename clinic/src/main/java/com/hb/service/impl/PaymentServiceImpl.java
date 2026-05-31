@@ -9,7 +9,7 @@ import com.hb.enums.PaymentStatus;
 import com.hb.enums.AppointmentStatus;
 import com.hb.pojo.Appointment;
 import com.hb.pojo.Payment;
-import com.hb.pojo.PaymentItems;
+import com.hb.pojo.PaymentItem;
 import com.hb.pojo.User;
 import com.hb.repository.PaymentItemRepository;
 import com.hb.repository.PaymentRepository;
@@ -19,7 +19,6 @@ import com.hb.service.NotificationService;
 import com.hb.service.PaymentItemsService;
 import com.hb.service.PaymentService;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -83,17 +82,17 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public Payment getPaymentByAppoint(Long appointmentId) {
-        PaymentItems item = itemService.getPaymentItemByAppointment(appointmentId);
+        PaymentItem item = itemService.getPaymentItemByAppointment(appointmentId);
         return this.paymentRepo.getPaymentById(item.getPaymentId().getId());
     }
 
     @Override
     public void updatePaymentTotalAmount(Payment payment) {
-        List<PaymentItems> items = itemRepo.getItemsByPayment(payment);
+        List<PaymentItem> items = itemRepo.getItemsByPayment(payment);
 
         BigDecimal total = BigDecimal.ZERO;
         if (items != null && !items.isEmpty()) {
-            for (PaymentItems item : items) {
+            for (PaymentItem item : items) {
                 if (item.getAmount() != null) {
                     total = total.add(item.getAmount());
                 }

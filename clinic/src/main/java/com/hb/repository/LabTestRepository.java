@@ -4,7 +4,7 @@
  */
 package com.hb.repository;
 
-import com.hb.pojo.LabTests;
+import com.hb.pojo.LabTest;
 import java.util.List;
 import java.util.Map;
 
@@ -12,10 +12,10 @@ import java.util.Map;
  *
  * @author DELL
  */
-public interface LabTestRepository extends BaseRepository<LabTests>{
-    List<LabTests> getLabTests(Map<String, String> params);
-    LabTests getLabTestById(Long id);
-    void addOrUpdateLabTest(LabTests test);
+public interface LabTestRepository extends BaseRepository<LabTest>{
+    List<LabTest> getLabTests(Map<String, String> params);
+    LabTest getLabTestById(Long id);
+    void addOrUpdateLabTest(LabTest test);
     void deleteLabTest(Long id);
     Long countLabTests(Map<String, String> params);
 }

@@ -6,9 +6,9 @@ package com.hb.service.impl;
 
 import com.hb.enums.PaymentItemType;
 import com.hb.pojo.Appointment;
-import com.hb.pojo.LabTests;
+import com.hb.pojo.LabTest;
 import com.hb.pojo.Payment;
-import com.hb.pojo.PaymentItems;
+import com.hb.pojo.PaymentItem;
 import com.hb.pojo.Prescription;
 import com.hb.pojo.PrescriptionItem;
 import com.hb.exception.ResourceNotFoundException;
@@ -55,7 +55,7 @@ public class PaymentItemsServiceImpl implements PaymentItemsService {
 
         BigDecimal price = app.getScheduleId().getSpecialtyId().getPrice();
 
-        PaymentItems item = new PaymentItems();
+        PaymentItem item = new PaymentItem();
         item.setPaymentId(payment);
         item.setItemType(PaymentItemType.APPOINTMENT);
         item.setAmount(price);
@@ -68,8 +68,8 @@ public class PaymentItemsServiceImpl implements PaymentItemsService {
     @Override
     public void addLabTestItems(Payment payment, Long testId) {
 
-        LabTests lt = labRepo.getLabTestById(testId);
-        PaymentItems item = new PaymentItems();
+        LabTest lt = labRepo.getLabTestById(testId);
+        PaymentItem item = new PaymentItem();
         item.setPaymentId(payment);
         item.setItemType(PaymentItemType.LAB_TEST);
         item.setAmount(lt.getPrice());
@@ -90,7 +90,7 @@ public class PaymentItemsServiceImpl implements PaymentItemsService {
             total = total.add(price.multiply(qty));
         }
 
-        PaymentItems item = new PaymentItems();
+        PaymentItem item = new PaymentItem();
         item.setPaymentId(payment);
         item.setItemType(PaymentItemType.PRESCRIPTION);
         item.setAmount(total);
@@ -101,12 +101,12 @@ public class PaymentItemsServiceImpl implements PaymentItemsService {
 
 
     @Override
-    public PaymentItems getPaymentItemByAppointment(Long  appointmentId) {
+    public PaymentItem getPaymentItemByAppointment(Long  appointmentId) {
         return this.itemRepo.getItemByAppointment(appointmentId);
     }
 
     @Override
-    public List<PaymentItems> getPaymentItemsByPaymentId(Long paymentId, Map<String, String> params) {
+    public List<PaymentItem> getPaymentItemsByPaymentId(Long paymentId, Map<String, String> params) {
         return this.itemRepo.getItemsByPaymentId(paymentId, params);
     }
 
