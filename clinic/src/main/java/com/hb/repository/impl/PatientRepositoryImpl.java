@@ -4,14 +4,20 @@
  */
 package com.hb.repository.impl;
 
+import com.hb.enums.PatientRelationship;
 import com.hb.exception.ResourceNotFoundException;
+import com.hb.pojo.Appointment;
+import com.hb.pojo.Doctor;
 import com.hb.pojo.Patient;
+import com.hb.pojo.Schedules;
+import com.hb.pojo.User;
 import com.hb.repository.PatientRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
@@ -44,8 +50,6 @@ public class PatientRepositoryImpl extends BaseRepositoryImpl<Patient> implement
         CriteriaQuery<Patient> cq = cb.createQuery(Patient.class);
         Root<Patient> root = cq.from(Patient.class);
 
-        root.fetch("userId", JoinType.LEFT);
-
         List<Predicate> predicates = new ArrayList<>();
         predicates.add(cb.equal(root.get("isActive"), true));
         if (params != null && hasText(params.get("patientName"))) {
@@ -59,7 +63,7 @@ public class PatientRepositoryImpl extends BaseRepositoryImpl<Patient> implement
             predicates.add(cb.equal(root.get("gender"), params.get("gender").trim()));
         }
  
-
+        cq.distinct(true);
         cq.where(predicates.toArray(new Predicate[0]));
         cq.orderBy(cb.desc(root.get("id")));
 
@@ -74,6 +78,40 @@ public class PatientRepositoryImpl extends BaseRepositoryImpl<Patient> implement
         }
 
         return q.getResultList();
+    }
+
+    @Override
+    public List<Patient> getPatientsForDoctor(Map<String, String> params) {
+        Session session = this.factory.getObject().getCurrentSession();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<Patient> cq = cb.createQuery(Patient.class);
+        Root<Patient> root = cq.from(Patient.class);
+
+        Join<Patient, Appointment> appointmentJoin = root.join("appointmentCollection", JoinType.LEFT);
+        Join<Appointment, Schedules> scheduleJoin = appointmentJoin.join("scheduleId", JoinType.LEFT);
+        Join<Schedules, Doctor> doctorJoin = scheduleJoin.join("doctorId", JoinType.LEFT);
+
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(cb.equal(root.get("isActive"), true));
+        if (params != null && hasText(params.get("patientName"))) {
+            String kw = "%" + params.get("patientName").trim() + "%";
+            predicates.add(cb.or(
+                    cb.like(root.get("fullName").as(String.class), kw),
+                    cb.like(root.get("cccd").as(String.class), kw)
+            ));
+        }
+        if (params != null && hasText(params.get("doctorId"))) {
+            predicates.add(cb.equal(doctorJoin.get("id"), params.get("doctorId").trim()));
+        }
+        if (params != null && hasText(params.get("gender"))) {
+            predicates.add(cb.equal(root.get("gender"), params.get("gender").trim()));
+        }
+
+        cq.distinct(true);
+        cq.where(predicates.toArray(new Predicate[0]));
+        cq.orderBy(cb.desc(root.get("id")));
+
+        return session.createQuery(cq).getResultList();
     }
 
     @Override
@@ -116,6 +154,7 @@ public class PatientRepositoryImpl extends BaseRepositoryImpl<Patient> implement
         Root<Patient> root = cq.from(Patient.class);
 
         List<Predicate> predicates = new ArrayList<>();
+        predicates.add(cb.equal(root.get("isActive"), true));
         if (params != null && hasText(params.get("patientName"))) {
             String kw = "%" + params.get("patientName").trim() + "%";
             predicates.add(cb.or(
@@ -126,10 +165,43 @@ public class PatientRepositoryImpl extends BaseRepositoryImpl<Patient> implement
         if (params != null && hasText(params.get("gender"))) {
             predicates.add(cb.equal(root.get("gender"), params.get("gender").trim()));
         }
-        cq.where(cb.equal(root.get("isActive"), true));
 
-        cq.select(cb.count(root)).where(predicates.toArray(new Predicate[0]));
+        cq.select(cb.countDistinct(root)).where(predicates.toArray(new Predicate[0]));
         return session.createQuery(cq).getSingleResult();
+    }
+
+    @Override
+    public List<Patient> getPatientsByUserId(Long userId) {
+        Session session = this.factory.getObject().getCurrentSession();
+        Query query = session.createQuery("SELECT p FROM Patient p WHERE p.userId.id = :id "
+                + " AND p.isActive = true", Patient.class);
+        query.setParameter("id", userId);
+        return query.getResultList();
+    }
+
+    @Override
+    public boolean isExistedCCCD(String cccd) {
+        Session session = this.factory.getObject().getCurrentSession();
+        Query query = session.createQuery("SELECT COUNT(p) FROM Patient p WHERE p.cccd =: cccd", Long.class);
+        query.setParameter("cccd", cccd);
+        
+        Long count = (Long) query.uniqueResult();
+        
+        return count != null && count > 0;
+    }
+
+    @Override
+    public boolean isExistedForSelf(User u) {
+        Session session = this.factory.getObject().getCurrentSession();
+        Query query = session.createQuery("SELECT COUNT(p) FROM Patient p WHERE p.userId.id = :userId "
+                                                                        + "AND p.relationship = :relationship", Long.class);
+        query.setParameter("userId", u.getId());
+        query.setParameter("relationship", PatientRelationship.SELF);
+        
+        Long count = (Long) query.uniqueResult();
+        
+        return count != null && count > 0;
+        
     }
 
 }

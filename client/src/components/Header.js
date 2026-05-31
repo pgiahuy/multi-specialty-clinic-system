@@ -1,9 +1,9 @@
 import { Badge, Button, Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
-import { Bell } from "react-bootstrap-icons";
+import { Bell, Messenger } from "react-bootstrap-icons";
 import { Link, useNavigate } from "react-router-dom";
 import NotificationBox from "./NotificationBox";
 import LoginRequiredModal from "./LoginRequiredModal";
-import API, { AUTH_ENDPOINTS, authApis, CLINIC_ENDPOINTS } from "../configs/Apis";
+import API, { AUTH_ENDPOINTS, authApis, CLINIC_ENDPOINTS, clinicApis } from "../configs/Apis";
 import cookies from 'react-cookies';
 import { useContext, useEffect, useState } from "react";
 import { MyUserContext } from "../configs/Contexts";
@@ -35,10 +35,11 @@ const Header = () => {
 
     const loadSpecialties = async () => {
         try {
-            const response = await API.get(CLINIC_ENDPOINTS.SPECIALTIES);
-            setSpecialties(response.data);
+            const response = await clinicApis.getSpecialties();
+            setSpecialties(Array.isArray(response?.data) ? response.data : []);
         } catch (error) {
             console.error("Lỗi khi lấy danh sách chuyên khoa:", error);
+            setSpecialties([]);
         }
     };
 
@@ -87,7 +88,7 @@ const Header = () => {
                         )}
 
                         <NavDropdown title="Chuyên khoa" id="specialties-nav-dropdown" className="me-2 header-dropdown">
-                            {specialties.map(s => (
+                            {(Array.isArray(specialties) ? specialties : []).map(s => (
                                 <NavDropdown.Item key={s.id} onClick={() => navigate(`/specialties/${s.id}`)}>
                                     {s.name}
                                 </NavDropdown.Item>
@@ -112,6 +113,14 @@ const Header = () => {
                             </div>
                         ) : (
                             <div className="ms-auto d-flex align-items-center">
+                                <Nav>
+                                    {user.role === 'ROLE_DOCTOR' ? (
+                                        <div>Chào bác sĩ {user?.doctorProfile ? user.doctorProfile.fullName : ''} !&nbsp;&nbsp;</div>
+                                    ) : (
+                                        <div>Chào {user?.name || 'bạn'} !&nbsp;&nbsp;</div>
+                                    )}
+                                </Nav>
+
                                 <Nav className="align-items-center header-notification me-1">
                                     <NotificationBox onNavigate={(path) => {
                                         if (!path) return;
@@ -141,7 +150,7 @@ const Header = () => {
                                     }>
 
                                     {user?.role === 'ROLE_DOCTOR' ? (
-                                        <NavDropdown.Item onClick={() => navigate('/doctor/profile')}>Thông tin cá nhân & tài khoản</NavDropdown.Item>
+                                        <NavDropdown.Item onClick={() => navigate('/doctor/profile')}>{user?.doctorProfile ? user?.doctorProfile.fullName : 'Bác sĩ'}</NavDropdown.Item>
                                     ) : (
                                         <>
                                             <NavDropdown.Item onClick={() => navigate('/patient/profiles')}>Hồ sơ sức khỏe</NavDropdown.Item>

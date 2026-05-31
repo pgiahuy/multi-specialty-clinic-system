@@ -14,9 +14,11 @@ import java.util.Map;
  * @author HUY
  */
 public interface PrescriptionService {
-    Prescription addPrescription(PrescriptionCreateRequest req);
+    Prescription createPrescription(PrescriptionCreateRequest req, String username);
+    Prescription saveOrUpdateDraftPrescription(PrescriptionCreateRequest req);
     List<Prescription> getPrescriptions(Map<String, String> params);
     Prescription getPrescriptionById(Long id);
+    Prescription getPrescriptionByMedicalRecordId(Long recordId);
     void deletePrescription(Long id);
     long countPrescription(Map<String,String> params);
 }

@@ -19,6 +19,8 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,6 +93,9 @@ public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> i
 
             if (params.containsKey("scheduleId")) {
                 predicates.add(cb.equal(scheduleJoin.get("id"), Long.valueOf(params.get("scheduleId"))));
+                if ("ROLE_DOCTOR".equals(params.get("currentUserRole"))) {
+                    predicates.add(cb.notEqual(root.get("status"), AppointmentStatus.UN_PAID));
+                }
             }
         }
 
@@ -202,6 +207,55 @@ public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> i
 
         Long count = query.uniqueResult();
         return count > 0; 
+    }
+
+    @Override
+    public List<Appointment> getAppointmentByPatientId(Long patientId, Map<String, String> params) {
+         Session session = this.factory.getObject().getCurrentSession();
+        
+        
+        StringBuilder hql = new StringBuilder("FROM Appointment a WHERE a.patientId.id = :patientId");
+        
+        
+        String status = params.get("status");
+        String startDate = params.get("startDate");
+        String endDate = params.get("endDate");
+        
+        
+        if (status != null && !status.isEmpty()) {
+            hql.append(" AND a.status = :status");
+        }
+        
+       
+        if (startDate != null && !startDate.isEmpty() && endDate != null && !endDate.isEmpty()) {
+            hql.append(" AND a.scheduleId.date >= :startDate AND a.cr < :endDate");
+        }
+        
+       
+        hql.append(" ORDER BY a.scheduleId.date DESC");
+        
+        
+        Query<Appointment> query = session.createQuery(hql.toString(), Appointment.class);
+        query.setParameter("patientId", patientId);
+        
+        
+        if (status != null && !status.isEmpty()) {
+            query.setParameter("status", status);
+        }
+        
+        
+        if (startDate != null && !startDate.isEmpty() && endDate != null && !endDate.isEmpty()) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            
+            LocalDate start = LocalDate.parse(startDate, formatter);
+            LocalDate end = LocalDate.parse(endDate, formatter);
+            
+            
+            query.setParameter("startDate", start);
+            query.setParameter("endDate", end.plusDays(1));
+        }
+        
+        return query.getResultList();
     }
 
     

@@ -9,13 +9,14 @@ import com.hb.mapper.PaymentMapper;
 import com.hb.pojo.Patient;
 import com.hb.pojo.Payment;
 import com.hb.pojo.User;
-import com.hb.repository.PaymentItemRepository;
 import com.hb.service.MomoPaymentService;
-import com.hb.service.PaymentItemsService;
 import com.hb.service.PaymentService;
 import com.hb.service.UserService;
+import com.hb.service.VnpayPaymentService;
+import jakarta.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -44,6 +45,9 @@ public class ApiPaymentController {
     private MomoPaymentService momoService;
 
     @Autowired
+    private VnpayPaymentService vnpayService;
+
+    @Autowired
     private PaymentService paymentService;
 
     @Autowired
@@ -56,79 +60,104 @@ public class ApiPaymentController {
     public ResponseEntity<?> pay(
             @RequestParam("method") String method,
             @RequestParam("paymentId") Long paymentId,
-            @RequestParam("orderInfo") String orderInfo) throws Exception {
+            @RequestParam("orderInfo") String orderInfo, HttpServletRequest request) throws Exception {
 
         Long totalAmount = paymentService.getPaymentAmount(paymentId).longValue();
-        String orderId = "ORDER_" + paymentId;
+        String orderId = "ORDER_" + paymentId + "_" + System.currentTimeMillis();
 
         return switch (method.toUpperCase()) {
             case "MOMO" ->
                 ResponseEntity.ok(momoService.createPayment(orderId, totalAmount, orderInfo));
-//            case "VNPAY"   -> ResponseEntity.ok(vnpayService.createPayment(orderId, amount, orderInfo));
-//            case "ZALOPAY" -> ResponseEntity.ok(zaloPayService.createPayment(orderId, amount, orderInfo));
-//            case "COD"     -> ResponseEntity.ok(Map.of("method", "COD", "orderId", orderId));
+            case "VNPAY" -> {
+                String vnpayUrl = vnpayService.createVnPayPaymentUrl(paymentId, totalAmount, "", request);
+                yield ResponseEntity.ok(Map.of("payUrl", vnpayUrl));
+            }
+            case "CASH" -> {
+                Payment payment = paymentService.getPaymentById(paymentId);
+                if (payment == null) {
+
+                    yield ResponseEntity.badRequest().body("Không tìm thấy hóa đơn!");
+                }
+
+                paymentService.confirmPaymentSuccess(paymentId, PaymentMethod.CASH);
+
+                yield ResponseEntity.ok(Map.of("message", "Thanh toán thành công cập nhật DB", "status", "SUCCESS"));
+            }
+
             default ->
                 ResponseEntity.badRequest().body("Phương thức không hỗ trợ");
         };
     }
 
-    @GetMapping("/payments/momo/return")
     public ResponseEntity<?> momoReturn(@RequestParam Map<String, String> params) throws Exception {
-
         boolean valid = momoService.verifySignature(params);
         String resultCode = params.get("resultCode");
         String orderId = params.get("orderId");
-        Long paymentId = Long.parseLong(orderId.replace("ORDER_", ""));
+        Long paymentId = Long.parseLong(orderId.split("_")[1]);
 
         if (valid && "0".equals(resultCode)) {
-
-            String extraData = params.get("extraData");
-
-            if (extraData != null && !extraData.isEmpty()) {
-
-                paymentService.confirmPaymentSuccess(paymentId, PaymentMethod.MOMO);
-            }
-
+            paymentService.confirmPaymentSuccess(paymentId, PaymentMethod.MOMO);
         } else {
-
             paymentService.confirmPaymentFailed(paymentId, PaymentMethod.MOMO);
         }
-
         return ResponseEntity.ok().body(null);
     }
 
-    @PostMapping("/payments/momo/ipn")
     public ResponseEntity<?> momoIpn(@RequestBody Map<String, String> params) throws Exception {
-
         boolean valid = momoService.verifySignature(params);
-
         try {
             String resultCode = params.get("resultCode");
             String orderId = params.get("orderId");
-            Long paymentId = Long.parseLong(orderId.replace("ORDER_", ""));
+            Long paymentId = Long.parseLong(orderId.split("_")[1]);
 
             if (valid && "0".equals(resultCode)) {
-
-                String extraData = params.get("extraData");
-
-                if (extraData != null && !extraData.isEmpty()) {
-
-                    paymentService.confirmPaymentSuccess(paymentId, PaymentMethod.MOMO);
-
-                }
-
+                paymentService.confirmPaymentSuccess(paymentId, PaymentMethod.MOMO);
             } else {
-
                 paymentService.confirmPaymentFailed(paymentId, PaymentMethod.MOMO);
             }
-            
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
-
         }
-        
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/payments/vnpay/ipn")
+    public ResponseEntity<?> vnpayIpn(@RequestParam Map<String, String> params) {
+        try {
+            String vnp_ResponseCode = params.get("vnp_ResponseCode");
+
+            String orderInfo = params.get("vnp_OrderInfo");
+            Long paymentId = Long.parseLong(orderInfo.replaceAll("[^0-9]", ""));
+
+            Map<String, String> response = new HashMap<>();
+
+            if (!vnpayService.verifyVnpaySignature(params)) {
+               
+                response.put("RspCode", "97");
+                response.put("Message", "Invalid Checksum");
+                return ResponseEntity.ok(response);
+            }
+
+            if ("00".equals(vnp_ResponseCode)) {
+                paymentService.confirmPaymentSuccess(paymentId, PaymentMethod.VNPAY);
+
+                response.put("RspCode", "00");
+                response.put("Message", "Confirm Success");
+            } else {
+                paymentService.confirmPaymentFailed(paymentId, PaymentMethod.VNPAY);
+
+                response.put("RspCode", "01");
+                response.put("Message", "Payment Failed");
+            }
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            Map<String, String> response = new HashMap<>();
+            response.put("RspCode", "99");
+            response.put("Message", "Unknow error");
+            return ResponseEntity.ok(response);
+        }
     }
 
     @GetMapping("/payments/{patientId}")

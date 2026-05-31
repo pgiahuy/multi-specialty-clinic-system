@@ -20,4 +20,6 @@ public interface AppointmentService {
     AppointmentResponse registerAppointment(AppointmentCreateRequest req);
     long countAppointments(Map<String,String> params);
     boolean doctorConfirmAppointment(Long appointmentId);
+    boolean doctorStartAppointment(Long appointmentId);
+    List<Appointment> getAppointmentsByPatientId(Long patientId, Map<String, String> params);
 }

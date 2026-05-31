@@ -9,6 +9,7 @@ package com.hb.enums;
  * @author HUY
  */
 public enum AppointmentStatus {
+    UN_PAID,
     PENDING,
     CONFIRMED,
     IN_PROGRESS,

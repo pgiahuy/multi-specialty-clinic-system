@@ -15,12 +15,16 @@ import java.util.List;
  */
 public class PrescriptionResponse {
     private Long id;
+    private String status;
     private String doctorName;
     private String patientName;
+    private String diagnosis;
     private String note;
     private List<PrescriptionItemResponse> items;
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime createdAt;
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
+    private LocalDateTime publicAt;
 
     public PrescriptionResponse() {
     }
@@ -38,6 +42,20 @@ public class PrescriptionResponse {
      */
     public void setId(Long id) {
         this.id = id;
+    }
+
+    /**
+     * @return the status
+     */
+    public String getStatus() {
+        return status;
+    }
+
+    /**
+     * @param status the status to set
+     */
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     /**
@@ -108,6 +126,34 @@ public class PrescriptionResponse {
      */
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    /**
+     * @return the publicAt
+     */
+    public LocalDateTime getPublicAt() {
+        return publicAt;
+    }
+
+    /**
+     * @param publicAt the publicAt to set
+     */
+    public void setPublicAt(LocalDateTime publicAt) {
+        this.publicAt = publicAt;
+    }
+
+    /**
+     * @return the diagnosis
+     */
+    public String getDiagnosis() {
+        return diagnosis;
+    }
+
+    /**
+     * @param diagnosis the diagnosis to set
+     */
+    public void setDiagnosis(String diagnosis) {
+        this.diagnosis = diagnosis;
     }
     
     

@@ -5,6 +5,7 @@
 package com.hb.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.hb.enums.PatientRelationship;
 import java.time.LocalDate;
 import java.util.Date;
 
@@ -21,11 +22,12 @@ public class PatientResponse {
     private LocalDate dob;
     private String address;
     private String gender;
+    private PatientRelationship relationship;
 
     public PatientResponse() {
     }
 
-    public PatientResponse(Long id, String cccd, String fullName, String phone, LocalDate dob, String address, String gender) {
+    public PatientResponse(Long id, String cccd, String fullName, String phone, LocalDate dob, String address, String gender, PatientRelationship relationship) {
         this.id = id;
         this.cccd = cccd;
         this.fullName = fullName;
@@ -33,9 +35,9 @@ public class PatientResponse {
         this.dob = dob;
         this.address = address;
         this.gender = gender;
+        this.relationship = relationship;
     }
-    
-    
+
     
     /**
      * @return the id
@@ -134,4 +136,18 @@ public class PatientResponse {
     public void setGender(String gender) {
         this.gender = gender;
     } 
+
+    /**
+     * @return the relationship
+     */
+    public PatientRelationship getRelationship() {
+        return relationship;
+    }
+
+    /**
+     * @param relationship the relationship to set
+     */
+    public void setRelationship(PatientRelationship relationship) {
+        this.relationship = relationship;
+    }
 }

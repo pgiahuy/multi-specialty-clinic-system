@@ -4,8 +4,20 @@
  */
 package com.hb.repository.impl;
 
+import com.hb.exception.ResourceNotFoundException;
+import com.hb.pojo.Appointment;
 import com.hb.pojo.MedicalRecord;
+import com.hb.pojo.Patient;
+import com.hb.pojo.Schedules;
+import com.hb.pojo.User;
 import com.hb.repository.MedicalRecordRepository;
+import jakarta.ejb.Schedule;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import java.util.List;
 import java.util.Map;
 import org.hibernate.Session;
@@ -25,11 +37,10 @@ public class MedicalRecordRepositoryImpl extends BaseRepositoryImpl<MedicalRecor
 
     @Autowired
     private LocalSessionFactoryBean factory;
-    
+
     private boolean hasText(String value) {
         return value != null && !value.trim().isEmpty();
     }
-
 
     @Override
     public List<MedicalRecord> getMedicalRecords(Map<String, String> params) {
@@ -70,10 +81,9 @@ public class MedicalRecordRepositoryImpl extends BaseRepositoryImpl<MedicalRecor
     @Override
     public MedicalRecord addorUpdateMedicalRecord(MedicalRecord m) {
         Session session = this.factory.getObject().getCurrentSession();
-        if (m.getId()==null) {
+        if (m.getId() == null) {
             session.persist(m);
-        }
-        else {
+        } else {
             session.merge(m);
         }
         return m;
@@ -111,10 +121,10 @@ public class MedicalRecordRepositoryImpl extends BaseRepositoryImpl<MedicalRecor
         Session session = this.factory.getObject().getCurrentSession();
         Query<MedicalRecord> query = session.createQuery("SELECT m FROM MedicalRecord m WHERE m.appointmentId.id = :appointmentId", MedicalRecord.class);
         query.setParameter("appointmentId", appointmentId);
-        
+
         return query.getSingleResult();
     }
-        
+
     @Override
     public long countMedicalRecords(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
@@ -131,5 +141,36 @@ public class MedicalRecordRepositoryImpl extends BaseRepositoryImpl<MedicalRecor
         }
 
         return q.getSingleResult();
+    }
+
+    @Override
+    public boolean checkAccessControll(User user, Long medicalRecordId) {
+        Session session = this.factory.getObject().getCurrentSession();
+        if (user == null || medicalRecordId == null) {
+            throw new ResourceNotFoundException("Thông tin xác thực không hợp lệ!");
+        }
+
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<Long> query = cb.createQuery(Long.class);
+
+        Root<MedicalRecord> medicalRecord = query.from(MedicalRecord.class);
+
+        Join<MedicalRecord, Appointment> appointment = medicalRecord.join("appointmentId", JoinType.INNER);
+        Join<Appointment, Schedules> schedule = appointment.join("scheduleId", JoinType.LEFT);
+        Join<Appointment, Patient> patient = appointment.join("patientId", JoinType.LEFT);
+
+        Predicate idMatch = cb.equal(medicalRecord.get("id"), medicalRecordId);
+
+        Predicate doctorMatch = cb.equal(schedule.get("doctorId").get("userId").get("id"), user.getId());
+
+        Predicate patientMatch = cb.equal(patient.get("userId").get("id"), user.getId());
+
+        Predicate userMatch = cb.or(doctorMatch, patientMatch);
+        query.select(cb.count(medicalRecord)).where(cb.and(idMatch, userMatch));
+
+        Long count = session.createQuery(query).getSingleResult();
+
+        return count > 0;
+
     }
 }

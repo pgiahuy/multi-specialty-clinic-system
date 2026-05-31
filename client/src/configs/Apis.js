@@ -34,6 +34,7 @@ export const endpoint = {
     'current-user': '/secure/users/profile',
     'appointments': '/secure/appointments',
     'appointment': (appointmentId) => `/secure/appointment/${appointmentId}`,
+    "appointment-patient": (patientId) => `/secure/appointments/patient/${patientId}`,
     'create-payment': '/secure/payments/create',
     'momo-return': '/secure/payments/momo/return',
     'payments': (patientId) => `/secure/payments/${patientId}`,
@@ -65,8 +66,19 @@ export const CLINIC_ENDPOINTS = {
     SCHEDULES: 'secure/schedules',
     DOCTOR_APPOINTMENTS: (scheduleId) => `secure/appointments?scheduleId=${scheduleId}`,
     DOCTOR_CONFIRM_APPOINTMENT: (appointmentId) => `secure/appointments/${appointmentId}/confirm`,
+    DOCTOR_START_APPOINTMENT: (appointmentId) => `secure/appointments/${appointmentId}/start`,
+    DOCTOR_GET_PATIENTS: 'secure/patients',
+    CREATE_MEDICAL_RECORD: 'secure/medical-records',
     PATIENT_BOOKING_APPOINTMENT: 'secure/appointments',
     TEST_RESULTS: (patientId) => `secure/test/${patientId}`,
+    APPOINTMENT_BY_ID: (id) => `secure/appointment/${id}`,
+    MEDICAL_RECORD_BY_ID: (id) => `secure/medical-records/${id}`,
+    MEDICAL_RECORD_BY_PATIENT_ID: (id) => `secure/medical-records/patient/${id}`,
+    PRESCRIPTION_BY_RECORD_ID: (recordId) => `secure/prescriptions/medical-record/${recordId}`,
+    MEDICINES: 'secure/medicines',
+    CREATE_PRESCRIPTIONS: 'secure/prescriptions',
+    SAVE_DRAFT_PRESCRIPTIONS: 'secure/prescriptions/draft',
+    TEST_RESULTS_APPOINTMENT: (appointmentId) => `secure/tests/appointment/${appointmentId}`,
 };
 
 
@@ -78,9 +90,19 @@ export const USER_ENDPOINTS = {
     PATIENT_PROFILE_DETAIL: (patientId) => `secure/profile/${patientId}`,
 };
 
+
+export const APPOINTMENT_ENDPOINTS = {
+    APPOINTMENTS: 'secure/appointments',
+    APPOINTMENT_DETAIL: (appointmentId) => `secure/appointment/${appointmentId}`,
+    APPOINTMENTS_BY_PATIENT: (patientId) => `secure/appointments/patient/${patientId}`,
+    CREATE_APPOINTMENT: 'secure/appointments',
+    CONFIRM_APPOINTMENT: (appointmentId) => `secure/appointments/${appointmentId}/confirm`,
+};
+
 export const PAYMENT_ENDPOINTS = {
-    CREATE: 'secure/payments/create',
+    PAY: 'secure/payments/pay',
     MOMO_RETURN: 'secure/payments/momo/return',
+    VNPAY_IPN: 'secure/payments/vnpay/ipn',
     HISTORY: (patientId) => `secure/payments/${patientId}`,
     ITEMS: (paymentId) => `secure/payment-items/${paymentId}`,
 };
@@ -92,6 +114,7 @@ export const clinicApis = {
     getSchedule: () => authApis.get(CLINIC_ENDPOINTS.SCHEDULES),
     getDoctorAppointments: (scheduleId) => authApis().get(CLINIC_ENDPOINTS.APPOINTMENTS(scheduleId)),
     getShifts: () => API.get(CLINIC_ENDPOINTS.SHIFTS),
+    getMedicines: (params = {}) => authApis().get(CLINIC_ENDPOINTS.MEDICINES, { params }),
 };
 
 
