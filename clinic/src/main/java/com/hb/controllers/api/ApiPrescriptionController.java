@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -82,8 +83,9 @@ public class ApiPrescriptionController {
     }
     
     
-//    @GetMapping("prescriptions/{id}")
-//    public ResponseEntity<List<PrescriptionResponse>> list(@PathVariable Long id){
-//        return null;
-//    }
+    @GetMapping("prescriptions/medical-record/{recordId}")
+    public ResponseEntity<PrescriptionResponse> list(@PathVariable("recordId") Long id, Principal p){
+        Prescription prescription = this.prescriptionService.getPrescriptionByMedicalRecordId(id);
+        return ResponseEntity.ok().body(PrescriptionMapper.INSTANCE.toResponse(prescription));
+    }
 }

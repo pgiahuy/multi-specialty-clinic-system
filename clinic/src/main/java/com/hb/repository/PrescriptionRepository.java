@@ -18,5 +18,6 @@ public interface PrescriptionRepository extends BaseRepository<Prescription> {
     List<Prescription> getPrescriptions(Map<String,String> params);
     Prescription saveOrUpdate(Prescription m);
     Prescription getPrescriptionById(Long id);
+    Prescription getPrescriptionByMedicalRecordId(Long recordId);
     void deletePrescription(Long id);
 }

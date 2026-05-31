@@ -21,5 +21,11 @@ public interface PrescriptionItemMapper {
 
     @Mapping(source = "medicineId.name", target = "medicineName")
     @Mapping(source = "medicineId.secureUrl", target = "medicineImage")
+    @Mapping(source = "medicineId.price", target = "medicinePrice")
+    @Mapping(source = "medicineId.id", target = "medicineId")
+    @Mapping(source = "medicineId.unit", target = "unit")
+    @Mapping(source = "note", target = "note")
+    @Mapping(source = "daysToUse", target = "daysToUse")
+    @Mapping(source = "quantity", target = "quantity")
     PrescriptionItemResponse toResponse(PrescriptionItem prescriptionItem);
 }
