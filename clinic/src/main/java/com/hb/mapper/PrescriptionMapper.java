@@ -24,6 +24,8 @@ public interface PrescriptionMapper {
     @Mapping(source = "prescriptionItemCollection", target = "items")
     @Mapping(source = "medicalRecordId.note", target = "note")
     @Mapping(source = "medicalRecordId.diagnosis", target = "diagnosis")
+    @Mapping(target = "status", expression = "java(prescription.getStatus() != null ? prescription.getStatus().name() : null)")
+    @Mapping(source = "publicAt", target = "publicAt")
     PrescriptionResponse toResponse(Prescription prescription);
     
 }
