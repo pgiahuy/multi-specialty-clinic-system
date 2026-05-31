@@ -4,11 +4,13 @@
  */
 package com.hb.repository.impl;
 
+import com.hb.enums.PatientRelationship;
 import com.hb.exception.ResourceNotFoundException;
 import com.hb.pojo.Appointment;
 import com.hb.pojo.Doctor;
 import com.hb.pojo.Patient;
 import com.hb.pojo.Schedules;
+import com.hb.pojo.User;
 import com.hb.repository.PatientRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -166,6 +168,40 @@ public class PatientRepositoryImpl extends BaseRepositoryImpl<Patient> implement
 
         cq.select(cb.countDistinct(root)).where(predicates.toArray(new Predicate[0]));
         return session.createQuery(cq).getSingleResult();
+    }
+
+    @Override
+    public List<Patient> getPatientsByUserId(Long userId) {
+        Session session = this.factory.getObject().getCurrentSession();
+        Query query = session.createQuery("SELECT p FROM Patient p WHERE p.userId.id = :id "
+                + " AND p.isActive = true", Patient.class);
+        query.setParameter("id", userId);
+        return query.getResultList();
+    }
+
+    @Override
+    public boolean isExistedCCCD(String cccd) {
+        Session session = this.factory.getObject().getCurrentSession();
+        Query query = session.createQuery("SELECT COUNT(p) FROM Patient p WHERE p.cccd =: cccd", Long.class);
+        query.setParameter("cccd", cccd);
+        
+        Long count = (Long) query.uniqueResult();
+        
+        return count != null && count > 0;
+    }
+
+    @Override
+    public boolean isExistedForSelf(User u) {
+        Session session = this.factory.getObject().getCurrentSession();
+        Query query = session.createQuery("SELECT COUNT(p) FROM Patient p WHERE p.userId.id = :userId "
+                                                                        + "AND p.relationship = :relationship", Long.class);
+        query.setParameter("userId", u.getId());
+        query.setParameter("relationship", PatientRelationship.SELF);
+        
+        Long count = (Long) query.uniqueResult();
+        
+        return count != null && count > 0;
+        
     }
 
 }
