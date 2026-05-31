@@ -5,7 +5,7 @@
 package com.hb.mapper;
 
 import com.hb.dto.response.PaymentItemResponse;
-import com.hb.pojo.PaymentItems;
+import com.hb.pojo.PaymentItem;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -19,5 +19,5 @@ public interface PaymentItemMapper {
    PaymentItemMapper INSTANCE = Mappers.getMapper(PaymentItemMapper.class);
    
    @Mapping(source = "paymentId.id", target = "paymentId")
-   PaymentItemResponse toResponse(PaymentItems paymentItem);
+   PaymentItemResponse toResponse(PaymentItem paymentItem);
 }

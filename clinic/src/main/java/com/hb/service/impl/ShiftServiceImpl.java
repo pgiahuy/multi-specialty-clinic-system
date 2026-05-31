@@ -7,7 +7,7 @@ package com.hb.service.impl;
 import com.hb.dto.request.form.ShiftForm;
 import com.hb.dto.response.ShiftResponse;
 import com.hb.mapper.ShiftMapper;
-import com.hb.pojo.Shifts;
+import com.hb.pojo.Shift;
 import com.hb.repository.ShiftRepository;
 import com.hb.service.ShiftService;
 import java.util.List;
@@ -27,15 +27,15 @@ public class ShiftServiceImpl implements ShiftService {
 
     @Override
     public List<ShiftResponse> getShifts(Map<String, String> params) {
-        List<Shifts> res = this.shiftRepo.getShifts(params);
+        List<Shift> res = this.shiftRepo.getShifts(params);
         return res.stream().map(ShiftMapper.INSTANCE::toResponse).toList();
     }
 
     @Override
-    public Shifts saveOrUpdate(ShiftForm form) {
-        Shifts s;
+    public Shift saveOrUpdate(ShiftForm form) {
+        Shift s;
         if (form.getId() == null) {
-            s = new Shifts();
+            s = new Shift();
         } else {
             s = this.shiftRepo.getShiftById(form.getId());
         }
@@ -50,7 +50,7 @@ public class ShiftServiceImpl implements ShiftService {
 
     @Override
     public ShiftResponse getShiftById(Long id) {
-        Shifts s = this.shiftRepo.getShiftById(id);
+        Shift s = this.shiftRepo.getShiftById(id);
         return ShiftMapper.INSTANCE.toResponse(s);
     }
 
@@ -61,7 +61,7 @@ public class ShiftServiceImpl implements ShiftService {
 
     @Override
     public long countShifts(Map<String, String> params) {
-        return shiftRepo.count(params, Shifts.class);
+        return shiftRepo.count(params, Shift.class);
     }
 
 }

@@ -5,7 +5,7 @@
 package com.hb.mapper;
 
 import com.hb.dto.response.LabTestResponse;
-import com.hb.pojo.LabTests;
+import com.hb.pojo.LabTest;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -17,5 +17,5 @@ import org.mapstruct.factory.Mappers;
 public interface LabTestMapper {
     LabTestMapper INSTANCE = Mappers.getMapper(LabTestMapper.class);
     
-    LabTestResponse toResponse(LabTests test);
+    LabTestResponse toResponse(LabTest test);
 }

@@ -5,7 +5,7 @@
 package com.hb.service;
 
 import com.hb.dto.request.form.RoomForm;
-import com.hb.pojo.Rooms;
+import com.hb.pojo.Room;
 import java.util.List;
 import java.util.Map;
 
@@ -15,11 +15,11 @@ import java.util.Map;
  */
 public interface RoomService {
 
-    List<Rooms> getRooms(Map<String, String> params);
+    List<Room> getRooms(Map<String, String> params);
 
-    Rooms getRoomById(Long id);
+    Room getRoomById(Long id);
 
-    Rooms saveOrUpdate(RoomForm form);
+    Room saveOrUpdate(RoomForm form);
 
     void deleteRoom(Long id);
 

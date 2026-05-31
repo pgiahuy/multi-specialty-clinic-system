@@ -21,13 +21,12 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
  *
- * @author DELL
+ * @author HUY
  */
 @Entity
 @Table(name = "refresh_token")
@@ -62,7 +61,7 @@ public class RefreshToken implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
     @Column(name = "revoked")
-    private Boolean revoked;
+    private boolean revoked;
     @Size(max = 100)
     @Column(name = "device_id")
     private String deviceId;
@@ -118,11 +117,11 @@ public class RefreshToken implements Serializable {
         this.createdAt = createdAt;
     }
 
-    public Boolean getRevoked() {
+    public boolean getRevoked() {
         return revoked;
     }
 
-    public void setRevoked(Boolean revoked) {
+    public void setRevoked(boolean revoked) {
         this.revoked = revoked;
     }
 

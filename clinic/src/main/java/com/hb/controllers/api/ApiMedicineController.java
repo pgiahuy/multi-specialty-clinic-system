@@ -5,6 +5,7 @@
 package com.hb.controllers.api;
 
 import com.hb.dto.response.MedicineResponse;
+import com.hb.enums.UserRole;
 import com.hb.pojo.Medicine;
 import com.hb.pojo.User;
 import com.hb.service.MedicineBatchService;
@@ -57,8 +58,8 @@ public class ApiMedicineController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        String role = u.getRole();
-        if (role == null || !"ROLE_DOCTOR".equals(role)) {
+        UserRole role = u.getRole();
+        if (role == null || !UserRole.ROLE_DOCTOR.equals(role)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 

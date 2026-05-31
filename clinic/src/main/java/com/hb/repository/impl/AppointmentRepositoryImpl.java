@@ -7,7 +7,7 @@ package com.hb.repository.impl;
 import com.hb.enums.AppointmentStatus;
 import com.hb.pojo.Appointment;
 import com.hb.pojo.Patient;
-import com.hb.pojo.Schedules;
+import com.hb.pojo.Schedule;
 import com.hb.repository.AppointmentRepository;
 
 import java.util.ArrayList;
@@ -54,12 +54,12 @@ public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> i
         Join<Appointment, Patient> patientJoin = root.join("patientId", JoinType.LEFT);
 
         root.fetch("scheduleId", JoinType.LEFT);
-        Join<Appointment, Schedules> scheduleJoin = root.join("scheduleId", JoinType.LEFT);
+        Join<Appointment, Schedule> scheduleJoin = root.join("scheduleId", JoinType.LEFT);
         scheduleJoin.fetch("doctorId", JoinType.LEFT);
         scheduleJoin.fetch("shiftId", JoinType.LEFT);
         scheduleJoin.fetch("roomId", JoinType.LEFT);
 
-        Join<Schedules, ?> doctorJoin = scheduleJoin.join("doctorId", JoinType.LEFT);
+        Join<Schedule, ?> doctorJoin = scheduleJoin.join("doctorId", JoinType.LEFT);
 
         List<Predicate> predicates = new ArrayList<>();
 

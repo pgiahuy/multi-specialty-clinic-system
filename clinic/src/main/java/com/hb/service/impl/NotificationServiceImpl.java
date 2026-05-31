@@ -13,7 +13,6 @@ import com.hb.repository.UserRepository;
 import com.hb.service.FcmService;
 import com.hb.service.NotificationService;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;

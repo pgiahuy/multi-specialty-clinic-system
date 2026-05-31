@@ -73,7 +73,7 @@ public class ApiMedicalRecordController {
         User u = userService.getUserByUsername(principal.getName());
         if (u != null) {
             params.put("currentUserId", String.valueOf(u.getId()));
-            params.put("currentUserRole", u.getRole());
+            params.put("currentUserRole", u.getRole().toString());
         }
         int pageSize = this.env.getProperty("admin.page_size", Integer.class, 10);
         params.put("pageSize", String.valueOf(pageSize));

@@ -21,17 +21,15 @@ import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Date;
+
 
 /**
  *
- * @author DELL
+ * @author HUY
  */
 @Entity
 @Table(name = "appointment")
@@ -50,25 +48,24 @@ public class Appointment implements Serializable {
     private Long id;
     @Size(max = 11)
     @Column(name = "status")
-     @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     private AppointmentStatus status;
     @Column(name = "created_at")
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
     @JoinColumn(name = "patient_id", referencedColumnName = "id")
     @ManyToOne
     private Patient patientId;
     @JoinColumn(name = "schedule_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
-    private Schedules scheduleId;
+    private Schedule scheduleId;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "appointmentId")
+    private Collection<LabResult> labResultCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "appointmentId")
     private Collection<Payment> paymentCollection;
     @OneToOne(mappedBy = "appointmentId")
     private Conversation conversation;
     @OneToOne(mappedBy = "appointmentId")
     private MedicalRecord medicalRecord;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "appointmentId")
-    private Collection<LabResults> labResultsCollection;
 
     public Appointment() {
     }
@@ -109,12 +106,20 @@ public class Appointment implements Serializable {
         this.patientId = patientId;
     }
 
-    public Schedules getScheduleId() {
+    public Schedule getScheduleId() {
         return scheduleId;
     }
 
-    public void setScheduleId(Schedules scheduleId) {
+    public void setScheduleId(Schedule scheduleId) {
         this.scheduleId = scheduleId;
+    }
+
+    public Collection<LabResult> getLabResultCollection() {
+        return labResultCollection;
+    }
+
+    public void setLabResultCollection(Collection<LabResult> labResultCollection) {
+        this.labResultCollection = labResultCollection;
     }
 
     public Collection<Payment> getPaymentCollection() {
@@ -139,14 +144,6 @@ public class Appointment implements Serializable {
 
     public void setMedicalRecord(MedicalRecord medicalRecord) {
         this.medicalRecord = medicalRecord;
-    }
-
-    public Collection<LabResults> getLabResultsCollection() {
-        return labResultsCollection;
-    }
-
-    public void setLabResultsCollection(Collection<LabResults> labResultsCollection) {
-        this.labResultsCollection = labResultsCollection;
     }
 
     @Override

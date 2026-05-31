@@ -4,7 +4,7 @@
  */
 package com.hb.repository;
 
-import com.hb.pojo.Rooms;
+import com.hb.pojo.Room;
 import java.util.List;
 import java.util.Map;
 
@@ -12,9 +12,9 @@ import java.util.Map;
  *
  * @author DELL
  */
-public interface RoomRepository extends BaseRepository<Rooms>{
-    List<Rooms> getRooms(Map<String,String> params);
-    Rooms getRoomById(Long id);
-    Rooms saveOrUpdate(Rooms a);
+public interface RoomRepository extends BaseRepository<Room>{
+    List<Room> getRooms(Map<String,String> params);
+    Room getRoomById(Long id);
+    Room saveOrUpdate(Room a);
     void deleteRoom(Long id);
 }

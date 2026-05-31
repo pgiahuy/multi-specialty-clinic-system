@@ -4,10 +4,13 @@
  */
 package com.hb.pojo;
 
+import com.hb.enums.UserRole;
 import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -22,13 +25,14 @@ import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
 
 /**
  *
- * @author DELL
+ * @author HUY
  */
 @Entity
 @Table(name = "user")
@@ -68,9 +72,9 @@ public class User implements Serializable {
     private String username;
     @Size(max = 12)
     @Column(name = "role")
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
     @Column(name = "created_at")
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
     @Size(max = 255)
     @Column(name = "secure_url")
@@ -83,7 +87,7 @@ public class User implements Serializable {
     @Column(name = "fcm_token")
     private String fcmToken;
     @Column(name = "is_active")
-    private Boolean isActive;
+    private boolean isActive;
     @Size(max = 255)
     @Column(name = "name")
     private String name;
@@ -148,12 +152,12 @@ public class User implements Serializable {
     public void setUsername(String username) {
         this.username = username;
     }
-
-    public String getRole() {
+    
+    public UserRole getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(UserRole role) {
         this.role = role;
     }
 
@@ -189,11 +193,11 @@ public class User implements Serializable {
         this.fcmToken = fcmToken;
     }
 
-    public Boolean getIsActive() {
+    public boolean getIsActive() {
         return isActive;
     }
 
-    public void setIsActive(Boolean isActive) {
+    public void setIsActive(boolean isActive) {
         this.isActive = isActive;
     }
 
