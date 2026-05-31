@@ -5,6 +5,7 @@
 package com.hb.pojo;
 
 import jakarta.persistence.Basic;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,53 +15,54 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Date;
 
 /**
  *
- * @author HUY
+ * @author DELL
  */
 @Entity
 @Table(name = "lab_results")
 @NamedQueries({
     @NamedQuery(name = "LabResults.findAll", query = "SELECT l FROM LabResults l"),
-    @NamedQuery(name = "LabResults.findById", query = "SELECT l FROM LabResults l WHERE l.id = :id"),
-    @NamedQuery(name = "LabResults.findByResultValue", query = "SELECT l FROM LabResults l WHERE l.resultValue = :resultValue"),
-    @NamedQuery(name = "LabResults.findByIsAbnormal", query = "SELECT l FROM LabResults l WHERE l.isAbnormal = :isAbnormal"),
-    @NamedQuery(name = "LabResults.findByPdfUrl", query = "SELECT l FROM LabResults l WHERE l.pdfUrl = :pdfUrl"),
-    @NamedQuery(name = "LabResults.findByCreatedAt", query = "SELECT l FROM LabResults l WHERE l.createdAt = :createdAt")})
+    @NamedQuery(name = "LabResults.findByStatus", query = "SELECT l FROM LabResults l WHERE l.status = :status"),
+    @NamedQuery(name = "LabResults.findByCreatedAt", query = "SELECT l FROM LabResults l WHERE l.createdAt = :createdAt"),
+    @NamedQuery(name = "LabResults.findByTestAt", query = "SELECT l FROM LabResults l WHERE l.testAt = :testAt"),
+    @NamedQuery(name = "LabResults.findById", query = "SELECT l FROM LabResults l WHERE l.id = :id")})
 public class LabResults implements Serializable {
 
-    @Size(max = 50)
-    @Column(name = "result_value")
-    private String resultValue;
-    @Size(max = 255)
-    @Column(name = "pdf_url")
-    private String pdfUrl;
+    private static final long serialVersionUID = 1L;
+    @Size(max = 10)
+    @Column(name = "status")
+    private String status;
+    @Basic(optional = false)
+    @NotNull
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
-
-    private static final long serialVersionUID = 1L;
+    @Column(name = "test_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date testAt;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
-    @Column(name = "is_abnormal")
-    private Boolean isAbnormal;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "labResultsId")
+    private Collection<LabResultDetails> labResultDetailsCollection;
     @JoinColumn(name = "appointment_id", referencedColumnName = "id")
-    @ManyToOne
+    @ManyToOne(optional = false)
     private Appointment appointmentId;
-    @JoinColumn(name = "test_id", referencedColumnName = "id")
-    @ManyToOne
-    private LabTests testId;
-    
 
     public LabResults() {
     }
@@ -69,36 +71,17 @@ public class LabResults implements Serializable {
         this.id = id;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
+    public LabResults(Long id, LocalDateTime createdAt) {
         this.id = id;
+        this.createdAt = createdAt;
     }
 
-    public String getResultValue() {
-        return resultValue;
+    public String getStatus() {
+        return status;
     }
 
-    public void setResultValue(String resultValue) {
-        this.resultValue = resultValue;
-    }
-
-    public Boolean getIsAbnormal() {
-        return isAbnormal;
-    }
-
-    public void setIsAbnormal(Boolean isAbnormal) {
-        this.isAbnormal = isAbnormal;
-    }
-
-    public String getPdfUrl() {
-        return pdfUrl;
-    }
-
-    public void setPdfUrl(String pdfUrl) {
-        this.pdfUrl = pdfUrl;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -109,6 +92,30 @@ public class LabResults implements Serializable {
         this.createdAt = createdAt;
     }
 
+    public Date getTestAt() {
+        return testAt;
+    }
+
+    public void setTestAt(Date testAt) {
+        this.testAt = testAt;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Collection<LabResultDetails> getLabResultDetailsCollection() {
+        return labResultDetailsCollection;
+    }
+
+    public void setLabResultDetailsCollection(Collection<LabResultDetails> labResultDetailsCollection) {
+        this.labResultDetailsCollection = labResultDetailsCollection;
+    }
+
     public Appointment getAppointmentId() {
         return appointmentId;
     }
@@ -116,16 +123,6 @@ public class LabResults implements Serializable {
     public void setAppointmentId(Appointment appointmentId) {
         this.appointmentId = appointmentId;
     }
-
-    public LabTests getTestId() {
-        return testId;
-    }
-
-    public void setTestId(LabTests testId) {
-        this.testId = testId;
-    }
-
-   
 
     @Override
     public int hashCode() {
@@ -151,7 +148,5 @@ public class LabResults implements Serializable {
     public String toString() {
         return "com.hb.pojo.LabResults[ id=" + id + " ]";
     }
-
-   
     
 }

@@ -50,10 +50,7 @@ public class PaymentServiceImpl implements PaymentService {
     public List<Payment> getPayments(Map<String, String> params) {
         return this.paymentRepo.getPayments(params);
     }
-//    @Override
-//    public List<Payment> getPaymentsByUserName(Map<String, String> params) {
-//        return this.paymentRepo.getPaymentsByUserName(params);
-//    }
+
     
     @Override
     public Payment getPaymentById(Long id) {
@@ -69,10 +66,10 @@ public class PaymentServiceImpl implements PaymentService {
     public Payment createPayment(Appointment appointment) {
         Payment p = new Payment();
 
-        p.setAppointment(appointment);
+        p.setAppointmentId(appointment);
         p.setStatus(PaymentStatus.PENDING);
         p.setTotalAmount(BigDecimal.ONE);
-        p.setCreatedAt(LocalDate.now());
+        p.setCreatedAt(LocalDateTime.now());
         paymentRepo.addOrUpdatePayment(p);
 
         return p;
@@ -82,7 +79,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public Payment getPaymentByAppoint(Long appointmentId) {
         PaymentItems item = itemService.getPaymentItemByAppointment(appointmentId);
-        return this.paymentRepo.getPaymentById(item.getPayment().getId());
+        return this.paymentRepo.getPaymentById(item.getPaymentId().getId());
     }
 
     @Override
@@ -127,9 +124,9 @@ public class PaymentServiceImpl implements PaymentService {
         
         paymentRepo.addOrUpdatePayment(p);
 
-        if (p.getAppointment() != null) {
-            p.getAppointment().setStatus(AppointmentStatus.PENDING);
-            appointmentRepo.addOrUpdateAppointment(p.getAppointment());
+        if (p.getAppointmentId() != null) {
+            p.getAppointmentId().setStatus(AppointmentStatus.PENDING);
+            appointmentRepo.addOrUpdateAppointment(p.getAppointmentId());
         }
     }
 

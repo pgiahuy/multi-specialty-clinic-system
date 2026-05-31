@@ -1,20 +1,27 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Container, Row, Col, Card, Button, Spinner, Image, Form } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { authApis, CLINIC_ENDPOINTS, endpoint } from "../../configs/Apis";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { formCardStyle } from "../User/UserStyle";
+import MySpinner from "../../components/MySpinner";
 
 const ListDoctor = () => {
     const [doctors, setDoctors] = useState([]);
     const [loading, setLoading] = useState(false);
     const nav = useNavigate();
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedSpecialty, setSelectedSpecialty] = useState('');
 
-    const loadDoctors = async () => {
+    const loadDoctors = async (name = '', specialty = '') => {
         try {
             setLoading(true);
-            const res = await authApis().get(CLINIC_ENDPOINTS.DOCTORS);
+            const params = {};
+            if (name && name.trim()) params.doctorName = name.trim();
+            if (specialty) params.specialty = specialty;
+
+            const res = await authApis().get(CLINIC_ENDPOINTS.DOCTORS, { params });
             setDoctors(res.data || []);
         } catch (err) {
             console.log(err);
@@ -31,6 +38,25 @@ const ListDoctor = () => {
         loadDoctors();
     }, []);
 
+    const didMountRef = useRef(true);
+
+    
+    useEffect(() => {
+        if (didMountRef.current) {
+            didMountRef.current = false;
+            return;
+        }
+
+        const q = (searchTerm || '').trim();
+        if (q.length === 1) return; 
+
+        const t = setTimeout(() => {
+            loadDoctors(searchTerm, selectedSpecialty);
+        }, 350);
+
+        return () => clearTimeout(t);
+    }, [searchTerm, selectedSpecialty]);
+
     return (
         <>
             <div className="d-flex flex-column min-vh-100">
@@ -41,12 +67,16 @@ const ListDoctor = () => {
                             <Row>
                                 <Col md={8}>
                                     <Form.Group className="mb-4">
-                                        <Form.Control placeholder="Tìm kiếm bác sĩ..." />
+                                        <Form.Control
+                                            placeholder="Tìm kiếm bác sĩ..."
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                        />
 
                                     </Form.Group>
                                 </Col>
                                 <Col md={4}>
-                                    <Form.Select className="mb-4">
+                                    <Form.Select className="mb-4" value={selectedSpecialty} onChange={(e) => setSelectedSpecialty(e.target.value)}>
                                         <option value="">---Chuyên khoa---</option>
                                         <option value="cardiology">Tim mạch</option>
                                         <option value="dermatology">Da liễu</option>
@@ -62,7 +92,7 @@ const ListDoctor = () => {
                     <h3 className="mb-4">Danh sách bác sĩ</h3>
 
                     {loading ? (
-                        <div className="text-center py-5"><Spinner animation="border" /></div>
+                        <div className="text-center py-5"><MySpinner/></div>
                     ) : doctors.length === 0 ? (
                         <div className="text-center text-muted py-5">Không có bác sĩ để hiển thị.</div>
                     ) : (
