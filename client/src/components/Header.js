@@ -113,6 +113,14 @@ const Header = () => {
                             </div>
                         ) : (
                             <div className="ms-auto d-flex align-items-center">
+                                <Nav>
+                                    {user.role === 'ROLE_DOCTOR' ? (
+                                        <div>Chào bác sĩ {user?.doctorProfile ? user.doctorProfile.fullName : ''} !&nbsp;&nbsp;</div>
+                                    ) : (
+                                        <div>Chào {user?.name || 'bạn'} !&nbsp;&nbsp;</div>
+                                    )}
+                                </Nav>
+
                                 <Nav className="align-items-center header-notification me-1">
                                     <NotificationBox onNavigate={(path) => {
                                         if (!path) return;
@@ -142,7 +150,7 @@ const Header = () => {
                                     }>
 
                                     {user?.role === 'ROLE_DOCTOR' ? (
-                                        <NavDropdown.Item onClick={() => navigate('/doctor/profile')}>Thông tin cá nhân & tài khoản</NavDropdown.Item>
+                                        <NavDropdown.Item onClick={() => navigate('/doctor/profile')}>{user?.doctorProfile ? user?.doctorProfile.fullName : 'Bác sĩ'}</NavDropdown.Item>
                                     ) : (
                                         <>
                                             <NavDropdown.Item onClick={() => navigate('/patient/profiles')}>Hồ sơ sức khỏe</NavDropdown.Item>

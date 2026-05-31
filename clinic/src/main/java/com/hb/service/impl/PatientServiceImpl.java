@@ -47,6 +47,11 @@ public class PatientServiceImpl implements PatientService {
     }
 
     @Override
+    public List<Patient> getPatientsForDoctor(Map<String, String> params) {
+        return patientRepo.getPatientsForDoctor(params);
+    }
+
+    @Override
     public Patient getPatientById(Long id) {
         return this.patientRepo.getPatientById(id);
     }

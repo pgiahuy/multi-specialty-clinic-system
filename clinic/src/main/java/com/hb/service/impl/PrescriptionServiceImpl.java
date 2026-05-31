@@ -61,7 +61,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
             throw new BadRequestException("Thiếu thông tin đơn thuốc!");
         }
         if (req.getMedicalRecordId() == null) {
-            throw new BadRequestException("Không tìm thấy bệnh án!");
+            throw new BadRequestException("Không tìm thấy bệnh án!!");
         }
         if (req.getItems() == null || req.getItems().isEmpty()) {
             throw new BadRequestException("Cần ít nhất một loại thuốc để tạo đơn!");
@@ -98,7 +98,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
 
             MedicalRecord mr = medicalRecordRepo.getMedicalRecordById(req.getMedicalRecordId());
             if (mr == null) {
-                throw new ResourceNotFoundException("Không tìm thấy bệnh án!");
+                throw new ResourceNotFoundException("Không tìm thấy bệnh án!!");
             }
             if (mr.getPrescription() != null) {
                 throw new BadRequestException("Đã có đơn thuốc cho hồ sơ này!");
@@ -128,6 +128,8 @@ public class PrescriptionServiceImpl implements PrescriptionService {
             PrescriptionItem item = new PrescriptionItem();
             item.setMedicineId(medicine);
             item.setQuantity(i.getQuantity());
+            item.setDaysToUse(i.getDaysToUse());
+            item.setNote(i.getNote());
             item.setPrescriptionId(prescription);
 
             prescriptionItemRepo.save(item);
@@ -292,5 +294,10 @@ public class PrescriptionServiceImpl implements PrescriptionService {
         } catch (Exception e) {
             System.err.println("Lỗi gửi thông báo: " + e.getMessage());
         }
+    }
+
+    @Override
+    public Prescription getPrescriptionByMedicalRecordId(Long recordId) {
+        return this.prescriptionRepo.getPrescriptionByMedicalRecordId(recordId);
     }
 }
