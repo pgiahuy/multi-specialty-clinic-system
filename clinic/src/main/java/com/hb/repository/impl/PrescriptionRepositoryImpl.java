@@ -79,9 +79,9 @@ public class PrescriptionRepositoryImpl extends BaseRepositoryImpl<Prescription>
         Session session = this.factory.getObject().getCurrentSession();
 
         String hql = "SELECT DISTINCT p FROM Prescription p "
-                   + "LEFT JOIN FETCH p.prescriptionItemCollection items "
-                   + "LEFT JOIN FETCH items.medicineId "
-                   + "WHERE p.id = :id";
+                + "LEFT JOIN FETCH p.prescriptionItemCollection items "
+                + "LEFT JOIN FETCH items.medicineId "
+                + "WHERE p.id = :id";
         return session.createQuery(hql, Prescription.class)
                 .setParameter("id", id)
                 .uniqueResult();
@@ -98,5 +98,19 @@ public class PrescriptionRepositoryImpl extends BaseRepositoryImpl<Prescription>
         } else {
             throw new RuntimeException("Prescription not found!");
         }
+    }
+
+    @Override
+    public Prescription getPrescriptionByMedicalRecordId(Long recordId) {
+        Session session = this.factory.getObject().getCurrentSession();
+
+        String hql = "SELECT DISTINCT p FROM Prescription p "
+                + "LEFT JOIN FETCH p.medicalRecordId mr "
+                + "LEFT JOIN FETCH p.prescriptionItemCollection items "
+                + "LEFT JOIN FETCH items.medicineId "
+                + "WHERE mr.id = :recordId";
+        return session.createQuery(hql, Prescription.class)
+                .setParameter("recordId", recordId)
+                .uniqueResult();
     }
 }

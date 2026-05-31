@@ -771,7 +771,7 @@ const BookingPage = () => {
                                 <p className="mb-2"><strong>Ngày khám:</strong> {bookingData.date}</p>
                                 <p className="mb-0"><strong>Ca khám:</strong> {bookingData.time}</p>
                             </div>
-                            <p className="text-center text-danger fst-italic mt-3">
+                            <p className="text-center text-success fst-italic mt-3">
                                 Thông tin lịch hẹn đã được lưu.<br /> Vui lòng tiến hành thanh toán để hoàn tất quá trình đặt lịch!
                             </p>
                         </Modal.Body>

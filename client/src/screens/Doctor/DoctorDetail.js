@@ -99,10 +99,10 @@ const DoctorDetail = () => {
                                     </div>
                                 ) : (
                                     <>
-                                        <h4 className="fw-bold mb-1">{name}</h4>
+                                        <h4 className="fw-bold mb-3">{name}</h4>
                                         <div className="d-flex flex-wrap justify-content-center gap-2 mb-3">
                                             {specialties.length > 0 ? specialties.map(specialty => (
-                                                <span key={specialty.id || specialty.name} className="badge rounded-pill text-bg-primary px-3 py-2" style={{ fontSize: "0.8rem" }}>
+                                                <span key={specialty.id || specialty.name} className="badge rounded-pill text-bg-light border px-3 py-2" style={{ fontSize: "0.8rem" }}>
                                                     {specialty.name}
                                                 </span>
                                             )) : (
