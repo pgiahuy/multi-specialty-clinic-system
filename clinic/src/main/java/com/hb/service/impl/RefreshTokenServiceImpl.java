@@ -83,7 +83,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         User user = rt.getUserId();
 
         RefreshToken newRt = generateRefreshToken(user.getId(), rt.getDeviceId(), rt.getDeviceInfo(), oldExpiryDate);
-        String accessToken = JwtUtils.generateToken(user.getUsername(), user.getRole());
+        String accessToken = JwtUtils.generateToken(user.getUsername(), user.getRole().toString());
         
         refreshTokenRepo.revokeByToken(token);
 

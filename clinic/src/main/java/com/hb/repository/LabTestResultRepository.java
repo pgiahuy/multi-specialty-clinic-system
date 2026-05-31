@@ -5,7 +5,7 @@
 package com.hb.repository;
 
 import com.hb.dto.response.LabTestResultResponse;
-import com.hb.pojo.LabResults;
+import com.hb.pojo.LabResult;
 import java.util.List;
 import java.util.Map;
 
@@ -14,8 +14,8 @@ import java.util.Map;
  * @author DELL
  */
 public interface LabTestResultRepository {
-    LabResults getLabResultById(Long id);
-    List<LabResults> getLabResultsByAppointment(Long appointmentId);
-    void addOrUpdateTestResult(LabResults lr);
-    List<LabResults> getTestResults(Long patientId, Map<String, String> params);
+    LabResult getLabResultById(Long id);
+    List<LabResult> getLabResultsByAppointment(Long appointmentId);
+    void addOrUpdateTestResult(LabResult lr);
+    List<LabResult> getTestResults(Long patientId, Map<String, String> params);
 }

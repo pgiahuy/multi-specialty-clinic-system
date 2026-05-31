@@ -1,7 +1,7 @@
 package com.hb.controllers.api;
 
 import com.hb.dto.response.RoomResponse;
-import com.hb.pojo.Rooms;
+import com.hb.pojo.Room;
 import com.hb.service.RoomService;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +33,7 @@ public class ApiRoomController {
         int pageSize = this.env.getProperty("admin.page_size", Integer.class);
         params.put("pageSize", String.valueOf(pageSize));
 
-        List<Rooms> rooms = roomService.getRooms(params);
+        List<Room> rooms = roomService.getRooms(params);
         List<RoomResponse> response = rooms.stream().map(room -> new RoomResponse(
                 room.getId(),
                 room.getRoomNumber(),

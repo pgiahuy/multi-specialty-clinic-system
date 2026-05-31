@@ -4,7 +4,7 @@
  */
 package com.hb.repository.impl;
 
-import com.hb.pojo.LabResults;
+import com.hb.pojo.LabResult;
 import com.hb.repository.LabTestResultRepository;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -29,7 +29,7 @@ public class LabTestResultRepositoryImpl implements LabTestResultRepository {
     private LocalSessionFactoryBean factory;
 
     @Override
-    public void addOrUpdateTestResult(LabResults lr) {
+    public void addOrUpdateTestResult(LabResult lr) {
         Session session = this.factory.getObject().getCurrentSession();
         if (lr.getId() != null) {
             session.merge(lr);
@@ -39,18 +39,18 @@ public class LabTestResultRepositoryImpl implements LabTestResultRepository {
     }
 
     @Override
-    public LabResults getLabResultById(Long id) {
+    public LabResult getLabResultById(Long id) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<LabResults> q = session.createNamedQuery("LabResults.findById", LabResults.class);
+        Query<LabResult> q = session.createNamedQuery("LabResult.findById", LabResult.class);
         q.setParameter("id", id);
         return q.getSingleResult();
     }
 
     @Override
-    public List<LabResults> getTestResults(Long patientId, Map<String, String> params) {
+    public List<LabResult> getTestResults(Long patientId, Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
 
-        StringBuilder hql = new StringBuilder("SELECT l FROM LabResults l JOIN FETCH l.testId WHERE l.appointmentId.patientId.id = :patientId");
+        StringBuilder hql = new StringBuilder("SELECT l FROM LabResult l JOIN FETCH l.testId WHERE l.appointmentId.patientId.id = :patientId");
 
         String appointmentIdStr = params.get("appointmentId");
         if (appointmentIdStr != null && !appointmentIdStr.isEmpty()) {
@@ -63,7 +63,7 @@ public class LabTestResultRepositoryImpl implements LabTestResultRepository {
             hql.append(" AND l.createdAt BETWEEN :startDate AND :endDate");
         }
 
-        Query<LabResults> query = session.createQuery(hql.toString(), LabResults.class);
+        Query<LabResult> query = session.createQuery(hql.toString(), LabResult.class);
 
         query.setParameter("patientId", patientId);
 
@@ -83,9 +83,9 @@ public class LabTestResultRepositoryImpl implements LabTestResultRepository {
     }
 
     @Override
-    public List<LabResults> getLabResultsByAppointment(Long appointmentId) {
+    public List<LabResult> getLabResultsByAppointment(Long appointmentId) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<LabResults> query = session.createQuery("SELECT r FROM LabResults r WHERE appointmentId.id = :appointmentId", LabResults.class);
+        Query<LabResult> query = session.createQuery("SELECT r FROM LabResult r WHERE appointmentId.id = :appointmentId", LabResult.class);
         
         query.setParameter("appointmentId", appointmentId);
         return query.getResultList();

@@ -30,7 +30,7 @@ import java.util.Date;
 
 /**
  *
- * @author DELL
+ * @author HUY
  */
 @Entity
 @Table(name = "patient")
@@ -87,7 +87,7 @@ public class Patient implements Serializable {
     @Enumerated(EnumType.STRING)
     private PatientRelationship relationship;
     @Column(name = "is_active")
-    private Boolean isActive;
+    private boolean isActive;
     @OneToMany(mappedBy = "patientId")
     private Collection<Appointment> appointmentCollection;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
@@ -174,11 +174,11 @@ public class Patient implements Serializable {
         this.relationship = relationship;
     }
 
-    public Boolean getIsActive() {
+    public boolean getIsActive() {
         return isActive;
     }
 
-    public void setIsActive(Boolean isActive) {
+    public void setIsActive(boolean isActive) {
         this.isActive = isActive;
     }
 

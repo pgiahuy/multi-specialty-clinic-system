@@ -7,7 +7,7 @@ package com.hb.controllers.api;
 import com.hb.dto.request.ScheduleCreateRequest;
 import com.hb.dto.response.ScheduleRepsonse;
 import com.hb.mapper.ScheduleMapper;
-import com.hb.pojo.Schedules;
+import com.hb.pojo.Schedule;
 import com.hb.pojo.User;
 import com.hb.service.ScheduleService;
 import com.hb.service.UserService;
@@ -64,7 +64,7 @@ public class ApiScheduleController {
 
         int pageSize = this.env.getProperty("admin.page_size", Integer.class);
         params.put("pageSize", String.valueOf(pageSize));
-        List<Schedules> s = scheduleService.getSchedules(params);
+        List<Schedule> s = scheduleService.getSchedules(params);
         return ResponseEntity.ok(s.stream().map(scheduleMapper::toResponse).toList());
     }
 

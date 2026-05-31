@@ -7,7 +7,6 @@ package com.hb.repository;
 import com.hb.enums.PaymentMethod;
 import com.hb.enums.PaymentStatus;
 import com.hb.pojo.Payment;
-import com.hb.pojo.PaymentItems;
 import java.util.List;
 import java.util.Map;
 
