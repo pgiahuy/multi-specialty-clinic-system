@@ -99,6 +99,7 @@ export const APPOINTMENT_ENDPOINTS = {
 export const PAYMENT_ENDPOINTS = {
     PAY: 'secure/payments/pay',
     MOMO_RETURN: 'secure/payments/momo/return',
+    VNPAY_IPN: 'secure/payments/vnpay/ipn',
     HISTORY: (patientId) => `secure/payments/${patientId}`,
     ITEMS: (paymentId) => `secure/payment-items/${paymentId}`,
 };

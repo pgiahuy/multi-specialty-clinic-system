@@ -85,7 +85,7 @@ public class AppointmentMapper {
         a.setPatientId(patient);
         a.setScheduleId(schedule);
         a.setStatus(AppointmentStatus.UN_PAID);
-        a.setCreatedAt(LocalDateTime.now());
+        a.setCreatedAt(LocalDate.now());
         return a;
     }
 }

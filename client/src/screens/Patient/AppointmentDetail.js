@@ -60,7 +60,7 @@ const AppointmentDetail = () => {
                 ) : (
                     <Row className="justify-content-center">
                         <Col xs={12} md={8} lg={6}>
-                            <Card className="shadow-sm border-0 rounded-4 overflow-hidden">
+                            <Card className="shadow-sm rounded-4 overflow-hidden">
                                 <Card.Header className="d-flex justify-content-between align-items-center bg-light py-3 border-bottom-0">
                                     <div> Khoa {appointment.specialtyName} </div>
                                     <div> {appointment.roomName} - {appointment.areaName} </div>
@@ -75,13 +75,13 @@ const AppointmentDetail = () => {
                                         <div className="fw-semibold text-end">{appointment?.patientFullName || '-'}</div>
                                     </div>
 
-                                    {/* Dòng 2: Bác sĩ */}
+                                   
                                     <div className="d-flex justify-content-between align-items-center mb-3">
                                         <div className="small text-muted">Bác sĩ phụ trách</div>
                                         <div className="fw-semibold text-end">{appointment?.doctorFullName || '-'}</div>
                                     </div>
 
-                                    {/* Dòng 3: Ngày khám */}
+                                  
                                     <div className="d-flex justify-content-between align-items-center mb-3">
                                         <div className="small text-muted">Ngày khám</div>
                                         <div className="fw-bold text-primary text-end">{appointment?.appointmentDate || '-'} ({appointment.session || '-'})</div>
