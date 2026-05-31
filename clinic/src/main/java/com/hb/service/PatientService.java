@@ -24,6 +24,8 @@ public interface PatientService {
     PatientResponse addPatient(PatientCreateRequest prq, User u);
     long countPatients(Map<String,String> params);
     Patient saveOrUpdate(PatientForm form);
-    
+    boolean checkAccess(User u, Long patientId);
+    List<Patient> getPatientsByUserId(Long userId);
+    void validatePatientData(PatientCreateRequest req, User u);
     
 }
