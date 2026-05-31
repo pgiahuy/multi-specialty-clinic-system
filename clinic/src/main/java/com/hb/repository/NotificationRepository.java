@@ -16,6 +16,7 @@ public interface NotificationRepository {
     List<Notification> getNotificationsByUserId(Map<String,String> params);
     Notification addNotification(Notification n);
     Notification getNotificationById(Long id);
-    void deleteNotification(Long id);
+    void deleteNotification(Notification n);
     void markAsRead(Long id);
+    void markAllAsRead(String username);
 }

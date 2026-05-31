@@ -82,7 +82,6 @@ export const CLINIC_ENDPOINTS = {
 };
 
 
-
 export const USER_ENDPOINTS = {
     CURRENT_USER: 'secure/users/profile',
     NOTIFICATIONS: 'secure/users/notifications',
@@ -103,7 +102,7 @@ export const PAYMENT_ENDPOINTS = {
     PAY: 'secure/payments/pay',
     MOMO_RETURN: 'secure/payments/momo/return',
     VNPAY_IPN: 'secure/payments/vnpay/ipn',
-    HISTORY: (patientId) => `secure/payments/${patientId}`,
+    HISTORY: 'secure/payments',
     ITEMS: (paymentId) => `secure/payment-items/${paymentId}`,
 };
 

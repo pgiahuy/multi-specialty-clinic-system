@@ -11,7 +11,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -21,16 +20,11 @@ import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -62,8 +56,8 @@ public class Payment implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "created_at")
-   
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 7)
@@ -92,7 +86,7 @@ public class Payment implements Serializable {
         this.id = id;
     }
 
-    public Payment(Long id, BigDecimal totalAmount, LocalDate createdAt, PaymentStatus status) {
+    public Payment(Long id, BigDecimal totalAmount, LocalDateTime createdAt, PaymentStatus status) {
         this.id = id;
         this.totalAmount = totalAmount;
         this.createdAt = createdAt;
@@ -115,11 +109,11 @@ public class Payment implements Serializable {
         this.totalAmount = totalAmount;
     }
 
-    public LocalDate getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDate createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 

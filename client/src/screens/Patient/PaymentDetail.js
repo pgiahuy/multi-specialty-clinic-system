@@ -1,71 +1,72 @@
 import { useEffect, useState } from "react";
-import { Card, Col, Container, Row, Badge, Form, Spinner, Tabs, Tab, Button, Modal } from "react-bootstrap";
-import { useNavigate, useParams } from "react-router-dom";
+import { Card, Col, Container, Row, Badge, Form, Tabs, Tab, Button, Modal } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import Footer from "../../components/Footer";
 import Header from "../../components/Header";
 import { authApis, PAYMENT_ENDPOINTS, USER_ENDPOINTS } from "../../configs/Apis";
 import MySpinner from "../../components/MySpinner";
 
+const PAID_STATUSES = new Set(["success", "paid", "đã thanh toán"]);
+
+const getInitialFromDate = () => {
+    const date = new Date();
+    date.setMonth(date.getMonth() - 1);
+    return date.toISOString().slice(0, 10);
+};
+
+const getInitialToDate = () => {
+    const date = new Date();
+    return date.toISOString().slice(0, 10);
+};
+
+const normalizeStatus = (status) => String(status || "").toLowerCase();
+
 const PaymentDetail = () => {
-    const { patientId } = useParams();
     const navigate = useNavigate();
     const [payments, setPayments] = useState([]);
     const [patientProfiles, setPatientProfiles] = useState([]);
-    const [selectedPatientId, setSelectedPatientId] = useState(patientId || "");
-    const [loadingProfiles, setLoadingProfiles] = useState(true);
+    const [selectedPatientId, setSelectedPatientId] = useState(null);
     const [loadingPayments, setLoadingPayments] = useState(false);
     const [activeTab, setActiveTab] = useState('unpaid');
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('MOMO');
     const [currentInvoice, setCurrentInvoice] = useState(null);
-    const [fromDate, setFromDate] = useState(() => {
-        const date = new Date();
-        date.setMonth(date.getMonth() - 1);
-        return date.toISOString().slice(0, 10);
-    });
-    const [toDate, setToDate] = useState(() => {
-        const date = new Date();
-        return date.toISOString().slice(0, 10);
-    });
-    const [testDetails, setTestDetails] = useState([]);
+    const [fromDate, setFromDate] = useState(getInitialFromDate);
+    const [toDate, setToDate] = useState(getInitialToDate);
     const [testNamesMap, setTestNamesMap] = useState({});
 
     const loadPatientProfiles = async () => {
         try {
-            setLoadingProfiles(true);
             const res = await authApis().get(USER_ENDPOINTS.PATIENT_PROFILES);
             const profiles = res.data || [];
             setPatientProfiles(profiles);
 
-            if (!patientId && profiles.length > 0) {
-                const firstPatientId = String(profiles[0].id);
-                setSelectedPatientId(firstPatientId);
-                navigate(`/patient/payment/${firstPatientId}`, { replace: true });
-            } else if (patientId) {
-                setSelectedPatientId(String(patientId));
-            }
+            // if (!patientId && profiles.length > 0) {
+            //     const firstPatientId = String(profiles[0].id);
+            //     setSelectedPatientId(firstPatientId);
+            //     navigate(`/patient/payments`, { replace: true });
+            // } else if (patientId) {
+            //     setSelectedPatientId(String(patientId));
+            // }
         } catch (err) {
             console.log(err);
-        } finally {
-            setLoadingProfiles(false);
         }
     };
 
-    const loadPayments = async (id, startDate, endDate) => {
-        if (!id) {
-            setPayments([]);
-            return;
-        }
+    const loadPayments = async (patientId, startDate, endDate) => {
+
         setLoadingPayments(true);
         try {
             const params = {};
+
+            if (patientId) params.patientId = patientId;
             if (startDate) params.startDate = startDate;
             if (endDate) params.endDate = endDate;
-            const res = await authApis().get(PAYMENT_ENDPOINTS.HISTORY(id), {
-                params
-            });
-            setPayments(res.data || []);
-            loadTestNames(res.data);
+
+            const res = await authApis().get(PAYMENT_ENDPOINTS.HISTORY, { params });
+            const paymentList = res.data || [];
+            setPayments(paymentList);
+            loadTestNames(paymentList);
         } catch (err) {
             console.log(err);
             setPayments([]);
@@ -94,16 +95,17 @@ const PaymentDetail = () => {
             const promises = Array.from(idsToFetch).map(id => authApis().get(`secure/test/${id}`));
             const responses = await Promise.all(promises);
 
-            const newNames = { ...testNamesMap };
-            responses.forEach(res => {
-                if (res.data && res.data.id) {
+            setTestNamesMap(prev => {
+                const newNames = { ...prev };
 
-                    newNames[res.data.id] = res.data.testName || res.data.name;
-                }
+                responses.forEach(res => {
+                    if (res.data && res.data.id) {
+                        newNames[res.data.id] = res.data.testName || res.data.name;
+                    }
+                });
+
+                return newNames;
             });
-
-
-            setTestNamesMap(newNames);
         } catch (err) {
             console.error("Lỗi khi load tên xét nghiệm:", err);
         }
@@ -116,18 +118,13 @@ const PaymentDetail = () => {
     }, []);
 
     useEffect(() => {
-        if (patientId) {
-            setSelectedPatientId(String(patientId));
-            loadPayments(patientId, fromDate, toDate);
-        }
-    }, [patientId, fromDate, toDate]);
+        loadPayments(selectedPatientId, fromDate, toDate);
+    }, [selectedPatientId, fromDate, toDate]);
 
     const handlePatientChange = (event) => {
         const value = event.target.value;
         setSelectedPatientId(value);
-        if (value) {
-            navigate(`/patient/payment/${value}`);
-        }
+
     };
 
     const profileLabel = (profile) => {
@@ -135,13 +132,11 @@ const PaymentDetail = () => {
     };
 
     const isPaidInvoice = (payment) => {
-        const status = String(payment.status || '').toLowerCase();
-        return status === 'success' || status === 'paid' || status === 'đã thanh toán';
+        return PAID_STATUSES.has(normalizeStatus(payment.status));
     };
 
     const paymentStatusVariant = (status) => {
-        const lower = String(status || '').toLowerCase();
-        if (lower === 'success' || lower === 'paid' || lower === 'đã thanh toán') return 'success';
+        if (PAID_STATUSES.has(normalizeStatus(status))) return 'success';
         return 'warning';
     };
 
@@ -165,10 +160,8 @@ const PaymentDetail = () => {
     };
 
     const getInvoiceTitle = (payment) => {
-
-
-
-        const type = String(payment.paymentItems[0].itemType || '').toUpperCase();
+        const firstItemType = payment?.paymentItems?.[0]?.itemType;
+        const type = String(firstItemType || '').toUpperCase();
 
         switch (type) {
             case 'APPOINTMENT':
@@ -202,7 +195,8 @@ const PaymentDetail = () => {
     };
 
     const filteredPayments = payments.filter((payment) => {
-        if (activeTab === 'paid' ? !isPaidInvoice(payment) : isPaidInvoice(payment)) return false;
+        const shouldShowPaid = activeTab === 'paid';
+        if (shouldShowPaid ? !isPaidInvoice(payment) : isPaidInvoice(payment)) return false;
         return isPaymentInRange(payment);
     });
 
@@ -290,26 +284,22 @@ const PaymentDetail = () => {
 
                                 <div>
                                     <Form.Label className="small text-muted mb-1">Bệnh nhân</Form.Label>
-                                    {loadingProfiles ? (
-                                        <div className="d-flex align-items-center gap-2 py-2 px-3 bg-white rounded shadow-sm" style={{ width: '250px' }}>
-                                            <MySpinner />
-                                        </div>
-                                    ) : (
-                                        <Form.Select
-                                            value={selectedPatientId}
-                                            className="rounded-3 shadow-sm px-3"
-                                            style={{ minWidth: '250px' }}
-                                            onChange={handlePatientChange}
-                                            aria-label="Chọn hồ sơ bệnh nhân"
-                                        >
-                                            <option value="">---Chọn hồ sơ bệnh nhân---</option>
-                                            {patientProfiles.map((profile) => (
-                                                <option key={profile.id} value={profile.id}>
-                                                    {profileLabel(profile)}
-                                                </option>
-                                            ))}
-                                        </Form.Select>
-                                    )}
+
+                                    <Form.Select
+                                        value={selectedPatientId}
+                                        className="rounded-3 shadow-sm px-3"
+                                        style={{ minWidth: '250px' }}
+                                        onChange={(e) => handlePatientChange(e)}
+                                        aria-label="Chọn hồ sơ bệnh nhân"
+                                    >
+                                        <option value="">---Chọn hồ sơ bệnh nhân---</option>
+                                        {patientProfiles.map((profile) => (
+                                            <option key={profile.id} value={profile.id}>
+                                                {profileLabel(profile)}
+                                            </option>
+                                        ))}
+                                    </Form.Select>
+
                                 </div>
 
 
@@ -389,7 +379,6 @@ const PaymentDetail = () => {
                                     >
                                         <div className="h-100 d-flex flex-column bg-white">
 
-                                            {/* HEADER: Tiêu đề & Trạng thái */}
                                             <Card.Header className="bg-white border-0 p-4 pb-0">
                                                 <div className="d-flex justify-content-between align-items-start gap-3">
                                                     <div>
@@ -405,8 +394,8 @@ const PaymentDetail = () => {
                                                         <Badge
                                                             bg="transparent"
                                                             className={`rounded-pill px-3 py-2 border ${p.status === 'SUCCESS'
-                                                                    ? 'border-success text-success bg-success-subtle'
-                                                                    : 'border-warning text-warning bg-warning-subtle'
+                                                                ? 'border-success text-success bg-success-subtle'
+                                                                : 'border-warning text-warning bg-warning-subtle'
                                                                 }`}
                                                         >
                                                             {p.status === 'SUCCESS' ? 'ĐÃ THANH TOÁN' : 'CHỜ THANH TOÁN'}
@@ -415,7 +404,7 @@ const PaymentDetail = () => {
                                                 </div>
                                             </Card.Header>
 
-                                           
+
                                             <Card.Body className="d-flex flex-column px-4 py-4">
 
                                                 <div className="mb-auto">
@@ -430,7 +419,7 @@ const PaymentDetail = () => {
                                                     )}
                                                 </div>
 
-                                                
+
                                                 <div className="mt-4 pt-3 border-top border-light">
                                                     <div className="d-flex justify-content-between align-items-baseline mb-3">
                                                         <span className="text-secondary small fw-medium">Tổng cộng:</span>

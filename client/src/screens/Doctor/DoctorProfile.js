@@ -7,6 +7,12 @@ import { authApis, USER_ENDPOINTS } from "../../configs/Apis";
 const DoctorProfile = () => {
     const [profile, setProfile] = useState(null);
     const [err, setErr] = useState("");
+    const doctor = profile?.doctorProfile;
+    const roleLabel = profile?.role === "ROLE_DOCTOR"
+        ? "Bác sĩ"
+        : profile?.role === "ROLE_PATIENT"
+            ? "Bệnh nhân"
+            : profile?.role || "Chưa xác định";
 
     const loadProfile = async () => {
         try {
@@ -17,17 +23,29 @@ const DoctorProfile = () => {
             console.error(error);
         }
     };
+    const specialties = (() => {
+        if (Array.isArray(doctor?.specialtiesOfDoctor) && doctor.specialtiesOfDoctor.length > 0) {
+            return doctor.specialtiesOfDoctor.map(item => ({
+                id: item.id,
+                name: item.name || item.specialtyName || "Chuyên khoa",
+            }));
+        }
+
+        if (doctor?.specialtyName || doctor?.specialty) {
+            return [{
+                id: null,
+                name: doctor.specialtyName || doctor.specialty,
+            }];
+        }
+
+        return [];
+    })();
 
     useEffect(() => {
         loadProfile();
     }, []);
 
-    const doctor = profile?.doctorProfile;
-    const roleLabel = profile?.role === "ROLE_DOCTOR"
-        ? "Bác sĩ"
-        : profile?.role === "ROLE_PATIENT"
-            ? "Bệnh nhân"
-            : profile?.role || "Chưa xác định";
+
 
     return (
         <div className="d-flex flex-column min-vh-100">
@@ -44,8 +62,16 @@ const DoctorProfile = () => {
                                     style={{ width: 120, height: 120, objectFit: "cover" }}
                                     onError={(e) => { e.target.src = "/default-avatar.png"; }}
                                 />
-                                <h4 className="fw-bold mb-1">{doctor?.fullName || profile?.username || "Bác sĩ"}</h4>
-                                <div className="text-muted mb-3">{doctor?.specialty || "Chưa có chuyên khoa"}</div>
+                                <h4 className="fw-bold mb-21">{doctor?.fullName || profile?.username || "Bác sĩ"}</h4>
+                                <div className="d-flex flex-wrap justify-content-center gap-2 mb-3">
+                                    {specialties.length > 0 ? specialties.map(specialty => (
+                                        <span key={specialty.id || specialty.name} className="badge rounded-pill text-bg-light border px-3 py-2" style={{ fontSize: "0.8rem" }}>
+                                            {specialty.name}
+                                        </span>
+                                    )) : (
+                                        <div className="text-muted">Chưa có chuyên khoa</div>
+                                    )}
+                                </div>
                                 <Badge bg="primary" className="rounded-pill px-3 py-2">{roleLabel}</Badge>
                             </Card.Body>
                         </Card>

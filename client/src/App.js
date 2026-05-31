@@ -26,7 +26,6 @@ import { jwtDecode } from "jwt-decode";
 import cookies from 'react-cookies'
 import HistoryBooking from "./screens/Patient/BookingHistory";
 import ListDoctor from "./screens/Home/ListDoctor";
-import Schedules from "./screens/Doctor/Schedules";
 import AppointmentList from "./screens/Doctor/AppointmentList";
 import DoctorProfile from "./screens/Doctor/DoctorProfile";
 import RegisterSchedule from "./screens/Doctor/RegisterSchedule";
@@ -37,7 +36,7 @@ import CreateMedicalRecord from "./screens/Doctor/CreateMedicalRecord";
 import PrescribeMedicine from "./screens/Doctor/PrescribeMedicine";
 import PatientList from "./screens/Doctor/PatientList";
 import AppointmentDetail from "./screens/Patient/AppointmentDetail";
-
+import ScheduleManagement from "./screens/Doctor/ScheduleManagement";
 
 const initUserState = () => {
   const savedUser = localStorage.getItem("user");
@@ -75,14 +74,14 @@ function App() {
             <Route path="/patient/booking" element={<BookingPage />} />
             <Route path="/patient/history-booking" element={<HistoryBooking />} />
             <Route path="/patient/test-results" element={<TestResultDetail />} />
-            <Route path="/patient/payment/:patientId?" element={<PaymentDetail />} />
+            <Route path="/patient/payments" element={<PaymentDetail />} />
             <Route path="/patient/payment-result" element={<PaymentResult />} />
 
 
             <Route path="/doctors" element={<ListDoctor />} />
             <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
             <Route path="/doctor/create-medical-record" element={<CreateMedicalRecord />} />
-            <Route path="/doctor/schedules" element={<Schedules />} />
+            <Route path="/doctor/schedules" element={<ScheduleManagement />} />
             <Route path="/doctor/:scheduleId/appointments" element={<AppointmentList />} />
             <Route path="/doctor/profile" element={<DoctorProfile />} />
             <Route path="/doctor/detail/:doctorId" element={<DoctorDetail />} />
@@ -94,7 +93,7 @@ function App() {
             <Route path="/appointment/:appointmentId" element={<AppointmentDetail />} />
 
           </Routes>
-s
+
         </Container>
       </BrowserRouter>
     </MyUserContext.Provider>
