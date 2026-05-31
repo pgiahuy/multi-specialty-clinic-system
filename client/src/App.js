@@ -24,7 +24,6 @@ import PaymentDetail from "./screens/Patient/PaymentDetail";
 import PaymentResult from "./screens/Patient/PaymentResult";
 import HistoryBooking from "./screens/Patient/BookingHistory";
 import ListDoctor from "./screens/Home/ListDoctor";
-import Schedules from "./screens/Doctor/Schedules";
 import AppointmentList from "./screens/Doctor/AppointmentList";
 import DoctorProfile from "./screens/Doctor/DoctorProfile";
 import RegisterSchedule from "./screens/Doctor/RegisterSchedule";
@@ -35,6 +34,7 @@ import CreateMedicalRecord from "./screens/Doctor/CreateMedicalRecord";
 import PrescribeMedicine from "./screens/Doctor/PrescribeMedicine";
 import PatientList from "./screens/Doctor/PatientList";
 import AppointmentDetail from "./screens/Patient/AppointmentDetail";
+import ScheduleManagement from "./screens/Doctor/ScheduleManagement";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 const initUserState = () => {
@@ -63,7 +63,8 @@ function App() {
             } />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/doctors" element={<ListDoctor />} />
+
+
 
             <Route element={<ProtectedRoute allowedRoles={["ROLE_PATIENT"]} />}>
               <Route path="/patient/dashboard" element={<PatientDashboard />} />
@@ -79,14 +80,12 @@ function App() {
               <Route path="/patient/payment-result" element={<PaymentResult />} />
             </Route>
 
-            
-
             <Route element={<ProtectedRoute allowedRoles={["ROLE_DOCTOR"]} />}>
               <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
               <Route path="/doctor/create-medical-record" element={<CreateMedicalRecord />} />
-              <Route path="/doctor/schedules" element={<Schedules />} />
+              <Route path="/doctor/schedules" element={<ScheduleManagement />} />
               <Route path="/doctor/:scheduleId/appointments" element={<AppointmentList />} />
-              <Route path="/doctor/profile" element={<DoctorProfile />} /> 
+              <Route path="/doctor/profile" element={<DoctorProfile />} />
               <Route path="/doctor/register-schedule" element={<RegisterSchedule />} />
               <Route path="/doctor/appointments/:appointmentId/medical-record" element={<MedicalRecord />} />
               <Route path="/doctor/assign-test/:appointmentId" element={<AssignTest />} />
@@ -94,14 +93,19 @@ function App() {
               <Route path="/doctor/patients" element={<PatientList />} />
             </Route>
 
+
+
+
             <Route element={<ProtectedRoute />}>
+              <Route path="/doctors" element={<ListDoctor />} />
               <Route path="/appointment/:appointmentId" element={<AppointmentDetail />} />
             </Route>
-            
+
             <Route path="/doctor/detail/:doctorId" element={<DoctorDetail />} />
-            
+
 
           </Routes>
+
         </Container>
       </BrowserRouter>
     </MyUserContext.Provider>

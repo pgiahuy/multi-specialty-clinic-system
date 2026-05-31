@@ -21,15 +21,12 @@ import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Date;
 
 /**
  *
@@ -61,8 +58,8 @@ public class Payment implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "created_at")
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
+
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 7)
@@ -74,7 +71,6 @@ public class Payment implements Serializable {
     @Enumerated(EnumType.STRING)
     private PaymentMethod method;
     @Column(name = "paid_at")
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime paidAt;
     @JoinColumn(name = "appointment_id", referencedColumnName = "id")
     @ManyToOne(optional = false)

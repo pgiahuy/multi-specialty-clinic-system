@@ -87,7 +87,7 @@ const HistoryBooking = () => {
 
     useEffect(() => {
         if (selectedProfileId) loadAppointments(selectedProfileId);
-    }, [selectedProfileId]);
+    }, [selectedProfileId, fromDate, toDate]);
 
     const statusMatches = (status, filter) => {
         if (!filter || filter === 'all') return true;
