@@ -370,65 +370,86 @@ const PaymentDetail = () => {
                         ) : (
                             filteredPayments.map((p) => (
                                 <Col key={p.id} xs={12} md={6} lg={4}>
-                                    <Card className="h-100 shadow-sm border-0" style={{ borderRadius: '20px', overflow: 'hidden' }}>
+                                    <Card
+                                        className="h-100 shadow-sm border-0"
+                                        style={{
+                                            borderRadius: '20px',
+                                            overflow: 'hidden',
+                                            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                                            cursor: 'pointer'
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.transform = 'translateY(-5px)';
+                                            e.currentTarget.classList.replace('shadow-sm', 'shadow');
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                            e.currentTarget.classList.replace('shadow', 'shadow-sm');
+                                        }}
+                                    >
                                         <div className="h-100 d-flex flex-column bg-white">
-                                            <Card.Header className="bg-white border-0 pt-4 px-4 pb-2">
-                                                <div className="d-flex justify-content-between align-items-start">
 
-
+                                            {/* HEADER: Tiêu đề & Trạng thái */}
+                                            <Card.Header className="bg-white border-0 p-4 pb-0">
+                                                <div className="d-flex justify-content-between align-items-start gap-3">
                                                     <div>
-                                                        <div className="text-success fw-bold fs-5 mb-1">
+                                                        <h5 className="text-primary fw-bold mb-2" style={{ lineHeight: '1.4' }}>
                                                             {getInvoiceTitle(p)}
-                                                        </div>
-                                                        <div className="text-muted small">
-                                                            <i className="bi bi-calendar-event me-2"></i>
-                                                            {p.createdDate || p.createdAt || 'Không có ngày'}
+                                                        </h5>
+                                                        <div className="text-secondary small d-flex align-items-center">
+                                                            <i className="bi bi-clock-history me-2"></i>
+                                                            {p.createdDate || p.createdAt || 'Chưa cập nhật ngày'}
                                                         </div>
                                                     </div>
-
-
                                                     <div>
-                                                        <Badge bg={p.status === 'SUCCESS' ? 'success' : 'warning'} className="rounded-pill px-3 py-2 text-white">
+                                                        <Badge
+                                                            bg="transparent"
+                                                            className={`rounded-pill px-3 py-2 border ${p.status === 'SUCCESS'
+                                                                    ? 'border-success text-success bg-success-subtle'
+                                                                    : 'border-warning text-warning bg-warning-subtle'
+                                                                }`}
+                                                        >
                                                             {p.status === 'SUCCESS' ? 'ĐÃ THANH TOÁN' : 'CHỜ THANH TOÁN'}
                                                         </Badge>
                                                     </div>
-
                                                 </div>
                                             </Card.Header>
 
+                                           
+                                            <Card.Body className="d-flex flex-column px-4 py-4">
 
-                                            <Card.Body className="d-flex flex-column px-4 py-3">
-
-                                                <div className="mb-2">
+                                                <div className="mb-auto">
                                                     {p.paymentItems && p.paymentItems.length > 0 && String(p.paymentItems[0].itemType).toUpperCase() === 'APPOINTMENT' && (
                                                         <Button
-                                                            variant="primary"
-                                                            className="rounded-4 px-3 py-2 w-100 fw-medium"
+                                                            variant="outline-primary"
+                                                            className="rounded-pill px-3 py-2 w-100 fw-medium"
                                                             onClick={() => navigate(`/appointment/${p.paymentItems[0].referenceId}`)}
                                                         >
-                                                            Xem chi tiết
+                                                            <i className="bi bi-info-circle me-2"></i> Xem chi tiết
                                                         </Button>
                                                     )}
                                                 </div>
 
-                                                <div className="mt-auto pt-3 border-top">
-                                                    <div className="d-flex justify-content-between align-items-center mb-3">
-                                                        <span className="text-uppercase small fw-bold text-secondary">Tổng cộng:</span>
-                                                        <span className="fs-5 fw-bold text-primary">
+                                                
+                                                <div className="mt-4 pt-3 border-top border-light">
+                                                    <div className="d-flex justify-content-between align-items-baseline mb-3">
+                                                        <span className="text-secondary small fw-medium">Tổng cộng:</span>
+                                                        <span className="fs-5 fw-bold text-danger">
                                                             {(p.totalAmount || 0).toLocaleString('vi-VN')} đ
                                                         </span>
                                                     </div>
 
-                                                    {!isPaidInvoice(p) && activeTab === 'unpaid' &&
+                                                    {!isPaidInvoice(p) && activeTab === 'unpaid' && (
                                                         <Button
                                                             variant="primary"
-                                                            className="w-100 rounded-pill py-2"
+                                                            className="w-100 rounded-pill py-2 fw-bold shadow-sm"
                                                             onClick={() => handlePayClick(p)}
                                                         >
-                                                            Thanh toán
+                                                            <i className="bi bi-credit-card me-2"></i> Thanh toán ngay
                                                         </Button>
-                                                    }
+                                                    )}
                                                 </div>
+
                                             </Card.Body>
                                         </div>
                                     </Card>
@@ -446,18 +467,15 @@ const PaymentDetail = () => {
                         <Modal.Title className="fw-bold fs-5">Xác nhận thanh toán</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-
-
                         <div className="mb-4">
                             <div className="small text-muted mb-2">Chọn phương thức thanh toán</div>
 
-
+                            {/* 1. TIỀN MẶT */}
                             <div
                                 className={`d-flex align-items-center p-3 mb-2 border rounded-3 ${selectedPaymentMethod === 'CASH' ? 'border-primary bg-primary bg-opacity-10' : 'bg-white'}`}
                                 style={{ cursor: 'pointer', transition: 'all 0.2s' }}
                                 onClick={() => setSelectedPaymentMethod('CASH')}
                             >
-
                                 <div className="flex-grow-1">
                                     <div className="fw-bold text-dark">Tiền mặt tại quầy</div>
                                     <div className="small text-muted">Thanh toán trực tiếp cho thu ngân</div>
@@ -467,19 +485,34 @@ const PaymentDetail = () => {
                                 </div>
                             </div>
 
-
+                            {/* 2. MOMO */}
                             <div
-                                className={`d-flex align-items-center p-3 border rounded-3 ${selectedPaymentMethod === 'MOMO' ? 'border-danger bg-danger bg-opacity-10' : 'bg-white'}`}
+                                className={`d-flex align-items-center p-3 mb-2 border rounded-3 ${selectedPaymentMethod === 'MOMO' ? 'border-danger bg-danger bg-opacity-10' : 'bg-white'}`}
                                 style={{ cursor: 'pointer', transition: 'all 0.2s' }}
                                 onClick={() => setSelectedPaymentMethod('MOMO')}
                             >
-
                                 <div className="flex-grow-1">
                                     <div className="fw-bold" style={{ color: '#a50064' }}>Ví điện tử MoMo</div>
                                     <div className="small text-muted">Thanh toán quét mã QR</div>
                                 </div>
                                 <div>
                                     <Form.Check type="radio" checked={selectedPaymentMethod === 'MOMO'} readOnly style={{ accentColor: '#a50064' }} />
+                                </div>
+                            </div>
+
+                            {/* 3. VNPAY (MỚI THÊM) */}
+                            <div
+                                className={`d-flex align-items-center p-3 border rounded-3 ${selectedPaymentMethod === 'VNPAY' ? 'border-info bg-info bg-opacity-10' : 'bg-white'}`}
+                                style={{ cursor: 'pointer', transition: 'all 0.2s' }}
+                                onClick={() => setSelectedPaymentMethod('VNPAY')}
+                            >
+                                <div className="flex-grow-1">
+                                    {/* Sử dụng màu xanh dương chuẩn thương hiệu VNPAY */}
+                                    <div className="fw-bold" style={{ color: '#005baa' }}>Cổng thanh toán VNPAY</div>
+                                    <div className="small text-muted">Thẻ ATM / Thẻ tín dụng / QR Code</div>
+                                </div>
+                                <div>
+                                    <Form.Check type="radio" checked={selectedPaymentMethod === 'VNPAY'} readOnly style={{ accentColor: '#005baa' }} />
                                 </div>
                             </div>
                         </div>
@@ -491,13 +524,20 @@ const PaymentDetail = () => {
                             </div>
                         </div>
                     </Modal.Body>
+
                     <Modal.Footer className="justify-content-between border-0 pt-0">
                         <Button variant="outline-secondary" className="px-4 rounded-pill" onClick={closePaymentModal}>
                             Hủy bỏ
                         </Button>
                         <Button
-                            className="px-4 rounded-pill fw-bold border-0 text-white"
-                            style={{ backgroundColor: selectedPaymentMethod === 'MOMO' ? '#a50064' : '#0d6efd' }}
+                            className="px-4 rounded-pill fw-bold border-0 text-white transition-all"
+                            style={{
+                                // Đổi màu nút linh hoạt theo phương thức được chọn
+                                backgroundColor:
+                                    selectedPaymentMethod === 'MOMO' ? '#a50064' :
+                                        selectedPaymentMethod === 'VNPAY' ? '#005baa' :
+                                            '#0d6efd'
+                            }}
                             onClick={handleConfirmPayment}
                         >
                             Thanh toán ngay

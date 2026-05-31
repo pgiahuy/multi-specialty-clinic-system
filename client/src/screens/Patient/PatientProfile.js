@@ -6,6 +6,9 @@ import ProfileCard from "./components/ProfileCard";
 import { PlusLg, PencilSquare, Trash } from 'react-bootstrap-icons';
 import { useNavigate } from "react-router-dom";
 import Footer from "../../components/Footer";
+import { setLogLevel } from "firebase/app";
+import MySpinner from "../../components/MySpinner";
+import MyModal from "../../components/MyModal";
 
 const PatientProfile = () => {
     const [patientProfiles, setPatientProfiles] = useState([]);
@@ -13,6 +16,13 @@ const PatientProfile = () => {
 
     const [showEditModal, setShowEditModal] = useState(false);
     const [editData, setEditData] = useState({});
+    const [loading, setLoading] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [profileToDelete, setProfileToDelete] = useState(null);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [showConfirmEditModal, setShowConfirmEditModal] = useState(false);
+    const [showEditSuccessModal, setShowEditSuccessModal] = useState(false);
+    const [showAddSuccessModal, setShowAddSuccessModal] = useState(false);
 
     const handleEdit = (profile) => {
         let dataToEdit = { ...profile };
@@ -46,14 +56,14 @@ const PatientProfile = () => {
 
     const handleSaveChanges = async () => {
         try {
-            
+
             const res = await authApis().put(USER_ENDPOINTS.PATIENT_PROFILE_DETAIL(editData.id), editData);
-            
+
             setShowEditModal(false);
             loadPatientProfiles();
         } catch (error) {
             console.error(error);
-            
+
         }
     };
 
@@ -66,10 +76,28 @@ const PatientProfile = () => {
         }
     };
 
-
-
     const handleDelete = (profile) => {
-       alert('Chưa có xóa được đâu!');
+        setProfileToDelete(profile);
+        setShowDeleteModal(true);
+    };
+
+
+
+    const confirmDelete = async () => {
+        if (!profileToDelete) return;
+        try {
+            setShowDeleteModal(false);
+            setLoading(true);
+            const res = await authApis().delete(USER_ENDPOINTS.PATIENT_PROFILE_DETAIL(profileToDelete.id));
+            loadPatientProfiles();
+        } catch (err) {
+            console.error(err);
+
+        } finally {
+            setLoading(false);
+            setProfileToDelete(null);
+            setShowSuccessModal(true);
+        }
     };
 
     useEffect(() => {
@@ -85,12 +113,9 @@ const PatientProfile = () => {
                 <Container style={{ width: '80%' }} className="py-4">
                     <div className="mb-4 pb-3 border-bottom">
                         <div className="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3">
-
-
                             <div>
                                 <h2 className="fw-bold mb-0 text-primary">Danh sách hồ sơ</h2>
                             </div>
-
                             <Button
                                 variant="primary"
                                 className="ms-auto d-flex align-items-center gap-2 shadow-sm py-2 px-3 rounded-4 border-0 "
@@ -103,24 +128,31 @@ const PatientProfile = () => {
                     </div>
 
 
-                    <Row>
-                        <Col>
-                            {patientProfiles.length > 0 ? (
-                                patientProfiles.map((profile) => (
+                    <Row className="gy-4">
+                        {loading ? (
+                            <Col xs={12}>
+                                <div className="text-center py-5">
+                                    <MySpinner />
+                                    <div className="text-muted mt-3 small">Đang tải danh sách hồ sơ...</div>
+                                </div>
+                            </Col>
+                        ) : patientProfiles.length > 0 ? (
+                            patientProfiles.map((profile) => (
+                                <Col key={profile.id} xs={12} md={6}>
                                     <ProfileCard
-                                        key={profile.id}
                                         patient={profile}
                                         onEdit={() => handleEdit(profile)}
                                         onDelete={() => handleDelete(profile)}
                                     />
-                                ))
-                            ) : (
+                                </Col>
+                            ))
+                        ) : (
+                            <Col xs={12}>
                                 <div className="text-center py-5 bg-light rounded-3 border-dashed">
                                     <p className="text-muted mb-0">Hiện chưa có hồ sơ nào.</p>
                                 </div>
-                            )}
-                        </Col>
-
+                            </Col>
+                        )}
                     </Row>
                 </Container>
                 <Footer />
@@ -223,6 +255,36 @@ const PatientProfile = () => {
                         </Button>
                     </Modal.Footer>
                 </Modal>
+                <MyModal
+                    show={showDeleteModal}
+                    onHide={() => {
+                        setShowDeleteModal(false);
+                        setProfileToDelete(null);
+                    }}
+                    title="Xác nhận xóa hồ sơ"
+                    onConfirm={confirmDelete}
+                    confirmText="Xóa hồ sơ"
+                    cancelText="Hủy bỏ"
+                >
+                    {profileToDelete && (
+                        <div className="text-center py-3">
+
+                            <h5 className="mt-3 text-dark">Bạn có chắc chắn muốn xóa hồ sơ của {profileToDelete.fullName}?</h5>
+                        </div>
+                    )}
+                </MyModal>
+
+                <MyModal
+                    show={showSuccessModal}
+                    onHide={() => setShowSuccessModal(false)}
+                    title="Thông báo"
+                    cancelText="Đóng"
+
+                >
+                    <div className="text-center py-4">
+                        <h4 className="mt-3 text-success">Hồ sơ đã được xóa thành công!</h4>
+                    </div>
+                </MyModal>
 
             </div>
 
