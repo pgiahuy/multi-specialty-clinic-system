@@ -94,8 +94,8 @@ public class AppointmentServiceImpl implements AppointmentService {
         if (schedule.getCurrentPatients() >= schedule.getMaxPatients()) {
             throw new FullSlotException("Rất tiếc, ca khám này đã đủ số lượng người đăng ký!");
         }
-        
-        if(isDuplicateTimeAppointment(patient.getId(), req.getScheduleId())) {
+
+        if (isDuplicateTimeAppointment(patient.getId(), req.getScheduleId())) {
             throw new DuplicateResourceException("Bạn đã có lịch hẹn vào khung giờ này rồi!");
         }
 
@@ -182,12 +182,18 @@ public class AppointmentServiceImpl implements AppointmentService {
         boolean isTooLateToCancel = currentTime.plusHours(2).isAfter(appointmentDateTime)
                 || currentTime.plusHours(2).isEqual(appointmentDateTime);
 
-        if (appointment.getStatus() != AppointmentStatus.UN_PAID && isTooLateToCancel) {
+        if (status != AppointmentStatus.UN_PAID && isTooLateToCancel) {
             throw new BadRequestException("Lịch hẹn đã thanh toán chỉ được phép hủy trước giờ khám ít nhất 2 tiếng.");
+        }
+
+        if (status == AppointmentStatus.UN_PAID) {
+            Payment payment = paymentService.getPaymentByAppoint(appointment.getId());
+            paymentService.deletePayment(payment.getId());
         }
 
         appointment.setStatus(AppointmentStatus.CANCELLED);
         appointmentRepo.addOrUpdateAppointment(appointment);
+
     }
 
     @Override
@@ -195,28 +201,24 @@ public class AppointmentServiceImpl implements AppointmentService {
         Map<String, String> params = new HashMap<>();
         List<Appointment> appointments = this.getAppointmentsByPatientId(patientId, params);
 
-       
         LocalDate newDate = scheduleRepo.getScheduleById(scheduleId).getDate();
         Long newShiftId = scheduleRepo.getScheduleById(scheduleId).getShiftId().getId();
 
-        
         for (Appointment oldApp : appointments) {
-           
+
             if (oldApp.getStatus() == AppointmentStatus.CANCELLED) {
                 continue;
             }
 
-            
             LocalDate oldDate = oldApp.getScheduleId().getDate();
             Long oldShiftId = oldApp.getScheduleId().getShiftId().getId();
 
-            
             if (newDate.equals(oldDate) && newShiftId.equals(oldShiftId)) {
                 return true;
             }
         }
 
-        return false; 
+        return false;
     }
 
 }

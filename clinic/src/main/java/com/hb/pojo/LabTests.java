@@ -5,6 +5,7 @@
 package com.hb.pojo;
 
 import jakarta.persistence.Basic;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -21,7 +22,7 @@ import java.util.Collection;
 
 /**
  *
- * @author HUY
+ * @author DELL
  */
 @Entity
 @Table(name = "lab_tests")
@@ -52,9 +53,8 @@ public class LabTests implements Serializable {
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "price")
     private BigDecimal price;
-    
-    @OneToMany(mappedBy = "testId")
-    private Collection<LabResults> labResultsCollection;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "testId")
+    private Collection<LabResultDetails> labResultDetailsCollection;
 
     public LabTests() {
     }
@@ -103,14 +103,12 @@ public class LabTests implements Serializable {
         this.price = price;
     }
 
-   
-
-    public Collection<LabResults> getLabResultsCollection() {
-        return labResultsCollection;
+    public Collection<LabResultDetails> getLabResultDetailsCollection() {
+        return labResultDetailsCollection;
     }
 
-    public void setLabResultsCollection(Collection<LabResults> labResultsCollection) {
-        this.labResultsCollection = labResultsCollection;
+    public void setLabResultDetailsCollection(Collection<LabResultDetails> labResultDetailsCollection) {
+        this.labResultDetailsCollection = labResultDetailsCollection;
     }
 
     @Override

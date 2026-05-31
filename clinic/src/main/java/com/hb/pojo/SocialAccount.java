@@ -21,7 +21,7 @@ import java.io.Serializable;
 
 /**
  *
- * @author HUY
+ * @author DELL
  */
 @Entity
 @Table(name = "social_account")

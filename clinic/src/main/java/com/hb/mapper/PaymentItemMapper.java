@@ -18,6 +18,6 @@ import org.mapstruct.factory.Mappers;
 public interface PaymentItemMapper {
    PaymentItemMapper INSTANCE = Mappers.getMapper(PaymentItemMapper.class);
    
-   @Mapping(source = "payment.id", target = "paymentId")
+   @Mapping(source = "paymentId.id", target = "paymentId")
    PaymentItemResponse toResponse(PaymentItems paymentItem);
 }

@@ -6,7 +6,7 @@ import { Button, Container, Row, Col } from "react-bootstrap";
 import MySpinner from "../../components/MySpinner";
 import ShiftCard from "./component/ShiftCard";
 import moment from 'moment';
-import { Calendar } from 'primereact';
+
 const Schedules = () => {
     const [schedules, setSchedules] = useState([]);
     const [loading, setLoading] = useState(false);
