@@ -1,5 +1,5 @@
 import { Card, Row, Col, Stack, Container, Button } from 'react-bootstrap';
-import { PersonVcard, Phone, Calendar3, GeoAlt, Fingerprint, GenderMale, GenderFemale } from 'react-bootstrap-icons';
+import { PersonVcard, Phone, Calendar3, GeoAlt, Fingerprint, GenderMale, GenderFemale, PencilSquare, TrashFill } from 'react-bootstrap-icons';
 
 const PatientProfileCard = ({ patient, onEdit, onDelete }) => {
   const getGenderIcon = () => {
@@ -29,9 +29,8 @@ const PatientProfileCard = ({ patient, onEdit, onDelete }) => {
   };
 
   return (
-    <Container className="d-flex justify-content-center mt-3 mb-4">
-      <Card className="shadow-sm w-100 rounded-4 overflow-hidden" style={{ maxWidth: 760 }}>
-        <Card.Body className="p-4">
+    <Card className="shadow-sm w-100 rounded-4 overflow-hidden">
+      <Card.Body className="p-4">
 
           <div className="d-flex gap-3 align-items-start mb-4 pb-3 border-bottom border-light">
             <div className="bg-primary bg-opacity-10 text-primary rounded-4 d-flex align-items-center justify-content-center flex-shrink-0" style={{ width: 60, height: 60 }}>
@@ -93,6 +92,7 @@ const PatientProfileCard = ({ patient, onEdit, onDelete }) => {
                 
               }}
             >
+              <PencilSquare className="me-2 mb-1" size={18} />
               Cập nhật thông tin
             </Button>
 
@@ -104,13 +104,14 @@ const PatientProfileCard = ({ patient, onEdit, onDelete }) => {
                 
               }}
             >
+              <TrashFill className="me-2 mb-1" />
               Xóa
             </Button>
           </div>
 
         </Card.Body>
       </Card>
-    </Container>
+
   );
 };
 

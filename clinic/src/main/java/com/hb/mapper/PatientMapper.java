@@ -33,11 +33,6 @@ public class PatientMapper {
         res.setAddress(p.getAddress());
         res.setGender(p.getGender());
         res.setRelationship(p.getRelationship());
-//
-//        if (p.getUserId() != null) {
-//            res.setEmail(p.getUserId().getEmail());
-//            res.setAvatar(p.getUserId().getSecureUrl());
-//        }
 
         return res;
     }
@@ -57,6 +52,8 @@ public class PatientMapper {
         p.setDob(req.getDob());
         p.setAddress(req.getAddress());
         p.setGender(req.getGender());
+        p.setRelationship(req.getRelationship());
+        p.setIsActive(Boolean.TRUE);
 
         return p;
     }

@@ -36,7 +36,7 @@ const RegisterRecord = () => {
         title: "Địa chỉ",
         type: "text",
     }, {
-        field: "realtionship",
+        field: "relationship",
         title: "Mối quan hệ với chủ tài khoản",
         type: "select",
         options: [
@@ -104,6 +104,7 @@ const RegisterRecord = () => {
             }
 
             try {
+                setErr(null);
                 setLoading(true);
 
                 let res = await authApis().post(USER_ENDPOINTS.PATIENT_PROFILES, form);
@@ -113,7 +114,13 @@ const RegisterRecord = () => {
                 }
 
             } catch (error) {
-                setErr('Có lỗi xảy ra khi thêm hồ sơ!');
+                if (error.response && error.response.data) { 
+                   setErr(error.response.data.message);
+
+                }
+                else if (error.request) {
+                    setErr("Không thể kết nối đến máy chủ. Vui lòng kiểm tra mạng!");
+                }
             } finally {
                 setLoading(false);
             }
@@ -141,12 +148,12 @@ const RegisterRecord = () => {
                                             >
                                                 <option value="">{u.title}</option>
 
-                                                
+
                                                 {u.options.map((opt, index) => {
-                                                
+
                                                     const isObject = typeof opt === 'object' && opt !== null;
 
-                                                   
+
                                                     const optValue = isObject ? opt.value : opt;
                                                     const optLabel = isObject ? opt.label : opt;
 
@@ -156,7 +163,7 @@ const RegisterRecord = () => {
                                                         </option>
                                                     );
                                                 })}
-                                                
+
 
                                             </Form.Select>
                                         ) : (
@@ -172,10 +179,38 @@ const RegisterRecord = () => {
                                     </Form.Floating>)}
 
 
-                                <Form.Group className="mb-3 text-center " controlId="button" >
-                                    {loading === true ? <MySpinner /> : <Button variant="primary" type="submit" className="w-100 border-0" style={formCardStyle.button}>
-                                        Thêm hồ sơ
-                                    </Button>}
+                                <Form.Group className="mb-3" controlId="button">
+
+                                    <div className="d-flex gap-3">
+
+
+                                        <Button
+                                            variant="outline-danger"
+                                            type="button"
+                                            className="w-100 rounded-4"
+                                            onClick={() => nav('/patient/profiles')}
+                                        >
+                                            Quay lại
+                                        </Button>
+
+
+                                        {loading === true ? (
+
+                                            <div className="w-100 d-flex justify-content-center align-items-center">
+                                                <MySpinner />
+                                            </div>
+                                        ) : (
+                                            <Button
+                                                variant="primary"
+                                                type="submit"
+                                                className="w-100 border-0"
+                                                style={formCardStyle.button}
+                                            >
+                                                Thêm hồ sơ
+                                            </Button>
+                                        )}
+
+                                    </div>
                                 </Form.Group>
                             </Form>
                         </Card.Body>
