@@ -57,6 +57,7 @@ public class PaymentServiceImpl implements PaymentService {
         return this.paymentRepo.getPayments(params);
     }
 
+
     @Override
     public Payment getPaymentById(Long id) {
         return this.paymentRepo.getPaymentById(id);
@@ -71,7 +72,7 @@ public class PaymentServiceImpl implements PaymentService {
     public Payment createPayment(Appointment appointment) {
         Payment p = new Payment();
 
-        p.setAppointment(appointment);
+        p.setAppointmentId(appointment);
         p.setStatus(PaymentStatus.PENDING);
         p.setTotalAmount(BigDecimal.ONE);
         p.setCreatedAt(LocalDateTime.now());
@@ -83,7 +84,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public Payment getPaymentByAppoint(Long appointmentId) {
         PaymentItems item = itemService.getPaymentItemByAppointment(appointmentId);
-        return this.paymentRepo.getPaymentById(item.getPayment().getId());
+        return this.paymentRepo.getPaymentById(item.getPaymentId().getId());
     }
 
     @Override
@@ -126,20 +127,21 @@ public class PaymentServiceImpl implements PaymentService {
         p.setPaidAt(LocalDateTime.now());
 
         Payment saved = paymentRepo.addOrUpdatePayment(p);
-        if (p.getAppointment() != null) {
-            p.getAppointment().setStatus(AppointmentStatus.PENDING);
-            appointmentRepo.addOrUpdateAppointment(p.getAppointment());
+        if (p.getAppointmentId()!= null) {
+            p.getAppointmentId().setStatus(AppointmentStatus.PENDING);
+            appointmentRepo.addOrUpdateAppointment(p.getAppointmentId());
+
         }
         try {
-            if (saved != null && saved.getAppointment().getPatientId().getUserId()!= null) {
+            if (saved != null && saved.getAppointmentId().getPatientId().getUserId()!= null) {
                 
-                User patientUser = saved.getAppointment().getPatientId().getUserId();
+                User patientUser = saved.getAppointmentId().getPatientId().getUserId();
                 if (patientUser != null) {
                     Map<String, String> notiParams = new HashMap<>();
                     notiParams.put("username", patientUser.getUsername());
                     notiParams.put("title", "Thanh toán thành công!");
                     notiParams.put("content", "Bạn vừa thanh toán thành công một hoá đơn. Vui lòng kiểm tra!");
-                    notiParams.put("path", "/api/secure/payments/patient/" + saved.getAppointment().getPatientId().getId());
+                    notiParams.put("path", "/api/secure/payments/patient/" + saved.getAppointmentId().getPatientId().getId());
                     this.notificationService.addNotification(notiParams);
                 }
             }

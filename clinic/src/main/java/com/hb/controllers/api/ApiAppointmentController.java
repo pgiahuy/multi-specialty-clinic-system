@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -151,5 +152,11 @@ public class ApiAppointmentController {
         List<Appointment> res = appointmentService.getAppointmentsByPatientId(patientId, params);
         return ResponseEntity.ok(res.stream().map(appMapper::toResponse).toList());
         
+    }
+    
+    @PutMapping("/secure/appointment/{id}/cancel")
+    public ResponseEntity<?> cancel(@PathVariable(value="id") Long id, Principal principal) {
+        appointmentService.cancelAppointment(id, userService.getUserByUsername(principal.getName()));
+        return ResponseEntity.ok().build();
     }
 }

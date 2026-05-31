@@ -5,6 +5,8 @@ import Footer from "../../components/Footer";
 import Header from "../../components/Header";
 import { authApis, PAYMENT_ENDPOINTS, USER_ENDPOINTS } from "../../configs/Apis";
 import MySpinner from "../../components/MySpinner";
+import MyModal from "../../components/MyModal";
+import { CheckCircleFill } from "react-bootstrap-icons";
 
 const PAID_STATUSES = new Set(["success", "paid", "đã thanh toán"]);
 
@@ -29,7 +31,9 @@ const PaymentDetail = () => {
     const [loadingPayments, setLoadingPayments] = useState(false);
     const [activeTab, setActiveTab] = useState('unpaid');
     const [showPaymentModal, setShowPaymentModal] = useState(false);
-    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('MOMO');
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [successMessage, setSuccessMessage] = useState('Thanh toán đã được ghi nhận thành công.');
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('CASH');
     const [currentInvoice, setCurrentInvoice] = useState(null);
     const [fromDate, setFromDate] = useState(getInitialFromDate);
     const [toDate, setToDate] = useState(getInitialToDate);
@@ -153,7 +157,6 @@ const PaymentDetail = () => {
 
         switch (type) {
             case 'APPOINTMENT': return 'Phí khám bệnh';
-            case 'PRESCRIPTON':
             case 'PRESCRIPTION': return 'Đơn thuốc';
             default: return item?.itemName || item?.itemType || 'Dịch vụ y tế';
         }
@@ -168,7 +171,7 @@ const PaymentDetail = () => {
                 return 'PHÍ KHÁM BỆNH';
             case 'LAB_TEST':
                 return 'PHÍ XÉT NGHIỆM';
-            case 'PRESCRIPTON':
+
             case 'PRESCRIPTION':
                 return 'PHÍ MUA THUỐC';
             default:
@@ -213,12 +216,10 @@ const PaymentDetail = () => {
         }
 
         try {
-
             const formData = new URLSearchParams();
             formData.append("method", selectedPaymentMethod);
             formData.append("paymentId", currentInvoice.id);
             formData.append("orderInfo", `Thanh toan hoa don ${currentInvoice.id}`);
-
 
             const res = await authApis().post(PAYMENT_ENDPOINTS.PAY, formData, {
                 headers: {
@@ -227,15 +228,12 @@ const PaymentDetail = () => {
             });
 
 
-
             const payUrl = res.data.payUrl || res.data.shortLink;
 
             if (payUrl) {
-
                 setShowPaymentModal(false);
                 window.location.href = payUrl;
             } else {
-
                 setPayments((prev) =>
                     prev.map((payment) =>
                         payment.id === currentInvoice.id ? { ...payment, status: 'SUCCESS' } : payment
@@ -243,12 +241,12 @@ const PaymentDetail = () => {
                 );
                 setShowPaymentModal(false);
                 setCurrentInvoice(null);
-
+                setSuccessMessage('Thanh toán thành công!');
+                setShowSuccessModal(true);
             }
 
         } catch (error) {
             console.error("Lỗi thanh toán:", error);
-
 
 
         }
@@ -379,6 +377,7 @@ const PaymentDetail = () => {
                                     >
                                         <div className="h-100 d-flex flex-column bg-white">
 
+
                                             <Card.Header className="bg-white border-0 p-4 pb-0">
                                                 <div className="d-flex justify-content-between align-items-start gap-3">
                                                     <div>
@@ -459,7 +458,7 @@ const PaymentDetail = () => {
                         <div className="mb-4">
                             <div className="small text-muted mb-2">Chọn phương thức thanh toán</div>
 
-                            {/* 1. TIỀN MẶT */}
+
                             <div
                                 className={`d-flex align-items-center p-3 mb-2 border rounded-3 ${selectedPaymentMethod === 'CASH' ? 'border-primary bg-primary bg-opacity-10' : 'bg-white'}`}
                                 style={{ cursor: 'pointer', transition: 'all 0.2s' }}
@@ -474,7 +473,7 @@ const PaymentDetail = () => {
                                 </div>
                             </div>
 
-                            {/* 2. MOMO */}
+
                             <div
                                 className={`d-flex align-items-center p-3 mb-2 border rounded-3 ${selectedPaymentMethod === 'MOMO' ? 'border-danger bg-danger bg-opacity-10' : 'bg-white'}`}
                                 style={{ cursor: 'pointer', transition: 'all 0.2s' }}
@@ -489,14 +488,14 @@ const PaymentDetail = () => {
                                 </div>
                             </div>
 
-                            {/* 3. VNPAY (MỚI THÊM) */}
+
                             <div
                                 className={`d-flex align-items-center p-3 border rounded-3 ${selectedPaymentMethod === 'VNPAY' ? 'border-info bg-info bg-opacity-10' : 'bg-white'}`}
                                 style={{ cursor: 'pointer', transition: 'all 0.2s' }}
                                 onClick={() => setSelectedPaymentMethod('VNPAY')}
                             >
                                 <div className="flex-grow-1">
-                                    {/* Sử dụng màu xanh dương chuẩn thương hiệu VNPAY */}
+
                                     <div className="fw-bold" style={{ color: '#005baa' }}>Cổng thanh toán VNPAY</div>
                                     <div className="small text-muted">Thẻ ATM / Thẻ tín dụng / QR Code</div>
                                 </div>
@@ -521,7 +520,7 @@ const PaymentDetail = () => {
                         <Button
                             className="px-4 rounded-pill fw-bold border-0 text-white transition-all"
                             style={{
-                                // Đổi màu nút linh hoạt theo phương thức được chọn
+
                                 backgroundColor:
                                     selectedPaymentMethod === 'MOMO' ? '#a50064' :
                                         selectedPaymentMethod === 'VNPAY' ? '#005baa' :
@@ -533,6 +532,18 @@ const PaymentDetail = () => {
                         </Button>
                     </Modal.Footer>
                 </Modal>
+
+                <MyModal
+                    show={showSuccessModal}
+                    onHide={() => setShowSuccessModal(false)}
+                    title="Thông báo"
+                    cancelText="Đóng"
+                >
+                    <div className="text-center py-3">
+                        <h4 className="fw-semibold mb-2">{successMessage}</h4>
+                        <CheckCircleFill color="green" size={50} />
+                    </div>
+                </MyModal>
             </div>
         </>
     );

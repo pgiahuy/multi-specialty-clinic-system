@@ -7,6 +7,7 @@ package com.hb.pojo;
 import com.hb.enums.PaymentMethod;
 import com.hb.enums.PaymentStatus;
 import jakarta.persistence.Basic;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -25,7 +26,7 @@ import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Collection;
 
 /**
  *
@@ -39,7 +40,8 @@ import java.util.List;
     @NamedQuery(name = "Payment.findByTotalAmount", query = "SELECT p FROM Payment p WHERE p.totalAmount = :totalAmount"),
     @NamedQuery(name = "Payment.findByCreatedAt", query = "SELECT p FROM Payment p WHERE p.createdAt = :createdAt"),
     @NamedQuery(name = "Payment.findByStatus", query = "SELECT p FROM Payment p WHERE p.status = :status"),
-    @NamedQuery(name = "Payment.findByMethod", query = "SELECT p FROM Payment p WHERE p.method = :method")})
+    @NamedQuery(name = "Payment.findByMethod", query = "SELECT p FROM Payment p WHERE p.method = :method"),
+    @NamedQuery(name = "Payment.findByPaidAt", query = "SELECT p FROM Payment p WHERE p.paidAt = :paidAt")})
 public class Payment implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -57,7 +59,7 @@ public class Payment implements Serializable {
     @NotNull
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-    
+
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 7)
@@ -68,16 +70,13 @@ public class Payment implements Serializable {
     @Column(name = "method")
     @Enumerated(EnumType.STRING)
     private PaymentMethod method;
-    
-    @Column(name="paid_at")
+    @Column(name = "paid_at")
     private LocalDateTime paidAt;
-    
-    @ManyToOne
     @JoinColumn(name = "appointment_id", referencedColumnName = "id")
-    private Appointment appointment;
-    
-    @OneToMany(mappedBy = "paymentId")
-    private List<PaymentItems> paymentItems;
+    @ManyToOne(optional = false)
+    private Appointment appointmentId;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "paymentId")
+    private Collection<PaymentItems> paymentItemsCollection;
 
     public Payment() {
     }
@@ -133,6 +132,30 @@ public class Payment implements Serializable {
         this.method = method;
     }
 
+    public LocalDateTime getPaidAt() {
+        return paidAt;
+    }
+
+    public void setPaidAt(LocalDateTime paidAt) {
+        this.paidAt = paidAt;
+    }
+
+    public Appointment getAppointmentId() {
+        return appointmentId;
+    }
+
+    public void setAppointmentId(Appointment appointmentId) {
+        this.appointmentId = appointmentId;
+    }
+
+    public Collection<PaymentItems> getPaymentItemsCollection() {
+        return paymentItemsCollection;
+    }
+
+    public void setPaymentItemsCollection(Collection<PaymentItems> paymentItemsCollection) {
+        this.paymentItemsCollection = paymentItemsCollection;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -156,48 +179,6 @@ public class Payment implements Serializable {
     @Override
     public String toString() {
         return "com.hb.pojo.Payment[ id=" + id + " ]";
-    }
-
-    /**
-     * @return the appointment
-     */
-    public Appointment getAppointment() {
-        return appointment;
-    }
-
-    /**
-     * @param appointment the appointment to set
-     */
-    public void setAppointment(Appointment appointment) {
-        this.appointment = appointment;
-    }
-
-    /**
-     * @return the paidAt
-     */
-    public LocalDateTime getPaidAt() {
-        return paidAt;
-    }
-
-    /**
-     * @param paidAt the paidAt to set
-     */
-    public void setPaidAt(LocalDateTime paidAt) {
-        this.paidAt = paidAt;
-    }
-
-    /**
-     * @return the paymentItems
-     */
-    public List<PaymentItems> getPaymentItems() {
-        return paymentItems;
-    }
-
-    /**
-     * @param paymentItems the paymentItems to set
-     */
-    public void setPaymentItems(List<PaymentItems> paymentItems) {
-        this.paymentItems = paymentItems;
     }
     
 }

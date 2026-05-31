@@ -139,6 +139,7 @@ const Header = () => {
                                 <NavDropdown
                                     align="end"
                                     id="user-nav-dropdown"
+                                    className="me-2 header-dropdown"
                                     title={
                                         <span className="d-inline-flex align-items-center">
                                             <img

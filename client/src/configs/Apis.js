@@ -96,6 +96,7 @@ export const APPOINTMENT_ENDPOINTS = {
     APPOINTMENTS_BY_PATIENT: (patientId) => `secure/appointments/patient/${patientId}`,
     CREATE_APPOINTMENT: 'secure/appointments',
     CONFIRM_APPOINTMENT: (appointmentId) => `secure/appointments/${appointmentId}/confirm`,
+    CANCEL_APPOINTMENT: (appointmentId) => `secure/appointment/${appointmentId}/cancel`,
 };
 
 export const PAYMENT_ENDPOINTS = {

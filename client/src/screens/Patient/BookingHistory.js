@@ -87,17 +87,21 @@ const HistoryBooking = () => {
 
     useEffect(() => {
         if (selectedProfileId) loadAppointments(selectedProfileId);
-    }, [selectedProfileId]);
+    }, [selectedProfileId, fromDate, toDate]);
 
     const statusMatches = (status, filter) => {
         if (!filter || filter === 'all') return true;
         if (!status) return false;
         const s = String(status).toLowerCase();
         switch (filter) {
+            case 'un_paid':
+                return s.includes('un_paid') || s.includes('chưa thanh toán') || s.includes('chua thanh toan');
             case 'pending':
-                return s.includes('pending') || s.includes('un_paid') || s.includes('đang chờ') || s.includes('chưa thanh toán');
+                return s.includes('pending') || s.includes('un_paid') || s.includes('đang chờ');
             case 'confirmed':
                 return s.includes('confirmed') || s.includes('đã xác nhận');
+            case 'in_progress':
+                return s.includes('in_progress') || s.includes('đang khám');
             case 'completed':
                 return s.includes('completed') || s.includes('đã khám');
             case 'cancelled':
@@ -113,11 +117,25 @@ const HistoryBooking = () => {
         if (!status) return <span className="text-muted">Không rõ</span>;
 
         switch (status.toUpperCase()) {
-            case 'PENDING': return <span className="text-warning">Chưa thanh toán</span>;
-            case 'CONFIRMED': return <span className="text-primary">Đã thanh toán</span>;
-            case 'IN_PROGRESS': return <span className="text-info">Đang khám</span>;
-            case 'COMPLETED': return <span className="text-success">Đã hoàn thành</span>;
-            case 'CANCELLED': return <span className="text-danger">Đã hủy</span>;
+            case 'UN_PAID': return <Badge bg="transparent"
+                className="rounded-pill px-3 py-2 border border-warning text-warning bg-warning-subtle">
+                Chưa thanh toán</Badge>;
+
+            case 'PENDING': return <Badge bg="transparent"
+                className="rounded-pill px-3 py-2 border border-secondary text-secondary bg-secondary-subtle">
+                Chờ xác nhận</Badge>;
+            case 'CONFIRMED': return <Badge bg="transparent"
+                className="rounded-pill px-3 py-2 border border-primary text-primary bg-primary-subtle">
+                Đã xác nhận</Badge>;
+            case 'IN_PROGRESS': return <Badge bg="transparent"
+                className="rounded-pill px-3 py-2 border border-info text-info bg-info-subtle">
+                Đang khám</Badge>;
+            case 'COMPLETED': return <Badge bg="transparent"
+                className="rounded-pill px-3 py-2 border border-success text-success bg-success-subtle">
+                Đã hoàn thành</Badge>;
+            case 'CANCELLED': return <Badge bg="transparent"
+                className="rounded-pill px-3 py-2 border border-danger text-danger bg-danger-subtle">
+                Đã hủy</Badge>;
 
         }
     };
@@ -201,8 +219,10 @@ const HistoryBooking = () => {
                             style={{ boxShadow: '0 12px 30px rgba(13,110,253,0.04)' }}
                         >
                             <Tab eventKey="all" title="Tất cả" tabClassName="rounded-pill px-3 py-2" />
-                            <Tab eventKey="pending" title="Chưa thanh toán" tabClassName="rounded-pill px-3 py-2" />
-                            <Tab eventKey="confirmed" title="Đã thanh toán" tabClassName="rounded-pill px-3 py-2" />
+                            <Tab eventKey="un_paid" title="Chưa thanh toán" tabClassName="rounded-pill px-3 py-2" />
+                            <Tab eventKey="pending" title="Chờ xác nhận" tabClassName="rounded-pill px-3 py-2" />
+                            <Tab eventKey="confirmed" title="Đã xác nhận" tabClassName="rounded-pill px-3 py-2" />
+                            <Tab eventKey="in_progress" title="Đang khám" tabClassName="rounded-pill px-3 py-2" />
                             <Tab eventKey="completed" title="Đã khám" tabClassName="rounded-pill px-3 py-2" />
                             <Tab eventKey="cancelled" title="Đã hủy" tabClassName="rounded-pill px-3 py-2" />
                         </Tabs>

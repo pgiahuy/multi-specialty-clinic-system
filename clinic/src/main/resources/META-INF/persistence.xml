@@ -28,5 +28,8 @@
     <class>com.hb.pojo.ChatMessage</class>
     <class>com.hb.pojo.MedicineBatch</class>
     <class>com.hb.pojo.RefreshToken</class>
+    <class>com.hb.pojo.InventoryLog_1</class>
+    <class>com.hb.pojo.LabResultDetails</class>
+    <class>com.hb.pojo.Inventorylog</class>
   </persistence-unit>
 </persistence>

@@ -27,7 +27,7 @@ import java.util.Date;
 
 /**
  *
- * @author HUY
+ * @author DELL
  */
 @Entity
 @Table(name = "medicine_batch")
@@ -67,7 +67,7 @@ public class MedicineBatch implements Serializable {
     @ManyToOne
     private Medicine medicineId;
     @OneToMany(mappedBy = "batchId")
-    private Collection<InventoryLog> inventorylogCollection;
+    private Collection<InventoryLog> inventoryLogCollection;
 
     public MedicineBatch() {
     }
@@ -131,12 +131,12 @@ public class MedicineBatch implements Serializable {
         this.medicineId = medicineId;
     }
 
-    public Collection<InventoryLog> getInventorylogCollection() {
-        return inventorylogCollection;
+    public Collection<InventoryLog> getInventoryLogCollection() {
+        return inventoryLogCollection;
     }
 
-    public void setInventorylogCollection(Collection<InventoryLog> inventorylogCollection) {
-        this.inventorylogCollection = inventorylogCollection;
+    public void setInventoryLogCollection(Collection<InventoryLog> inventoryLogCollection) {
+        this.inventoryLogCollection = inventoryLogCollection;
     }
 
     @Override

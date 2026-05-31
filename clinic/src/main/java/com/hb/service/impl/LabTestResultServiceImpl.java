@@ -57,8 +57,7 @@ public class LabTestResultServiceImpl implements LabTestResultService {
         
         if(request.getId() != null) {
             labResult = labResultRepo.getLabResultById(request.getId());
-            labResult.setResultValue(request.getResult());
-            labResult.setIsAbnormal(request.getIsNormal());
+           
             labResultRepo.addOrUpdateTestResult(labResult);
             return labResult;
         }
