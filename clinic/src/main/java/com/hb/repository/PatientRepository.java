@@ -14,6 +14,7 @@ import java.util.Map;
  */
 public interface  PatientRepository extends BaseRepository<Patient>{
     List<Patient> getPatients(Map<String,String> params);
+    List<Patient> getPatientsForDoctor(Map<String,String> params);
     Patient getPatientById(Long id);
     Patient saveOrUpdate(Patient p);
     void deletePatient(Long id);

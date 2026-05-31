@@ -58,7 +58,7 @@ public class PrescriptionItemRepositoryImpl implements PrescriptionItemRepositor
     @Override
     public void delete(PrescriptionItem item) {
         Session session = factory.getObject().getCurrentSession();
-        session.detach(item);
+        session.remove(item);
     }
 
 }

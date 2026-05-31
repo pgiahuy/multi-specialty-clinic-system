@@ -13,6 +13,7 @@ import com.hb.service.PatientService;
 import com.hb.service.UserService;
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -45,6 +47,24 @@ public class ApiPatientController {
 
     @Autowired
     private UserService userService;
+
+    @GetMapping("/secure/patients")
+    public ResponseEntity<?> list(@RequestParam Map<String, String> params, Principal principal) {
+        User user = userService.getUserByUsername(principal.getName());
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Tài khoản không hợp lệ");
+        }
+        if (!user.getRole().equals("ROLE_DOCTOR")) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Không có quyền truy cập!");
+        }
+        if (user.getDoctor() != null) {
+            params.put("doctorId", user.getDoctor().getId().toString());
+        }
+        List<Patient> res = this.patientService.getPatientsForDoctor(params);
+
+        return ResponseEntity.ok().body(res.stream().map(patientMapper::toResponse).toList());
+    }
 
     @PostMapping("/secure/profiles")
     @Transactional
@@ -85,24 +105,22 @@ public class ApiPatientController {
         patients.forEach(s -> System.out.println(s.getFullName()));
         return ResponseEntity.ok(patients.stream().map(patientMapper::toResponse).toList());
     }
-    
-    
+
     @PutMapping("secure/profile/{patientId}")
     @Transactional
     public ResponseEntity<?> updateProfile(Principal principal,
             @PathVariable(value = "patientId") Long patientId,
-            @RequestBody PatientCreateRequest prq){
+            @RequestBody PatientCreateRequest prq) {
         try {
-            
+
             PatientResponse updatedProfile = patientService.updateProfile(patientId, prq);
-            
-            
+
             return ResponseEntity.ok(updatedProfile);
-            
+
         } catch (RuntimeException e) {
-           
-            return ResponseEntity.badRequest().build(); 
-           
+
+            return ResponseEntity.badRequest().build();
+
         }
     }
 

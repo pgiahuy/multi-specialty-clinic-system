@@ -35,6 +35,7 @@ import AssignTest from "./screens/Doctor/AssignTest";
 import DoctorDetail from "./screens/Doctor/DoctorDetail";
 import CreateMedicalRecord from "./screens/Doctor/CreateMedicalRecord";
 import PrescribeMedicine from "./screens/Doctor/PrescribeMedicine";
+import PatientList from "./screens/Doctor/PatientList";
 
 
 const initUserState = () => {
@@ -63,7 +64,7 @@ function App() {
             } />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
+
             <Route path="/patient/dashboard" element={<PatientDashboard />} />
             <Route path="/patient/notifications" element={<AllNotifications />} />
             <Route path="/patient/prescriptions" element={<Prescriptions />} />
@@ -73,11 +74,13 @@ function App() {
             <Route path="/patient/booking" element={<BookingPage />} />
             <Route path="/patient/history-booking" element={<HistoryBooking />} />
             <Route path="/patient/test-results" element={<TestResultDetail />} />
-            <Route path="/doctor/create-medical-record" element={<CreateMedicalRecord />} />
             <Route path="/patient/payment/:patientId?" element={<PaymentDetail />} />
-
             <Route path="/patient/payment-result" element={<PaymentResult />} />
+
+
             <Route path="/doctors" element={<ListDoctor />} />
+            <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
+            <Route path="/doctor/create-medical-record" element={<CreateMedicalRecord />} />
             <Route path="/doctor/schedules" element={<Schedules />} />
             <Route path="/doctor/:scheduleId/appointments" element={<AppointmentList />} />
             <Route path="/doctor/profile" element={<DoctorProfile />} />
@@ -86,6 +89,7 @@ function App() {
             <Route path="/doctor/appointments/:appointmentId/medical-record" element={<MedicalRecord />} />
             <Route path="/doctor/assign-test/:appointmentId" element={<AssignTest />} />
             <Route path="/doctor/prescribe/:medicalRecordId" element={<PrescribeMedicine />} />
+            <Route path="/doctor/patients" element={<PatientList />} />
 
           </Routes>
 
