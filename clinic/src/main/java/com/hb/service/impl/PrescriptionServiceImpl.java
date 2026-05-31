@@ -2,7 +2,7 @@ package com.hb.service.impl;
 
 import com.hb.dto.request.PrescriptionCreateRequest;
 import com.hb.dto.request.PrescriptionItemCreateRequest;
-import com.hb.enums.IventoryLogType;
+import com.hb.enums.InventoryLogType;
 import com.hb.enums.PrescriptionStatus;
 import com.hb.exception.BadRequestException;
 import com.hb.exception.ResourceNotFoundException;
@@ -230,7 +230,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
                 log.setMedicineId(m);
                 log.setBatchId(batch);
                 log.setChangeAmount(-qtyDeducted);            
-                log.setReason(IventoryLogType.PRESCRIPTION_EXPORT.getLabel());
+                log.setReason(InventoryLogType.PRESCRIPTION_EXPORT);
                 log.setReferenceId(p.getId());
                 log.setCreatedAt(LocalDateTime.now());
                 log.setCreatedBy(username);

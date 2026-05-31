@@ -5,7 +5,7 @@
 package com.hb.repository.impl;
 
 import com.hb.enums.SessionShift;
-import com.hb.pojo.Shifts;
+import com.hb.pojo.Shift;
 import com.hb.repository.ShiftRepository;
 import java.util.List;
 import java.util.Map;
@@ -24,21 +24,21 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @Transactional
-public class ShiftRepositoryImpl extends BaseRepositoryImpl<Shifts> implements ShiftRepository{
+public class ShiftRepositoryImpl extends BaseRepositoryImpl<Shift> implements ShiftRepository{
     @Autowired
     private LocalSessionFactoryBean factory;
     
  
     @Override
-    public List<Shifts> getShifts(Map<String, String> params) {
+    public List<Shift> getShifts(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
-        StringBuilder hql = new StringBuilder("SELECT s FROM Shifts s WHERE 1=1");
+        StringBuilder hql = new StringBuilder("SELECT s FROM Shift s WHERE 1=1");
 
         if (params != null && hasText(params.get("session"))) {
             hql.append(" AND s.session = :session");
         }
 
-        Query<Shifts> q = session.createQuery(hql.toString(), Shifts.class);
+        Query<Shift> q = session.createQuery(hql.toString(), Shift.class);
 
         if (params != null && hasText(params.get("session"))) {
             q.setParameter("session", SessionShift.valueOf(params.get("session").trim()));
@@ -56,9 +56,9 @@ public class ShiftRepositoryImpl extends BaseRepositoryImpl<Shifts> implements S
     }
 
     @Override
-    public long count(Map<String, String> params, Class<Shifts> clazz) {
+    public long count(Map<String, String> params, Class<Shift> clazz) {
         Session session = this.factory.getObject().getCurrentSession();
-        StringBuilder hql = new StringBuilder("SELECT COUNT(s.id) FROM Shifts s WHERE 1=1");
+        StringBuilder hql = new StringBuilder("SELECT COUNT(s.id) FROM Shift s WHERE 1=1");
 
         if (params != null && hasText(params.get("session"))) {
             hql.append(" AND s.session = :session");
@@ -74,7 +74,7 @@ public class ShiftRepositoryImpl extends BaseRepositoryImpl<Shifts> implements S
     }
 
     @Override
-    public Shifts saveOrUpdate(Shifts d) {
+    public Shift saveOrUpdate(Shift d) {
         Session session = this.factory.getObject().getCurrentSession();
         if (d.getId()==null) {
             session.persist(d);
@@ -85,15 +85,15 @@ public class ShiftRepositoryImpl extends BaseRepositoryImpl<Shifts> implements S
     }
 
     @Override
-    public Shifts getShiftById(Long id) {
+    public Shift getShiftById(Long id) {
         Session session = this.factory.getObject().getCurrentSession();
-        return session.get(Shifts.class, id);
+        return session.get(Shift.class, id);
     }
 
     @Override
     public void deleteShift(Long id) {
         Session session = this.factory.getObject().getCurrentSession();
-        Shifts shift = session.get(Shifts.class, id);
+        Shift shift = session.get(Shift.class, id);
 
         if (shift != null) {
             session.remove(shift);

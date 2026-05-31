@@ -14,23 +14,23 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.Collection;
 
 /**
  *
  * @author HUY
  */
 @Entity
-@Table(name = "social_account")
+@Table(name = "room")
 @NamedQueries({
-    @NamedQuery(name = "SocialAccount.findAll", query = "SELECT s FROM SocialAccount s"),
-    @NamedQuery(name = "SocialAccount.findById", query = "SELECT s FROM SocialAccount s WHERE s.id = :id"),
-    @NamedQuery(name = "SocialAccount.findByProvider", query = "SELECT s FROM SocialAccount s WHERE s.provider = :provider"),
-    @NamedQuery(name = "SocialAccount.findByProviderId", query = "SELECT s FROM SocialAccount s WHERE s.providerId = :providerId")})
-public class SocialAccount implements Serializable {
+    @NamedQuery(name = "Room.findAll", query = "SELECT r FROM Room r"),
+    @NamedQuery(name = "Room.findById", query = "SELECT r FROM Room r WHERE r.id = :id"),
+    @NamedQuery(name = "Room.findByRoomNumber", query = "SELECT r FROM Room r WHERE r.roomNumber = :roomNumber")})
+public class Room implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -38,28 +38,23 @@ public class SocialAccount implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
-    @Size(max = 8)
-    @Column(name = "provider")
-    private String provider;
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 255)
-    @Column(name = "provider_id")
-    private String providerId;
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @Size(max = 20)
+    @Column(name = "room_number")
+    private String roomNumber;
+    @JoinColumn(name = "area_id", referencedColumnName = "id")
     @ManyToOne
-    private User userId;
+    private Area areaId;
+    @JoinColumn(name = "specialty_id", referencedColumnName = "id")
+    @ManyToOne
+    private Specialty specialtyId;
+    @OneToMany(mappedBy = "roomId")
+    private Collection<Schedule> scheduleCollection;
 
-    public SocialAccount() {
+    public Room() {
     }
 
-    public SocialAccount(Long id) {
+    public Room(Long id) {
         this.id = id;
-    }
-
-    public SocialAccount(Long id, String providerId) {
-        this.id = id;
-        this.providerId = providerId;
     }
 
     public Long getId() {
@@ -70,28 +65,36 @@ public class SocialAccount implements Serializable {
         this.id = id;
     }
 
-    public String getProvider() {
-        return provider;
+    public String getRoomNumber() {
+        return roomNumber;
     }
 
-    public void setProvider(String provider) {
-        this.provider = provider;
+    public void setRoomNumber(String roomNumber) {
+        this.roomNumber = roomNumber;
     }
 
-    public String getProviderId() {
-        return providerId;
+    public Area getAreaId() {
+        return areaId;
     }
 
-    public void setProviderId(String providerId) {
-        this.providerId = providerId;
+    public void setAreaId(Area areaId) {
+        this.areaId = areaId;
     }
 
-    public User getUserId() {
-        return userId;
+    public Specialty getSpecialtyId() {
+        return specialtyId;
     }
 
-    public void setUserId(User userId) {
-        this.userId = userId;
+    public void setSpecialtyId(Specialty specialtyId) {
+        this.specialtyId = specialtyId;
+    }
+
+    public Collection<Schedule> getScheduleCollection() {
+        return scheduleCollection;
+    }
+
+    public void setScheduleCollection(Collection<Schedule> scheduleCollection) {
+        this.scheduleCollection = scheduleCollection;
     }
 
     @Override
@@ -104,10 +107,10 @@ public class SocialAccount implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof SocialAccount)) {
+        if (!(object instanceof Room)) {
             return false;
         }
-        SocialAccount other = (SocialAccount) object;
+        Room other = (Room) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -116,7 +119,7 @@ public class SocialAccount implements Serializable {
 
     @Override
     public String toString() {
-        return "com.hb.pojo.SocialAccount[ id=" + id + " ]";
+        return "com.hb.pojo.Room[ id=" + id + " ]";
     }
     
 }

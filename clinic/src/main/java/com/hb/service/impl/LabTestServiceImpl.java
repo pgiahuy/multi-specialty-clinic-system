@@ -4,7 +4,7 @@
  */
 package com.hb.service.impl;
 
-import com.hb.pojo.LabTests;
+import com.hb.pojo.LabTest;
 import com.hb.repository.LabTestRepository;
 import com.hb.service.LabTestService;
 import java.util.List;
@@ -17,18 +17,18 @@ import org.springframework.stereotype.Service;
  * @author DELL
  */
 @Service
-public class LabTestsServiceImpl implements LabTestService {
+public class LabTestServiceImpl implements LabTestService {
 
     @Autowired
     private LabTestRepository labTestRepo;
 
     @Override
-    public List<LabTests> getLabTests(Map<String, String> params) {
+    public List<LabTest> getLabTests(Map<String, String> params) {
         return labTestRepo.getLabTests(params);
     }
 
     @Override
-    public LabTests getLabTestById(Long id) {
+    public LabTest getLabTestById(Long id) {
         return labTestRepo.getLabTestById(id);
     }
    
@@ -40,7 +40,7 @@ public class LabTestsServiceImpl implements LabTestService {
 
     @Override
     public void addOrUpdateLabTest(Map<String, String> params) {
-        LabTests t = new LabTests();
+        LabTest t = new LabTest();
         String id = params.get("id");
         if (id != null && !id.isEmpty()) {
             t.setId(Long.parseLong(id));
@@ -55,7 +55,7 @@ public class LabTestsServiceImpl implements LabTestService {
 
     @Override
     public long countLabTests(Map<String, String> params) {
-        return labTestRepo.count(params, LabTests.class);
+        return labTestRepo.count(params, LabTest.class);
     }
 
 }

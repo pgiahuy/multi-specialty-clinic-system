@@ -25,7 +25,7 @@ import java.util.Collection;
 
 /**
  *
- * @author DELL
+ * @author HUY
  */
 @Entity
 @Table(name = "doctor")
@@ -56,7 +56,7 @@ public class Doctor implements Serializable {
     @Column(name = "gender")
     private String gender;
     @Column(name = "is_active")
-    private Boolean isActive;
+    private boolean isActive;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "rating")
     private Float rating;
@@ -70,11 +70,11 @@ public class Doctor implements Serializable {
     private Collection<Specialty> specialtyCollection;
     @OneToOne(mappedBy = "idHod")
     private Specialty specialty;
-    @OneToMany(mappedBy = "doctorId")
-    private Collection<Schedules> schedulesCollection;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @OneToOne
     private User userId;
+    @OneToMany(mappedBy = "doctorId")
+    private Collection<Schedule> scheduleCollection;
 
     public Doctor() {
     }
@@ -115,11 +115,11 @@ public class Doctor implements Serializable {
         this.gender = gender;
     }
 
-    public Boolean getIsActive() {
+    public boolean getIsActive() {
         return isActive;
     }
 
-    public void setIsActive(Boolean isActive) {
+    public void setIsActive(boolean isActive) {
         this.isActive = isActive;
     }
 
@@ -155,20 +155,20 @@ public class Doctor implements Serializable {
         this.specialty = specialty;
     }
 
-    public Collection<Schedules> getSchedulesCollection() {
-        return schedulesCollection;
-    }
-
-    public void setSchedulesCollection(Collection<Schedules> schedulesCollection) {
-        this.schedulesCollection = schedulesCollection;
-    }
-
     public User getUserId() {
         return userId;
     }
 
     public void setUserId(User userId) {
         this.userId = userId;
+    }
+
+    public Collection<Schedule> getScheduleCollection() {
+        return scheduleCollection;
+    }
+
+    public void setScheduleCollection(Collection<Schedule> scheduleCollection) {
+        this.scheduleCollection = scheduleCollection;
     }
 
     @Override

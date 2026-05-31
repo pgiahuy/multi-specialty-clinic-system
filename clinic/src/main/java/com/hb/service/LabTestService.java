@@ -4,7 +4,7 @@
  */
 package com.hb.service;
 
-import com.hb.pojo.LabTests;
+import com.hb.pojo.LabTest;
 import java.util.List;
 import java.util.Map;
 
@@ -13,8 +13,8 @@ import java.util.Map;
  * @author DELL
  */
 public interface LabTestService {
-    List<LabTests> getLabTests(Map<String, String> params);
-    LabTests getLabTestById(Long id);
+    List<LabTest> getLabTests(Map<String, String> params);
+    LabTest getLabTestById(Long id);
     void addOrUpdateLabTest(Map<String, String> params);
     void deleteLabTest(Long id);
     long countLabTests(Map<String, String> params);

@@ -6,7 +6,7 @@ package com.hb.repository.impl;
 
 import com.hb.pojo.Appointment;
 import com.hb.pojo.Patient;
-import com.hb.pojo.Schedules;
+import com.hb.pojo.Schedule;
 import com.hb.repository.StatsRepository;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -43,7 +43,7 @@ public class StatsRepositoryImpl implements StatsRepository {
         Root<Appointment> rootApp = q.from(Appointment.class);
 
         Join<Appointment, Patient> joinPatient = rootApp.join("patientId");
-        Join<Appointment, Schedules> joinSchedule = rootApp.join("scheduleId");
+        Join<Appointment, Schedule> joinSchedule = rootApp.join("scheduleId");
 
         Predicate p1 = b.between(joinSchedule.get("date"), fromDate, toDate);
         Predicate p2 = b.equal(rootApp.get("status"), "COMPLETED");
@@ -68,7 +68,7 @@ public class StatsRepositoryImpl implements StatsRepository {
         Root<Appointment> rootApp = q.from(Appointment.class);
 
         Join<Appointment, Patient> joinPatient = rootApp.join("patientId");
-        Join<Appointment, Schedules> joinSchedule = rootApp.join("scheduleId");
+        Join<Appointment, Schedule> joinSchedule = rootApp.join("scheduleId");
 
         Predicate p1 = b.between(joinSchedule.get("date"), fromDate, toDate);
         Predicate p2 = b.equal(rootApp.get("status"), "COMPLETED");
@@ -93,7 +93,7 @@ public class StatsRepositoryImpl implements StatsRepository {
         Root<Appointment> rootApp = q.from(Appointment.class);
 
         Join<Appointment, Patient> joinPatient = rootApp.join("patientId");
-        Join<Appointment, Schedules> joinSchedule = rootApp.join("scheduleId");
+        Join<Appointment, Schedule> joinSchedule = rootApp.join("scheduleId");
 
         Predicate p1 = b.between(joinSchedule.get("date"), fromDate, toDate);
         Predicate p2 = b.equal(rootApp.get("status"), "COMPLETED");

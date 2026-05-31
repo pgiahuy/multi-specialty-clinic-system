@@ -6,7 +6,7 @@ package com.hb.service;
 
 import com.hb.dto.request.LabTestResultRequest;
 import com.hb.dto.response.LabTestResultResponse;
-import com.hb.pojo.LabResults;
+import com.hb.pojo.LabResult;
 import java.util.List;
 import java.util.Map;
 
@@ -16,8 +16,8 @@ import java.util.Map;
  */
 
 public interface LabTestResultService {
-    LabResults addOrUpdateTestResult(LabTestResultRequest request);
-    List<LabResults> addMutipleTest(List<LabTestResultRequest> req);
+    LabResult addOrUpdateTestResult(LabTestResultRequest request);
+    List<LabResult> addMutipleTest(List<LabTestResultRequest> req);
     List<LabTestResultResponse> getTestResults(Long patientId, Map<String, String> params);
-    List<LabResults> getLabResultsesByAppointmentId(Long appointmentId);
+    List<LabResult> getLabResultsesByAppointmentId(Long appointmentId);
 }

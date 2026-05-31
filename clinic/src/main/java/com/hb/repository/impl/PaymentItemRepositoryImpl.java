@@ -6,7 +6,7 @@ package com.hb.repository.impl;
 
 import com.hb.pojo.Appointment;
 import com.hb.pojo.Payment;
-import com.hb.pojo.PaymentItems;
+import com.hb.pojo.PaymentItem;
 import com.hb.repository.PaymentItemRepository;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -36,22 +36,22 @@ public class PaymentItemRepositoryImpl implements PaymentItemRepository {
     private LocalSessionFactoryBean factory;
 
     @Override
-    public List<PaymentItems> getItemsByPaymentId(Long paymentId) {
+    public List<PaymentItem> getItemsByPaymentId(Long paymentId) {
         Session session = this.factory.getObject().getCurrentSession();
 
-        Query<PaymentItems> q = session.createQuery("FROM PaymentItems WHERE paymentId.id = :paymentId", PaymentItems.class);
+        Query<PaymentItem> q = session.createQuery("FROM PaymentItem WHERE paymentId.id = :paymentId", PaymentItem.class);
         q.setParameter("paymentId", paymentId);
         return q.getResultList();
     }
 
     @Override
-    public PaymentItems getItemById(Long id) {
+    public PaymentItem getItemById(Long id) {
         Session session = this.factory.getObject().getCurrentSession();
-        return session.get(PaymentItems.class, id);
+        return session.get(PaymentItem.class, id);
     }
 
     @Override
-    public void addOrUpdateItem(PaymentItems item) {
+    public void addOrUpdateItem(PaymentItem item) {
         Session session = this.factory.getObject().getCurrentSession();
         if (item.getId() != null) {
             session.merge(item);
@@ -63,37 +63,37 @@ public class PaymentItemRepositoryImpl implements PaymentItemRepository {
     @Override
     public void deleteItem(Long id) {
         Session session = this.factory.getObject().getCurrentSession();
-        PaymentItems item = this.getItemById(id);
+        PaymentItem item = this.getItemById(id);
         if (item != null) {
             session.remove(item);
         }
     }
 
     @Override
-    public PaymentItems getItemByAppointment(Long appointmentId) {
+    public PaymentItem getItemByAppointment(Long appointmentId) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<PaymentItems> q = session.createQuery("FROM PaymentItems p WHERE p.referenceId = :appointmentId", PaymentItems.class);
+        Query<PaymentItem> q = session.createQuery("FROM PaymentItem p WHERE p.referenceId = :appointmentId", PaymentItem.class);
         q.setParameter("appointmentId", appointmentId);
 
         return q.getSingleResult();
     }
 
     @Override
-    public List<PaymentItems> getItemsByPayment(Payment payment) {
+    public List<PaymentItem> getItemsByPayment(Payment payment) {
         Session session = this.factory.getObject().getCurrentSession();
 
-        String hql = "FROM PaymentItems p WHERE p.paymentId = :paymentId";
-        Query<PaymentItems> query = session.createQuery(hql, PaymentItems.class);
+        String hql = "FROM PaymentItem p WHERE p.paymentId = :paymentId";
+        Query<PaymentItem> query = session.createQuery(hql, PaymentItem.class);
         query.setParameter("paymentId", payment);
 
         return query.getResultList();
     }
 
     @Override
-    public List<PaymentItems> getItemsByPaymentId(Long paymentId, Map<String, String> params) {
+    public List<PaymentItem> getItemsByPaymentId(Long paymentId, Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
 
-        StringBuilder hql = new StringBuilder("From PaymentItems p WHERE p.paymentId.id = :paymentId");
+        StringBuilder hql = new StringBuilder("From PaymentItem p WHERE p.paymentId.id = :paymentId");
 
         String status = params.get("status");
         String startDate = params.get("startDate");
@@ -107,7 +107,7 @@ public class PaymentItemRepositoryImpl implements PaymentItemRepository {
             hql.append(" AND p.createdAt >= :startDate AND p.createdAt < :endDate");
         }
 
-        Query<PaymentItems> query = session.createQuery(hql.toString(), PaymentItems.class);
+        Query<PaymentItem> query = session.createQuery(hql.toString(), PaymentItem.class);
         query.setParameter("paymentId", paymentId);
 
         if (status != null && status.isEmpty()) {
@@ -129,7 +129,7 @@ public class PaymentItemRepositoryImpl implements PaymentItemRepository {
     }
 
     @Override
-    public List<PaymentItems> getPaymentItems(Map<String, String> params) {
+    public List<PaymentItem> getPaymentItems(Map<String, String> params) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 

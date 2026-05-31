@@ -5,13 +5,13 @@
 package com.hb.service.impl;
 
 import com.hb.dto.request.form.AreaForm;
-import com.hb.pojo.Areas;
-import com.hb.repository.AreasRepository;
+import com.hb.pojo.Area;
 import com.hb.service.AreasService;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.hb.repository.AreaRepository;
 
 /**
  *
@@ -21,16 +21,16 @@ import org.springframework.stereotype.Service;
 public class AreasServiceImpl implements AreasService {
 
     @Autowired
-    private AreasRepository areaRepo;
+    private AreaRepository areaRepo;
 
     @Override
-    public List<Areas> getAreas(Map<String, String> params) {
+    public List<Area> getAreas(Map<String, String> params) {
         return areaRepo.getAreas(params);
     }
 
     @Override
-    public Areas getAreasById(Long id) {
-        Areas a = areaRepo.getAreasById(id);
+    public Area getAreasById(Long id) {
+        Area a = areaRepo.getAreasById(id);
         if (a == null) {
             throw new RuntimeException("Doctor not found!");
         }
@@ -44,14 +44,14 @@ public class AreasServiceImpl implements AreasService {
 
     @Override
     public long countAreas(Map<String, String> params) {
-        return areaRepo.count(params, Areas.class);
+        return areaRepo.count(params, Area.class);
     }
 
     @Override
-    public Areas saveOrUpdate(AreaForm form) {
-        Areas a;
+    public Area saveOrUpdate(AreaForm form) {
+        Area a;
         if (form.getId() == null) {
-            a = new Areas();
+            a = new Area();
         } else {
             a = this.areaRepo.getAreasById(form.getId());
         }

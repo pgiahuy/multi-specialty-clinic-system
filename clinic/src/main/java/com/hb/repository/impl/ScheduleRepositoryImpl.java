@@ -4,7 +4,7 @@
  */
 package com.hb.repository.impl;
 
-import com.hb.pojo.Schedules;
+import com.hb.pojo.Schedule;
 import com.hb.repository.ScheduleRepository;
 import java.time.LocalDate;
 import java.util.List;
@@ -22,16 +22,16 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Repository
 @Transactional
-public class ScheduleRepositoryImpl extends BaseRepositoryImpl<Schedules> implements ScheduleRepository {
+public class ScheduleRepositoryImpl extends BaseRepositoryImpl<Schedule> implements ScheduleRepository {
 
     @Autowired
     private LocalSessionFactoryBean factory;
 
     @Override
-    public List<Schedules> getSchedules(Map<String, String> params) {
+    public List<Schedule> getSchedules(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
 
-        StringBuilder hql = new StringBuilder("SELECT DISTINCT s FROM Schedules s "
+        StringBuilder hql = new StringBuilder("SELECT DISTINCT s FROM Schedule s "
                 + "LEFT JOIN FETCH s.doctorId "
                 + "LEFT JOIN FETCH s.shiftId "
                 + "LEFT JOIN FETCH s.specialtyId "
@@ -67,7 +67,7 @@ public class ScheduleRepositoryImpl extends BaseRepositoryImpl<Schedules> implem
             
         }
 
-        Query<Schedules> q = session.createQuery(hql.toString(), Schedules.class);
+        Query<Schedule> q = session.createQuery(hql.toString(), Schedule.class);
 
         if (params != null) {
             if (params.containsKey("doctorId") && !params.get("doctorId").isEmpty()) {
@@ -111,7 +111,7 @@ public class ScheduleRepositoryImpl extends BaseRepositoryImpl<Schedules> implem
     }
 
     @Override
-    public Schedules saveOrUpdate(Schedules s) {
+    public Schedule saveOrUpdate(Schedule s) {
         Session session = this.factory.getObject().getCurrentSession();
 
         if (s.getId() == null) {
@@ -124,25 +124,72 @@ public class ScheduleRepositoryImpl extends BaseRepositoryImpl<Schedules> implem
     }
 
     @Override
-    public Schedules getScheduleById(Long id) {
+    public Schedule getScheduleById(Long id) {
         Session session = this.factory.getObject().getCurrentSession();
-        return session.get(Schedules.class, id);
+        return session.get(Schedule.class, id);
     }
 
     @Override
     public void deleteSchedule(Long id) {
         Session session = this.factory.getObject().getCurrentSession();
-        Schedules s = session.get(Schedules.class, id);
+        Schedule s = session.get(Schedule.class, id);
         if (s != null) {
             session.remove(s);
         }
     }
 
     @Override
-    public long count(Map<String, String> params, Class<Schedules> clazz) {
+    public boolean checkDoctorAvailability(Long doctorId, LocalDate date, Long shiftId, Long excludeId) {
+        Session session = this.factory.getObject().getCurrentSession();
+        
+        StringBuilder hql = new StringBuilder("SELECT COUNT(s) FROM Schedule s "
+                + "WHERE s.doctorId.id = :doctorId "
+                + "AND s.date = :date "
+                + "AND s.shiftId.id = :shiftId ");
+        
+        if (excludeId != null) {
+            hql.append(" AND s.id != :excludeId ");
+        }
+
+        Query<Long> q = session.createQuery(hql.toString(), Long.class);
+        q.setParameter("doctorId", doctorId);
+        q.setParameter("date", date);
+        q.setParameter("shiftId", shiftId);
+        if (excludeId != null) {
+            q.setParameter("excludeId", excludeId);
+        }
+        return q.getSingleResult() == 0;
+    }
+
+    @Override
+    public boolean checkRoomAvailability(Long roomId, LocalDate date, Long shiftId, Long excludeId) {
+        Session session = this.factory.getObject().getCurrentSession();
+        
+        StringBuilder hql = new StringBuilder("SELECT COUNT(s) FROM Schedule s "
+                + "WHERE s.roomId.id = :roomId "
+                + "AND s.date = :date "
+                + "AND s.shiftId.id = :shiftId ");
+        
+        if (excludeId != null) {
+            hql.append(" AND s.id != :excludeId ");
+        }
+
+        Query<Long> q = session.createQuery(hql.toString(), Long.class);
+        q.setParameter("roomId", roomId);
+        q.setParameter("date", date);
+        q.setParameter("shiftId", shiftId);
+        if (excludeId != null) {
+            q.setParameter("excludeId", excludeId);
+        }
+
+        return q.getSingleResult() == 0;
+    }
+
+    @Override
+    public long count(Map<String, String> params, Class<Schedule> clazz) {
         Session session = this.factory.getObject().getCurrentSession();
 
-        StringBuilder hql = new StringBuilder("SELECT COUNT(DISTINCT s) FROM Schedules s WHERE 1=1 ");
+        StringBuilder hql = new StringBuilder("SELECT COUNT(DISTINCT s) FROM Schedule s WHERE 1=1 ");
 
         if (params != null) {
             if (params.containsKey("doctorId") && !params.get("doctorId").isEmpty()) {
