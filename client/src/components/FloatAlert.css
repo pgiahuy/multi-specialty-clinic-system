@@ -1,0 +1,45 @@
+
+.alert-container {
+    position: fixed;
+    top: 20px;
+    right: 0;
+    z-index: 9999;
+    width: 100%;
+    max-width: 380px; 
+    pointer-events: none;
+    border-radius: 10px;
+    overflow: hidden; 
+}
+
+.custom-alert {
+    pointer-events: auto;
+    background-color: #fff;
+    padding: 15px 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    animation: slideLeft 0.4s cubic-bezier(0.25, 1, 0.5, 1) forwards; 
+}
+
+.custom-alert.warning {
+    background-color: #fff3cd;
+    color: #664d03;
+}
+.custom-alert.success {
+    background-color: #d1e7dd;
+    color: #0f5132;
+}
+.custom-alert.danger {
+    background-color: #f8d7da;
+    color: #842029;
+}
+
+@keyframes slideLeft {
+    from {
+        transform: translateX(110%); 
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}

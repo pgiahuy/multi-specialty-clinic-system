@@ -11,8 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,11 +32,10 @@ public class ApiNotificationController {
     @Autowired
     private NotificationService notiService;
 
-
     @Autowired
     private Environment env;
 
-    @PatchMapping("/notifications/{id}/read")
+    @PostMapping("/notifications/{id}/read")
     @ResponseStatus(HttpStatus.OK)
     public void markRead(@PathVariable("id") Long id, Principal principal) {
         System.out.println("heheh-controller-0");
@@ -56,5 +57,26 @@ public class ApiNotificationController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy thông báo!");
         }
         System.out.println("heheh-controller-OK");
+    }
+
+    @PostMapping("/notifications/read-all")
+    @ResponseStatus(HttpStatus.OK)
+    public void markAllRead(Principal principal) {
+        System.out.println("heheh-controller-0");
+        String currentUsername = principal.getName();
+        this.notiService.markAllAsRead(currentUsername);
+
+    }
+
+    @DeleteMapping("/notifications/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteNotification(@PathVariable("id") Long id, Principal principal) {
+        Notification n = this.notiService.getNotificationById(id);
+        String currentUsername = principal.getName();
+        if (n.getUserId().getUsername().equals(currentUsername)) {
+            this.notiService.deleteNotification(id);
+        } else {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, null);
+        }
     }
 }

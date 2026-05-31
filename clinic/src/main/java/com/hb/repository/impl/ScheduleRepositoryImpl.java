@@ -52,7 +52,7 @@ public class ScheduleRepositoryImpl extends BaseRepositoryImpl<Schedules> implem
             }
             boolean hasFromDate = params.containsKey("fromDate") && !params.get("fromDate").isEmpty();
             boolean hasToDate = params.containsKey("toDate") && !params.get("toDate").isEmpty();
-
+            
             if (hasFromDate && hasToDate) {
                 hql.append(" AND s.date BETWEEN :fromDate AND :toDate");
             } else if (hasFromDate) {
@@ -60,6 +60,11 @@ public class ScheduleRepositoryImpl extends BaseRepositoryImpl<Schedules> implem
             } else if (hasToDate) {
                 hql.append(" AND s.date <= :toDate");
             }
+            if (params.containsKey("date") && !params.get("date").isEmpty()) {
+                hql.append(" AND s.date = :date");
+            }
+            
+            
         }
 
         Query<Schedules> q = session.createQuery(hql.toString(), Schedules.class);
@@ -88,6 +93,9 @@ public class ScheduleRepositoryImpl extends BaseRepositoryImpl<Schedules> implem
                 q.setParameter("fromDate", LocalDate.parse(params.get("fromDate")));
             } else if (hasToDate) {
                 q.setParameter("toDate", LocalDate.parse(params.get("toDate")));
+            }
+            if (params.containsKey("date") && !params.get("date").isEmpty()) {
+                q.setParameter("date", LocalDate.parse(params.get("date")));
             }
             
 
@@ -159,6 +167,9 @@ public class ScheduleRepositoryImpl extends BaseRepositoryImpl<Schedules> implem
             } else if (hasToDate) {
                 hql.append(" AND s.date <= :toDate");
             }
+            if (params.containsKey("date") && !params.get("date").isEmpty()) {
+                hql.append(" AND s.date = :date");
+            }
         }
 
         Query<Long> q = session.createQuery(hql.toString(), Long.class);
@@ -186,6 +197,9 @@ public class ScheduleRepositoryImpl extends BaseRepositoryImpl<Schedules> implem
                 q.setParameter("fromDate", java.time.LocalDate.parse(params.get("fromDate")));
             } else if (hasToDate) {
                 q.setParameter("toDate", java.time.LocalDate.parse(params.get("toDate")));
+            }
+            if (params.containsKey("date") && !params.get("date").isEmpty()) {
+                q.setParameter("date", java.time.LocalDate.parse(params.get("date")));
             }
         }
 
