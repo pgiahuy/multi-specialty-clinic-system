@@ -137,4 +137,9 @@ public class AppointmentServiceImpl implements AppointmentService {
         return true;
     }
 
+    @Override
+    public List<Appointment> getAppointmentsByPatientId(Long patientId, Map<String, String> params) {
+       return appointmentRepo.getAppointmentByPatientId(patientId, params);
+    }
+
 }

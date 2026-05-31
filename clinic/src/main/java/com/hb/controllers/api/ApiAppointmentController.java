@@ -142,5 +142,13 @@ public class ApiAppointmentController {
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Chỉ có thể bắt đầu khám khi lịch hẹn đang ở trạng thái đã xác nhận!");
         }
+    
+    
+    @GetMapping("/secure/appointments/patient/{patientId}")
+    public ResponseEntity<List<AppointmentResponse>> getAppointByPatientId(@PathVariable(value="patientId") Long patientId,
+            @RequestParam Map<String, String> params) {
+        List<Appointment> res = appointmentService.getAppointmentsByPatientId(patientId, params);
+        return ResponseEntity.ok(res.stream().map(appMapper::toResponse).toList());
+        
     }
 }
