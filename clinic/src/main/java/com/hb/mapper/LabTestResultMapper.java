@@ -26,7 +26,7 @@ public class LabTestResultMapper {
         
         labResult.setAppointmentId(appointment);
         labResult.setCreatedAt(LocalDateTime.now());
-        labResult.setTestId(labTest);
+       
         
         return labResult;
     }
@@ -37,15 +37,10 @@ public class LabTestResultMapper {
         LabTestResultResponse res = new LabTestResultResponse();
         
         res.setId(labResult.getId());
-        res.setResult(labResult.getResultValue());
-        res.setIsNormal(labResult.getIsAbnormal());
+       
         res.setCreateAt(labResult.getCreatedAt());
         
-        if (labResult.getTestId() != null) {
-            res.setTestName(labResult.getTestId().getTestName());
-            res.setUnit(labResult.getTestId().getUnit());
-            res.setNormalRange(labResult.getTestId().getNormalRange());
-        }
+       
         
         if (labResult.getAppointmentId() != null) {
             res.setPatientName(labResult.getAppointmentId().getPatientId().getFullName());

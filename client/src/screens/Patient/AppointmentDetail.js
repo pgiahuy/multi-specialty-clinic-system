@@ -62,6 +62,7 @@ const AppointmentDetail = () => {
         if (!status) return <span className="text-muted">Không rõ</span>;
 
         switch (status.toUpperCase()) {
+            case 'UN_PAID': return <span className="text-warning">Chưa thanh toán</span>;
             case 'PENDING': return <span className="text-warning">Chờ xác nhận</span>;
             case 'CONFIRMED': return <span className="text-primary">Đã xác nhận</span>;
             case 'IN_PROGRESS': return <span className="text-info">Đang khám</span>;
@@ -89,7 +90,7 @@ const AppointmentDetail = () => {
                 ) : (
                     <Row className="justify-content-center">
                         <Col xs={12} md={8} lg={6}>
-                            <Card className="shadow-sm rounded-4 overflow-hidden">
+                            <Card className=" shadow-sm rounded-4 overflow-hidden">
                                 <Card.Header className="d-flex justify-content-between align-items-center bg-light py-3 border-bottom-0">
                                     <div> Khoa {appointment.specialtyName} </div>
                                     <div> {appointment.roomName} - {appointment.areaName} </div>
@@ -98,7 +99,7 @@ const AppointmentDetail = () => {
                                 </Card.Header>
 
                                 <Card.Body className="p-4">
-                                    {/* Dòng 1: Bệnh nhân */}
+                                    
                                     <div className="d-flex justify-content-between align-items-center mb-3">
                                         <div className="small text-muted">Bệnh nhân</div>
                                         <div className="fw-semibold text-end">{appointment?.patientFullName || '-'}</div>
@@ -146,7 +147,7 @@ const AppointmentDetail = () => {
 
                                 <Card.Footer className="bg-white border-0 p-4 pt-0">
 
-                                    {appointment?.status === 'PENDING' && (
+                                    {appointment?.status === 'UN_PAID' && (
                                         <div className="d-flex align-items-center p-3 mb-4 bg-warning bg-opacity-10 border border-warning border-opacity-50 rounded-3">
                                             <i className="bi bi-exclamation-circle-fill text-warning fs-5 me-3"></i>
                                             <div className="small fw-semibold text-dark">
@@ -168,13 +169,13 @@ const AppointmentDetail = () => {
                                         <Button variant="outline-secondary" className="rounded-pill px-4 py-2" onClick={() => navigate(-1)}>
                                             Trở về
                                         </Button>
-                                        {(appointment?.status === 'PENDING' || appointment?.status === 'CONFIRMED') && (
+                                        {appointment?.status !== 'CANCELLED' && (
                                             <Button variant="danger" className="rounded-pill px-4 py-2" onClick={() => setShowCancelModal(true)}>
                                                 Hủy lịch hẹn
                                             </Button>
                                         )}
 
-                                        {appointment?.status === 'PENDING' && (
+                                        {appointment?.status === 'UN_PAID' && (
                                             <Button variant="primary" className="rounded-pill px-4 py-2" onClick={() => navigate(`/patient/payment/${appointment.patientId}`)}>
                                                 Thanh toán
                                             </Button>

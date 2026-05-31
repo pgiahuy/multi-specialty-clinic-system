@@ -1,6 +1,6 @@
 import React from "react";
 import { Container, Row, Col } from "react-bootstrap";
-import { Link } from "react-router-dom"; // Import Link từ react-router-dom
+import { Link } from "react-router-dom"; 
 
 const Footer = () => {
     return (
@@ -15,7 +15,7 @@ const Footer = () => {
             <Container>
                 <Row className="gy-4">
                     
-                    {/* Cột 1: Thông tin phòng khám */}
+                    
                     <Col lg={5} md={12} className="mb-4 mb-md-0">
                         <h4 className="fw-bold text-primary mb-3">
                             <i className="bi bi-hospital me-2"></i> OU-Clinic
@@ -25,12 +25,12 @@ const Footer = () => {
                         </p>
                     </Col>
 
-                    {/* Cột 2: Các dịch vụ/Liên kết */}
+                    
                     <Col lg={3} md={6} className="mb-4 mb-md-0">
                         <h6 className="fw-bold text-uppercase mb-3">Dịch vụ</h6>
                         <ul className="list-unstyled mb-0">
                             <li className="mb-2">
-                                {/* Thay <a> thành <Link> và href thành to */}
+                               
                                 <Link to="/" className="text-muted text-decoration-none">Trang chủ</Link>
                             </li>
                             <li className="mb-2">
@@ -45,7 +45,7 @@ const Footer = () => {
                         </ul>
                     </Col>
 
-                    {/* Cột 3: Hỗ trợ / Chính sách */}
+                   
                     <Col lg={4} md={6} className="mb-4 mb-md-0">
                         <h6 className="fw-bold text-uppercase mb-3">Hỗ trợ khách hàng</h6>
                         <ul className="list-unstyled text-muted">
@@ -63,7 +63,7 @@ const Footer = () => {
                 </Row>
             </Container>
 
-            {/* Phần Copyright */}
+            
             <Container className="mt-4">
                 <div className="pt-3 border-top border-secondary-subtle text-center text-muted">
                     <small>© 2026 OU-Clinic. All rights reserved.</small>

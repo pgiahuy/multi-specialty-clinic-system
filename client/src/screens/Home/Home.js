@@ -1,6 +1,7 @@
 import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import { Calendar, FileText, CreditCard } from "react-bootstrap-icons";
 import "./HomeStyle.css";
+import { useNavigate } from "react-router-dom";
 
 
 const features = [
@@ -22,6 +23,7 @@ const features = [
 ];
 
 const Home = () => {
+  const navigate = useNavigate();
   return (
     <>
       <section
@@ -40,7 +42,7 @@ const Home = () => {
                   hồ sơ y tế trực tuyến một cách nhanh chóng, an toàn và tiện lợi.
                 </p>
                 <div className="mt-4">
-                  <Button variant="primary rounded-4" className="border-0" size="lg">
+                  <Button variant="primary rounded-4" className="border-0" size="lg" onClick={() => navigate('/patient/booking')}>
                     Đặt lịch khám ngay
                   </Button>
                 </div>
