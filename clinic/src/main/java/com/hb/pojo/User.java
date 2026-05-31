@@ -28,7 +28,7 @@ import java.util.Date;
 
 /**
  *
- * @author HUY
+ * @author DELL
  */
 @Entity
 @Table(name = "user")
@@ -46,18 +46,23 @@ import java.util.Date;
     @NamedQuery(name = "User.findByName", query = "SELECT u FROM User u WHERE u.name = :name")})
 public class User implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id")
+    private Long id;
     // @Pattern(regexp="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", message="Invalid email")//if the field contains email address consider using this annotation to enforce field validation
     @Size(max = 100)
     @Column(name = "email")
-private String email;
+    private String email;
     @Basic(optional = false)
-    @NotNull()
+    @NotNull
     @Size(min = 1, max = 255)
     @Column(name = "password")
     private String password;
-    // @Pattern(regexp="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", message="Invalid email")//if the field contains email address consider using this annotation to enforce field validation
     @Basic(optional = false)
-    @NotNull()
+    @NotNull
     @Size(min = 1, max = 100)
     @Column(name = "username")
     private String username;
@@ -73,7 +78,7 @@ private String email;
     @Size(max = 255)
     @Column(name = "public_id")
     private String publicId;
-    @Lob()
+    @Lob
     @Size(max = 65535)
     @Column(name = "fcm_token")
     private String fcmToken;
@@ -82,18 +87,8 @@ private String email;
     @Size(max = 255)
     @Column(name = "name")
     private String name;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
-    private Collection<RefreshToken> refreshTokenCollection;
-    private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "id")
-    private Long id;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "senderId")
     private Collection<ChatMessage> chatMessageCollection;
-    @OneToOne(mappedBy = "userId")
-    private Doctor doctor;
     @OneToMany(mappedBy = "userId")
     private Collection<Notification> notificationCollection;
     @OneToMany(mappedBy = "userId")
@@ -104,6 +99,10 @@ private String email;
     private Collection<Conversation> conversationCollection;
     @OneToMany(mappedBy = "receiverId")
     private Collection<Conversation> conversationCollection1;
+    @OneToOne(mappedBy = "userId")
+    private Doctor doctor;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
+    private Collection<RefreshToken> refreshTokenCollection;
 
     public User() {
     }
@@ -126,6 +125,37 @@ private String email;
         this.id = id;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
@@ -167,6 +197,13 @@ private String email;
         this.isActive = isActive;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public Collection<ChatMessage> getChatMessageCollection() {
         return chatMessageCollection;
@@ -174,14 +211,6 @@ private String email;
 
     public void setChatMessageCollection(Collection<ChatMessage> chatMessageCollection) {
         this.chatMessageCollection = chatMessageCollection;
-    }
-
-    public Doctor getDoctor() {
-        return doctor;
-    }
-
-    public void setDoctor(Doctor doctor) {
-        this.doctor = doctor;
     }
 
     public Collection<Notification> getNotificationCollection() {
@@ -224,6 +253,22 @@ private String email;
         this.conversationCollection1 = conversationCollection1;
     }
 
+    public Doctor getDoctor() {
+        return doctor;
+    }
+
+    public void setDoctor(Doctor doctor) {
+        this.doctor = doctor;
+    }
+
+    public Collection<RefreshToken> getRefreshTokenCollection() {
+        return refreshTokenCollection;
+    }
+
+    public void setRefreshTokenCollection(Collection<RefreshToken> refreshTokenCollection) {
+        this.refreshTokenCollection = refreshTokenCollection;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -247,55 +292,6 @@ private String email;
     @Override
     public String toString() {
         return "com.hb.pojo.User[ id=" + id + " ]";
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Collection<RefreshToken> getRefreshTokenCollection() {
-        return refreshTokenCollection;
-    }
-
-    public void setRefreshTokenCollection(Collection<RefreshToken> refreshTokenCollection) {
-        this.refreshTokenCollection = refreshTokenCollection;
     }
     
 }

@@ -15,15 +15,19 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  *
- * @author HUY
+ * @author DELL
  */
 @Entity
 @Table(name = "refresh_token")
@@ -33,15 +37,16 @@ import java.time.LocalDateTime;
     @NamedQuery(name = "RefreshToken.findByToken", query = "SELECT r FROM RefreshToken r WHERE r.token = :token"),
     @NamedQuery(name = "RefreshToken.findByExpiryDate", query = "SELECT r FROM RefreshToken r WHERE r.expiryDate = :expiryDate"),
     @NamedQuery(name = "RefreshToken.findByCreatedAt", query = "SELECT r FROM RefreshToken r WHERE r.createdAt = :createdAt"),
-    @NamedQuery(name = "RefreshToken.findByRevoked", query = "SELECT r FROM RefreshToken r WHERE r.revoked = :revoked")})
+    @NamedQuery(name = "RefreshToken.findByRevoked", query = "SELECT r FROM RefreshToken r WHERE r.revoked = :revoked"),
+    @NamedQuery(name = "RefreshToken.findByDeviceId", query = "SELECT r FROM RefreshToken r WHERE r.deviceId = :deviceId"),
+    @NamedQuery(name = "RefreshToken.findByDeviceInfo", query = "SELECT r FROM RefreshToken r WHERE r.deviceInfo = :deviceInfo")})
 public class RefreshToken implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id")
     private Long id;
     @Basic(optional = false)
     @NotNull
@@ -51,15 +56,17 @@ public class RefreshToken implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "expiry_date")
+    @Temporal(TemporalType.TIMESTAMP)
     private Instant expiryDate;
     @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
     @Column(name = "revoked")
     private Boolean revoked;
-    @Size(max = 128)
+    @Size(max = 100)
     @Column(name = "device_id")
     private String deviceId;
-    @Size(max = 512)
+    @Size(max = 255)
     @Column(name = "device_info")
     private String deviceInfo;
     @JoinColumn(name = "user_id", referencedColumnName = "id")

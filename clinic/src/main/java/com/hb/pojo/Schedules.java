@@ -22,10 +22,11 @@ import jakarta.persistence.TemporalType;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Date;
 
 /**
  *
- * @author HUY
+ * @author DELL
  */
 @Entity
 @Table(name = "schedules")

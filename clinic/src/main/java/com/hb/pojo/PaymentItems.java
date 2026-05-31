@@ -57,13 +57,10 @@ public class PaymentItems implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "reference_id")
-    private Long referenceId;
-    
-    @ManyToOne
-    @JoinColumn(name ="payment_id")
+    private long referenceId;
+    @JoinColumn(name = "payment_id", referencedColumnName = "id")
+    @ManyToOne(optional = false)
     private Payment paymentId;
-    
-    
 
     public PaymentItems() {
     }
@@ -72,7 +69,7 @@ public class PaymentItems implements Serializable {
         this.id = id;
     }
 
-    public PaymentItems(Long id, PaymentItemType itemType, BigDecimal amount, Long referenceId) {
+    public PaymentItems(Long id, PaymentItemType itemType, BigDecimal amount, long referenceId) {
         this.id = id;
         this.itemType = itemType;
         this.amount = amount;
@@ -103,12 +100,20 @@ public class PaymentItems implements Serializable {
         this.amount = amount;
     }
 
-    public Long getReferenceId() {
+    public long getReferenceId() {
         return referenceId;
     }
 
-    public void setReferenceId(Long referenceId) {
+    public void setReferenceId(long referenceId) {
         this.referenceId = referenceId;
+    }
+
+    public Payment getPaymentId() {
+        return paymentId;
+    }
+
+    public void setPaymentId(Payment paymentId) {
+        this.paymentId = paymentId;
     }
 
     @Override
@@ -134,20 +139,6 @@ public class PaymentItems implements Serializable {
     @Override
     public String toString() {
         return "com.hb.pojo.PaymentItems[ id=" + id + " ]";
-    }
-
-    /**
-     * @return the payment
-     */
-    public Payment getPayment() {
-        return paymentId;
-    }
-
-    /**
-     * @param payment the payment to set
-     */
-    public void setPayment(Payment paymentId) {
-        this.paymentId = paymentId;
     }
     
 }
