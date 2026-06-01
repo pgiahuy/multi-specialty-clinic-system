@@ -5,6 +5,7 @@
 package com.hb.service.impl;
 
 import com.hb.dto.request.LabResultDetailRequest;
+import com.hb.exception.BadRequestException;
 import com.hb.exception.ResourceNotFoundException;
 import com.hb.pojo.LabResult;
 import com.hb.pojo.LabResultDetail;
@@ -59,6 +60,7 @@ public class LabResultDetailServiceImpl implements LabResultDetailService{
     }
 
     @Override
+    @Transactional
     public void updateDetails(Long labResultId, List<LabResultDetailRequest> reqs) {
         LabResult labResult = labResultService.getLabResultById(labResultId);
         
@@ -66,10 +68,15 @@ public class LabResultDetailServiceImpl implements LabResultDetailService{
             throw new ResourceNotFoundException("Không tìm thấy phiếu xét nghiệm!");
         }
         
+        if (reqs == null) {
+            throw new BadRequestException("Không có kết quả xét nghiệm nào");
+        }
+        
         for (LabResultDetailRequest req : reqs) {
-            LabResultDetail resultDetail = resultDetailRepo.getLabResultDetailById(labResultId);
+            LabResultDetail resultDetail = resultDetailRepo.getLabResultDetailById(req.getId());
             resultDetail.setValue(req.getValue());
             resultDetail.setIsAbnormal(req.getIsAbnormal());
+            resultDetailRepo.addOrUpdate(resultDetail);
         }
     }
     

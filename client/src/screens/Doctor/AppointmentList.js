@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Footer from "../../components/Footer";
 import Header from "../../components/Header";
 import { authApis, CLINIC_ENDPOINTS, endpoint } from "../../configs/Apis";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Button, Container, Table } from "react-bootstrap";
 import MySpinner from "../../components/MySpinner";
 import { tableStyles } from "../Patient/PatientStyle";
@@ -19,8 +19,10 @@ const AppointmentList = () => {
     const loadAppointments = async (scheduleId) => {
         try {
             setLoading(true);
+            
             const response = await authApis().get(`${CLINIC_ENDPOINTS.DOCTOR_APPOINTMENTS(scheduleId)}`);
             setAppointments(response.data);
+           
         } catch (error) {
             console.error("Lỗi khi tải danh sách lịch hẹn:", error);
         } finally {

@@ -107,6 +107,13 @@ export const PAYMENT_ENDPOINTS = {
     ITEMS: (paymentId) => `secure/payment-items/${paymentId}`,
 };
 
+export const TEST_ENDPOINTS = {
+    LAB_RESULTS: 'secure/lab-results',
+    TEST_RESULT_DETAIL: (testId) => `secure/test/${testId}`,
+    UPDATE_LAB_RESULT: (labResultId) => `secure/lab-results/${labResultId}`,
+    LAB_RESULTS_BY_APPOINTMENT: (appointmentId) => `secure/lab-results/appointment/${appointmentId}`,
+};
+
 
 export const clinicApis = {
     getDoctors: () => API.get(CLINIC_ENDPOINTS.DOCTORS),
@@ -116,6 +123,7 @@ export const clinicApis = {
     getShifts: () => API.get(CLINIC_ENDPOINTS.SHIFTS),
     getMedicines: (params = {}) => authApis().get(CLINIC_ENDPOINTS.MEDICINES, { params }),
 };
+
 
 
 
