@@ -114,6 +114,13 @@ export const TEST_ENDPOINTS = {
     LAB_RESULTS_BY_APPOINTMENT: (appointmentId) => `secure/lab-results/appointment/${appointmentId}`,
 };
 
+export const CHAT_ENDPOINTS = {
+    CONVERSATIONS: 'secure/conversations',
+    START_CONVERSATION: 'secure/conversations/quick-start',
+    MESSAGES: (conversationId) => `secure/chat-messages/conversation/${conversationId}`,
+    SEND_MESSAGE: 'secure/chat-messages/send',
+};
+
 
 export const clinicApis = {
     getDoctors: () => API.get(CLINIC_ENDPOINTS.DOCTORS),

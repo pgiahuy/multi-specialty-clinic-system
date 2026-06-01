@@ -24,7 +24,6 @@
     <class>com.hb.pojo.Shifts</class>
     <class>com.hb.pojo.Rooms</class>
     <class>com.hb.pojo.Medicinebatch</class>
-    <class>com.hb.pojo.Conversation</class>
     <class>com.hb.pojo.ChatMessage</class>
     <class>com.hb.pojo.MedicineBatch</class>
     <class>com.hb.pojo.RefreshToken</class>
@@ -39,5 +38,16 @@
     <class>com.hb.pojo.LabResult</class>
     <class>com.hb.pojo.Room</class>
     <class>com.hb.pojo.PaymentItem</class>
+    <class>com.hb.pojo.Schedule_1</class>
+    <class>com.hb.pojo.Area_1</class>
+    <class>com.hb.pojo.Doctor_1</class>
+    <class>com.hb.pojo.User_1</class>
+    <class>com.hb.pojo.Shift_1</class>
+    <class>com.hb.pojo.Specialty_1</class>
+    <class>com.hb.pojo.Room_1</class>
+    <class>com.hb.pojo.Appointment_1</class>
+    <class>com.hb.pojo.Patient_1</class>
+    <class>com.hb.pojo.Conversation_1_1</class>
+    <class>com.hb.pojo.Conversation</class>
   </persistence-unit>
 </persistence>
