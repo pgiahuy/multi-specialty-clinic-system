@@ -37,6 +37,7 @@ import AppointmentDetail from "./screens/Patient/AppointmentDetail";
 import ScheduleManagement from "./screens/Doctor/ScheduleManagement";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AppointmentOfSchedule from "./screens/Doctor/AppointmentOfSchedule";
+import LabTest from "./screens/Doctor/LabTest";
 
 const initUserState = () => {
   const savedUser = localStorage.getItem("user");
@@ -93,6 +94,7 @@ function App() {
               <Route path="/doctor/assign-test/:appointmentId" element={<AssignTest />} />
               <Route path="/doctor/prescribe/:medicalRecordId" element={<PrescribeMedicine />} />
               <Route path="/doctor/patients" element={<PatientList />} />
+              <Route path="/doctor/lab-tests" element={<LabTest />} />
             </Route>
 
 
