@@ -183,7 +183,7 @@ public class PaymentServiceImpl implements PaymentService {
                     notiParams.put("username", patientUser.getUsername());
                     notiParams.put("title", "Thanh toán thành công!");
                     notiParams.put("content", "Bạn vừa thanh toán thành công một hoá đơn. Vui lòng kiểm tra!");
-                    notiParams.put("path", "/api/secure/payments/patient/" + saved.getAppointmentId().getPatientId().getId());
+                    notiParams.put("path", "/patient/payments");
                     this.notificationService.addNotification(notiParams);
                 }
             }

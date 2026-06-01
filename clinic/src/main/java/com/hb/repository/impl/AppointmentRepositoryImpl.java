@@ -93,9 +93,6 @@ public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> i
 
             if (params.containsKey("scheduleId") && !params.get("scheduleId").isEmpty()) {
                 predicates.add(cb.equal(scheduleJoin.get("id"), Long.valueOf(params.get("scheduleId"))));
-                if ("ROLE_DOCTOR".equals(params.get("currentUserRole"))) {
-                    predicates.add(cb.notEqual(root.get("status"), AppointmentStatus.UN_PAID));
-                }
             }
         }
 
@@ -185,12 +182,13 @@ public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> i
     }
 
     @Override
-    public void addOrUpdateAppointment(Appointment a) {
+    public Appointment addOrUpdateAppointment(Appointment a) {
         Session session = this.factory.getObject().getCurrentSession();
         if (a.getId() == null) {
             session.persist(a);
+            return a;
         } else {
-            session.merge(a);
+            return session.merge(a);
         }
     }
 

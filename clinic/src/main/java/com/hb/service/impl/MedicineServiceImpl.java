@@ -5,6 +5,7 @@
 package com.hb.service.impl;
 
 import com.hb.dto.request.form.MedicineForm;
+import com.hb.dto.response.MedicineResponse;
 import com.hb.pojo.Medicine;
 import com.hb.repository.MedicineRepository;
 import com.hb.service.MedicineService;
@@ -80,5 +81,10 @@ public class MedicineServiceImpl implements MedicineService {
     @Override
     public long countMedicines(Map<String, String> params) {
         return medicineRepo.countMedicines(params);
+    }
+
+    @Override
+    public List<MedicineResponse> getMedicinesWithStock(Map<String, String> params) {
+        return this.medicineRepo.getMedicinesWithStock(params);
     }
 }

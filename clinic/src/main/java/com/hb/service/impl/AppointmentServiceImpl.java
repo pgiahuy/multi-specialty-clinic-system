@@ -22,6 +22,7 @@ import com.hb.repository.AppointmentRepository;
 import com.hb.repository.PatientRepository;
 import com.hb.repository.ScheduleRepository;
 import com.hb.service.AppointmentService;
+import com.hb.service.NotificationService;
 import com.hb.service.PaymentItemsService;
 import com.hb.service.PaymentService;
 import java.time.LocalDate;
@@ -58,6 +59,9 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Autowired
     private PaymentService paymentService;
+    
+    @Autowired
+    private NotificationService notificationService;
 
     @Override
     public List<Appointment> getAppointments(Map<String, String> params) {
@@ -129,7 +133,23 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
 
         appointment.setStatus(AppointmentStatus.CONFIRMED);
-        appointmentRepo.addOrUpdateAppointment(appointment);
+        Appointment saved = appointmentRepo.addOrUpdateAppointment(appointment);
+        try {
+            if (saved != null && saved.getPatientId().getUserId() != null) {
+
+                User patientUser = saved.getPatientId().getUserId();
+                if (patientUser != null) {
+                    Map<String, String> notiParams = new HashMap<>();
+                    notiParams.put("username", patientUser.getUsername());
+                    notiParams.put("title", "Lịch khám đã được xác nhận!");
+                    notiParams.put("content", "Lịch hẹn khám của bạn đã được bác sĩ xác nhận. Vui lòng kiểm tra!");
+                    notiParams.put("path", "/appointments/" + saved.getId().toString());
+                    this.notificationService.addNotification(notiParams);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Lỗi gửi thông báo: " + e.getMessage());
+        }
         return true;
     }
 
@@ -223,7 +243,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public void updateStatusAppointment(Long appointmentId, AppointmentStatus status) {
         Appointment appointment = appointmentRepo.getAppointmentById(appointmentId);
-        if(appointment == null) {
+        if (appointment == null) {
             throw new ResourceNotFoundException("Không tìm thấy lịch hẹn");
         }
         appointment.setStatus(status);

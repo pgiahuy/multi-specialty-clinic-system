@@ -99,7 +99,7 @@ const AppointmentDetail = () => {
                                 </Card.Header>
 
                                 <Card.Body className="p-4">
-                                    
+
                                     <div className="d-flex justify-content-between align-items-center mb-3">
                                         <div className="small text-muted">Bệnh nhân</div>
                                         <div className="fw-semibold text-end">{appointment?.patientFullName || '-'}</div>
@@ -176,7 +176,7 @@ const AppointmentDetail = () => {
                                         )}
 
                                         {appointment?.status === 'UN_PAID' && (
-                                            <Button variant="primary" className="rounded-pill px-4 py-2" onClick={() => navigate(`/patient/payment/${appointment.patientId}`)}>
+                                            <Button variant="primary" className="rounded-pill px-4 py-2" onClick={() => navigate(`/patient/payments`)}>
                                                 Thanh toán
                                             </Button>
                                         )}

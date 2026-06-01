@@ -405,15 +405,9 @@ const PaymentDetail = () => {
 
                                             <Card.Header className="bg-white border-0 p-4 pb-0">
                                                 <div className="d-flex justify-content-between align-items-start gap-3">
-                                                    <div>
-                                                        <h5 className="text-primary fw-bold mb-2" style={{ lineHeight: '1.4' }}>
-                                                            {getInvoiceTitle(p)}
-                                                        </h5>
-                                                        <div className="text-secondary small d-flex align-items-center">
-                                                            <i className="bi bi-clock-history me-2"></i>
-                                                            {p.createdDate || p.createdAt || 'Chưa cập nhật ngày'}
-                                                        </div>
-                                                    </div>
+                                                    <h5 className="text-primary fw-bold mb-2" style={{ lineHeight: '1.4' }}>
+                                                        {getInvoiceTitle(p)}
+                                                    </h5>
                                                     <div>
                                                         <Badge
                                                             bg="transparent"
@@ -425,6 +419,19 @@ const PaymentDetail = () => {
                                                             {p.status === 'SUCCESS' ? 'ĐÃ THANH TOÁN' : 'CHỜ THANH TOÁN'}
                                                         </Badge>
                                                     </div>
+
+
+                                                </div>
+                                                <div>
+
+                                                    <div className="text d-flex align-items-center mb-2">
+                                                        {p.patientName}
+                                                    </div>
+                                                    {p.paidAt && (
+                                                        <div className="text-success small d-flex align-items-center mt-1">
+                                                            Ngày thanh toán: {p.paidAt}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </Card.Header>
 
