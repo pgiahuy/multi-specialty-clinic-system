@@ -22,19 +22,23 @@ public class LabResultResponse {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime testAt;
     private LabResultStatus status;
+    private String doctorName;
     private List<LabResultDetailResponse> resultDetails;
 
     public LabResultResponse() {
     }
 
-    public LabResultResponse(Long id, String patientName, LocalDateTime createdAt, LocalDateTime testAt, LabResultStatus status, List<LabResultDetailResponse> resultDetails) {
+    public LabResultResponse(Long id, String patientName, LocalDateTime createdAt, LocalDateTime testAt, LabResultStatus status, String doctorName, List<LabResultDetailResponse> resultDetails) {
         this.id = id;
         this.patientName = patientName;
         this.createdAt = createdAt;
         this.testAt = testAt;
         this.status = status;
+        this.doctorName = doctorName;
         this.resultDetails = resultDetails;
     }
+
+    
 
     /**
      * @return the id
@@ -122,6 +126,20 @@ public class LabResultResponse {
      */
     public void setResultDetails(List<LabResultDetailResponse> resultDetails) {
         this.resultDetails = resultDetails;
+    }
+
+    /**
+     * @return the doctorName
+     */
+    public String getDoctorName() {
+        return doctorName;
+    }
+
+    /**
+     * @param doctorName the doctorName to set
+     */
+    public void setDoctorName(String doctorName) {
+        this.doctorName = doctorName;
     }
     
     

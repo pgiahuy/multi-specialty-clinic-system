@@ -6,6 +6,7 @@ package com.hb.controllers.api;
 
 import com.hb.dto.request.AppointmentCreateRequest;
 import com.hb.dto.response.AppointmentResponse;
+import com.hb.enums.UserRole;
 import com.hb.mapper.AppointmentMapper;
 import com.hb.pojo.Appointment;
 
@@ -99,7 +100,7 @@ public class ApiAppointmentController {
 
         boolean isOwner = false;
         
-        if ("ROLE_DOCTOR".equals(currentUser.getRole())) {
+        if (UserRole.ROLE_DOCTOR.equals(currentUser.getRole())) {
             if (appointment.getScheduleId() != null && appointment.getScheduleId().getDoctorId() != null) {
                 isOwner = appointment.getScheduleId().getDoctorId().getUserId().getId().equals(currentUser.getId());
             }
@@ -126,7 +127,7 @@ public class ApiAppointmentController {
 
         boolean isOwner = false;
 
-        if ("ROLE_DOCTOR".equals(currentUser.getRole())) {
+        if (UserRole.ROLE_DOCTOR.equals(currentUser.getRole())) {
             if (appointment.getScheduleId() != null && appointment.getScheduleId().getDoctorId() != null) {
                 isOwner = appointment.getScheduleId().getDoctorId().getUserId().getId().equals(currentUser.getId());
             }

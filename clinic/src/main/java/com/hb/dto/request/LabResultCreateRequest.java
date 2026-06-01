@@ -19,19 +19,23 @@ public class LabResultCreateRequest {
     private LocalDateTime testAt;
     private LabResultStatus status;
     private List<LabResultDetailRequest> details;
+    private Long dr_id;
     
 
     public LabResultCreateRequest() {
     }
 
-    public LabResultCreateRequest(Long id, Long appointmentId, LocalDateTime createdAt, LocalDateTime testAt, LabResultStatus status, List<LabResultDetailRequest> details) {
+    public LabResultCreateRequest(Long id, Long appointmentId, LocalDateTime createdAt, LocalDateTime testAt, LabResultStatus status, List<LabResultDetailRequest> details, Long dr_id) {
         this.id = id;
         this.appointmentId = appointmentId;
         this.createdAt = createdAt;
         this.testAt = testAt;
         this.status = status;
         this.details = details;
+        this.dr_id = dr_id;
     }
+
+    
 
    
 
@@ -117,6 +121,20 @@ public class LabResultCreateRequest {
      */
     public void setStatus(LabResultStatus status) {
         this.status = status;
+    }
+
+    /**
+     * @return the dr_id
+     */
+    public Long getDr_id() {
+        return dr_id;
+    }
+
+    /**
+     * @param dr_id the dr_id to set
+     */
+    public void setDr_id(Long dr_id) {
+        this.dr_id = dr_id;
     }
     
     
