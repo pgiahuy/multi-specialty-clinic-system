@@ -17,7 +17,7 @@ public interface PaymentItemsService {
    
     void addAppointmentItem(Payment payment, Long appointmentId);
     
-    void addLabTestItems(Payment payment,Long testId);
+    void addLabTestItems(Payment payment,Long testId, Long labResultId);
     
     void addPrescriptionItem(Payment payment, Long prescriptionId);
     

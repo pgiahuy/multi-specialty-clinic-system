@@ -19,10 +19,10 @@ public class PaymentResponse {
     private Long id;
     private String patientName;
     private BigDecimal totalAmount;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
-    private LocalDate createdAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
+    private LocalDateTime createdAt;
     private PaymentStatus status;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime paidAt;
     private Long appointmentId;
     private List<PaymentItemResponse> paymentItems;
@@ -32,7 +32,7 @@ public class PaymentResponse {
         
     }
 
-    public PaymentResponse(Long id, String patientName, BigDecimal totalAmount, LocalDate createdAt, PaymentStatus status, LocalDateTime paidAt, Long appointmentId, List<PaymentItemResponse> paymentItems) {
+    public PaymentResponse(Long id, String patientName, BigDecimal totalAmount, LocalDateTime createdAt, PaymentStatus status, LocalDateTime paidAt, Long appointmentId, List<PaymentItemResponse> paymentItems) {
         this.id = id;
         this.patientName = patientName;
         this.totalAmount = totalAmount;
@@ -43,11 +43,7 @@ public class PaymentResponse {
         this.paymentItems = paymentItems;
     }
 
-    
 
-   
-    
-    
     
     /**
      * @return the id
@@ -126,14 +122,14 @@ public class PaymentResponse {
     /**
      * @return the createdAt
      */
-    public LocalDate getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
     /**
      * @param createdAt the createdAt to set
      */
-    public void setCreatedAt(LocalDate createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 

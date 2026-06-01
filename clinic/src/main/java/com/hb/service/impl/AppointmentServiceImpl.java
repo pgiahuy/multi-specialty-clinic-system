@@ -220,4 +220,14 @@ public class AppointmentServiceImpl implements AppointmentService {
         return false;
     }
 
+    @Override
+    public void updateStatusAppointment(Long appointmentId, AppointmentStatus status) {
+        Appointment appointment = appointmentRepo.getAppointmentById(appointmentId);
+        if(appointment == null) {
+            throw new ResourceNotFoundException("Không tìm thấy lịch hẹn");
+        }
+        appointment.setStatus(status);
+        appointmentRepo.addOrUpdateAppointment(appointment);
+    }
+
 }
