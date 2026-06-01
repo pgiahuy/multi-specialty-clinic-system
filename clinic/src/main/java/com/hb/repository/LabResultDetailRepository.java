@@ -4,12 +4,12 @@
  */
 package com.hb.repository;
 
-import com.hb.pojo.LabResultDetails;
+import com.hb.pojo.LabResultDetail;
 
 /**
  *
  * @author DELL
  */
 public interface LabResultDetailRepository {
-    void addOrUpdate(LabResultDetails detail);
+    void addOrUpdate(LabResultDetail detail);
 }

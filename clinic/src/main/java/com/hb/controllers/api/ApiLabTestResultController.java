@@ -4,14 +4,14 @@
  */
 package com.hb.controllers.api;
 
-import com.hb.dto.request.LabTestResultRequest;
-import com.hb.dto.request.TestDetailRequest;
+import com.hb.dto.request.LabResultCreateRequest;
+import com.hb.dto.request.LabResultDetailRequest;
 import com.hb.dto.response.LabTestResponse;
 import com.hb.dto.response.LabTestResultResponse;
 import com.hb.mapper.LabTestMapper;
 import com.hb.mapper.LabTestResultMapper;
-import com.hb.pojo.LabResults;
-import com.hb.pojo.LabTests;
+import com.hb.pojo.LabResult;
+import com.hb.pojo.LabTest;
 import com.hb.pojo.Patient;
 import com.hb.pojo.User;
 import com.hb.service.LabTestResultService;
@@ -57,9 +57,10 @@ public class ApiLabTestResultController {
 
 
     @PostMapping("/lab-results")
-    public ResponseEntity<?> create(@RequestBody LabTestResultRequest req) {
+    public ResponseEntity<?> create(@RequestBody LabResultCreateRequest req) {
         testResultService.labTestOrder(req);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+
     }
 
     @GetMapping("/tests/{patientId}")
@@ -93,14 +94,14 @@ public class ApiLabTestResultController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         
-        List<LabResults> res = this.testResultService.getLabResultsesByAppointmentId(appointmentId);
+        List<LabResult> res = this.testResultService.getLabResultsesByAppointmentId(appointmentId);
         return ResponseEntity.ok(res.stream().map(testResultMapper::toResponse).toList());
     }
     
     
     @GetMapping("/tests")
     public ResponseEntity<?> list(@RequestParam Map<String, String> params) {
-        List<LabTests> res = this.testService.getLabTests(params);
+        List<LabTest> res = this.testService.getLabTests(params);
         long total = this.testService.countLabTests(params);
         
         
@@ -119,7 +120,7 @@ public class ApiLabTestResultController {
     
     @GetMapping("/test/{id}")
     public ResponseEntity<LabTestResponse> getLabTest(@PathVariable(value="id") Long id) {
-        LabTests res = testService.getLabTestById(id);
+        LabTest res = testService.getLabTestById(id);
         return ResponseEntity.ok(LabTestMapper.INSTANCE.toResponse(res));
     }
     

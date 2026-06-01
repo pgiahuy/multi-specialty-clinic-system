@@ -4,7 +4,7 @@
  */
 package com.hb.repository.impl;
 
-import com.hb.pojo.LabResultDetails;
+import com.hb.pojo.LabResultDetail;
 import com.hb.repository.LabResultDetailRepository;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ public class LabResultDetailRepositoryIml implements LabResultDetailRepository{
     private LocalSessionFactoryBean factory;
 
     @Override
-    public void addOrUpdate(LabResultDetails detail) {
+    public void addOrUpdate(LabResultDetail detail) {
         Session session = this.factory.getObject().getCurrentSession();
         
         if (detail.getId() == null) {

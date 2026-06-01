@@ -9,7 +9,7 @@ import com.hb.exception.ResourceNotFoundException;
 import com.hb.pojo.Appointment;
 import com.hb.pojo.Doctor;
 import com.hb.pojo.Patient;
-import com.hb.pojo.Schedules;
+import com.hb.pojo.Schedule;
 import com.hb.pojo.User;
 import com.hb.repository.PatientRepository;
 import java.util.ArrayList;
@@ -88,8 +88,8 @@ public class PatientRepositoryImpl extends BaseRepositoryImpl<Patient> implement
         Root<Patient> root = cq.from(Patient.class);
 
         Join<Patient, Appointment> appointmentJoin = root.join("appointmentCollection", JoinType.LEFT);
-        Join<Appointment, Schedules> scheduleJoin = appointmentJoin.join("scheduleId", JoinType.LEFT);
-        Join<Schedules, Doctor> doctorJoin = scheduleJoin.join("doctorId", JoinType.LEFT);
+        Join<Appointment, Schedule> scheduleJoin = appointmentJoin.join("scheduleId", JoinType.LEFT);
+        Join<Schedule, Doctor> doctorJoin = scheduleJoin.join("doctorId", JoinType.LEFT);
 
         List<Predicate> predicates = new ArrayList<>();
         predicates.add(cb.equal(root.get("isActive"), true));

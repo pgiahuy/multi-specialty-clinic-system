@@ -29,6 +29,7 @@ public class DoctorMapper {
         res.setFullName(d.getFullName());
         res.setDescription(d.getDescription());
         res.setGender(d.getGender());
+        res.setRating(d.getRating());
 
   
         res.setSpecialtiesOfDoctor(d.getSpecialtyCollection().stream().map(specMapper::toResponse).toList());

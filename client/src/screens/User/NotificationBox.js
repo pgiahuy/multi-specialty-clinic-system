@@ -1,10 +1,9 @@
-import React, { use, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavDropdown, Badge, ListGroup, Stack } from 'react-bootstrap';
 import { Bell, CircleFill, Check2All, Trash2 } from 'react-bootstrap-icons';
-import './NotificationBox.css';
-import { onMessageListener, requestForToken } from '../configs/firebaseConfig';
-import { authApis, endpoint, USER_ENDPOINTS } from '../configs/Apis';
-import cookies from 'react-cookies';
+import '../User/NotificationBox.css';
+import { onMessageListener, requestForToken } from '../../configs/firebaseConfig';
+import { authApis, USER_ENDPOINTS } from '../../configs/Apis';
 import { useNavigate } from 'react-router-dom';
 
 const NotificationBox = ({ onNavigate }) => {
@@ -17,15 +16,19 @@ const NotificationBox = ({ onNavigate }) => {
 
     const markAllAsRead = () => {
         setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
-        // notifications.filter(n => !n.isRead).forEach(noti => {
-        //     authApis.patch(`secure/notifications/${noti.id}/read`);
-        // });
+        authApis().post(`secure/notifications/read-all`);
         console.log("Đánh dấu tất cả là đã đọc");
     };
 
     const deleteNotification = (id) => {
-        setNotifications(prev => prev.filter(n => n.id !== id));
-        console.log("Xóa thông báo:", id);
+        try {
+            authApis().delete(`secure/notifications/${id}`);
+            setNotifications(prev => prev.filter(n => n.id !== id));
+            console.log("Xóa thông báo:", id);
+        } catch (err) {
+            console.error("Không thể xóa thông báo:", err);
+        }
+
     };
 
     const fetchNotifications = async () => {
@@ -81,20 +84,14 @@ const NotificationBox = ({ onNavigate }) => {
         try {
 
             setNotifications(prev => prev.map(n => n.id === noti.id ? { ...n, isRead: true } : n));
-
-
-            await authApis().patch(`secure/notifications/${noti.id}/read`);
-
-
+            await authApis().post(`secure/notifications/${noti.id}/read`);
             const targetPath = noti.path || noti.click_action || noti.data?.click_action;
-            // noti.path: "/api/secure/prescriptions/1"
-            navigate('/patient/prescriptions')
 
-            // if (targetPath) {
-            //     navigate(targetPath);
-            // } else {
-            //     console.warn("Không tìm thấy đường dẫn cho thông báo này!");
-            // }
+            if (targetPath) {
+                navigate(targetPath);
+            } else {
+                console.warn("Không tìm thấy đường dẫn cho thông báo này!");
+            }
 
         } catch (err) {
 

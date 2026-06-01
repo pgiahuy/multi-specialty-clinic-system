@@ -16,7 +16,7 @@ import com.hb.mapper.AppointmentMapper;
 import com.hb.pojo.Appointment;
 import com.hb.pojo.Patient;
 import com.hb.pojo.Payment;
-import com.hb.pojo.Schedules;
+import com.hb.pojo.Schedule;
 import com.hb.pojo.User;
 import com.hb.repository.AppointmentRepository;
 import com.hb.repository.PatientRepository;
@@ -80,7 +80,7 @@ public class AppointmentServiceImpl implements AppointmentService {
             throw new ResourceNotFoundException("Không tìm thấy bệnh nhân!");
         }
 
-        Schedules schedule = scheduleRepo.getScheduleById(req.getScheduleId());
+        Schedule schedule = scheduleRepo.getScheduleById(req.getScheduleId());
         if (schedule == null) {
             throw new ResourceNotFoundException("Không tìm thấy lịch khám!");
         }

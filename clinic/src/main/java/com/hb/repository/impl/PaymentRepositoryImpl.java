@@ -9,7 +9,6 @@ import com.hb.enums.PaymentStatus;
 import com.hb.pojo.Payment;
 import com.hb.repository.PaymentRepository;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +29,6 @@ public class PaymentRepositoryImpl implements PaymentRepository {
 
     @Autowired
     private LocalSessionFactoryBean factory;
-    
 
     @Override
     public List<Payment> getPaymentsByUserName(Map<String, String> params) {
@@ -51,7 +49,35 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     @Override
     public List<Payment> getPayments(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<Payment> q = session.createNamedQuery("Payment.findAll", Payment.class);
+        StringBuilder hql = new StringBuilder("SELECT p FROM Payment p "
+                + "JOIN FETCH p.paymentItem i "
+                + "JOIN FETCH p.appointment a "
+                + "JOIN FETCH a.patientId WHERE 1=1");
+
+        if (params != null && params.containsKey("patientId")) {
+            hql.append(" AND a.patientId.id = :patientId");
+        }
+        if (params != null && params.containsKey("endDate") && params.containsKey("startDate")) {
+            hql.append(" AND p.createdAt >= :startDate AND p.createdAt < :endDate");
+        } else if (params != null && params.containsKey("startDate")) {
+            hql.append(" AND p.createdAt >= :startDate");
+        } else if (params != null && params.containsKey("endDate")) {
+            hql.append(" AND p.createdAt < :endDate");
+        }
+
+        hql.append(" ORDER BY p.createdAt DESC");
+
+        Query<Payment> q = session.createQuery(hql.toString(), Payment.class);
+
+        if (params != null && params.containsKey("patientId")) {
+            q.setParameter("patientId", Long.valueOf(params.get("patientId")));
+        }
+        if (params != null && params.containsKey("startDate")) {
+            q.setParameter("startDate", LocalDate.parse(params.get("startDate")).atStartOfDay());
+        }
+        if (params != null && params.containsKey("endDate")) {
+            q.setParameter("endDate", LocalDate.parse(params.get("endDate")).plusDays(1).atStartOfDay());
+        }
 
         if (params != null) {
             int pageSize = Integer.parseInt(params.get("pageSize"));
@@ -104,9 +130,9 @@ public class PaymentRepositoryImpl implements PaymentRepository {
                 .setParameter("orderId", orderId)
                 .uniqueResult();
     }
-    
+
     @Override
-    public void updatePaymentStatus(Long paymentId, PaymentStatus status,PaymentMethod method ) {
+    public void updatePaymentStatus(Long paymentId, PaymentStatus status, PaymentMethod method) {
         Session s = this.factory.getObject().getCurrentSession();
         Payment p = this.getPaymentById(paymentId);
         if (p != null) {
@@ -115,14 +141,15 @@ public class PaymentRepositoryImpl implements PaymentRepository {
             s.merge(p);
         }
     }
-    
+
     @Override
-    public void addOrUpdatePayment(Payment p) {
+    public Payment addOrUpdatePayment(Payment p) {
         Session s = this.factory.getObject().getCurrentSession();
         if (p.getId() != null && p.getId() > 0) {
-            s.merge(p);
+            return s.merge(p);
         } else {
             s.persist(p);
+            return p;
         }
     }
 
@@ -135,42 +162,38 @@ public class PaymentRepositoryImpl implements PaymentRepository {
 //        
 //        
 //    }
-
     @Override
     public List<Payment> getPaymentByPatientId(Long patientId, Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
-        
-       StringBuilder hql = new StringBuilder(
-            "SELECT DISTINCT p FROM Payment p " +
-            "LEFT JOIN FETCH p.paymentItems " + 
-            "WHERE p.appointment.patientId.id = :patientId"
+
+        StringBuilder hql = new StringBuilder(
+                "SELECT DISTINCT p FROM Payment p "
+                + "LEFT JOIN FETCH p.paymentItem "
+                + "WHERE p.appointment.patientId.id = :patientId"
         );
         String startDate = params.get("startDate");
         String endDate = params.get("endDate");
-        
-        if (startDate != null && !startDate.isEmpty() && endDate != null && !endDate.isEmpty()) {
-            hql.append(" AND p.createdAt BETWEEN :startDate AND :endDate");
-        }
-        
-        hql.append(" ORDER BY p.createdAt DESC");
-        
-        Query<Payment> query = session.createQuery(hql.toString(), Payment.class);
-        
-        query.setParameter("patientId", patientId);
-        
-         if (startDate != null && !startDate.isEmpty() && endDate != null && !endDate.isEmpty()) {
 
+        if (startDate != null && !startDate.isEmpty() && endDate != null && !endDate.isEmpty()) {
+            hql.append(" AND p.createdAt >= :startDate AND p.createdAt < :endDate");
+        }
+
+        hql.append(" ORDER BY p.createdAt DESC");
+
+        Query<Payment> query = session.createQuery(hql.toString(), Payment.class);
+
+        query.setParameter("patientId", patientId);
+
+        if (startDate != null && !startDate.isEmpty() && endDate != null && !endDate.isEmpty()) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             LocalDate start = LocalDate.parse(startDate, formatter);
             LocalDate end = LocalDate.parse(endDate, formatter);
-            
-         
-            query.setParameter("startDate", start);
-            query.setParameter("endDate", end.plusDays(1));
+
+            query.setParameter("startDate", start.atStartOfDay());
+            query.setParameter("endDate", end.plusDays(1).atStartOfDay());
         }
-        
+
         return query.getResultList();
     }
 
-   
 }

@@ -10,7 +10,6 @@ import com.hb.dto.request.RefreshTokenRequest;
 import com.hb.dto.request.UserCreateRequest;
 import com.hb.dto.request.UserLogin;
 import com.hb.dto.response.AuthResponse;
-import com.hb.exception.DuplicateResourceException;
 import com.hb.pojo.RefreshToken;
 import com.hb.pojo.User;
 import com.hb.service.AuthService;
@@ -46,7 +45,7 @@ public class ApiAuthController {
 
     @Autowired
     private UserService userService;
-    
+
     @Autowired
     private RefreshTokenService refreshTokenService;
 
@@ -55,41 +54,34 @@ public class ApiAuthController {
 
     @PostMapping(value = "/auth/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> create(@ModelAttribute UserCreateRequest urq) {
-        try {
-            authService.registerPatient(urq);
-            return new ResponseEntity<>(HttpStatus.CREATED);
-        } catch (DuplicateResourceException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi hệ thống: ");
-        }
+        authService.registerPatient(urq);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PostMapping("/auth/login")
     public ResponseEntity<?> login(@RequestBody UserLogin u) {
         if (this.authService.authenticate(u.getUsername(), u.getPassword())) {
-  
-                
-           if (u.getFcmToken() != null && !u.getFcmToken().isEmpty()) {
-                    this.userService.updateFcmToken(u.getUsername(), u.getFcmToken());
-                }
 
-                String role = this.userService.getRoleByUsername(u.getUsername());
-                String token = JwtUtils.generateToken(u.getUsername(), role);
-                User user = userService.getUserByUsername(u.getUsername());
-                String deviceId = u.getDeviceId();
-                String deviceInfo = u.getDeviceInfo();
-                RefreshToken rt = refreshTokenService.generateRefreshToken(user.getId(), deviceId, deviceInfo, null);
-                String refreshToken = rt.getToken();
-                AuthResponse res = new AuthResponse(token, refreshToken);
-              
-                return ResponseEntity.ok().body(res);
+            if (u.getFcmToken() != null && !u.getFcmToken().isEmpty()) {
+                this.userService.updateFcmToken(u.getUsername(), u.getFcmToken());
+            }
+
+            String role = this.userService.getRoleByUsername(u.getUsername());
+            String token = JwtUtils.generateToken(u.getUsername(), role);
+            User user = userService.getUserByUsername(u.getUsername());
+            String deviceId = u.getDeviceId();
+            String deviceInfo = u.getDeviceInfo();
+            RefreshToken rt = refreshTokenService.generateRefreshToken(user.getId(), deviceId, deviceInfo, null);
+            String refreshToken = rt.getToken();
+            AuthResponse res = new AuthResponse(token, refreshToken);
+
+            return ResponseEntity.ok().body(res);
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Sai thông tin đăng nhập");
     }
 
     @PostMapping("/auth/refresh")
-    public ResponseEntity<?> refresh(@RequestBody RefreshTokenRequest req ) {
+    public ResponseEntity<?> refresh(@RequestBody RefreshTokenRequest req) {
         AuthResponse res = refreshTokenService.refresh(req.getRefreshToken());
         return ResponseEntity.ok().body(res);
     }
@@ -112,13 +104,13 @@ public class ApiAuthController {
 
             GoogleIdToken.Payload payload = idToken.getPayload();
 
-            User user = userService.processSocialLogin(payload, fcmToken);
+            User user = userService.processSocialLoginGoogle(payload, fcmToken);
 
             String role = userService.getRoleByUsername(user.getUsername());
             String accessToken = JwtUtils.generateToken(user.getUsername(), role);
             String deviceId = params.get("deviceId");
             String deviceInfo = params.get("deviceInfo");
-            RefreshToken rt = refreshTokenService.generateRefreshToken(user.getId(), deviceId, deviceInfo,null);
+            RefreshToken rt = refreshTokenService.generateRefreshToken(user.getId(), deviceId, deviceInfo, null);
 
             return ResponseEntity.ok(new AuthResponse(accessToken, rt.getToken()));
 
@@ -143,9 +135,9 @@ public class ApiAuthController {
 
         String deviceId = params.get("deviceId");
         String deviceInfo = params.get("deviceInfo");
-        RefreshToken rt = refreshTokenService.generateRefreshToken(user.getId(), deviceId, deviceInfo,null);
+        RefreshToken rt = refreshTokenService.generateRefreshToken(user.getId(), deviceId, deviceInfo, null);
 
-        String accessToken = JwtUtils.generateToken(user.getUsername(), user.getRole());
+        String accessToken = JwtUtils.generateToken(user.getUsername(), user.getRole().toString());
 
         return ResponseEntity.ok(new AuthResponse(accessToken, rt.getToken()));
     }

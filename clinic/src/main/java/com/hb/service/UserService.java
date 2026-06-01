@@ -26,7 +26,7 @@ public interface UserService extends UserDetailsService {
     List<User> getActiveUsers(String kw);
     
     void deleteUser(Long id);
-    User processSocialLogin(GoogleIdToken.Payload payload, String fcmToken);
+    User processSocialLoginGoogle(GoogleIdToken.Payload payload, String fcmToken);
     User processSocialLoginFacebook(String facebookId, String email, String name);
             
             

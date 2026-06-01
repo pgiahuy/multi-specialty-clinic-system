@@ -7,6 +7,8 @@ package com.hb.pojo;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -19,39 +21,42 @@ import java.io.Serializable;
 
 /**
  *
- * @author DELL
+ * @author HUY
  */
 @Entity
-@Table(name = "lab_result_details")
+@Table(name = "lab_result_detail")
 @NamedQueries({
-    @NamedQuery(name = "LabResultDetails.findAll", query = "SELECT l FROM LabResultDetails l"),
-    @NamedQuery(name = "LabResultDetails.findById", query = "SELECT l FROM LabResultDetails l WHERE l.id = :id"),
-    @NamedQuery(name = "LabResultDetails.findByValue", query = "SELECT l FROM LabResultDetails l WHERE l.value = :value"),
-    @NamedQuery(name = "LabResultDetails.findByIsAbnormal", query = "SELECT l FROM LabResultDetails l WHERE l.isAbnormal = :isAbnormal")})
-public class LabResultDetails implements Serializable {
+    @NamedQuery(name = "LabResultDetail.findAll", query = "SELECT l FROM LabResultDetail l"),
+    @NamedQuery(name = "LabResultDetail.findById", query = "SELECT l FROM LabResultDetail l WHERE l.id = :id"),
+    @NamedQuery(name = "LabResultDetail.findByValue", query = "SELECT l FROM LabResultDetail l WHERE l.value = :value"),
+    @NamedQuery(name = "LabResultDetail.findByIsAbnormal", query = "SELECT l FROM LabResultDetail l WHERE l.isAbnormal = :isAbnormal")})
+public class LabResultDetail implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
     @NotNull
     @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Size(max = 45)
     @Column(name = "value")
     private String value;
     @Column(name = "is_abnormal")
     private Short isAbnormal;
-    @JoinColumn(name = "lab_results_id", referencedColumnName = "id")
+    @NotNull
+    @JoinColumn(name = "lab_result_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
-    private LabResults labResultsId;
+    private LabResult labResultId;
+    @NotNull
     @JoinColumn(name = "test_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
-    private LabTests testId;
+    private LabTest testId;
 
-    public LabResultDetails() {
+    public LabResultDetail() {
     }
 
-    public LabResultDetails(Long id) {
+    public LabResultDetail(Long id) {
         this.id = id;
     }
 
@@ -79,19 +84,19 @@ public class LabResultDetails implements Serializable {
         this.isAbnormal = isAbnormal;
     }
 
-    public LabResults getLabResultsId() {
-        return labResultsId;
+    public LabResult getLabResultsId() {
+        return labResultId;
     }
 
-    public void setLabResultsId(LabResults labResultsId) {
-        this.labResultsId = labResultsId;
+    public void setLabResultsId(LabResult labResultsId) {
+        this.labResultId = labResultsId;
     }
 
-    public LabTests getTestId() {
+    public LabTest getTestId() {
         return testId;
     }
 
-    public void setTestId(LabTests testId) {
+    public void setTestId(LabTest testId) {
         this.testId = testId;
     }
 
@@ -105,10 +110,10 @@ public class LabResultDetails implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof LabResultDetails)) {
+        if (!(object instanceof LabResultDetail)) {
             return false;
         }
-        LabResultDetails other = (LabResultDetails) object;
+        LabResultDetail other = (LabResultDetail) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -117,7 +122,7 @@ public class LabResultDetails implements Serializable {
 
     @Override
     public String toString() {
-        return "com.hb.pojo.LabResultDetails[ id=" + id + " ]";
+        return "com.hb.pojo.LabResultDetail[ id=" + id + " ]";
     }
     
 }

@@ -4,9 +4,9 @@
  */
 package com.hb.service.impl;
 
-import com.hb.pojo.LabResultDetails;
+import com.hb.pojo.LabResultDetail;
 import com.hb.service.LabResultDetailService;
-import java.io.Serial;
+
 import org.springframework.stereotype.Service;
 
 /**
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 public class LabResultDetailServiceImpl implements LabResultDetailService{
 
     @Override
-    public LabResultDetails getLabResultDetailById(Long id) {
+    public LabResultDetail getLabResultDetailById(Long id) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
     

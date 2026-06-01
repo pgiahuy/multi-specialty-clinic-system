@@ -19,7 +19,8 @@ public interface PaymentMapper {
     PaymentMapper INSTANCE = Mappers.getMapper(PaymentMapper.class);
     
     @Mapping(source = "appointmentId.patientId.fullName", target = "patientName")
-    @Mapping(source = "appointmentId.id", target = "appointmentId")        
+    @Mapping(source = "appointmentId.id", target = "appointmentId")     
+    @Mapping(source = "paymentItemCollection", target = "paymentItems")
     PaymentResponse toResponse(Payment payment);
     
 }

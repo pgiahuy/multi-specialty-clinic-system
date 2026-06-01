@@ -27,19 +27,19 @@ import java.util.Date;
 
 /**
  *
- * @author DELL
+ * @author HUY
  */
 @Entity
-@Table(name = "shifts")
+@Table(name = "shift")
 @NamedQueries({
-    @NamedQuery(name = "Shifts.findAll", query = "SELECT s FROM Shifts s"),
-    @NamedQuery(name = "Shifts.findById", query = "SELECT s FROM Shifts s WHERE s.id = :id"),
-    @NamedQuery(name = "Shifts.findByStartTime", query = "SELECT s FROM Shifts s WHERE s.startTime = :startTime"),
-    @NamedQuery(name = "Shifts.findByEndTime", query = "SELECT s FROM Shifts s WHERE s.endTime = :endTime"),
-    @NamedQuery(name = "Shifts.findBySession", query = "SELECT s FROM Shifts s WHERE s.session = :session"),
-    @NamedQuery(name = "Shifts.findByMaxPatients", query = "SELECT s FROM Shifts s WHERE s.maxPatients = :maxPatients"),
-    @NamedQuery(name = "Shifts.findByMinPatients", query = "SELECT s FROM Shifts s WHERE s.minPatients = :minPatients")})
-public class Shifts implements Serializable {
+    @NamedQuery(name = "Shift.findAll", query = "SELECT s FROM Shift s"),
+    @NamedQuery(name = "Shift.findById", query = "SELECT s FROM Shift s WHERE s.id = :id"),
+    @NamedQuery(name = "Shift.findByStartTime", query = "SELECT s FROM Shift s WHERE s.startTime = :startTime"),
+    @NamedQuery(name = "Shift.findByEndTime", query = "SELECT s FROM Shift s WHERE s.endTime = :endTime"),
+    @NamedQuery(name = "Shift.findBySession", query = "SELECT s FROM Shift s WHERE s.session = :session"),
+    @NamedQuery(name = "Shift.findByMaxPatients", query = "SELECT s FROM Shift s WHERE s.maxPatients = :maxPatients"),
+    @NamedQuery(name = "Shift.findByMinPatients", query = "SELECT s FROM Shift s WHERE s.minPatients = :minPatients")})
+public class Shift implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -62,12 +62,12 @@ public class Shifts implements Serializable {
     @Column(name = "min_patients")
     private Integer minPatients;
     @OneToMany(mappedBy = "shiftId")
-    private Collection<Schedules> schedulesCollection;
+    private Collection<Schedule> scheduleCollection;
 
-    public Shifts() {
+    public Shift() {
     }
 
-    public Shifts(Long id) {
+    public Shift(Long id) {
         this.id = id;
     }
 
@@ -119,12 +119,12 @@ public class Shifts implements Serializable {
         this.minPatients = minPatients;
     }
 
-    public Collection<Schedules> getSchedulesCollection() {
-        return schedulesCollection;
+    public Collection<Schedule> getScheduleCollection() {
+        return scheduleCollection;
     }
 
-    public void setSchedulesCollection(Collection<Schedules> schedulesCollection) {
-        this.schedulesCollection = schedulesCollection;
+    public void setScheduleCollection(Collection<Schedule> scheduleCollection) {
+        this.scheduleCollection = scheduleCollection;
     }
 
     @Override
@@ -137,10 +137,10 @@ public class Shifts implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Shifts)) {
+        if (!(object instanceof Shift)) {
             return false;
         }
-        Shifts other = (Shifts) object;
+        Shift other = (Shift) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -149,7 +149,7 @@ public class Shifts implements Serializable {
 
     @Override
     public String toString() {
-        return "com.hb.pojo.Shifts[ id=" + id + " ]";
+        return "com.hb.pojo.Shift[ id=" + id + " ]";
     }
     
 }

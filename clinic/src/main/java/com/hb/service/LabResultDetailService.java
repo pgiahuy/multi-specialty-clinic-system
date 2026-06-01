@@ -4,12 +4,12 @@
  */
 package com.hb.service;
 
-import com.hb.pojo.LabResultDetails;
+import com.hb.pojo.LabResultDetail;
 
 /**
  *
  * @author DELL
  */
 public interface LabResultDetailService {
-    LabResultDetails getLabResultDetailById(Long id);
+    LabResultDetail getLabResultDetailById(Long id);
 }

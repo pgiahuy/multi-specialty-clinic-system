@@ -4,9 +4,8 @@
  */
 package com.hb.service;
 
-import com.hb.pojo.Appointment;
 import com.hb.pojo.Payment;
-import com.hb.pojo.PaymentItems;
+import com.hb.pojo.PaymentItem;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +23,7 @@ public interface PaymentItemsService {
     
 //    void confirmItemsPaid(String transId, String method, List<Long> itemIds);
     
-    PaymentItems getPaymentItemByAppointment(Long  appointmentId);
+    PaymentItem getPaymentItemByAppointment(Long  appointmentId);
     
-    List<PaymentItems> getPaymentItemsByPaymentId(Long paymentId, Map<String, String> params);
+    List<PaymentItem> getPaymentItemsByPaymentId(Long paymentId, Map<String, String> params);
 }

@@ -11,18 +11,18 @@ import java.util.List;
  *
  * @author DELL
  */
-public class LabTestResultRequest {
+public class LabResultCreateRequest {
     private Long id;
     private Long appointId;
     private LocalDateTime createdAt;
     private LocalDateTime testAt;
-    private List<TestDetailRequest> details;
+    private List<LabResultDetailRequest> details;
     
 
-    public LabTestResultRequest() {
+    public LabResultCreateRequest() {
     }
 
-    public LabTestResultRequest(Long id, Long appointId, LocalDateTime createdAt, LocalDateTime testAt, List<TestDetailRequest> details) {
+    public LabResultCreateRequest(Long id, Long appointId, LocalDateTime createdAt, LocalDateTime testAt, List<LabResultDetailRequest> details) {
         this.id = id;
         this.appointId = appointId;
         this.createdAt = createdAt;
@@ -95,14 +95,14 @@ public class LabTestResultRequest {
     /**
      * @return the details
      */
-    public List<TestDetailRequest> getDetails() {
+    public List<LabResultDetailRequest> getDetails() {
         return details;
     }
 
     /**
      * @param details the details to set
      */
-    public void setDetails(List<TestDetailRequest> details) {
+    public void setDetails(List<LabResultDetailRequest> details) {
         this.details = details;
     }
     

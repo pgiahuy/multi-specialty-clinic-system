@@ -6,7 +6,7 @@ package com.hb.repository;
 
 import com.hb.pojo.Appointment;
 import com.hb.pojo.Payment;
-import com.hb.pojo.PaymentItems;
+import com.hb.pojo.PaymentItem;
 import java.util.List;
 import java.util.Map;
 
@@ -15,12 +15,12 @@ import java.util.Map;
  * @author DELL
  */
 public interface PaymentItemRepository {
-    List<PaymentItems> getItemsByPaymentId(Long paymentId);
-    List<PaymentItems> getItemsByPayment(Payment payment);
-    List<PaymentItems> getPaymentItems(Map<String,String> params);
-    PaymentItems getItemById(Long id);
-    PaymentItems getItemByAppointment(Long appointmentId);
-    void addOrUpdateItem(PaymentItems item);
+    List<PaymentItem> getItemsByPaymentId(Long paymentId);
+    List<PaymentItem> getItemsByPayment(Payment payment);
+    List<PaymentItem> getPaymentItems(Map<String,String> params);
+    PaymentItem getItemById(Long id);
+    PaymentItem getItemByAppointment(Long appointmentId);
+    void addOrUpdateItem(PaymentItem item);
     void deleteItem(Long id);
-    List<PaymentItems> getItemsByPaymentId(Long paymentId, Map<String, String> params);
+    List<PaymentItem> getItemsByPaymentId(Long paymentId, Map<String, String> params);
 }

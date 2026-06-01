@@ -22,18 +22,18 @@ import java.util.Collection;
 
 /**
  *
- * @author DELL
+ * @author HUY
  */
 @Entity
-@Table(name = "lab_tests")
+@Table(name = "lab_test")
 @NamedQueries({
-    @NamedQuery(name = "LabTests.findAll", query = "SELECT l FROM LabTests l"),
-    @NamedQuery(name = "LabTests.findById", query = "SELECT l FROM LabTests l WHERE l.id = :id"),
-    @NamedQuery(name = "LabTests.findByTestName", query = "SELECT l FROM LabTests l WHERE l.testName = :testName"),
-    @NamedQuery(name = "LabTests.findByUnit", query = "SELECT l FROM LabTests l WHERE l.unit = :unit"),
-    @NamedQuery(name = "LabTests.findByNormalRange", query = "SELECT l FROM LabTests l WHERE l.normalRange = :normalRange"),
-    @NamedQuery(name = "LabTests.findByPrice", query = "SELECT l FROM LabTests l WHERE l.price = :price")})
-public class LabTests implements Serializable {
+    @NamedQuery(name = "LabTest.findAll", query = "SELECT l FROM LabTest l"),
+    @NamedQuery(name = "LabTest.findById", query = "SELECT l FROM LabTest l WHERE l.id = :id"),
+    @NamedQuery(name = "LabTest.findByTestName", query = "SELECT l FROM LabTest l WHERE l.testName = :testName"),
+    @NamedQuery(name = "LabTest.findByUnit", query = "SELECT l FROM LabTest l WHERE l.unit = :unit"),
+    @NamedQuery(name = "LabTest.findByNormalRange", query = "SELECT l FROM LabTest l WHERE l.normalRange = :normalRange"),
+    @NamedQuery(name = "LabTest.findByPrice", query = "SELECT l FROM LabTest l WHERE l.price = :price")})
+public class LabTest implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -54,12 +54,12 @@ public class LabTests implements Serializable {
     @Column(name = "price")
     private BigDecimal price;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "testId")
-    private Collection<LabResultDetails> labResultDetailsCollection;
+    private Collection<LabResultDetail> labResultDetailCollection;
 
-    public LabTests() {
+    public LabTest() {
     }
 
-    public LabTests(Long id) {
+    public LabTest(Long id) {
         this.id = id;
     }
 
@@ -103,12 +103,12 @@ public class LabTests implements Serializable {
         this.price = price;
     }
 
-    public Collection<LabResultDetails> getLabResultDetailsCollection() {
-        return labResultDetailsCollection;
+    public Collection<LabResultDetail> getLabResultDetailCollection() {
+        return labResultDetailCollection;
     }
 
-    public void setLabResultDetailsCollection(Collection<LabResultDetails> labResultDetailsCollection) {
-        this.labResultDetailsCollection = labResultDetailsCollection;
+    public void setLabResultDetailCollection(Collection<LabResultDetail> labResultDetailCollection) {
+        this.labResultDetailCollection = labResultDetailCollection;
     }
 
     @Override
@@ -121,10 +121,10 @@ public class LabTests implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof LabTests)) {
+        if (!(object instanceof LabTest)) {
             return false;
         }
-        LabTests other = (LabTests) object;
+        LabTest other = (LabTest) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -133,7 +133,7 @@ public class LabTests implements Serializable {
 
     @Override
     public String toString() {
-        return "com.hb.pojo.LabTests[ id=" + id + " ]";
+        return "com.hb.pojo.LabTest[ id=" + id + " ]";
     }
     
 }

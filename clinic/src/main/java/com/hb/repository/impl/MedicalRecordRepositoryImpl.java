@@ -8,10 +8,9 @@ import com.hb.exception.ResourceNotFoundException;
 import com.hb.pojo.Appointment;
 import com.hb.pojo.MedicalRecord;
 import com.hb.pojo.Patient;
-import com.hb.pojo.Schedules;
+import com.hb.pojo.Schedule;
 import com.hb.pojo.User;
 import com.hb.repository.MedicalRecordRepository;
-import jakarta.ejb.Schedule;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Join;
@@ -156,7 +155,7 @@ public class MedicalRecordRepositoryImpl extends BaseRepositoryImpl<MedicalRecor
         Root<MedicalRecord> medicalRecord = query.from(MedicalRecord.class);
 
         Join<MedicalRecord, Appointment> appointment = medicalRecord.join("appointmentId", JoinType.INNER);
-        Join<Appointment, Schedules> schedule = appointment.join("scheduleId", JoinType.LEFT);
+        Join<Appointment, Schedule> schedule = appointment.join("scheduleId", JoinType.LEFT);
         Join<Appointment, Patient> patient = appointment.join("patientId", JoinType.LEFT);
 
         Predicate idMatch = cb.equal(medicalRecord.get("id"), medicalRecordId);

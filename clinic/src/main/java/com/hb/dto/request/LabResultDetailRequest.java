@@ -8,17 +8,17 @@ package com.hb.dto.request;
  *
  * @author DELL
  */
-public class TestDetailRequest {
+public class LabResultDetailRequest {
     private Long id;
     private Long testId;
     private Long labResultId;
     private String value;
     private Boolean isAbnormal;
 
-    public TestDetailRequest() {
+    public LabResultDetailRequest() {
     }
 
-    public TestDetailRequest(Long id, Long testId, Long labResultId, String value, Boolean isAbnormal) {
+    public LabResultDetailRequest(Long id, Long testId, Long labResultId, String value, Boolean isAbnormal) {
         this.id = id;
         this.testId = testId;
         this.labResultId = labResultId;

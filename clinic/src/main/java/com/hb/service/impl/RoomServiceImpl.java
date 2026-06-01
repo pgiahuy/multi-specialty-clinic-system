@@ -6,15 +6,15 @@ package com.hb.service.impl;
 
 import com.hb.dto.request.form.RoomForm;
 import com.hb.exception.BadRequestException;
-import com.hb.pojo.Areas;
-import com.hb.pojo.Rooms;
-import com.hb.repository.AreasRepository;
+import com.hb.pojo.Area;
+import com.hb.pojo.Room;
 import com.hb.repository.RoomRepository;
 import com.hb.service.RoomService;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.hb.repository.AreaRepository;
 
 /**
  *
@@ -26,16 +26,16 @@ public class RoomServiceImpl implements RoomService{
     private RoomRepository roomRepo;
     
     @Autowired
-    private AreasRepository areaRepo;
+    private AreaRepository areaRepo;
     
     @Override
-    public List<Rooms> getRooms(Map<String, String> params) {
+    public List<Room> getRooms(Map<String, String> params) {
         return roomRepo.getRooms(params);
     }
 
     @Override
-    public Rooms getRoomById(Long id) {
-        Rooms r = roomRepo.getRoomById(id);
+    public Room getRoomById(Long id) {
+        Room r = roomRepo.getRoomById(id);
         if (r == null) {
             throw new RuntimeException("Room not found!");
         }
@@ -43,10 +43,10 @@ public class RoomServiceImpl implements RoomService{
     }
 
     @Override
-    public Rooms saveOrUpdate(RoomForm form) {
-        Rooms r;
+    public Room saveOrUpdate(RoomForm form) {
+        Room r;
         if (form.getId()==null) {
-            r = new Rooms();
+            r = new Room();
         }else{
             r = this.roomRepo.getRoomById(form.getId());
         }
@@ -68,7 +68,7 @@ public class RoomServiceImpl implements RoomService{
 
     @Override
     public long countRooms(Map<String, String> params) {
-        return roomRepo.count(params, Rooms.class);
+        return roomRepo.count(params, Room.class);
     }
     
 }

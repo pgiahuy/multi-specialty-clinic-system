@@ -9,16 +9,18 @@ import com.hb.enums.PaymentStatus;
 import com.hb.enums.AppointmentStatus;
 import com.hb.pojo.Appointment;
 import com.hb.pojo.Payment;
-import com.hb.pojo.PaymentItems;
+import com.hb.pojo.PaymentItem;
+import com.hb.pojo.User;
 import com.hb.repository.PaymentItemRepository;
 import com.hb.repository.PaymentRepository;
 import com.hb.repository.AppointmentRepository;
 import com.hb.service.AppointmentService;
+import com.hb.service.NotificationService;
 import com.hb.service.PaymentItemsService;
 import com.hb.service.PaymentService;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,9 +38,12 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Autowired
     private PaymentItemsService itemService;
-    
+
     @Autowired
     private AppointmentService appointService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Autowired
     private PaymentItemRepository itemRepo;
@@ -51,7 +56,7 @@ public class PaymentServiceImpl implements PaymentService {
         return this.paymentRepo.getPayments(params);
     }
 
-    
+
     @Override
     public Payment getPaymentById(Long id) {
         return this.paymentRepo.getPaymentById(id);
@@ -75,20 +80,19 @@ public class PaymentServiceImpl implements PaymentService {
         return p;
     }
 
-
     @Override
     public Payment getPaymentByAppoint(Long appointmentId) {
-        PaymentItems item = itemService.getPaymentItemByAppointment(appointmentId);
+        PaymentItem item = itemService.getPaymentItemByAppointment(appointmentId);
         return this.paymentRepo.getPaymentById(item.getPaymentId().getId());
     }
 
     @Override
     public void updatePaymentTotalAmount(Payment payment) {
-        List<PaymentItems> items = itemRepo.getItemsByPayment(payment);
+        List<PaymentItem> items = itemRepo.getItemsByPayment(payment);
 
         BigDecimal total = BigDecimal.ZERO;
         if (items != null && !items.isEmpty()) {
-            for (PaymentItems item : items) {
+            for (PaymentItem item : items) {
                 if (item.getAmount() != null) {
                     total = total.add(item.getAmount());
                 }
@@ -103,8 +107,7 @@ public class PaymentServiceImpl implements PaymentService {
     public List<Payment> getPaymentByPatientId(Long patientId, Map<String, String> params) {
         return this.paymentRepo.getPaymentByPatientId(patientId, params);
     }
-    
-    
+
     @Override
     public BigDecimal getPaymentAmount(Long paymentId) {
         Payment p = paymentRepo.getPaymentById(paymentId);
@@ -117,16 +120,32 @@ public class PaymentServiceImpl implements PaymentService {
         if (p.getStatus() == PaymentStatus.SUCCESS) {
             return;
         }
-        
+
         p.setStatus(PaymentStatus.SUCCESS);
         p.setMethod(method);
         p.setPaidAt(LocalDateTime.now());
-        
-        paymentRepo.addOrUpdatePayment(p);
 
-        if (p.getAppointmentId() != null) {
+        Payment saved = paymentRepo.addOrUpdatePayment(p);
+        if (p.getAppointmentId()!= null) {
             p.getAppointmentId().setStatus(AppointmentStatus.PENDING);
             appointmentRepo.addOrUpdateAppointment(p.getAppointmentId());
+
+        }
+        try {
+            if (saved != null && saved.getAppointmentId().getPatientId().getUserId()!= null) {
+                
+                User patientUser = saved.getAppointmentId().getPatientId().getUserId();
+                if (patientUser != null) {
+                    Map<String, String> notiParams = new HashMap<>();
+                    notiParams.put("username", patientUser.getUsername());
+                    notiParams.put("title", "Thanh toán thành công!");
+                    notiParams.put("content", "Bạn vừa thanh toán thành công một hoá đơn. Vui lòng kiểm tra!");
+                    notiParams.put("path", "/api/secure/payments/patient/" + saved.getAppointmentId().getPatientId().getId());
+                    this.notificationService.addNotification(notiParams);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Lỗi gửi thông báo: " + e.getMessage());
         }
     }
 
@@ -136,11 +155,11 @@ public class PaymentServiceImpl implements PaymentService {
         if (p.getStatus() == PaymentStatus.SUCCESS) {
             return;
         }
-        
+
         p.setStatus(PaymentStatus.FAILURE);
         p.setMethod(method);
         p.setPaidAt(LocalDateTime.now());
-        
+
         paymentRepo.addOrUpdatePayment(p);
     }
 

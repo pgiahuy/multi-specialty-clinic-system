@@ -4,7 +4,7 @@
  */
 package com.hb.repository;
 
-import com.hb.pojo.Shifts;
+import com.hb.pojo.Shift;
 import java.util.List;
 import java.util.Map;
 
@@ -12,10 +12,10 @@ import java.util.Map;
  *
  * @author HUY
  */
-public interface ShiftRepository extends BaseRepository<Shifts>{
-    List<Shifts> getShifts(Map<String,String> params);
-    Shifts saveOrUpdate(Shifts d);
-    Shifts getShiftById(Long id);
+public interface ShiftRepository extends BaseRepository<Shift>{
+    List<Shift> getShifts(Map<String,String> params);
+    Shift saveOrUpdate(Shift d);
+    Shift getShiftById(Long id);
     void deleteShift(Long id);
     
 }

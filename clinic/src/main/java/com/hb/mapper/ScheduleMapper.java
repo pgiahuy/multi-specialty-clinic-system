@@ -6,7 +6,7 @@ package com.hb.mapper;
 
 import com.hb.dto.request.ScheduleCreateRequest;
 import com.hb.dto.response.ScheduleRepsonse;
-import com.hb.pojo.Schedules;
+import com.hb.pojo.Schedule;
 import org.springframework.stereotype.Component;
 
 /**
@@ -16,47 +16,47 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ScheduleMapper {
-    public ScheduleRepsonse toResponse(Schedules sche) {
+    public ScheduleRepsonse toResponse(Schedule schedule) {
     ScheduleRepsonse s = new ScheduleRepsonse();
 
-    s.setId(sche.getId());
-    s.setDate(sche.getDate());
-    s.setMaxPatients(sche.getMaxPatients());
-    s.setCurrentPatients(sche.getCurrentPatients());
+    s.setId(schedule.getId());
+    s.setDate(schedule.getDate());
+    s.setMaxPatients(schedule.getMaxPatients());
+    s.setCurrentPatients(schedule.getCurrentPatients());
 
-    if (sche.getDoctorId() != null) {
-        s.setDoctorName(sche.getDoctorId().getFullName());
+    if (schedule.getDoctorId() != null) {
+        s.setDoctorName(schedule.getDoctorId().getFullName());
     }
 
-    if (sche.getRoomId() != null) {
-        s.setRoom(sche.getRoomId().getRoomNumber());
+    if (schedule.getRoomId() != null) {
+        s.setRoom(schedule.getRoomId().getRoomNumber());
 
-        if (sche.getRoomId().getAreaId() != null) {
-            s.setArea(sche.getRoomId().getAreaId().getAreaName());
+        if (schedule.getRoomId().getAreaId() != null) {
+            s.setArea(schedule.getRoomId().getAreaId().getAreaName());
         }
     }
 
-    if (sche.getSpecialtyId() != null) {
-        s.setSpecialtyName(sche.getSpecialtyId().getName());
+    if (schedule.getSpecialtyId() != null) {
+        s.setSpecialtyName(schedule.getSpecialtyId().getName());
     }
 
-    if (sche.getShiftId() != null) {
+    if (schedule.getShiftId() != null) {
 
-        if (sche.getShiftId().getSession() != null) {
+        if (schedule.getShiftId().getSession() != null) {
             s.setSession(
-                sche.getShiftId().getSession().getLabel()
+                schedule.getShiftId().getSession().getLabel()
             );
         }
 
-        if (sche.getShiftId().getStartTime() != null) {
+        if (schedule.getShiftId().getStartTime() != null) {
             s.setShiftStartTime(
-                sche.getShiftId().getStartTime().toString()
+                schedule.getShiftId().getStartTime().toString()
             );
         }
 
-        if (sche.getShiftId().getEndTime() != null) {
+        if (schedule.getShiftId().getEndTime() != null) {
             s.setShiftEndTime(
-                sche.getShiftId().getEndTime().toString()
+                schedule.getShiftId().getEndTime().toString()
             );
         }
     }

@@ -33,7 +33,7 @@ import java.util.Date;
 
 /**
  *
- * @author DELL
+ * @author HUY
  */
 @Entity
 @Table(name = "payment")
@@ -61,7 +61,6 @@ public class Payment implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "created_at")
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
     @Basic(optional = false)
     @NotNull
@@ -80,7 +79,7 @@ public class Payment implements Serializable {
     @ManyToOne(optional = false)
     private Appointment appointmentId;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "paymentId")
-    private Collection<PaymentItems> paymentItemsCollection;
+    private Collection<PaymentItem> paymentItemCollection;
 
     public Payment() {
     }
@@ -152,12 +151,12 @@ public class Payment implements Serializable {
         this.appointmentId = appointmentId;
     }
 
-    public Collection<PaymentItems> getPaymentItemsCollection() {
-        return paymentItemsCollection;
+    public Collection<PaymentItem> getPaymentItemCollection() {
+        return paymentItemCollection;
     }
 
-    public void setPaymentItemsCollection(Collection<PaymentItems> paymentItemsCollection) {
-        this.paymentItemsCollection = paymentItemsCollection;
+    public void setPaymentItemCollection(Collection<PaymentItem> paymentItemCollection) {
+        this.paymentItemCollection = paymentItemCollection;
     }
 
     @Override
@@ -184,5 +183,5 @@ public class Payment implements Serializable {
     public String toString() {
         return "com.hb.pojo.Payment[ id=" + id + " ]";
     }
-    
+
 }
