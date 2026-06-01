@@ -17,12 +17,12 @@ public class MedicineResponse {
     private String name;
     private BigDecimal price;
     private String unit;
-    private int totalStock;
+    private Long totalStock;
 
     public MedicineResponse() {
     }
 
-    public MedicineResponse(Long id, String code, String name, BigDecimal price, String unit, int totalStock) {
+    public MedicineResponse(Long id, String code, String name, BigDecimal price, String unit, Long totalStock) {
         this.id = id;
         this.code = code;
         this.name = name;
@@ -104,14 +104,14 @@ public class MedicineResponse {
     /**
      * @return the totalStock
      */
-    public int getTotalStock() {
+    public Long getTotalStock() {
         return totalStock;
     }
 
     /**
      * @param totalStock the totalStock to set
      */
-    public void setTotalStock(int totalStock) {
+    public void setTotalStock(Long totalStock) {
         this.totalStock = totalStock;
     }
 

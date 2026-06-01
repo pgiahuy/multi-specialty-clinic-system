@@ -181,7 +181,17 @@ const BookingPage = () => {
             return;
         }
 
-        if (!selectedPatient || !selectedSpecialty || !selectedDoctor || !selectedDate || !selectedSchedule) {
+        if (!selectedPatient) {
+            handleShowAlert(
+                "Vui lòng chọn hồ sơ bệnh nhân",
+                "Vui lòng chọn hồ sơ bệnh nhân trước khi đăng ký lịch khám.",
+                "warning"
+            );
+            return;
+        }
+
+
+        if (!selectedSchedule) {
             handleShowAlert(
                 "Thiếu thông tin",
                 "Vui lòng chọn đầy đủ hồ sơ, chuyên khoa, bác sĩ, ngày khám và ca khám.",
@@ -369,7 +379,7 @@ const BookingPage = () => {
                                             backgroundColor: "#f8f9fa",
                                         }}
                                     >
-                                        <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-2">
+                                        <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-2 g-2">
                                             {patientProfiles.length === 0 ? (
                                                 <div className="text-muted small fst-italic px-2 py-2">Chưa có hồ sơ để hiển thị.</div>
                                             ) : (

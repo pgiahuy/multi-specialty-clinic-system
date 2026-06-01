@@ -4,16 +4,12 @@
  */
 package com.hb.repository.impl;
 
-import com.hb.pojo.Appointment;
 import com.hb.pojo.Payment;
 import com.hb.pojo.PaymentItem;
 import com.hb.repository.PaymentItemRepository;
-import java.sql.Timestamp;
-import java.time.Instant;
+
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
+
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;

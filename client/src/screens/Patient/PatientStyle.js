@@ -30,11 +30,13 @@ export const patientInfoCard = {
 
 export const tableStyles = {
     container: {
+        padding: '0 15px 0 15px',
         boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
         borderRadius: '8px',
         overflow: 'hidden'
     },
     table: {
+
         margin: 0,
         borderCollapse: 'collapse'
     },
@@ -43,8 +45,8 @@ export const tableStyles = {
         color: '#fff'
     },
     headerCell: {
-        padding: '14px 16px',
-        fontWeight: '600',
+        padding: '18px 0',
+        fontWeight: '500',
         fontSize: '14px',
         textAlign: 'center',
         borderBottom: 'none'
@@ -58,13 +60,13 @@ export const tableStyles = {
         backgroundColor: '#e7f1ff'
     },
     dataCell: {
-        padding: '12px 16px',
+        padding: '12px 0',
         fontSize: '14px',
         textAlign: 'center',
         color: '#6c757d'
     },
     dataCellLeft: {
-        padding: '12px 16px',
+        padding: '12px 0',
         fontSize: '14px',
         fontWeight: '500',
         color: '#212529',

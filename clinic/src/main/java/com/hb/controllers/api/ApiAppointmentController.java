@@ -103,7 +103,7 @@ public class ApiAppointmentController {
 
         boolean isOwner = false;
 
-        if (UserRole.ROLE_DOCTOR.equals(currentUser.getRole().toString())) {
+        if (UserRole.ROLE_DOCTOR.equals(currentUser.getRole())) {
             if (appointment.getScheduleId() != null && appointment.getScheduleId().getDoctorId() != null) {
                 isOwner = appointment.getScheduleId().getDoctorId().getUserId().getId().equals(currentUser.getId());
             }

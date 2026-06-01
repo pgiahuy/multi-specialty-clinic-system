@@ -34,7 +34,7 @@ export const endpoint = {
     'current-user': '/secure/users/profile',
     'appointments': '/secure/appointments',
     'appointment': (appointmentId) => `/secure/appointment/${appointmentId}`,
-    "appointment-patient": (patientId) => `/secure/appointments/patient/${patientId}`,
+
     'create-payment': '/secure/payments/create',
     'momo-return': '/secure/payments/momo/return',
     'payments': (patientId) => `/secure/payments/${patientId}`,
