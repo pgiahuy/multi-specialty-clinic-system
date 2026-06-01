@@ -1,71 +1,76 @@
 import { useEffect, useState } from "react";
-import { Card, Col, Container, Row, Badge, Form, Spinner, Tabs, Tab, Button, Modal } from "react-bootstrap";
-import { useNavigate, useParams } from "react-router-dom";
+import { Card, Col, Container, Row, Badge, Form, Tabs, Tab, Button, Modal } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import Footer from "../../components/Footer";
 import Header from "../../components/Header";
 import { authApis, PAYMENT_ENDPOINTS, USER_ENDPOINTS } from "../../configs/Apis";
 import MySpinner from "../../components/MySpinner";
+import MyModal from "../../components/MyModal";
+import { CheckCircleFill } from "react-bootstrap-icons";
+
+const PAID_STATUSES = new Set(["success", "paid", "đã thanh toán"]);
+
+const getInitialFromDate = () => {
+    const date = new Date();
+    date.setMonth(date.getMonth() - 1);
+    return date.toISOString().slice(0, 10);
+};
+
+const getInitialToDate = () => {
+    const date = new Date();
+    return date.toISOString().slice(0, 10);
+};
+
+const normalizeStatus = (status) => String(status || "").toLowerCase();
 
 const PaymentDetail = () => {
-    const { patientId } = useParams();
     const navigate = useNavigate();
     const [payments, setPayments] = useState([]);
     const [patientProfiles, setPatientProfiles] = useState([]);
-    const [selectedPatientId, setSelectedPatientId] = useState(patientId || "");
-    const [loadingProfiles, setLoadingProfiles] = useState(true);
+    const [selectedPatientId, setSelectedPatientId] = useState(null);
     const [loadingPayments, setLoadingPayments] = useState(false);
     const [activeTab, setActiveTab] = useState('unpaid');
     const [showPaymentModal, setShowPaymentModal] = useState(false);
-    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('MOMO');
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [successMessage, setSuccessMessage] = useState('Thanh toán đã được ghi nhận thành công.');
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('CASH');
     const [currentInvoice, setCurrentInvoice] = useState(null);
-    const [fromDate, setFromDate] = useState(() => {
-        const date = new Date();
-        date.setMonth(date.getMonth() - 1);
-        return date.toISOString().slice(0, 10);
-    });
-    const [toDate, setToDate] = useState(() => {
-        const date = new Date();
-        return date.toISOString().slice(0, 10);
-    });
-    const [testDetails, setTestDetails] = useState([]);
+    const [fromDate, setFromDate] = useState(getInitialFromDate);
+    const [toDate, setToDate] = useState(getInitialToDate);
     const [testNamesMap, setTestNamesMap] = useState({});
 
     const loadPatientProfiles = async () => {
         try {
-            setLoadingProfiles(true);
             const res = await authApis().get(USER_ENDPOINTS.PATIENT_PROFILES);
             const profiles = res.data || [];
             setPatientProfiles(profiles);
 
-            if (!patientId && profiles.length > 0) {
-                const firstPatientId = String(profiles[0].id);
-                setSelectedPatientId(firstPatientId);
-                navigate(`/patient/payment/${firstPatientId}`, { replace: true });
-            } else if (patientId) {
-                setSelectedPatientId(String(patientId));
-            }
+            // if (!patientId && profiles.length > 0) {
+            //     const firstPatientId = String(profiles[0].id);
+            //     setSelectedPatientId(firstPatientId);
+            //     navigate(`/patient/payments`, { replace: true });
+            // } else if (patientId) {
+            //     setSelectedPatientId(String(patientId));
+            // }
         } catch (err) {
             console.log(err);
-        } finally {
-            setLoadingProfiles(false);
         }
     };
 
-    const loadPayments = async (id, startDate, endDate) => {
-        if (!id) {
-            setPayments([]);
-            return;
-        }
+    const loadPayments = async (patientId, startDate, endDate) => {
+
         setLoadingPayments(true);
         try {
             const params = {};
+
+            if (patientId) params.patientId = patientId;
             if (startDate) params.startDate = startDate;
             if (endDate) params.endDate = endDate;
-            const res = await authApis().get(PAYMENT_ENDPOINTS.HISTORY(id), {
-                params
-            });
-            setPayments(res.data || []);
-            loadTestNames(res.data);
+
+            const res = await authApis().get(PAYMENT_ENDPOINTS.HISTORY, { params });
+            const paymentList = res.data || [];
+            setPayments(paymentList);
+            loadTestNames(paymentList);
         } catch (err) {
             console.log(err);
             setPayments([]);
@@ -94,16 +99,17 @@ const PaymentDetail = () => {
             const promises = Array.from(idsToFetch).map(id => authApis().get(`secure/test/${id}`));
             const responses = await Promise.all(promises);
 
-            const newNames = { ...testNamesMap };
-            responses.forEach(res => {
-                if (res.data && res.data.id) {
+            setTestNamesMap(prev => {
+                const newNames = { ...prev };
 
-                    newNames[res.data.id] = res.data.testName || res.data.name;
-                }
+                responses.forEach(res => {
+                    if (res.data && res.data.id) {
+                        newNames[res.data.id] = res.data.testName || res.data.name;
+                    }
+                });
+
+                return newNames;
             });
-
-
-            setTestNamesMap(newNames);
         } catch (err) {
             console.error("Lỗi khi load tên xét nghiệm:", err);
         }
@@ -116,18 +122,13 @@ const PaymentDetail = () => {
     }, []);
 
     useEffect(() => {
-        if (patientId) {
-            setSelectedPatientId(String(patientId));
-            loadPayments(patientId, fromDate, toDate);
-        }
-    }, [patientId, fromDate, toDate]);
+        loadPayments(selectedPatientId, fromDate, toDate);
+    }, [selectedPatientId, fromDate, toDate]);
 
     const handlePatientChange = (event) => {
         const value = event.target.value;
         setSelectedPatientId(value);
-        if (value) {
-            navigate(`/patient/payment/${value}`);
-        }
+
     };
 
     const profileLabel = (profile) => {
@@ -135,13 +136,11 @@ const PaymentDetail = () => {
     };
 
     const isPaidInvoice = (payment) => {
-        const status = String(payment.status || '').toLowerCase();
-        return status === 'success' || status === 'paid' || status === 'đã thanh toán';
+        return PAID_STATUSES.has(normalizeStatus(payment.status));
     };
 
     const paymentStatusVariant = (status) => {
-        const lower = String(status || '').toLowerCase();
-        if (lower === 'success' || lower === 'paid' || lower === 'đã thanh toán') return 'success';
+        if (PAID_STATUSES.has(normalizeStatus(status))) return 'success';
         return 'warning';
     };
 
@@ -158,24 +157,21 @@ const PaymentDetail = () => {
 
         switch (type) {
             case 'APPOINTMENT': return 'Phí khám bệnh';
-            case 'PRESCRIPTON':
             case 'PRESCRIPTION': return 'Đơn thuốc';
             default: return item?.itemName || item?.itemType || 'Dịch vụ y tế';
         }
     };
 
     const getInvoiceTitle = (payment) => {
-
-
-
-        const type = String(payment.paymentItems[0].itemType || '').toUpperCase();
+        const firstItemType = payment?.paymentItems?.[0]?.itemType;
+        const type = String(firstItemType || '').toUpperCase();
 
         switch (type) {
             case 'APPOINTMENT':
                 return 'PHÍ KHÁM BỆNH';
             case 'LAB_TEST':
                 return 'PHÍ XÉT NGHIỆM';
-            case 'PRESCRIPTON':
+
             case 'PRESCRIPTION':
                 return 'PHÍ MUA THUỐC';
             default:
@@ -183,26 +179,52 @@ const PaymentDetail = () => {
         }
     };
 
+
+
+    const parseVietnameseDate = (dateString) => {
+        if (!dateString) return null;
+
+
+        const parts = dateString.split(' ');
+        const datePart = parts[0];
+        const timePart = parts[1] || '00:00:00';
+
+
+        const [day, month, year] = datePart.split('/');
+
+
+        if (!day || !month || !year) return new Date(dateString);
+
+
+        return new Date(`${year}-${month}-${day}T${timePart}`);
+    };
+
     const isPaymentInRange = (payment) => {
         const rawDate = payment.createdDate || payment.createdAt || '';
-        const invoiceDate = rawDate
-            ? new Date(rawDate + 'T00:00:00')
-            : null;
+
+
+        const invoiceDate = parseVietnameseDate(rawDate);
+
         if (!invoiceDate || Number.isNaN(invoiceDate.getTime())) return true;
 
         if (fromDate) {
-            const from = new Date(fromDate + 'T00:00:00');
+            const from = new Date(fromDate);
+            from.setHours(0, 0, 0, 0);
             if (invoiceDate < from) return false;
         }
+
         if (toDate) {
-            const to = new Date(toDate + 'T23:59:59');
+            const to = new Date(toDate);
+            to.setHours(23, 59, 59, 999);
             if (invoiceDate > to) return false;
         }
+
         return true;
     };
 
     const filteredPayments = payments.filter((payment) => {
-        if (activeTab === 'paid' ? !isPaidInvoice(payment) : isPaidInvoice(payment)) return false;
+        const shouldShowPaid = activeTab === 'paid';
+        if (shouldShowPaid ? !isPaidInvoice(payment) : isPaidInvoice(payment)) return false;
         return isPaymentInRange(payment);
     });
 
@@ -219,12 +241,10 @@ const PaymentDetail = () => {
         }
 
         try {
-
             const formData = new URLSearchParams();
             formData.append("method", selectedPaymentMethod);
             formData.append("paymentId", currentInvoice.id);
             formData.append("orderInfo", `Thanh toan hoa don ${currentInvoice.id}`);
-
 
             const res = await authApis().post(PAYMENT_ENDPOINTS.PAY, formData, {
                 headers: {
@@ -233,15 +253,12 @@ const PaymentDetail = () => {
             });
 
 
-
             const payUrl = res.data.payUrl || res.data.shortLink;
 
             if (payUrl) {
-
                 setShowPaymentModal(false);
                 window.location.href = payUrl;
             } else {
-
                 setPayments((prev) =>
                     prev.map((payment) =>
                         payment.id === currentInvoice.id ? { ...payment, status: 'SUCCESS' } : payment
@@ -249,12 +266,12 @@ const PaymentDetail = () => {
                 );
                 setShowPaymentModal(false);
                 setCurrentInvoice(null);
-
+                setSuccessMessage('Thanh toán thành công!');
+                setShowSuccessModal(true);
             }
 
         } catch (error) {
             console.error("Lỗi thanh toán:", error);
-
 
 
         }
@@ -290,26 +307,22 @@ const PaymentDetail = () => {
 
                                 <div>
                                     <Form.Label className="small text-muted mb-1">Bệnh nhân</Form.Label>
-                                    {loadingProfiles ? (
-                                        <div className="d-flex align-items-center gap-2 py-2 px-3 bg-white rounded shadow-sm" style={{ width: '250px' }}>
-                                            <MySpinner />
-                                        </div>
-                                    ) : (
-                                        <Form.Select
-                                            value={selectedPatientId}
-                                            className="rounded-3 shadow-sm px-3"
-                                            style={{ minWidth: '250px' }}
-                                            onChange={handlePatientChange}
-                                            aria-label="Chọn hồ sơ bệnh nhân"
-                                        >
-                                            <option value="">---Chọn hồ sơ bệnh nhân---</option>
-                                            {patientProfiles.map((profile) => (
-                                                <option key={profile.id} value={profile.id}>
-                                                    {profileLabel(profile)}
-                                                </option>
-                                            ))}
-                                        </Form.Select>
-                                    )}
+
+                                    <Form.Select
+                                        value={selectedPatientId}
+                                        className="rounded-3 shadow-sm px-3"
+                                        style={{ minWidth: '250px' }}
+                                        onChange={(e) => handlePatientChange(e)}
+                                        aria-label="Chọn hồ sơ bệnh nhân"
+                                    >
+                                        <option value="">---Chọn hồ sơ bệnh nhân---</option>
+                                        {patientProfiles.map((profile) => (
+                                            <option key={profile.id} value={profile.id}>
+                                                {profileLabel(profile)}
+                                            </option>
+                                        ))}
+                                    </Form.Select>
+
                                 </div>
 
 
@@ -389,33 +402,40 @@ const PaymentDetail = () => {
                                     >
                                         <div className="h-100 d-flex flex-column bg-white">
 
-                                            {/* HEADER: Tiêu đề & Trạng thái */}
+
                                             <Card.Header className="bg-white border-0 p-4 pb-0">
                                                 <div className="d-flex justify-content-between align-items-start gap-3">
-                                                    <div>
-                                                        <h5 className="text-primary fw-bold mb-2" style={{ lineHeight: '1.4' }}>
-                                                            {getInvoiceTitle(p)}
-                                                        </h5>
-                                                        <div className="text-secondary small d-flex align-items-center">
-                                                            <i className="bi bi-clock-history me-2"></i>
-                                                            {p.createdDate || p.createdAt || 'Chưa cập nhật ngày'}
-                                                        </div>
-                                                    </div>
+                                                    <h5 className="text-primary fw-bold mb-2" style={{ lineHeight: '1.4' }}>
+                                                        {getInvoiceTitle(p)}
+                                                    </h5>
                                                     <div>
                                                         <Badge
                                                             bg="transparent"
                                                             className={`rounded-pill px-3 py-2 border ${p.status === 'SUCCESS'
-                                                                    ? 'border-success text-success bg-success-subtle'
-                                                                    : 'border-warning text-warning bg-warning-subtle'
+                                                                ? 'border-success text-success bg-success-subtle'
+                                                                : 'border-warning text-warning bg-warning-subtle'
                                                                 }`}
                                                         >
                                                             {p.status === 'SUCCESS' ? 'ĐÃ THANH TOÁN' : 'CHỜ THANH TOÁN'}
                                                         </Badge>
                                                     </div>
+
+
+                                                </div>
+                                                <div>
+
+                                                    <div className="text d-flex align-items-center mb-2">
+                                                        {p.patientName}
+                                                    </div>
+                                                    {p.paidAt && (
+                                                        <div className="text-success small d-flex align-items-center mt-1">
+                                                            Ngày thanh toán: {p.paidAt}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </Card.Header>
 
-                                           
+
                                             <Card.Body className="d-flex flex-column px-4 py-4">
 
                                                 <div className="mb-auto">
@@ -430,7 +450,7 @@ const PaymentDetail = () => {
                                                     )}
                                                 </div>
 
-                                                
+
                                                 <div className="mt-4 pt-3 border-top border-light">
                                                     <div className="d-flex justify-content-between align-items-baseline mb-3">
                                                         <span className="text-secondary small fw-medium">Tổng cộng:</span>
@@ -470,7 +490,7 @@ const PaymentDetail = () => {
                         <div className="mb-4">
                             <div className="small text-muted mb-2">Chọn phương thức thanh toán</div>
 
-                            {/* 1. TIỀN MẶT */}
+
                             <div
                                 className={`d-flex align-items-center p-3 mb-2 border rounded-3 ${selectedPaymentMethod === 'CASH' ? 'border-primary bg-primary bg-opacity-10' : 'bg-white'}`}
                                 style={{ cursor: 'pointer', transition: 'all 0.2s' }}
@@ -485,7 +505,7 @@ const PaymentDetail = () => {
                                 </div>
                             </div>
 
-                            {/* 2. MOMO */}
+
                             <div
                                 className={`d-flex align-items-center p-3 mb-2 border rounded-3 ${selectedPaymentMethod === 'MOMO' ? 'border-danger bg-danger bg-opacity-10' : 'bg-white'}`}
                                 style={{ cursor: 'pointer', transition: 'all 0.2s' }}
@@ -500,14 +520,14 @@ const PaymentDetail = () => {
                                 </div>
                             </div>
 
-                            {/* 3. VNPAY (MỚI THÊM) */}
+
                             <div
                                 className={`d-flex align-items-center p-3 border rounded-3 ${selectedPaymentMethod === 'VNPAY' ? 'border-info bg-info bg-opacity-10' : 'bg-white'}`}
                                 style={{ cursor: 'pointer', transition: 'all 0.2s' }}
                                 onClick={() => setSelectedPaymentMethod('VNPAY')}
                             >
                                 <div className="flex-grow-1">
-                                    {/* Sử dụng màu xanh dương chuẩn thương hiệu VNPAY */}
+
                                     <div className="fw-bold" style={{ color: '#005baa' }}>Cổng thanh toán VNPAY</div>
                                     <div className="small text-muted">Thẻ ATM / Thẻ tín dụng / QR Code</div>
                                 </div>
@@ -532,7 +552,7 @@ const PaymentDetail = () => {
                         <Button
                             className="px-4 rounded-pill fw-bold border-0 text-white transition-all"
                             style={{
-                                // Đổi màu nút linh hoạt theo phương thức được chọn
+
                                 backgroundColor:
                                     selectedPaymentMethod === 'MOMO' ? '#a50064' :
                                         selectedPaymentMethod === 'VNPAY' ? '#005baa' :
@@ -544,6 +564,18 @@ const PaymentDetail = () => {
                         </Button>
                     </Modal.Footer>
                 </Modal>
+
+                <MyModal
+                    show={showSuccessModal}
+                    onHide={() => setShowSuccessModal(false)}
+                    title="Thông báo"
+                    cancelText="Đóng"
+                >
+                    <div className="text-center py-3">
+                        <h4 className="fw-semibold mb-2">{successMessage}</h4>
+                        <CheckCircleFill color="green" size={50} />
+                    </div>
+                </MyModal>
             </div>
         </>
     );

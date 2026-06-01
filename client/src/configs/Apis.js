@@ -34,7 +34,7 @@ export const endpoint = {
     'current-user': '/secure/users/profile',
     'appointments': '/secure/appointments',
     'appointment': (appointmentId) => `/secure/appointment/${appointmentId}`,
-    "appointment-patient": (patientId) => `/secure/appointments/patient/${patientId}`,
+
     'create-payment': '/secure/payments/create',
     'momo-return': '/secure/payments/momo/return',
     'payments': (patientId) => `/secure/payments/${patientId}`,
@@ -61,7 +61,7 @@ export const CLINIC_ENDPOINTS = {
     DOCTORS: 'doctors',
     PATIENTS: 'patients',
     SPECIALTIES: 'specialties',
-    ROOMS: 'rooms',
+    AVAILABLE_ROOMS: 'secure/available-rooms',
     SHIFTS: 'shifts',
     SCHEDULES: 'secure/schedules',
     DOCTOR_APPOINTMENTS: (scheduleId) => `secure/appointments?scheduleId=${scheduleId}`,
@@ -82,7 +82,6 @@ export const CLINIC_ENDPOINTS = {
 };
 
 
-
 export const USER_ENDPOINTS = {
     CURRENT_USER: 'secure/users/profile',
     NOTIFICATIONS: 'secure/users/notifications',
@@ -97,14 +96,22 @@ export const APPOINTMENT_ENDPOINTS = {
     APPOINTMENTS_BY_PATIENT: (patientId) => `secure/appointments/patient/${patientId}`,
     CREATE_APPOINTMENT: 'secure/appointments',
     CONFIRM_APPOINTMENT: (appointmentId) => `secure/appointments/${appointmentId}/confirm`,
+    CANCEL_APPOINTMENT: (appointmentId) => `secure/appointment/${appointmentId}/cancel`,
 };
 
 export const PAYMENT_ENDPOINTS = {
     PAY: 'secure/payments/pay',
     MOMO_RETURN: 'secure/payments/momo/return',
     VNPAY_IPN: 'secure/payments/vnpay/ipn',
-    HISTORY: (patientId) => `secure/payments/${patientId}`,
+    HISTORY: 'secure/payments',
     ITEMS: (paymentId) => `secure/payment-items/${paymentId}`,
+};
+
+export const TEST_ENDPOINTS = {
+    LAB_RESULTS: 'secure/lab-results',
+    TEST_RESULT_DETAIL: (testId) => `secure/test/${testId}`,
+    UPDATE_LAB_RESULT: (labResultId) => `secure/lab-results/${labResultId}`,
+    LAB_RESULTS_BY_APPOINTMENT: (appointmentId) => `secure/lab-results/appointment/${appointmentId}`,
 };
 
 
@@ -116,6 +123,7 @@ export const clinicApis = {
     getShifts: () => API.get(CLINIC_ENDPOINTS.SHIFTS),
     getMedicines: (params = {}) => authApis().get(CLINIC_ENDPOINTS.MEDICINES, { params }),
 };
+
 
 
 

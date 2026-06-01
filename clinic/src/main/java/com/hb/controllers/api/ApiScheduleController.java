@@ -6,8 +6,9 @@ package com.hb.controllers.api;
 
 import com.hb.dto.request.ScheduleCreateRequest;
 import com.hb.dto.response.ScheduleRepsonse;
+import com.hb.enums.UserRole;
 import com.hb.mapper.ScheduleMapper;
-import com.hb.pojo.Schedules;
+import com.hb.pojo.Schedule;
 import com.hb.pojo.User;
 import com.hb.service.ScheduleService;
 import com.hb.service.UserService;
@@ -19,6 +20,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -54,7 +56,7 @@ public class ApiScheduleController {
 
         User u = userService.getUserByUsername(principal.getName());
         
-        if ("ROLE_DOCTOR".equals(u.getRole())) {
+        if (UserRole.ROLE_DOCTOR.equals(u.getRole())) {
             if (u.getDoctor() != null) {
                 params.put("doctorId", String.valueOf(u.getDoctor().getId()));
             }
@@ -64,11 +66,12 @@ public class ApiScheduleController {
 
         int pageSize = this.env.getProperty("admin.page_size", Integer.class);
         params.put("pageSize", String.valueOf(pageSize));
-        List<Schedules> s = scheduleService.getSchedules(params);
+        List<Schedule> s = scheduleService.getSchedules(params);
         return ResponseEntity.ok(s.stream().map(scheduleMapper::toResponse).toList());
     }
 
     @PostMapping("/secure/schedules")
+    @PreAuthorize("hasRole('DOCTOR')")
     public ResponseEntity<ScheduleRepsonse> register(Principal principal, @RequestBody ScheduleCreateRequest req) {
         User u = this.userService.getUserByUsername(principal.getName());
         if (u.getDoctor() == null) {

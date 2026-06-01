@@ -19,7 +19,7 @@ public class AppointmentResponse {
     private Long id;
     private String status;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
     private Long patientId;
     private String patientFullName;
     private String doctorFullName;
@@ -34,7 +34,7 @@ public class AppointmentResponse {
     public AppointmentResponse() {
     }
 
-    public AppointmentResponse(Long id, String status, LocalDate createdAt, Long patientId, String patientFullName, String doctorFullName, String specialtyName, BigDecimal price, String appointmentDate, String session, String timeSlot, String roomName, String areaName) {
+    public AppointmentResponse(Long id, String status, LocalDateTime createdAt, Long patientId, String patientFullName, String doctorFullName, String specialtyName, BigDecimal price, String appointmentDate, String session, String timeSlot, String roomName, String areaName) {
         this.id = id;
         this.status = status;
         this.createdAt = createdAt;
@@ -67,14 +67,14 @@ public class AppointmentResponse {
     /**
      * @return the createdAt
      */
-    public LocalDate getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
     /**
      * @param createdAt the createdAt to set
      */
-    public void setCreatedAt(LocalDate createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 

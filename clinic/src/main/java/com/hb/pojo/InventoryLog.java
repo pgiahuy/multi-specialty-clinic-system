@@ -4,9 +4,12 @@
  */
 package com.hb.pojo;
 
+import com.hb.enums.InventoryLogType;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -15,10 +18,14 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  *
@@ -36,6 +43,12 @@ import java.time.LocalDateTime;
     @NamedQuery(name = "InventoryLog.findByCreatedBy", query = "SELECT i FROM InventoryLog i WHERE i.createdBy = :createdBy")})
 public class InventoryLog implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id")
+    private Long id;
     @Basic(optional = false)
     @NotNull
     @Column(name = "change_amount")
@@ -44,7 +57,8 @@ public class InventoryLog implements Serializable {
     @NotNull
     @Size(min = 1, max = 255)
     @Column(name = "reason")
-    private String reason;
+    @Enumerated(EnumType.STRING)
+    private InventoryLogType reason;
     @Column(name = "reference_id")
     private Long referenceId;
     @Column(name = "created_at")
@@ -52,13 +66,6 @@ public class InventoryLog implements Serializable {
     @Size(max = 255)
     @Column(name = "created_by")
     private String createdBy;
-
-    private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "id")
-    private Long id;
     @JoinColumn(name = "medicine_id", referencedColumnName = "id")
     @ManyToOne
     private Medicine medicineId;
@@ -73,7 +80,7 @@ public class InventoryLog implements Serializable {
         this.id = id;
     }
 
-    public InventoryLog(Long id, int changeAmount, String reason) {
+    public InventoryLog(Long id, int changeAmount, InventoryLogType reason) {
         this.id = id;
         this.changeAmount = changeAmount;
         this.reason = reason;
@@ -95,6 +102,13 @@ public class InventoryLog implements Serializable {
         this.changeAmount = changeAmount;
     }
 
+    public InventoryLogType getReason() {
+        return reason;
+    }
+
+    public void setReason(InventoryLogType reason) {
+        this.reason = reason;
+    }
 
     public Long getReferenceId() {
         return referenceId;
@@ -112,7 +126,13 @@ public class InventoryLog implements Serializable {
         this.createdAt = createdAt;
     }
 
-   
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
 
     public Medicine getMedicineId() {
         return medicineId;
@@ -153,25 +173,6 @@ public class InventoryLog implements Serializable {
     @Override
     public String toString() {
         return "com.hb.pojo.InventoryLog[ id=" + id + " ]";
-    }
-
- 
-    public String getReason() {
-        return reason;
-    }
-
-    public void setReason(String reason) {
-        this.reason = reason;
-    }
-
-   
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
     }
     
 }

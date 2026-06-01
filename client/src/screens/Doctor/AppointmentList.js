@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import Footer from "../../components/Footer";
 import Header from "../../components/Header";
-import { authApis, CLINIC_ENDPOINTS, endpoint } from "../../configs/Apis";
-import { useNavigate, useParams } from "react-router-dom";
+import { APPOINTMENT_ENDPOINTS, authApis, CLINIC_ENDPOINTS, endpoint } from "../../configs/Apis";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Button, Container, Table } from "react-bootstrap";
 import MySpinner from "../../components/MySpinner";
 import { tableStyles } from "../Patient/PatientStyle";
@@ -16,11 +16,12 @@ const AppointmentList = () => {
     const nav = useNavigate();
 
 
-    const loadAppointments = async (scheduleId) => {
+    const loadAppointments = async () => {
         try {
             setLoading(true);
-            const response = await authApis().get(`${CLINIC_ENDPOINTS.DOCTOR_APPOINTMENTS(scheduleId)}`);
+            const response = await authApis().get(`${APPOINTMENT_ENDPOINTS.APPOINTMENTS}`);
             setAppointments(response.data);
+           
         } catch (error) {
             console.error("Lỗi khi tải danh sách lịch hẹn:", error);
         } finally {
@@ -32,7 +33,7 @@ const AppointmentList = () => {
         try {
             setConfirmingAppointmentId(appointmentId);
             await authApis().post(CLINIC_ENDPOINTS.DOCTOR_CONFIRM_APPOINTMENT(appointmentId));
-            await loadAppointments(scheduleId);
+            await loadAppointments();
         } catch (error) {
             console.error("Lỗi khi xác nhận lịch hẹn:", error);
         } finally {
@@ -44,7 +45,7 @@ const AppointmentList = () => {
         try {
             setConfirmingAppointmentId(appointmentId);
             await authApis().post(CLINIC_ENDPOINTS.DOCTOR_START_APPOINTMENT(appointmentId));
-            await loadAppointments(scheduleId);
+            await loadAppointments();
         } catch (error) {
             console.error("Lỗi khi bắt đầu khám:", error);
         } finally {
@@ -53,10 +54,9 @@ const AppointmentList = () => {
     };
 
     useEffect(() => {
-        if (scheduleId) {
-            loadAppointments(scheduleId);
-        }
-    }, [scheduleId]);
+        loadAppointments();
+    }, []);
+
 
 
     const statusMap = {
@@ -83,7 +83,7 @@ const AppointmentList = () => {
     const getAppointmentAction = (appointment) => {
         if (appointment.status === 'PENDING') {
             return {
-                label: confirmingAppointmentId === appointment.id ? 'Đang xác nhận...' : 'Xác nhận lịch hẹn',
+                label: confirmingAppointmentId === appointment.id ? 'Đang xác nhận...' : 'Xác nhận',
                 variant: 'warning',
                 disabled: confirmingAppointmentId === appointment.id,
                 onClick: () => handleConfirmAppointment(appointment.id),
@@ -92,7 +92,7 @@ const AppointmentList = () => {
 
         if (appointment.status === 'CONFIRMED') {
             return {
-                label: confirmingAppointmentId === appointment.id ? 'Đang bắt đầu...' : 'Bắt đầu khám',
+                label: confirmingAppointmentId === appointment.id ? 'Đang bắt đầu...' : 'Vào khám',
                 variant: 'info',
                 disabled: confirmingAppointmentId === appointment.id,
                 onClick: () => handleStartAppointment(appointment.id),
@@ -115,7 +115,7 @@ const AppointmentList = () => {
         <>
             <div className="d-flex flex-column min-vh-100">
                 <Header />
-                <Container className="py-4">
+                <Container fluid className="py-4" style={{ width: '97%' }}>
                     <h3 className="mb-4 text-center">DANH SÁCH LỊCH HẸN</h3>
                     {loading ? (
                         <div className="text-center">
@@ -130,7 +130,7 @@ const AppointmentList = () => {
                             <Table hover className="table" style={tableStyles.table}>
                                 <thead>
                                     <tr style={tableStyles.headerRow}>
-                                        <th style={tableStyles.headerCell}>Số thứ tự</th>
+                                        <th style={tableStyles.headerCell}>STT</th>
                                         <th style={tableStyles.headerCell}>Bệnh nhân</th>
                                         <th style={tableStyles.headerCell}>Bác sĩ</th>
                                         <th style={tableStyles.headerCell}>Chuyên khoa</th>

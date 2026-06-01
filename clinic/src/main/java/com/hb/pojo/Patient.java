@@ -6,7 +6,6 @@ package com.hb.pojo;
 
 import com.hb.enums.PatientRelationship;
 import jakarta.persistence.Basic;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -44,6 +43,7 @@ import java.util.Date;
     @NamedQuery(name = "Patient.findByGender", query = "SELECT p FROM Patient p WHERE p.gender = :gender"),
     @NamedQuery(name = "Patient.findByAddress", query = "SELECT p FROM Patient p WHERE p.address = :address"),
     @NamedQuery(name = "Patient.findByPhone", query = "SELECT p FROM Patient p WHERE p.phone = :phone"),
+    @NamedQuery(name = "Patient.findByRelationship", query = "SELECT p FROM Patient p WHERE p.relationship = :relationship"),
     @NamedQuery(name = "Patient.findByIsActive", query = "SELECT p FROM Patient p WHERE p.isActive = :isActive")})
 public class Patient implements Serializable {
 
@@ -78,23 +78,21 @@ public class Patient implements Serializable {
     @Size(min = 1, max = 255)
     @Column(name = "address")
     private String address;
-    
-    @Enumerated(EnumType.STRING)
-    @Column(name="relationship")
-    private PatientRelationship relationship;
     // @Pattern(regexp="^\\(?(\\d{3})\\)?[- ]?(\\d{3})[- ]?(\\d{4})$", message="Invalid phone/fax format, should be as xxx-xxx-xxxx")//if the field contains phone or fax number consider using this annotation to enforce field validation
     @Size(max = 20)
     @Column(name = "phone")
     private String phone;
+    @Size(max = 11)
+    @Column(name = "relationship")
+    @Enumerated(EnumType.STRING)
+    private PatientRelationship relationship;
     @Column(name = "is_active")
-    private Boolean isActive;
+    private boolean isActive;
     @OneToMany(mappedBy = "patientId")
     private Collection<Appointment> appointmentCollection;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @ManyToOne
     private User userId;
-    
-    
 
     public Patient() {
     }
@@ -103,20 +101,14 @@ public class Patient implements Serializable {
         this.id = id;
     }
 
-    public Patient(Long id, String cccd, String fullName, LocalDate dob, String gender, String address, PatientRelationship relationship, String phone, Boolean isActive, Collection<Appointment> appointmentCollection, User userId) {
+    public Patient(Long id, String cccd, String fullName, LocalDate dob, String gender, String address) {
         this.id = id;
         this.cccd = cccd;
         this.fullName = fullName;
         this.dob = dob;
         this.gender = gender;
         this.address = address;
-        this.relationship = relationship;
-        this.phone = phone;
-        this.isActive = isActive;
-        this.userId = userId;
     }
-
-    
 
     public Long getId() {
         return id;
@@ -174,11 +166,19 @@ public class Patient implements Serializable {
         this.phone = phone;
     }
 
-    public Boolean getIsActive() {
+    public PatientRelationship getRelationship() {
+        return relationship;
+    }
+
+    public void setRelationship(PatientRelationship relationship) {
+        this.relationship = relationship;
+    }
+
+    public boolean getIsActive() {
         return isActive;
     }
 
-    public void setIsActive(Boolean isActive) {
+    public void setIsActive(boolean isActive) {
         this.isActive = isActive;
     }
 
@@ -197,9 +197,6 @@ public class Patient implements Serializable {
     public void setUserId(User userId) {
         this.userId = userId;
     }
-
-  
-   
 
     @Override
     public int hashCode() {
@@ -224,20 +221,6 @@ public class Patient implements Serializable {
     @Override
     public String toString() {
         return "com.hb.pojo.Patient[ id=" + id + " ]";
-    }
-
-    /**
-     * @return the relationship
-     */
-    public PatientRelationship getRelationship() {
-        return relationship;
-    }
-
-    /**
-     * @param relationship the relationship to set
-     */
-    public void setRelationship(PatientRelationship relationship) {
-        this.relationship = relationship;
     }
     
 }

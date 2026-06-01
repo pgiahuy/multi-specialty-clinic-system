@@ -18,5 +18,6 @@ public interface DoctorRepository extends BaseRepository<Doctor>{
     List<Doctor> getAllDoctors();
     Doctor saveOrUpdate(Doctor d);
     Doctor getDoctorById(Long id);
+    Doctor getDoctorByUserId(Long id);
     void deleteDoctor(Long id);
 }

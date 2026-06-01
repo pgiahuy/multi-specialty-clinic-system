@@ -8,14 +8,17 @@ package com.hb.enums;
  *
  * @author HUY
  */
-public enum IventoryLogType {
-    IMPORT_FROM_SUPPLIER("Nhập hàng"),
-    PRESCRIPTION_EXPORT("Kê đơn"),
-    EXPIRED_DISPOSAL("Huỷ hết hạn");
+public enum UserRole {
+    
+    ROLE_PATIENT("Bệnh nhân"),
+    ROLE_DOCTOR("Bác sĩ"),
+    ROLE_ADMIN("Quản trị viên"),
+    ROLE_STAFF("Nhân viên y tế"),
+    ROLE_STOREKEEPER("Thủ kho");
     
     private final String label;
 
-    IventoryLogType(String label) {
+    UserRole(String label) {
         this.label = label;
     }
 

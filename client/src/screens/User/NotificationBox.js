@@ -1,10 +1,9 @@
-import React, { use, useEffect, useState } from 'react';
-import { NavDropdown, Badge, ListGroup, Stack } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { NavDropdown, Badge, ListGroup, Stack, Button } from 'react-bootstrap';
 import { Bell, CircleFill, Check2All, Trash2 } from 'react-bootstrap-icons';
-import './NotificationBox.css';
-import { onMessageListener, requestForToken } from '../configs/firebaseConfig';
-import { authApis, endpoint, USER_ENDPOINTS } from '../configs/Apis';
-import cookies from 'react-cookies';
+import '../User/NotificationBox.css';
+import { onMessageListener, requestForToken } from '../../configs/firebaseConfig';
+import { authApis, USER_ENDPOINTS } from '../../configs/Apis';
 import { useNavigate } from 'react-router-dom';
 
 const NotificationBox = ({ onNavigate }) => {
@@ -17,25 +16,39 @@ const NotificationBox = ({ onNavigate }) => {
 
     const markAllAsRead = () => {
         setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
-        // notifications.filter(n => !n.isRead).forEach(noti => {
-        //     authApis.patch(`secure/notifications/${noti.id}/read`);
-        // });
+        authApis().post(`secure/notifications/read-all`);
         console.log("Đánh dấu tất cả là đã đọc");
     };
 
     const deleteNotification = (id) => {
-        setNotifications(prev => prev.filter(n => n.id !== id));
-        console.log("Xóa thông báo:", id);
+        try {
+            authApis().delete(`secure/notifications/${id}`);
+            setNotifications(prev => prev.filter(n => n.id !== id));
+            console.log("Xóa thông báo:", id);
+        } catch (err) {
+            console.error("Không thể xóa thông báo:", err);
+        }
     };
+
 
     const fetchNotifications = async () => {
         try {
             const res = await authApis().get(USER_ENDPOINTS.NOTIFICATIONS);
-            setNotifications(res.data || []);
+            const data = res.data || [];
+
+
+            const sortedData = data.sort((a, b) => {
+                const timeA = a.createdAt || a.id;
+                const timeB = b.createdAt || b.id;
+                return timeB > timeA ? 1 : -1;
+            });
+
+            setNotifications(sortedData);
         } catch (err) {
             console.error("Không thể lấy thông báo:", err);
         }
     };
+
 
     const addNotificationToState = (payload) => {
         const notificationId = payload.data?.id || Date.now().toString();
@@ -47,7 +60,8 @@ const NotificationBox = ({ onNavigate }) => {
             time: "Vừa xong",
             isRead: false,
             path,
-            raw: payload
+            raw: payload,
+            createdAt: null//new Date().toISOString()
         };
 
         setNotifications(prev => {
@@ -76,32 +90,21 @@ const NotificationBox = ({ onNavigate }) => {
         }
     };
 
-
     const handleNotificationClick = async (noti) => {
         try {
-
             setNotifications(prev => prev.map(n => n.id === noti.id ? { ...n, isRead: true } : n));
-
-
-            await authApis().patch(`secure/notifications/${noti.id}/read`);
-
-
+            await authApis().post(`secure/notifications/${noti.id}/read`);
             const targetPath = noti.path || noti.click_action || noti.data?.click_action;
-            // noti.path: "/api/secure/prescriptions/1"
-            navigate('/patient/prescriptions')
 
-            // if (targetPath) {
-            //     navigate(targetPath);
-            // } else {
-            //     console.warn("Không tìm thấy đường dẫn cho thông báo này!");
-            // }
-
+            if (targetPath) {
+                navigate(targetPath);
+            } else {
+                console.warn("Không tìm thấy đường dẫn cho thông báo này!");
+            }
         } catch (err) {
-
             console.error('Error handling notification click:', err);
         }
     };
-
 
     useEffect(() => {
         handleRequestNotificationPermission();
@@ -119,19 +122,11 @@ const NotificationBox = ({ onNavigate }) => {
 
     return (
         <NavDropdown
-
             title={
                 <span className="notification-bell-container">
-                    <Bell
-                        size={24}
-                        className="notification-bell"
-                    />
+                    <Bell size={24} className="notification-bell" />
                     {unreadCount > 0 && (
-                        <Badge
-                            pill
-                            bg="danger"
-                            className="notification-badge"
-                        >
+                        <Badge pill bg="danger" className="notification-badge">
                             {unreadCount > 9 ? '9+' : unreadCount}
                         </Badge>
                     )}
@@ -143,7 +138,6 @@ const NotificationBox = ({ onNavigate }) => {
             drop="down"
         >
             <div className="notification-box">
-
                 <div className="notification-header">
                     <span className="notification-title">Thông báo</span>
                     {unreadCount > 0 && (
@@ -156,7 +150,6 @@ const NotificationBox = ({ onNavigate }) => {
                         </button>
                     )}
                 </div>
-
 
                 <ListGroup variant="flush" className="notification-list">
                     {notifications.length > 0 ? (
@@ -176,11 +169,9 @@ const NotificationBox = ({ onNavigate }) => {
                                 }}
                             >
                                 <Stack direction="horizontal" gap={3} className="align-items-start notification-content">
-
                                     <div className="notification-icon">
                                         {noti.icon || <Bell size={16} />}
                                     </div>
-
 
                                     <div className="notification-text-wrapper">
                                         <div className="notification-text-title">
@@ -191,16 +182,13 @@ const NotificationBox = ({ onNavigate }) => {
                                         </div>
                                         <div className="notification-text-time">
                                             {noti.createdAt
-                                                ? (typeof noti.createdAt === 'string' ? noti.createdAt.slice(0, -3) : noti.createdAt)
-                                                : 'Vừa xong'}
+                                                || 'Vừa xong'}
                                         </div>
                                     </div>
-
 
                                     {!noti.isRead && (
                                         <CircleFill size={8} className="notification-unread-dot" />
                                     )}
-
 
                                     <button
                                         className="notification-delete-btn"
@@ -223,7 +211,6 @@ const NotificationBox = ({ onNavigate }) => {
                     )}
                 </ListGroup>
 
-
                 {notifications.length > 0 && (
                     <div className="notification-footer">
                         <button className="view-all-btn" onClick={() => onNavigate ? onNavigate('/patient/notifications') : window.location.assign('/patient/notifications')}>
@@ -236,4 +223,4 @@ const NotificationBox = ({ onNavigate }) => {
     );
 };
 
-export default NotificationBox;
+export default NotificationBox; 

@@ -6,6 +6,8 @@ package com.hb.service.impl;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.hb.dto.request.UserCreateRequest;
+import com.hb.enums.UserRole;
+import com.hb.exception.BadRequestException;
 import com.hb.exception.DuplicateResourceException;
 import com.hb.exception.ResourceNotFoundException;
 import com.hb.pojo.SocialAccount;
@@ -24,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.security.core.GrantedAuthority;
@@ -54,6 +57,7 @@ public class UserServiceImpl implements UserService {
     private CloudinaryService cloudinaryService;
 
     @Autowired
+    @Lazy
     private BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
@@ -75,35 +79,36 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User saveOrUpdateUser(UserCreateRequest urq) {
+
+        validateUsername(urq.getUsername());
+        validatePassword(urq.getPassword());
+        validateEmail(urq.getEmail());
+
         User u;
 
         if (urq.getId() != null) {
             u = userRepo.getUserById(urq.getId());
+
             if (u == null) {
-                throw new ResourceNotFoundException("Không tìm thấy người dùng với ID: " + urq.getId());
+                throw new ResourceNotFoundException("Không tìm thấy người dùng!");
             }
 
             if (!u.getUsername().equals(urq.getUsername())) {
-                User checkUser = userRepo.existsByUsername(urq.getUsername());
-                if (checkUser != null) {
-                    throw new DuplicateResourceException("Tên tài khoản đã tồn tại!");
-                }
-                u.setUsername(urq.getUsername());
+                throw new DuplicateResourceException("Không thể thay đổi tên tài khoản!");
             }
 
             if (!u.getEmail().equals(urq.getEmail())) {
-                User checkEmail = userRepo.existsByEmail(urq.getEmail());
-                if (checkEmail != null) {
-                    throw new DuplicateResourceException("Email này đã được sử dụng!");
+                User checkUser = userRepo.existsByEmail(urq.getEmail());
+                if (checkUser != null) {
+                    throw new DuplicateResourceException("Email đã tồn tại!");
                 }
-                u.setEmail(urq.getEmail());
             }
 
             if (urq.getPassword() != null && !urq.getPassword().trim().isEmpty()) {
                 u.setPassword(passwordEncoder.encode(urq.getPassword()));
             }
-            
-            if (urq.getName()!= null && !urq.getName().trim().isEmpty()) {
+
+            if (urq.getName() != null && !urq.getName().trim().isEmpty()) {
                 u.setName(urq.getName());
             }
 
@@ -112,7 +117,6 @@ public class UserServiceImpl implements UserService {
             if (checkUser != null) {
                 throw new DuplicateResourceException("Tên tài khoản đã tồn tại!");
             }
-
             User checkEmail = userRepo.existsByEmail(urq.getEmail());
             if (checkEmail != null) {
                 throw new DuplicateResourceException("Email này đã được sử dụng!");
@@ -122,7 +126,7 @@ public class UserServiceImpl implements UserService {
             u.setUsername(urq.getUsername());
             u.setEmail(urq.getEmail());
             u.setPassword(passwordEncoder.encode(urq.getPassword()));
-            u.setRole("ROLE_PATIENT");
+            u.setRole(UserRole.ROLE_PATIENT);
             u.setIsActive(true);
             u.setName(urq.getName());
             u.setCreatedAt(LocalDateTime.now());
@@ -152,7 +156,7 @@ public class UserServiceImpl implements UserService {
         }
 
         Set<GrantedAuthority> authorities = new HashSet<>();
-        authorities.add(new SimpleGrantedAuthority(user.getRole()));
+        authorities.add(new SimpleGrantedAuthority(user.getRole().toString()));
 
         return new org.springframework.security.core.userdetails.User(user.getUsername(),
                 user.getPassword(), authorities);
@@ -170,7 +174,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User processSocialLogin(GoogleIdToken.Payload payload, String fcmToken) {
+    public User processSocialLoginGoogle(GoogleIdToken.Payload payload, String fcmToken) {
         String googleId = payload.getSubject();
         String email = payload.getEmail();
         String name = (String) payload.get("name");
@@ -190,7 +194,7 @@ public class UserServiceImpl implements UserService {
             user.setEmail(email);
             user.setName(name);
             user.setSecureUrl(avatarUrl);
-            user.setRole("ROLE_PATIENT");
+            user.setRole(UserRole.ROLE_PATIENT);
             user.setCreatedAt(LocalDateTime.now());
             String randomPassword = UUID.randomUUID().toString();
             user.setPassword(passwordEncoder.encode(randomPassword));
@@ -224,7 +228,7 @@ public class UserServiceImpl implements UserService {
             user = new User();
             user.setEmail(email);
             user.setName(name);
-            user.setUsername(email); 
+            user.setUsername(email);
             user.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
             userRepo.saveOrUpdate(user);
         }
@@ -252,8 +256,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void updateFcmToken(String username, String fcmToken
-    ) {
+    public void updateFcmToken(String username, String fcmToken) {
         User user = this.userRepo.getUserByUsername(username);
         if (user != null) {
             user.setFcmToken(fcmToken);
@@ -261,15 +264,73 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String getRoleByUsername(String username
-    ) {
+    public String getRoleByUsername(String username) {
         User user = this.userRepo.getUserByUsername(username);
-        return user != null ? user.getRole() : null;
+        return user != null ? user.getRole().toString() : null;
     }
 
     @Override
     public List<User> getActiveUsers(String kw) {
         return this.userRepo.getActiveUsers(kw);
+    }
+
+    private void validateEmail(String email) {
+        if (email == null || email.trim().isEmpty()) {
+            throw new BadRequestException("Email không được để trống!");
+        }
+        if (!email.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
+            throw new BadRequestException("Email không hợp lệ!");
+        }
+        if (email.contains(" ")) {
+            throw new BadRequestException("Email không được chứa khoảng trắng!");
+        }
+    }
+
+    private void validateUsername(String username) {
+
+        if (username == null || username.trim().isEmpty()) {
+            throw new BadRequestException("Tên tài khoản không được để trống!");
+        }
+        if (username.length() < 3 || username.length() > 20) {
+            throw new BadRequestException("Tên tài khoản phải có từ 3 đến 20 ký tự!");
+        }
+        if (!username.matches("^[a-zA-Z0-9._-]+$")) {
+            throw new BadRequestException("Tên tài khoản chỉ được chứa chữ cái, số, dấu chấm, gạch dưới và gạch ngang!");
+        }
+        if (username.contains(" ")) {
+            throw new BadRequestException("Tên tài khoản không được chứa khoảng trắng!");
+        }
+        if (username.matches(".*[A-Z].*")) {
+            throw new BadRequestException("Tên tài khoản không được chứa chữ cái viết hoa!");
+        }
+        if (username.matches(".*[!@#$%^&*()].*")) {
+            throw new BadRequestException("Tên tài khoản không được chứa ký tự đặc biệt!");
+        }
+    }
+
+    private void validatePassword(String password) {
+        if (password == null || password.trim().isEmpty()) {
+            throw new BadRequestException("Mật khẩu không được để trống!");
+        }
+        if (password.length() < 6) {
+            throw new BadRequestException("Mật khẩu phải có ít nhất 6 ký tự!");
+        }
+        if (!password.matches(".*[A-Z].*")) {
+            throw new BadRequestException("Mật khẩu phải chứa ít nhất một chữ cái viết hoa!");
+        }
+        if (!password.matches(".*[a-z].*")) {
+            throw new BadRequestException("Mật khẩu phải chứa ít nhất một chữ cái viết thường!");
+        }
+        if (!password.matches(".*\\d.*")) {
+            throw new BadRequestException("Mật khẩu phải chứa ít nhất một chữ số!");
+        }
+        if (!password.matches(".*[!@#$%^&*()].*")) {
+            throw new BadRequestException("Mật khẩu phải chứa ít nhất một ký tự đặc biệt!");
+        }
+        if (password.contains(" ")) {
+            throw new BadRequestException("Mật khẩu không được chứa khoảng trắng!");
+        }
+
     }
 
 }

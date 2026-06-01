@@ -19,10 +19,13 @@ import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Date;
 
 /**
  *
@@ -34,15 +37,9 @@ import java.util.Collection;
     @NamedQuery(name = "Prescription.findAll", query = "SELECT p FROM Prescription p"),
     @NamedQuery(name = "Prescription.findById", query = "SELECT p FROM Prescription p WHERE p.id = :id"),
     @NamedQuery(name = "Prescription.findByCreatedAt", query = "SELECT p FROM Prescription p WHERE p.createdAt = :createdAt"),
-    @NamedQuery(name = "Prescription.findByStatus", query = "SELECT p FROM Prescription p WHERE p.status = :status")})
+    @NamedQuery(name = "Prescription.findByStatus", query = "SELECT p FROM Prescription p WHERE p.status = :status"),
+    @NamedQuery(name = "Prescription.findByPublicAt", query = "SELECT p FROM Prescription p WHERE p.publicAt = :publicAt")})
 public class Prescription implements Serializable {
-
-    @Size(max = 9)
-    @Column(name = "status")
-    @Enumerated(EnumType.STRING)
-    private PrescriptionStatus status;
-    @Column(name = "public_at")
-    private LocalDateTime publicAt;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -52,12 +49,17 @@ public class Prescription implements Serializable {
     private Long id;
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
+    @Size(max = 9)
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private PrescriptionStatus status;
+    @Column(name = "public_at")
+    private LocalDateTime publicAt;
+    @OneToMany(mappedBy = "prescriptionId")
+    private Collection<PrescriptionItem> prescriptionItemCollection;
     @JoinColumn(name = "medical_record_id", referencedColumnName = "id")
     @OneToOne
     private MedicalRecord medicalRecordId;
-    @OneToMany(mappedBy = "prescriptionId")
-    private Collection<PrescriptionItem> prescriptionItemCollection;
 
     public Prescription() {
     }
@@ -82,15 +84,20 @@ public class Prescription implements Serializable {
         this.createdAt = createdAt;
     }
 
-
-  
-
-    public MedicalRecord getMedicalRecordId() {
-        return medicalRecordId;
+    public PrescriptionStatus getStatus() {
+        return status;
     }
 
-    public void setMedicalRecordId(MedicalRecord medicalRecordId) {
-        this.medicalRecordId = medicalRecordId;
+    public void setStatus(PrescriptionStatus status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getPublicAt() {
+        return publicAt;
+    }
+
+    public void setPublicAt(LocalDateTime publicAt) {
+        this.publicAt = publicAt;
     }
 
     public Collection<PrescriptionItem> getPrescriptionItemCollection() {
@@ -99,6 +106,14 @@ public class Prescription implements Serializable {
 
     public void setPrescriptionItemCollection(Collection<PrescriptionItem> prescriptionItemCollection) {
         this.prescriptionItemCollection = prescriptionItemCollection;
+    }
+
+    public MedicalRecord getMedicalRecordId() {
+        return medicalRecordId;
+    }
+
+    public void setMedicalRecordId(MedicalRecord medicalRecordId) {
+        this.medicalRecordId = medicalRecordId;
     }
 
     @Override
@@ -124,22 +139,6 @@ public class Prescription implements Serializable {
     @Override
     public String toString() {
         return "com.hb.pojo.Prescription[ id=" + id + " ]";
-    }
-
-    public PrescriptionStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(PrescriptionStatus status) {
-        this.status = status;
-    }
-
-    public LocalDateTime getPublicAt() {
-        return publicAt;
-    }
-
-    public void setPublicAt(LocalDateTime publicAt) {
-        this.publicAt = publicAt;
     }
     
 }

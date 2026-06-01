@@ -4,6 +4,7 @@
  */
 package com.hb.service;
 
+import com.hb.dto.response.PaymentResponse;
 import com.hb.enums.PaymentMethod;
 import com.hb.pojo.Appointment;
 import com.hb.pojo.Payment;
@@ -16,14 +17,17 @@ import java.util.Map;
  * @author HUY
  */
 public interface PaymentService {
-    List<Payment> getPayments(Map<String, String> params);
+    List<PaymentResponse> getPayments(Map<String, String> params);
     Payment getPaymentById(Long id);
     Payment getPaymentByAppoint(Long appointmentId);
     void deletePayment(Long id);
-    Payment createPayment(Appointment appointment);
+    Payment createPayment(Long appointmentId);
     void confirmPaymentSuccess(Long paymentId, PaymentMethod method);
     void confirmPaymentFailed(Long paymentId, PaymentMethod method);
     void updatePaymentTotalAmount(Payment payment);
     List<Payment> getPaymentByPatientId(Long patientId, Map<String, String> params);
     BigDecimal getPaymentAmount(Long paymentId);
+    void confirmPaymentForAppointment(Long appointmentId);
+    void confirmPaymentForLabResult(Long labResultId);
+    void confirmPaymentForPrescription(Long prescriptionId);
 }

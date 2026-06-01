@@ -18,4 +18,5 @@ public interface NotificationService {
     Notification getNotificationById(Long id);
     void deleteNotification(Long id);
     void markAsRead(Long id);
+    void markAllAsRead(String username);
 }

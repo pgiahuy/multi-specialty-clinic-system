@@ -10,12 +10,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Collection;
@@ -25,12 +24,13 @@ import java.util.Collection;
  * @author HUY
  */
 @Entity
-@Table(name = "rooms")
+@Table(name = "area")
 @NamedQueries({
-    @NamedQuery(name = "Rooms.findAll", query = "SELECT r FROM Rooms r"),
-    @NamedQuery(name = "Rooms.findById", query = "SELECT r FROM Rooms r WHERE r.id = :id"),
-    @NamedQuery(name = "Rooms.findByRoomNumber", query = "SELECT r FROM Rooms r WHERE r.roomNumber = :roomNumber")})
-public class Rooms implements Serializable {
+    @NamedQuery(name = "Area.findAll", query = "SELECT a FROM Area a"),
+    @NamedQuery(name = "Area.findById", query = "SELECT a FROM Area a WHERE a.id = :id"),
+    @NamedQuery(name = "Area.findByAreaName", query = "SELECT a FROM Area a WHERE a.areaName = :areaName"),
+    @NamedQuery(name = "Area.findByLocationFloor", query = "SELECT a FROM Area a WHERE a.locationFloor = :locationFloor")})
+public class Area implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -38,20 +38,26 @@ public class Rooms implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
-    @Size(max = 20)
-    @Column(name = "room_number")
-    private String roomNumber;
-    @JoinColumn(name = "area_id", referencedColumnName = "id")
-    @ManyToOne
-    private Areas areaId;
-    @OneToMany(mappedBy = "roomId")
-    private Collection<Schedules> schedulesCollection;
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 100)
+    @Column(name = "area_name")
+    private String areaName;
+    @Column(name = "location_floor")
+    private Integer locationFloor;
+    @OneToMany(mappedBy = "areaId")
+    private Collection<Room> roomCollection;
 
-    public Rooms() {
+    public Area() {
     }
 
-    public Rooms(Long id) {
+    public Area(Long id) {
         this.id = id;
+    }
+
+    public Area(Long id, String areaName) {
+        this.id = id;
+        this.areaName = areaName;
     }
 
     public Long getId() {
@@ -62,28 +68,28 @@ public class Rooms implements Serializable {
         this.id = id;
     }
 
-    public String getRoomNumber() {
-        return roomNumber;
+    public String getAreaName() {
+        return areaName;
     }
 
-    public void setRoomNumber(String roomNumber) {
-        this.roomNumber = roomNumber;
+    public void setAreaName(String areaName) {
+        this.areaName = areaName;
     }
 
-    public Areas getAreaId() {
-        return areaId;
+    public Integer getLocationFloor() {
+        return locationFloor;
     }
 
-    public void setAreaId(Areas areaId) {
-        this.areaId = areaId;
+    public void setLocationFloor(Integer locationFloor) {
+        this.locationFloor = locationFloor;
     }
 
-    public Collection<Schedules> getSchedulesCollection() {
-        return schedulesCollection;
+    public Collection<Room> getRoomCollection() {
+        return roomCollection;
     }
 
-    public void setSchedulesCollection(Collection<Schedules> schedulesCollection) {
-        this.schedulesCollection = schedulesCollection;
+    public void setRoomCollection(Collection<Room> roomCollection) {
+        this.roomCollection = roomCollection;
     }
 
     @Override
@@ -96,10 +102,10 @@ public class Rooms implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Rooms)) {
+        if (!(object instanceof Area)) {
             return false;
         }
-        Rooms other = (Rooms) object;
+        Area other = (Area) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -108,7 +114,7 @@ public class Rooms implements Serializable {
 
     @Override
     public String toString() {
-        return "com.hb.pojo.Rooms[ id=" + id + " ]";
+        return "com.hb.pojo.Area[ id=" + id + " ]";
     }
     
 }

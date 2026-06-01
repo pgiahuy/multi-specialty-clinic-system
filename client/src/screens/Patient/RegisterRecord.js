@@ -2,7 +2,7 @@ import { Alert, Button, Card, Container, Form } from "react-bootstrap";
 import MySpinner from "../../components/MySpinner";
 import Header from "../../components/Header";
 import { formCardStyle } from "../User/UserStyle";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { authApis, endpoint, USER_ENDPOINTS } from "../../configs/Apis";
 import { useNavigate } from "react-router-dom";
 import Footer from "../../components/Footer";
@@ -56,20 +56,28 @@ const RegisterRecord = () => {
     const nav = useNavigate();
 
 
+
+    const handleShowErr = (message) => {
+        setErr(message);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    }
+
+
     const validate = () => {
         for (let u of patientInfo)
             if (!patient[u.field] || patient[u.field].toString().trim() === "") {
-                setErr(`Vui lòng nhập ${u.title}!`);
+                handleShowErr(`Vui lòng nhập ${u.title}!`);
                 return false;
             }
         const cccdRegex = /^\d{12}$/;
         if (!cccdRegex.test(patient.cccd)) {
-            setErr("CCCD phải có 12 số!");
+            handleShowErr("CCCD phải có 12 số!");
             return false;
         }
         const phoneRegex = /(84|0[3|5|7|8|9])+([0-9]{8})\b/;
         if (!phoneRegex.test(patient.phone)) {
-            setErr("Số điện thoại không hợp lệ!");
+            handleShowErr("Số điện thoại không hợp lệ!");
             return false;
 
             const selectedDate = new Date(patient.dob);
@@ -77,11 +85,11 @@ const RegisterRecord = () => {
             today.setHours(0, 0, 0, 0);
 
             if (selectedDate > today) {
-                setErr("Ngày sinh không thể lớn hơn ngày hiện tại!");
+                handleShowErr("Ngày sinh không thể lớn hơn ngày hiện tại!");
                 return false;
             }
         }
-        setErr(null);
+        handleShowErr(null);
         return true;
     };
 
@@ -114,12 +122,11 @@ const RegisterRecord = () => {
                 }
 
             } catch (error) {
-                if (error.response && error.response.data) { 
-                   setErr(error.response.data.message);
-
+                if (error.response && error.response.data) {
+                    handleShowErr(error.response.data.message);
                 }
                 else if (error.request) {
-                    setErr("Không thể kết nối đến máy chủ. Vui lòng kiểm tra mạng!");
+                    handleShowErr("Không thể kết nối đến máy chủ. Vui lòng kiểm tra mạng!");
                 }
             } finally {
                 setLoading(false);

@@ -4,8 +4,16 @@
  */
 package com.hb.repository.impl;
 
-import com.hb.pojo.Rooms;
+import com.hb.pojo.Room;
+import com.hb.pojo.Schedule;
 import com.hb.repository.RoomRepository;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.hibernate.Session;
@@ -22,17 +30,16 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Repository
 @Transactional
-public class RoomRepositoryImpl extends BaseRepositoryImpl<Rooms> implements RoomRepository {
-
+public class RoomRepositoryImpl extends BaseRepositoryImpl<Room> implements RoomRepository {
 
     @Autowired
     private LocalSessionFactoryBean factory;
 
     @Override
-    public List<Rooms> getRooms(Map<String, String> params) {
+    public List<Room> getRooms(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
         StringBuilder hql = new StringBuilder(
-                "SELECT DISTINCT r FROM Rooms r LEFT JOIN FETCH r.areaId a WHERE 1=1");
+                "SELECT DISTINCT r FROM Room r LEFT JOIN FETCH r.areaId a WHERE 1=1");
 
         if (params != null && hasText(params.get("roomNumber"))) {
             hql.append(" AND r.roomNumber LIKE :roomNumber");
@@ -41,7 +48,7 @@ public class RoomRepositoryImpl extends BaseRepositoryImpl<Rooms> implements Roo
             hql.append(" AND a.areaName LIKE :areaName");
         }
 
-        Query<Rooms> q = session.createQuery(hql.toString(), Rooms.class);
+        Query<Room> q = session.createQuery(hql.toString(), Room.class);
 
         if (params != null && hasText(params.get("roomNumber"))) {
             q.setParameter("roomNumber", "%" + params.get("roomNumber").trim() + "%");
@@ -60,10 +67,45 @@ public class RoomRepositoryImpl extends BaseRepositoryImpl<Rooms> implements Roo
     }
 
     @Override
-    public long count(Map<String, String> params, Class<Rooms> clazz) {
+    public List<Room> getAvailableRooms(Map<String, String> params) {
+        Session session = this.factory.getObject().getCurrentSession();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+
+        CriteriaQuery<Room> cq = cb.createQuery(Room.class);
+        Root<Room> root = cq.from(Room.class);
+        
+        List<Predicate> mainPredicates = new ArrayList<>();
+
+        if (params != null) {
+            if (params.containsKey("specialtyId") && !params.get("specialtyId").isEmpty()) {
+                mainPredicates.add(cb.equal(root.get("specialtyId").get("id"), Long.valueOf(params.get("specialtyId"))));
+            }
+
+            if (params.containsKey("date") && params.containsKey("shiftId")
+                    && !params.get("date").isEmpty() && !params.get("shiftId").isEmpty()) {
+
+                Subquery<Long> subquery = cq.subquery(Long.class);
+                Root<Schedule> subRoot = subquery.from(Schedule.class);
+                subquery.select(subRoot.get("roomId").get("id"));
+
+                List<Predicate> subPredicates = new ArrayList<>();
+                subPredicates.add(cb.equal(subRoot.get("date"), LocalDate.parse(params.get("date"))));
+                subPredicates.add(cb.equal(subRoot.get("shiftId").get("id"), Long.valueOf(params.get("shiftId"))));
+                subquery.where(subPredicates.toArray(new Predicate[0]));
+
+                mainPredicates.add(cb.not(root.get("id").in(subquery)));
+            }
+        }
+
+        cq.select(root).where(mainPredicates.toArray(new Predicate[0]));
+        return session.createQuery(cq).getResultList();
+    }
+
+    @Override
+    public long count(Map<String, String> params, Class<Room> clazz) {
         Session session = this.factory.getObject().getCurrentSession();
         StringBuilder hql = new StringBuilder(
-                "SELECT COUNT(DISTINCT r.id) FROM Rooms r LEFT JOIN r.areaId a WHERE 1=1");
+                "SELECT COUNT(DISTINCT r.id) FROM Room r LEFT JOIN r.areaId a WHERE 1=1");
 
         if (params != null && hasText(params.get("roomNumber"))) {
             hql.append(" AND r.roomNumber LIKE :roomNumber");
@@ -89,18 +131,18 @@ public class RoomRepositoryImpl extends BaseRepositoryImpl<Rooms> implements Roo
     }
 
     @Override
-    public Rooms getRoomById(Long id) {
+    public Room getRoomById(Long id) {
         Session session = this.factory.getObject().getCurrentSession();
-        return session.get(Rooms.class, id);
+        return session.get(Room.class, id);
     }
 
     @Override
-    public Rooms saveOrUpdate(Rooms a) {
+    public Room saveOrUpdate(Room a) {
         Session session = this.factory.getObject().getCurrentSession();
-        if (a.getId()==null) {
+        if (a.getId() == null) {
             session.persist(a);
             return a;
-        }else{
+        } else {
             return session.merge(a);
         }
     }
@@ -109,7 +151,7 @@ public class RoomRepositoryImpl extends BaseRepositoryImpl<Rooms> implements Roo
     public void deleteRoom(Long id) {
         Session session = this.factory.getObject().getCurrentSession();
 
-        Rooms r = session.get(Rooms.class, id);
+        Room r = session.get(Room.class, id);
 
         if (r != null) {
             session.remove(r);

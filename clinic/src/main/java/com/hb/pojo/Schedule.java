@@ -22,20 +22,21 @@ import jakarta.persistence.TemporalType;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Date;
 
 /**
  *
  * @author HUY
  */
 @Entity
-@Table(name = "schedules")
+@Table(name = "schedule")
 @NamedQueries({
-    @NamedQuery(name = "Schedules.findAll", query = "SELECT s FROM Schedules s"),
-    @NamedQuery(name = "Schedules.findById", query = "SELECT s FROM Schedules s WHERE s.id = :id"),
-    @NamedQuery(name = "Schedules.findByDate", query = "SELECT s FROM Schedules s WHERE s.date = :date"),
-    @NamedQuery(name = "Schedules.findByMaxPatients", query = "SELECT s FROM Schedules s WHERE s.maxPatients = :maxPatients"),
-    @NamedQuery(name = "Schedules.findByCurrentPatients", query = "SELECT s FROM Schedules s WHERE s.currentPatients = :currentPatients")})
-public class Schedules implements Serializable {
+    @NamedQuery(name = "Schedule.findAll", query = "SELECT s FROM Schedule s"),
+    @NamedQuery(name = "Schedule.findById", query = "SELECT s FROM Schedule s WHERE s.id = :id"),
+    @NamedQuery(name = "Schedule.findByDate", query = "SELECT s FROM Schedule s WHERE s.date = :date"),
+    @NamedQuery(name = "Schedule.findByMaxPatients", query = "SELECT s FROM Schedule s WHERE s.maxPatients = :maxPatients"),
+    @NamedQuery(name = "Schedule.findByCurrentPatients", query = "SELECT s FROM Schedule s WHERE s.currentPatients = :currentPatients")})
+public class Schedule implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -57,18 +58,18 @@ public class Schedules implements Serializable {
     private Doctor doctorId;
     @JoinColumn(name = "room_id", referencedColumnName = "id")
     @ManyToOne
-    private Rooms roomId;
+    private Room roomId;
     @JoinColumn(name = "shift_id", referencedColumnName = "id")
     @ManyToOne
-    private Shifts shiftId;
+    private Shift shiftId;
     @JoinColumn(name = "specialty_id", referencedColumnName = "id")
     @ManyToOne
     private Specialty specialtyId;
 
-    public Schedules() {
+    public Schedule() {
     }
 
-    public Schedules(Long id) {
+    public Schedule(Long id) {
         this.id = id;
     }
 
@@ -120,19 +121,19 @@ public class Schedules implements Serializable {
         this.doctorId = doctorId;
     }
 
-    public Rooms getRoomId() {
+    public Room getRoomId() {
         return roomId;
     }
 
-    public void setRoomId(Rooms roomId) {
+    public void setRoomId(Room roomId) {
         this.roomId = roomId;
     }
 
-    public Shifts getShiftId() {
+    public Shift getShiftId() {
         return shiftId;
     }
 
-    public void setShiftId(Shifts shiftId) {
+    public void setShiftId(Shift shiftId) {
         this.shiftId = shiftId;
     }
 
@@ -154,10 +155,10 @@ public class Schedules implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Schedules)) {
+        if (!(object instanceof Schedule)) {
             return false;
         }
-        Schedules other = (Schedules) object;
+        Schedule other = (Schedule) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -166,7 +167,7 @@ public class Schedules implements Serializable {
 
     @Override
     public String toString() {
-        return "com.hb.pojo.Schedules[ id=" + id + " ]";
+        return "com.hb.pojo.Schedule[ id=" + id + " ]";
     }
     
 }

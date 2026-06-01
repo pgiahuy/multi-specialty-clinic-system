@@ -7,7 +7,6 @@ package com.hb.repository;
 import com.hb.enums.PaymentMethod;
 import com.hb.enums.PaymentStatus;
 import com.hb.pojo.Payment;
-import com.hb.pojo.PaymentItems;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +24,7 @@ public interface PaymentRepository {
     void updatePayment(Payment p);                   
     Payment getPaymentByOrderId(String orderId); 
     void updatePaymentStatus(Long paymentId, PaymentStatus status, PaymentMethod method);
-    void addOrUpdatePayment(Payment p);
+    Payment addOrUpdatePayment(Payment p);
     List<Payment> getPaymentByPatientId(Long patientId, Map<String, String> params);
     
 }

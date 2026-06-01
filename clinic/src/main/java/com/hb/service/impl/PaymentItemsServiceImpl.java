@@ -6,9 +6,9 @@ package com.hb.service.impl;
 
 import com.hb.enums.PaymentItemType;
 import com.hb.pojo.Appointment;
-import com.hb.pojo.LabTests;
+import com.hb.pojo.LabTest;
 import com.hb.pojo.Payment;
-import com.hb.pojo.PaymentItems;
+import com.hb.pojo.PaymentItem;
 import com.hb.pojo.Prescription;
 import com.hb.pojo.PrescriptionItem;
 import com.hb.exception.ResourceNotFoundException;
@@ -33,13 +33,13 @@ public class PaymentItemsServiceImpl implements PaymentItemsService {
 
     @Autowired
     private PaymentItemRepository itemRepo;
-    
+
     @Autowired
     private LabTestRepository labRepo;
-    
+
     @Autowired
     private AppointmentRepository appRepo;
-    
+
     @Autowired
     private PrescriptionRepository presRepo;
 
@@ -55,25 +55,25 @@ public class PaymentItemsServiceImpl implements PaymentItemsService {
 
         BigDecimal price = app.getScheduleId().getSpecialtyId().getPrice();
 
-        PaymentItems item = new PaymentItems();
-        item.setPayment(payment);
+        PaymentItem item = new PaymentItem();
+        item.setPaymentId(payment);
         item.setItemType(PaymentItemType.APPOINTMENT);
         item.setAmount(price);
         item.setReferenceId(appointmentId);
         itemRepo.addOrUpdateItem(item);
         payService.updatePaymentTotalAmount(payment);
-        
+
     }
 
     @Override
-    public void addLabTestItems(Payment payment, Long testId) {
+    public void addLabTestItems(Payment payment, Long testId, Long labResultId) {
 
-        LabTests lt = labRepo.getLabTestById(testId);
-        PaymentItems item = new PaymentItems();
-        item.setPayment(payment);
+        LabTest labtest = labRepo.getLabTestById(testId);
+        PaymentItem item = new PaymentItem();
+        item.setPaymentId(payment);
         item.setItemType(PaymentItemType.LAB_TEST);
-        item.setAmount(lt.getPrice());
-        item.setReferenceId(testId);
+        item.setAmount(labtest.getPrice());
+        item.setReferenceId(labResultId);
         itemRepo.addOrUpdateItem(item);
         payService.updatePaymentTotalAmount(payment);
 
@@ -90,8 +90,8 @@ public class PaymentItemsServiceImpl implements PaymentItemsService {
             total = total.add(price.multiply(qty));
         }
 
-        PaymentItems item = new PaymentItems();
-        item.setPayment(payment);
+        PaymentItem item = new PaymentItem();
+        item.setPaymentId(payment);
         item.setItemType(PaymentItemType.PRESCRIPTION);
         item.setAmount(total);
         item.setReferenceId(prescriptionId);
@@ -99,35 +99,15 @@ public class PaymentItemsServiceImpl implements PaymentItemsService {
         payService.updatePaymentTotalAmount(payment);
     }
 
-//    @Override
-//    public void confirmItemsPaid(String transId, String method, List<Long> itemIds) {
-//        for (Long id : itemIds) {
-//            PaymentItems item = itemRepo.getItemById(id);
-//            if (item != null) {
-//                if (item.getItemType().equals(PaymentItemType.APPOINTMENT)) {
-//                    Appointment a = item.getAppointmentId();
-//
-//                    a.setStatus(AppointmentStatus.CONFIRMED);
-//
-//                    appRepo.addOrUpdateAppointment(a);
-//                }
-//                
-//                item.setStatus(PaymentStatus.SUCCESS);
-//                item.setMethod(PaymentMethod.valueOf(method));
-//                item.setTransId(transId);
-//                item.setPaidAt(LocalDateTime.now());
-//                itemRepo.addOrUpdateItem(item);
-//            }
-//        }
-//    }
-
     @Override
-    public PaymentItems getPaymentItemByAppointment(Long  appointmentId) {
+
+    public PaymentItem getPaymentItemByAppointment(Long  appointmentId) {
+
         return this.itemRepo.getItemByAppointment(appointmentId);
     }
 
     @Override
-    public List<PaymentItems> getPaymentItemsByPaymentId(Long paymentId, Map<String, String> params) {
+    public List<PaymentItem> getPaymentItemsByPaymentId(Long paymentId, Map<String, String> params) {
         return this.itemRepo.getItemsByPaymentId(paymentId, params);
     }
 

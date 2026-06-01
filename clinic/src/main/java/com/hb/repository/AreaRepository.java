@@ -4,7 +4,7 @@
  */
 package com.hb.repository;
 
-import com.hb.pojo.Areas;
+import com.hb.pojo.Area;
 import com.hb.pojo.Specialty;
 import java.util.List;
 import java.util.Map;
@@ -13,9 +13,9 @@ import java.util.Map;
  *
  * @author DELL
  */
-public interface AreasRepository extends BaseRepository<Areas>{
-    List<Areas> getAreas(Map<String,String> params);
-    Areas getAreasById(Long id);
-    Areas saveOrUpdate(Areas a);
+public interface AreaRepository extends BaseRepository<Area>{
+    List<Area> getAreas(Map<String,String> params);
+    Area getAreasById(Long id);
+    Area saveOrUpdate(Area a);
     void deleteAreas(Long id);
 }

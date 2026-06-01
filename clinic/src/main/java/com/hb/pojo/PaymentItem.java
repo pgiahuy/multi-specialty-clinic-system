@@ -25,17 +25,17 @@ import java.math.BigDecimal;
 
 /**
  *
- * @author DELL
+ * @author HUY
  */
 @Entity
-@Table(name = "payment_items")
+@Table(name = "payment_item")
 @NamedQueries({
-    @NamedQuery(name = "PaymentItems.findAll", query = "SELECT p FROM PaymentItems p"),
-    @NamedQuery(name = "PaymentItems.findById", query = "SELECT p FROM PaymentItems p WHERE p.id = :id"),
-    @NamedQuery(name = "PaymentItems.findByItemType", query = "SELECT p FROM PaymentItems p WHERE p.itemType = :itemType"),
-    @NamedQuery(name = "PaymentItems.findByAmount", query = "SELECT p FROM PaymentItems p WHERE p.amount = :amount"),
-    @NamedQuery(name = "PaymentItems.findByReferenceId", query = "SELECT p FROM PaymentItems p WHERE p.referenceId = :referenceId")})
-public class PaymentItems implements Serializable {
+    @NamedQuery(name = "PaymentItem.findAll", query = "SELECT p FROM PaymentItem p"),
+    @NamedQuery(name = "PaymentItem.findById", query = "SELECT p FROM PaymentItem p WHERE p.id = :id"),
+    @NamedQuery(name = "PaymentItem.findByItemType", query = "SELECT p FROM PaymentItem p WHERE p.itemType = :itemType"),
+    @NamedQuery(name = "PaymentItem.findByAmount", query = "SELECT p FROM PaymentItem p WHERE p.amount = :amount"),
+    @NamedQuery(name = "PaymentItem.findByReferenceId", query = "SELECT p FROM PaymentItem p WHERE p.referenceId = :referenceId")})
+public class PaymentItem implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -57,22 +57,19 @@ public class PaymentItems implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "reference_id")
-    private Long referenceId;
-    
-    @ManyToOne
-    @JoinColumn(name ="payment_id")
+    private long referenceId;
+    @JoinColumn(name = "payment_id", referencedColumnName = "id")
+    @ManyToOne(optional = false)
     private Payment paymentId;
-    
-    
 
-    public PaymentItems() {
+    public PaymentItem() {
     }
 
-    public PaymentItems(Long id) {
+    public PaymentItem(Long id) {
         this.id = id;
     }
 
-    public PaymentItems(Long id, PaymentItemType itemType, BigDecimal amount, Long referenceId) {
+    public PaymentItem(Long id, PaymentItemType itemType, BigDecimal amount, long referenceId) {
         this.id = id;
         this.itemType = itemType;
         this.amount = amount;
@@ -103,12 +100,20 @@ public class PaymentItems implements Serializable {
         this.amount = amount;
     }
 
-    public Long getReferenceId() {
+    public long getReferenceId() {
         return referenceId;
     }
 
-    public void setReferenceId(Long referenceId) {
+    public void setReferenceId(long referenceId) {
         this.referenceId = referenceId;
+    }
+
+    public Payment getPaymentId() {
+        return paymentId;
+    }
+
+    public void setPaymentId(Payment paymentId) {
+        this.paymentId = paymentId;
     }
 
     @Override
@@ -121,10 +126,10 @@ public class PaymentItems implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof PaymentItems)) {
+        if (!(object instanceof PaymentItem)) {
             return false;
         }
-        PaymentItems other = (PaymentItems) object;
+        PaymentItem other = (PaymentItem) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -133,21 +138,7 @@ public class PaymentItems implements Serializable {
 
     @Override
     public String toString() {
-        return "com.hb.pojo.PaymentItems[ id=" + id + " ]";
-    }
-
-    /**
-     * @return the payment
-     */
-    public Payment getPayment() {
-        return paymentId;
-    }
-
-    /**
-     * @param payment the payment to set
-     */
-    public void setPayment(Payment paymentId) {
-        this.paymentId = paymentId;
+        return "com.hb.pojo.PaymentItem[ id=" + id + " ]";
     }
     
 }

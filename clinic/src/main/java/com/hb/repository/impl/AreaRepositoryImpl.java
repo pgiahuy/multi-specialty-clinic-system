@@ -4,8 +4,7 @@
  */
 package com.hb.repository.impl;
 
-import com.hb.pojo.Areas;
-import com.hb.repository.AreasRepository;
+import com.hb.pojo.Area;
 import java.util.List;
 import java.util.Map;
 import org.hibernate.Session;
@@ -15,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import com.hb.repository.AreaRepository;
 
 /**
  *
@@ -22,21 +22,21 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Repository
 @Transactional
-public class AreasRepositoryImpl extends BaseRepositoryImpl<Areas> implements AreasRepository {
+public class AreaRepositoryImpl extends BaseRepositoryImpl<Area> implements AreaRepository {
 
     @Autowired
     private LocalSessionFactoryBean factory;
 
     @Override
-    public List<Areas> getAreas(Map<String, String> params) {
+    public List<Area> getAreas(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
-        StringBuilder hql = new StringBuilder("SELECT a FROM Areas a WHERE 1=1");
+        StringBuilder hql = new StringBuilder("SELECT a FROM Area a WHERE 1=1");
 
         if (params != null && hasText(params.get("areaName"))) {
             hql.append(" AND a.areaName LIKE :areaName");
         }
 
-        Query<Areas> q = session.createQuery(hql.toString(), Areas.class);
+        Query<Area> q = session.createQuery(hql.toString(), Area.class);
 
         if (params != null && hasText(params.get("areaName"))) {
             q.setParameter("areaName", "%" + params.get("areaName").trim() + "%");
@@ -53,9 +53,9 @@ public class AreasRepositoryImpl extends BaseRepositoryImpl<Areas> implements Ar
     }
 
     @Override
-    public long count(Map<String, String> params, Class<Areas> clazz) {
+    public long count(Map<String, String> params, Class<Area> clazz) {
         Session session = this.factory.getObject().getCurrentSession();
-        StringBuilder hql = new StringBuilder("SELECT COUNT(a.id) FROM Areas a WHERE 1=1");
+        StringBuilder hql = new StringBuilder("SELECT COUNT(a.id) FROM Area a WHERE 1=1");
 
         if (params != null && hasText(params.get("areaName"))) {
             hql.append(" AND a.areaName LIKE :areaName");
@@ -75,13 +75,13 @@ public class AreasRepositoryImpl extends BaseRepositoryImpl<Areas> implements Ar
     }
 
     @Override
-    public Areas getAreasById(Long id) {
+    public Area getAreasById(Long id) {
         Session session = this.factory.getObject().getCurrentSession();
-        return session.get(Areas.class, id);
+        return session.get(Area.class, id);
     }
 
     @Override
-    public Areas saveOrUpdate(Areas a) {
+    public Area saveOrUpdate(Area a) {
         Session session = this.factory.getObject().getCurrentSession();
         if (a.getId()==null) {
             session.persist(a);
@@ -95,7 +95,7 @@ public class AreasRepositoryImpl extends BaseRepositoryImpl<Areas> implements Ar
     public void deleteAreas(Long id) {
         Session session = this.factory.getObject().getCurrentSession();
 
-        Areas m = session.get(Areas.class, id);
+        Area m = session.get(Area.class, id);
 
         if (m != null) {
             session.remove(m);

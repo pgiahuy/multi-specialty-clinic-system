@@ -20,7 +20,7 @@ const MyModal = ({
                 centered
                 className="rounded-4"
             >
-                <Modal.Header closeButton className="border-bottom pb-3">
+                <Modal.Header closeButton className="border-bottom-0 pb-3">
                     <Modal.Title className="fw-bold">{title}</Modal.Title>
                 </Modal.Header>
 

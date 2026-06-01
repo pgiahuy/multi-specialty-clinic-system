@@ -28,5 +28,16 @@
     <class>com.hb.pojo.ChatMessage</class>
     <class>com.hb.pojo.MedicineBatch</class>
     <class>com.hb.pojo.RefreshToken</class>
+    <class>com.hb.pojo.InventoryLog_1</class>
+    <class>com.hb.pojo.LabResultDetails</class>
+    <class>com.hb.pojo.Inventorylog</class>
+    <class>com.hb.pojo.Schedule</class>
+    <class>com.hb.pojo.Area</class>
+    <class>com.hb.pojo.Shift</class>
+    <class>com.hb.pojo.LabTest</class>
+    <class>com.hb.pojo.LabResultDetail</class>
+    <class>com.hb.pojo.LabResult</class>
+    <class>com.hb.pojo.Room</class>
+    <class>com.hb.pojo.PaymentItem</class>
   </persistence-unit>
 </persistence>

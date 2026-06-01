@@ -1,9 +1,8 @@
-import { Badge, Button, Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
-import { Bell, Messenger } from "react-bootstrap-icons";
+import { Button, Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
-import NotificationBox from "./NotificationBox";
+import NotificationBox from "../../src/screens/User/NotificationBox";
 import LoginRequiredModal from "./LoginRequiredModal";
-import API, { AUTH_ENDPOINTS, authApis, CLINIC_ENDPOINTS, clinicApis } from "../configs/Apis";
+import { AUTH_ENDPOINTS, authApis, clinicApis } from "../configs/Apis";
 import cookies from 'react-cookies';
 import { useContext, useEffect, useState } from "react";
 import { MyUserContext } from "../configs/Contexts";
@@ -68,7 +67,7 @@ const Header = () => {
                                     setShowLoginRequired(true);
                                     return;
                                 }
-                                navigate(user.role === 'ROLE_DOCTOR' ? '/doctor/dashboard' : '/patient/dashboard');
+                                navigate(user?.role === 'ROLE_DOCTOR' ? '/doctor/dashboard' : '/patient/dashboard');
                             }}
                         >
                             {user?.role === 'ROLE_DOCTOR' ? 'Công việc' : 'Dịch vụ'}
@@ -76,31 +75,33 @@ const Header = () => {
 
 
 
-                        {user && user.role === 'ROLE_PATIENT' && (
+                        {user && user?.role === 'ROLE_PATIENT' && (
                             <Nav.Link className="header-navlink" onClick={() => navigate('/doctors')}>
                                 Bác sĩ
                             </Nav.Link>
                         )}
-                        {user && user.role === 'ROLE_DOCTOR' && (
+                        {user && user?.role === 'ROLE_DOCTOR' && (
                             <Nav.Link className="header-navlink" onClick={() => navigate('/doctor/appointments')}>
                                 Lịch hẹn
                             </Nav.Link>
                         )}
 
-                        <NavDropdown title="Chuyên khoa" id="specialties-nav-dropdown" className="me-2 header-dropdown">
+                        {/* <NavDropdown title="Chuyên khoa" id="specialties-nav-dropdown" className="me-2 header-dropdown">
                             {(Array.isArray(specialties) ? specialties : []).map(s => (
                                 <NavDropdown.Item key={s.id} onClick={() => navigate(`/specialties/${s.id}`)}>
                                     {s.name}
                                 </NavDropdown.Item>
                             ))}
                         </NavDropdown>
+ */}
 
 
 
-
-                        <Nav.Link className="header-navlink" onClick={() => navigate('/')}>
-                            Liên hệ
-                        </Nav.Link>
+                        {{ user } && user?.role === 'ROLE_PATIENT' && (
+                            <Nav.Link className="header-navlink" onClick={() => navigate('/')}>
+                                Liên hệ
+                            </Nav.Link>
+                        )}
 
                         {user === null ? (
                             <div className="ms-auto d-flex align-items-center">
@@ -114,7 +115,7 @@ const Header = () => {
                         ) : (
                             <div className="ms-auto d-flex align-items-center">
                                 <Nav>
-                                    {user.role === 'ROLE_DOCTOR' ? (
+                                    {user?.role === 'ROLE_DOCTOR' ? (
                                         <div>Chào bác sĩ {user?.doctorProfile ? user.doctorProfile.fullName : ''} !&nbsp;&nbsp;</div>
                                     ) : (
                                         <div>Chào {user?.name || 'bạn'} !&nbsp;&nbsp;</div>
@@ -138,13 +139,14 @@ const Header = () => {
                                 <NavDropdown
                                     align="end"
                                     id="user-nav-dropdown"
+                                    className="me-2 header-dropdown"
                                     title={
                                         <span className="d-inline-flex align-items-center">
                                             <img
-                                                src={user?.avatar}
+                                                src={user?.avatar || '/doctor-avatar.png'}
                                                 className="rounded-circle header-avatar"
                                                 alt="avatar"
-                                                onError={(e) => e.target.src = '/default-avatar.png'}
+                                                onError={(e) => { e.target.src = '/doctor-avatar.png'; }}
                                             />
                                         </span>
                                     }>

@@ -4,12 +4,19 @@
  */
 package com.hb.repository.impl;
 
-import com.hb.pojo.Schedules;
+import com.hb.pojo.Schedule;
 import com.hb.repository.ScheduleRepository;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.hibernate.Session;
+import org.hibernate.query.MutationQuery;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
@@ -22,88 +29,81 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Repository
 @Transactional
-public class ScheduleRepositoryImpl extends BaseRepositoryImpl<Schedules> implements ScheduleRepository {
+public class ScheduleRepositoryImpl extends BaseRepositoryImpl<Schedule> implements ScheduleRepository {
 
     @Autowired
     private LocalSessionFactoryBean factory;
 
     @Override
-    public List<Schedules> getSchedules(Map<String, String> params) {
+    public List<Schedule> getSchedules(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
 
-        StringBuilder hql = new StringBuilder("SELECT DISTINCT s FROM Schedules s "
-                + "LEFT JOIN FETCH s.doctorId "
-                + "LEFT JOIN FETCH s.shiftId "
-                + "LEFT JOIN FETCH s.specialtyId "
-                + "LEFT JOIN FETCH s.roomId WHERE 1=1 ");
+        CriteriaQuery<Schedule> cq = cb.createQuery(Schedule.class);
+        Root<Schedule> root = cq.from(Schedule.class);
+        cq.select(root).distinct(true);
+
+        root.fetch("doctorId", JoinType.LEFT);
+        root.fetch("shiftId", JoinType.LEFT);
+        root.fetch("specialtyId", JoinType.LEFT);
+        root.fetch("roomId", JoinType.LEFT);
+
+        List<Predicate> predicates = new ArrayList<>();
 
         if (params != null) {
             if (params.containsKey("doctorId") && !params.get("doctorId").isEmpty()) {
-                hql.append(" AND s.doctorId.id = :docId ");
+                predicates.add(cb.equal(root.get("doctorId").get("id"), Long.valueOf(params.get("doctorId"))));
             }
             if (params.containsKey("specialtyId") && !params.get("specialtyId").isEmpty()) {
-                hql.append(" AND s.specialtyId.id = :specId ");
+                predicates.add(cb.equal(root.get("specialtyId").get("id"), Long.valueOf(params.get("specialtyId"))));
             }
             if (params.containsKey("doctorName") && !params.get("doctorName").isEmpty()) {
-                hql.append(" AND lower(s.doctorId.fullName) LIKE :doctorName ");
+                String pattern = "%" + params.get("doctorName").toLowerCase().trim() + "%";
+                predicates.add(cb.like(cb.lower(root.get("doctorId").get("fullName")), pattern));
             }
+
             if (params.containsKey("specialtyName") && !params.get("specialtyName").isEmpty()) {
-                hql.append(" AND lower(s.specialtyId.name) LIKE :specialtyName ");
+                String pattern = "%" + params.get("specialtyName").toLowerCase().trim() + "%";
+                predicates.add(cb.like(cb.lower(root.get("specialtyId").get("name")), pattern));
             }
+
             boolean hasFromDate = params.containsKey("fromDate") && !params.get("fromDate").isEmpty();
             boolean hasToDate = params.containsKey("toDate") && !params.get("toDate").isEmpty();
 
             if (hasFromDate && hasToDate) {
-                hql.append(" AND s.date BETWEEN :fromDate AND :toDate");
+                LocalDate from = LocalDate.parse(params.get("fromDate"));
+                LocalDate to = LocalDate.parse(params.get("toDate"));
+                predicates.add(cb.between(root.get("date"), from, to));
             } else if (hasFromDate) {
-                hql.append(" AND s.date >= :fromDate");
+                LocalDate from = LocalDate.parse(params.get("fromDate"));
+                predicates.add(cb.greaterThanOrEqualTo(root.get("date"), from));
             } else if (hasToDate) {
-                hql.append(" AND s.date <= :toDate");
+                LocalDate to = LocalDate.parse(params.get("toDate"));
+                predicates.add(cb.lessThanOrEqualTo(root.get("date"), to));
+            }
+
+            if (params.containsKey("date") && !params.get("date").isEmpty()) {
+                LocalDate singleDate = LocalDate.parse(params.get("date"));
+                predicates.add(cb.equal(root.get("date"), singleDate));
             }
         }
 
-        Query<Schedules> q = session.createQuery(hql.toString(), Schedules.class);
+        cq.where(predicates.toArray(new Predicate[0]));
 
-        if (params != null) {
-            if (params.containsKey("doctorId") && !params.get("doctorId").isEmpty()) {
-                q.setParameter("docId", Long.valueOf(params.get("doctorId")));
-            }
-            if (params.containsKey("specialtyId") && !params.get("specialtyId").isEmpty()) {
-                q.setParameter("specId", Long.valueOf(params.get("specialtyId")));
-            }
-            if (params.containsKey("doctorName") && !params.get("doctorName").isEmpty()) {
-                  q.setParameter("doctorName", "%" + params.get("doctorName").toLowerCase().trim() + "%");
-            }
-            if (params.containsKey("specialtyName") && !params.get("specialtyName").isEmpty()) {
-                  q.setParameter("specialtyName", "%" + params.get("specialtyName").toLowerCase().trim() + "%");
-            }
-            
-            boolean hasFromDate = params.containsKey("fromDate") && !params.get("fromDate").isEmpty();
-            boolean hasToDate = params.containsKey("toDate") && !params.get("toDate").isEmpty();
+        Query<Schedule> q = session.createQuery(cq);
 
-            if (hasFromDate && hasToDate) {
-                q.setParameter("fromDate", LocalDate.parse(params.get("fromDate")));
-                q.setParameter("toDate", LocalDate.parse(params.get("toDate")));
-            } else if (hasFromDate) {
-                q.setParameter("fromDate", LocalDate.parse(params.get("fromDate")));
-            } else if (hasToDate) {
-                q.setParameter("toDate", LocalDate.parse(params.get("toDate")));
-            }
-            
-
-            if (params.containsKey("pageSize")) {
-                int pageSize = Integer.parseInt(params.get("pageSize"));
-                int page = Integer.parseInt(params.getOrDefault("page", "1"));
-                q.setMaxResults(pageSize);
-                q.setFirstResult((page - 1) * pageSize);
-            }
+        if (params != null && params.containsKey("pageSize")) {
+            int pageSize = Integer.parseInt(params.get("pageSize"));
+            int page = Integer.parseInt(params.getOrDefault("page", "1"));
+            q.setMaxResults(pageSize);
+            q.setFirstResult((page - 1) * pageSize);
         }
 
         return q.getResultList();
     }
 
     @Override
-    public Schedules saveOrUpdate(Schedules s) {
+    public Schedule saveOrUpdate(Schedule s) {
         Session session = this.factory.getObject().getCurrentSession();
 
         if (s.getId() == null) {
@@ -116,84 +116,132 @@ public class ScheduleRepositoryImpl extends BaseRepositoryImpl<Schedules> implem
     }
 
     @Override
-    public Schedules getScheduleById(Long id) {
+    public Schedule getScheduleById(Long id) {
         Session session = this.factory.getObject().getCurrentSession();
-        return session.get(Schedules.class, id);
+        return session.get(Schedule.class, id);
     }
 
     @Override
     public void deleteSchedule(Long id) {
         Session session = this.factory.getObject().getCurrentSession();
-        Schedules s = session.get(Schedules.class, id);
+        Schedule s = session.get(Schedule.class, id);
         if (s != null) {
             session.remove(s);
         }
     }
 
     @Override
-    public long count(Map<String, String> params, Class<Schedules> clazz) {
+    public boolean checkDoctorAvailability(Long doctorId, LocalDate date, Long shiftId, Long excludeId) {
         Session session = this.factory.getObject().getCurrentSession();
 
-        StringBuilder hql = new StringBuilder("SELECT COUNT(DISTINCT s) FROM Schedules s WHERE 1=1 ");
+        StringBuilder hql = new StringBuilder("SELECT COUNT(s) FROM Schedule s "
+                + "WHERE s.doctorId.id = :doctorId "
+                + "AND s.date = :date "
+                + "AND s.shiftId.id = :shiftId ");
 
-        if (params != null) {
-            if (params.containsKey("doctorId") && !params.get("doctorId").isEmpty()) {
-                hql.append(" AND s.doctorId.id = :docId ");
-            }
-            if (params.containsKey("specialtyId") && !params.get("specialtyId").isEmpty()) {
-                hql.append(" AND s.specialtyId.id = :specId ");
-            }
-            if (params.containsKey("doctorName") && !params.get("doctorName").isEmpty()) {
-                hql.append(" AND lower(s.doctorId.fullName) LIKE :doctorName ");
-            }
-            if (params.containsKey("specialtyName") && !params.get("specialtyName").isEmpty()) {
-                hql.append(" AND lower(s.specialtyId.name) LIKE :specialtyName ");
-            }
-            boolean hasFromDate = params.containsKey("fromDate") && !params.get("fromDate").isEmpty();
-            boolean hasToDate = params.containsKey("toDate") && !params.get("toDate").isEmpty();
-
-            if (hasFromDate && hasToDate) {
-                hql.append(" AND s.date BETWEEN :fromDate AND :toDate");
-            } else if (hasFromDate) {
-                hql.append(" AND s.date >= :fromDate");
-            } else if (hasToDate) {
-                hql.append(" AND s.date <= :toDate");
-            }
+        if (excludeId != null) {
+            hql.append(" AND s.id != :excludeId ");
         }
 
         Query<Long> q = session.createQuery(hql.toString(), Long.class);
+        q.setParameter("doctorId", doctorId);
+        q.setParameter("date", date);
+        q.setParameter("shiftId", shiftId);
+        if (excludeId != null) {
+            q.setParameter("excludeId", excludeId);
+        }
+        return q.getSingleResult() == 0;
+    }
+
+    @Override
+    public boolean checkRoomAvailability(Long roomId, LocalDate date, Long shiftId, Long excludeId) {
+        Session session = this.factory.getObject().getCurrentSession();
+        StringBuilder hql = new StringBuilder("SELECT COUNT(s) FROM Schedule s "
+                + "WHERE s.roomId.id = :roomId "
+                + "AND s.date = :date "
+                + "AND s.shiftId.id = :shiftId ");
+
+        if (excludeId != null) {
+            hql.append(" AND s.id != :excludeId ");
+        }
+        Query<Long> q = session.createQuery(hql.toString(), Long.class);
+        q.setParameter("roomId", roomId);
+        q.setParameter("date", date);
+        q.setParameter("shiftId", shiftId);
+        if (excludeId != null) {
+            q.setParameter("excludeId", excludeId);
+        }
+
+        return q.getSingleResult() == 0;
+    }
+
+    @Override
+    public long count(Map<String, String> params, Class<Schedule> clazz) {
+        Session session = this.factory.getObject().getCurrentSession();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+        Root<Schedule> root = cq.from(Schedule.class);
+
+        cq.select(cb.countDistinct(root));
+
+        List<Predicate> predicates = new ArrayList<>();
 
         if (params != null) {
+
             if (params.containsKey("doctorId") && !params.get("doctorId").isEmpty()) {
-                q.setParameter("docId", Long.parseLong(params.get("doctorId")));
+                predicates.add(cb.equal(root.get("doctorId").get("id"), Long.valueOf(params.get("doctorId"))));
             }
             if (params.containsKey("specialtyId") && !params.get("specialtyId").isEmpty()) {
-                q.setParameter("specId", Long.parseLong(params.get("specialtyId")));
+                predicates.add(cb.equal(root.get("specialtyId").get("id"), Long.valueOf(params.get("specialtyId"))));
             }
             if (params.containsKey("doctorName") && !params.get("doctorName").isEmpty()) {
-                q.setParameter("doctorName", "%" + params.get("doctorName").toLowerCase().trim() + "%");
+                String pattern = "%" + params.get("doctorName").toLowerCase().trim() + "%";
+                predicates.add(cb.like(cb.lower(root.get("doctorId").get("fullName")), pattern));
             }
             if (params.containsKey("specialtyName") && !params.get("specialtyName").isEmpty()) {
-                q.setParameter("specialtyName", "%" + params.get("specialtyName").toLowerCase().trim() + "%");
+                String pattern = "%" + params.get("specialtyName").toLowerCase().trim() + "%";
+                predicates.add(cb.like(cb.lower(root.get("specialtyId").get("name")), pattern));
             }
+
             boolean hasFromDate = params.containsKey("fromDate") && !params.get("fromDate").isEmpty();
             boolean hasToDate = params.containsKey("toDate") && !params.get("toDate").isEmpty();
 
             if (hasFromDate && hasToDate) {
-                q.setParameter("fromDate", java.time.LocalDate.parse(params.get("fromDate")));
-                q.setParameter("toDate", java.time.LocalDate.parse(params.get("toDate")));
+                LocalDate from = LocalDate.parse(params.get("fromDate"));
+                LocalDate to = LocalDate.parse(params.get("toDate"));
+                predicates.add(cb.between(root.get("date"), from, to));
             } else if (hasFromDate) {
-                q.setParameter("fromDate", java.time.LocalDate.parse(params.get("fromDate")));
+                LocalDate from = LocalDate.parse(params.get("fromDate"));
+                predicates.add(cb.greaterThanOrEqualTo(root.get("date"), from));
             } else if (hasToDate) {
-                q.setParameter("toDate", java.time.LocalDate.parse(params.get("toDate")));
+                LocalDate to = LocalDate.parse(params.get("toDate"));
+                predicates.add(cb.lessThanOrEqualTo(root.get("date"), to));
+            }
+
+            if (params.containsKey("date") && !params.get("date").isEmpty()) {
+                LocalDate singleDate = LocalDate.parse(params.get("date"));
+                predicates.add(cb.equal(root.get("date"), singleDate));
             }
         }
 
-        return q.getSingleResult();
-    }
-    
-    
+        cq.where(predicates.toArray(new Predicate[0]));
 
-  
+        Query<Long> q = session.createQuery(cq);
+        Long result = q.getSingleResult();
+
+        return result != null ? result : 0L;
+    }
+
+    @Override
+    public int incrementCurrentPatients(Long scheduleId) {
+        Session session = this.factory.getObject().getCurrentSession();
+
+        String hql = "UPDATE Schedule s SET s.currentPatients = s.currentPatients + 1 "
+                + "WHERE s.id = :id AND s.currentPatients < s.maxPatients";
+        MutationQuery query = session.createMutationQuery(hql);
+        query.setParameter("id", scheduleId);
+
+        return query.executeUpdate();
+    }
 
 }

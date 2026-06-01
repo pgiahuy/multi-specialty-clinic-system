@@ -18,8 +18,9 @@ import org.mapstruct.factory.Mappers;
 public interface PaymentMapper {
     PaymentMapper INSTANCE = Mappers.getMapper(PaymentMapper.class);
     
-    @Mapping(source = "appointment.patientId.fullName", target = "patientName")
-    @Mapping(source = "appointment.id", target = "appointmentId")        
+    @Mapping(source = "appointmentId.patientId.fullName", target = "patientName")
+    @Mapping(source = "appointmentId.id", target = "appointmentId")     
+    @Mapping(source = "paymentItemCollection", target = "paymentItems")
     PaymentResponse toResponse(Payment payment);
     
 }

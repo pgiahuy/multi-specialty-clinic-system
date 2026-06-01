@@ -9,9 +9,8 @@ import com.hb.dto.response.AppointmentResponse;
 import com.hb.enums.AppointmentStatus;
 import com.hb.pojo.Appointment;
 import com.hb.pojo.Patient;
-import com.hb.pojo.Schedules;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
+import com.hb.pojo.Schedule;
+import com.hb.pojo.Shift;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -55,7 +54,7 @@ public class AppointmentMapper {
             }
 
             if (s.getShiftId() != null) {
-                var shift = s.getShiftId();
+                Shift shift = s.getShiftId();
                 if (shift.getSession() != null) {
                     res.setSession(shift.getSession().getLabel());
                 }
@@ -77,7 +76,7 @@ public class AppointmentMapper {
         return res;
     }
 
-    public Appointment toEntity(AppointmentCreateRequest req, Patient patient, Schedules schedule) {
+    public Appointment toEntity(AppointmentCreateRequest req, Patient patient, Schedule schedule) {
         if (req == null || patient == null || schedule == null) {
             return null;
         }
@@ -85,7 +84,7 @@ public class AppointmentMapper {
         a.setPatientId(patient);
         a.setScheduleId(schedule);
         a.setStatus(AppointmentStatus.UN_PAID);
-        a.setCreatedAt(LocalDate.now());
+        a.setCreatedAt(LocalDateTime.now());
         return a;
     }
 }

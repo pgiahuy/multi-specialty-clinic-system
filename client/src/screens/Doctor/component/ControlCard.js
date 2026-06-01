@@ -9,9 +9,11 @@ const ControlCard = () => {
     const navItems = [
         { title: 'Đăng ký lịch làm việc', icon: <CalendarPlus size={30} className="text-primary mb-2" />, path: '/doctor/register-schedule' },
         { title: 'Lịch làm việc', icon: <PersonBadge size={30} className="text-success mb-2" />, path: '/doctor/schedules' },
-        { title: 'Kê đơn thuốc', icon: <Receipt size={30} className="text-success mb-2" />, path: '/doctor/prescriptions' },
+        { title: 'Kê đơn thuốc', icon: <Receipt size={30} className="text-success mb-2" />, path: '/doctor/schedules' },
         { title: 'Bệnh nhân', icon: <FileEarmarkMedical size={30} className="text-info mb-2" />, path: '/doctor/patients' },
+        { title: 'Lịch hẹn', icon: <ClockHistory size={30} className="text-warning mb-2" />, path: '/doctor/appointments' },
         { title: 'Tư vấn', icon: <ClockHistory size={30} className="text-warning mb-2" />, path: '/doctor/consultations' },
+        { title: 'Xét nghiệm', icon: <Droplet size={30} className="text-info mb-2" />, path: '/doctor/lab-tests' },
     ];
 
     const navItemStyle = {
@@ -24,7 +26,7 @@ const ControlCard = () => {
     };
 
     return (
-        <Card className="shadow-sm border-0 mb-4 m-3" style={{ borderRadius: '15px', backgroundColor: '#e0f6ff' }}>
+        <Card className=" mb-4 m-3" style={{ borderRadius: '15px', backgroundColor: '#e0f6ff' }}>
             <Card.Body>
                 <Row className="text-center g-3">
 

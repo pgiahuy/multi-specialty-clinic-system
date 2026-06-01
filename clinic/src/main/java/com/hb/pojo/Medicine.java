@@ -69,11 +69,11 @@ public class Medicine implements Serializable {
     @Column(name = "unit")
     private String unit;
     @OneToMany(mappedBy = "medicineId")
+    private Collection<PrescriptionItem> prescriptionItemCollection;
+    @OneToMany(mappedBy = "medicineId")
     private Collection<MedicineBatch> medicineBatchCollection;
     @OneToMany(mappedBy = "medicineId")
-    private Collection<InventoryLog> inventorylogCollection;
-    @OneToMany(mappedBy = "medicineId")
-    private Collection<PrescriptionItem> prescriptionItemCollection;
+    private Collection<InventoryLog> inventoryLogCollection;
 
     public Medicine() {
     }
@@ -152,6 +152,14 @@ public class Medicine implements Serializable {
         this.unit = unit;
     }
 
+    public Collection<PrescriptionItem> getPrescriptionItemCollection() {
+        return prescriptionItemCollection;
+    }
+
+    public void setPrescriptionItemCollection(Collection<PrescriptionItem> prescriptionItemCollection) {
+        this.prescriptionItemCollection = prescriptionItemCollection;
+    }
+
     public Collection<MedicineBatch> getMedicineBatchCollection() {
         return medicineBatchCollection;
     }
@@ -160,20 +168,12 @@ public class Medicine implements Serializable {
         this.medicineBatchCollection = medicineBatchCollection;
     }
 
-    public Collection<InventoryLog> getInventorylogCollection() {
-        return inventorylogCollection;
+    public Collection<InventoryLog> getInventoryLogCollection() {
+        return inventoryLogCollection;
     }
 
-    public void setInventorylogCollection(Collection<InventoryLog> inventorylogCollection) {
-        this.inventorylogCollection = inventorylogCollection;
-    }
-
-    public Collection<PrescriptionItem> getPrescriptionItemCollection() {
-        return prescriptionItemCollection;
-    }
-
-    public void setPrescriptionItemCollection(Collection<PrescriptionItem> prescriptionItemCollection) {
-        this.prescriptionItemCollection = prescriptionItemCollection;
+    public void setInventoryLogCollection(Collection<InventoryLog> inventoryLogCollection) {
+        this.inventoryLogCollection = inventoryLogCollection;
     }
 
     @Override

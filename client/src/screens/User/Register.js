@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { Button, Card, Container, Form, Alert } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import MySpinner from "../../components/MySpinner";
-import API, { endpoint, USER_ENDPOINTS } from "../../configs/Apis";
+import API, { AUTH_ENDPOINTS, endpoint, USER_ENDPOINTS } from "../../configs/Apis";
 import { formCardStyle } from "./UserStyle";
 
 const Register = () => {
@@ -64,7 +64,7 @@ const Register = () => {
 
             try {
                 setLoading(true);
-                let res = await API.post(USER_ENDPOINTS.REGISTER, form, {
+                let res = await API.post(AUTH_ENDPOINTS.REGISTER, form, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }

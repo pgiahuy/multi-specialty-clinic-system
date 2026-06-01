@@ -4,6 +4,7 @@ import { APPOINTMENT_ENDPOINTS, authApis } from "../../configs/Apis";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { Button, Card, Col, Row, Badge, Spinner } from "react-bootstrap";
+import MyModal from "../../components/MyModal";
 import MySpinner from "../../components/MySpinner";
 
 const AppointmentDetail = () => {
@@ -25,14 +26,43 @@ const AppointmentDetail = () => {
         }
     };
 
+    const [showCancelModal, setShowCancelModal] = useState(false);
+    const [showCancelErrorModal, setShowCancelErrorModal] = useState(false);
+    const [cancelErrorMessage, setCancelErrorMessage] = useState("");
+    const [cancelling, setCancelling] = useState(false);
+
     useEffect(() => {
         loadAppointmentDetail();
     }, [appointmentId]);
+
+    const confirmCancel = async () => {
+        if (!appointment) return;
+        setCancelling(true);
+        try {
+            const response = await authApis().put(APPOINTMENT_ENDPOINTS.CANCEL_APPOINTMENT(appointmentId));
+
+            if (response.status === 200) {
+                setAppointment(prev => prev ? { ...prev, status: 'CANCELLED' } : prev);
+                setShowCancelModal(false);
+            }
+
+        } catch (err) {
+            const errorMessage = err.response?.data?.message || 'Đã có lỗi xảy ra khi hủy lịch. Vui lòng thử lại sau.';
+            setCancelErrorMessage(errorMessage);
+            setShowCancelModal(false);
+            setShowCancelErrorModal(true);
+            console.error('Lỗi khi hủy lịch:', err);
+
+        } finally {
+            setCancelling(false);
+        }
+    };
 
     const renderStatusText = (status) => {
         if (!status) return <span className="text-muted">Không rõ</span>;
 
         switch (status.toUpperCase()) {
+            case 'UN_PAID': return <span className="text-warning">Chưa thanh toán</span>;
             case 'PENDING': return <span className="text-warning">Chờ xác nhận</span>;
             case 'CONFIRMED': return <span className="text-primary">Đã xác nhận</span>;
             case 'IN_PROGRESS': return <span className="text-info">Đang khám</span>;
@@ -53,14 +83,14 @@ const AppointmentDetail = () => {
 
                 {loading ? (
                     <div className="d-flex justify-content-center py-5">
-                        <MySpinner  />
+                        <MySpinner />
                     </div>
                 ) : !appointment ? (
                     <div className="text-center text-muted p-5 bg-white rounded border">Không có thông tin cuộc hẹn.</div>
                 ) : (
                     <Row className="justify-content-center">
                         <Col xs={12} md={8} lg={6}>
-                            <Card className="shadow-sm rounded-4 overflow-hidden">
+                            <Card className=" shadow-sm rounded-4 overflow-hidden">
                                 <Card.Header className="d-flex justify-content-between align-items-center bg-light py-3 border-bottom-0">
                                     <div> Khoa {appointment.specialtyName} </div>
                                     <div> {appointment.roomName} - {appointment.areaName} </div>
@@ -69,19 +99,19 @@ const AppointmentDetail = () => {
                                 </Card.Header>
 
                                 <Card.Body className="p-4">
-                                    {/* Dòng 1: Bệnh nhân */}
+
                                     <div className="d-flex justify-content-between align-items-center mb-3">
                                         <div className="small text-muted">Bệnh nhân</div>
                                         <div className="fw-semibold text-end">{appointment?.patientFullName || '-'}</div>
                                     </div>
 
-                                   
+
                                     <div className="d-flex justify-content-between align-items-center mb-3">
                                         <div className="small text-muted">Bác sĩ phụ trách</div>
                                         <div className="fw-semibold text-end">{appointment?.doctorFullName || '-'}</div>
                                     </div>
 
-                                  
+
                                     <div className="d-flex justify-content-between align-items-center mb-3">
                                         <div className="small text-muted">Ngày khám</div>
                                         <div className="fw-bold text-primary text-end">{appointment?.appointmentDate || '-'} ({appointment.session || '-'})</div>
@@ -117,7 +147,7 @@ const AppointmentDetail = () => {
 
                                 <Card.Footer className="bg-white border-0 p-4 pt-0">
 
-                                    {appointment?.status === 'PENDING' && (
+                                    {appointment?.status === 'UN_PAID' && (
                                         <div className="d-flex align-items-center p-3 mb-4 bg-warning bg-opacity-10 border border-warning border-opacity-50 rounded-3">
                                             <i className="bi bi-exclamation-circle-fill text-warning fs-5 me-3"></i>
                                             <div className="small fw-semibold text-dark">
@@ -136,17 +166,22 @@ const AppointmentDetail = () => {
                                     )}
 
                                     <div className="d-flex justify-content-end align-items-center gap-3">
+                                        <Button variant="outline-secondary" className="rounded-pill px-4 py-2" onClick={() => navigate(-1)}>
+                                            Trở về
+                                        </Button>
+                                        {appointment?.status !== 'CANCELLED' && (
+                                            <Button variant="danger" className="rounded-pill px-4 py-2" onClick={() => setShowCancelModal(true)}>
+                                                Hủy lịch hẹn
+                                            </Button>
+                                        )}
 
-                                        {appointment?.status === 'PENDING' && (
-                                            <Button variant="primary" className="rounded-pill px-4 py-2" onClick={() => navigate(`/patient/payment/${appointment.patientId}`)}>
+                                        {appointment?.status === 'UN_PAID' && (
+                                            <Button variant="primary" className="rounded-pill px-4 py-2" onClick={() => navigate(`/patient/payments`)}>
                                                 Thanh toán
                                             </Button>
                                         )}
 
 
-                                        <Button variant="outline-secondary" className="rounded-pill px-4 fw-medium" onClick={() => navigate(-1)}>
-                                            Trở về
-                                        </Button>
                                     </div>
                                 </Card.Footer>
                             </Card>
@@ -154,6 +189,27 @@ const AppointmentDetail = () => {
                     </Row>
                 )}
             </div>
+            <MyModal
+                show={showCancelModal}
+                onHide={() => setShowCancelModal(false)}
+                title="Xác nhận hủy lịch"
+                onConfirm={confirmCancel}
+                confirmText={cancelling ? 'Đang hủy...' : 'Xác nhận hủy'}
+                cancelText="Hủy"
+            >
+                <div>Bạn có chắc chắn muốn hủy lịch hẹn này không? Hành động này có thể không hoàn tác được.</div>
+            </MyModal>
+
+            <MyModal
+                show={showCancelErrorModal}
+                onHide={() => setShowCancelErrorModal(false)}
+                title="Lỗi hủy lịch"
+                cancelText="Đóng"
+                hideFooter={false}
+            >
+                <div className="text-danger small">{cancelErrorMessage}</div>
+            </MyModal>
+
             <Footer />
         </div>
     );

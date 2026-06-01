@@ -28,9 +28,17 @@ import java.io.Serializable;
 @NamedQueries({
     @NamedQuery(name = "PrescriptionItem.findAll", query = "SELECT p FROM PrescriptionItem p"),
     @NamedQuery(name = "PrescriptionItem.findById", query = "SELECT p FROM PrescriptionItem p WHERE p.id = :id"),
-    @NamedQuery(name = "PrescriptionItem.findByQuantity", query = "SELECT p FROM PrescriptionItem p WHERE p.quantity = :quantity")})
+    @NamedQuery(name = "PrescriptionItem.findByQuantity", query = "SELECT p FROM PrescriptionItem p WHERE p.quantity = :quantity"),
+    @NamedQuery(name = "PrescriptionItem.findByDaysToUse", query = "SELECT p FROM PrescriptionItem p WHERE p.daysToUse = :daysToUse"),
+    @NamedQuery(name = "PrescriptionItem.findByNote", query = "SELECT p FROM PrescriptionItem p WHERE p.note = :note")})
 public class PrescriptionItem implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id")
+    private Long id;
     @Basic(optional = false)
     @NotNull
     @Column(name = "quantity")
@@ -40,13 +48,6 @@ public class PrescriptionItem implements Serializable {
     @Size(max = 255)
     @Column(name = "note")
     private String note;
-
-    private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "id")
-    private Long id;
     @JoinColumn(name = "medicine_id", referencedColumnName = "id")
     @ManyToOne
     private Medicine medicineId;
@@ -61,6 +62,11 @@ public class PrescriptionItem implements Serializable {
         this.id = id;
     }
 
+    public PrescriptionItem(Long id, int quantity) {
+        this.id = id;
+        this.quantity = quantity;
+    }
+
     public Long getId() {
         return id;
     }
@@ -69,6 +75,29 @@ public class PrescriptionItem implements Serializable {
         this.id = id;
     }
 
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public Integer getDaysToUse() {
+        return daysToUse;
+    }
+
+    public void setDaysToUse(Integer daysToUse) {
+        this.daysToUse = daysToUse;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
 
     public Medicine getMedicineId() {
         return medicineId;
@@ -109,30 +138,6 @@ public class PrescriptionItem implements Serializable {
     @Override
     public String toString() {
         return "com.hb.pojo.PrescriptionItem[ id=" + id + " ]";
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
-    public Integer getDaysToUse() {
-        return daysToUse;
-    }
-
-    public void setDaysToUse(Integer daysToUse) {
-        this.daysToUse = daysToUse;
-    }
-
-    public String getNote() {
-        return note;
-    }
-
-    public void setNote(String note) {
-        this.note = note;
     }
     
 }

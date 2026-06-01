@@ -6,6 +6,7 @@ package com.hb.pojo;
 
 import com.hb.enums.AppointmentStatus;
 import jakarta.persistence.Basic;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -20,14 +21,11 @@ import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Date;
+
 
 /**
  *
@@ -48,28 +46,27 @@ public class Appointment implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
+    @Size(max = 11)
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private AppointmentStatus status;
     @Column(name = "created_at")
-    private LocalDate createdAt;
-    @OneToOne(mappedBy = "appointmentId")
-    private MedicalRecord medicalRecord;
-    
+    private LocalDateTime createdAt;
     @JoinColumn(name = "patient_id", referencedColumnName = "id")
     @ManyToOne
     private Patient patientId;
     @JoinColumn(name = "schedule_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
-    private Schedules scheduleId;
-    @OneToMany(mappedBy = "appointmentId")
-    private Collection<LabResults> labResultsCollection;
+    private Schedule scheduleId;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "appointmentId")
+    private Collection<LabResult> labResultCollection;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "appointmentId")
+    private Collection<Payment> paymentCollection;
     @OneToOne(mappedBy = "appointmentId")
     private Conversation conversation;
-    @OneToMany(mappedBy = "appointment")
-    private Collection<Payment> payments;
-    
-    
+    @OneToOne(mappedBy = "appointmentId")
+    private MedicalRecord medicalRecord;
+
     public Appointment() {
     }
 
@@ -93,22 +90,13 @@ public class Appointment implements Serializable {
         this.status = status;
     }
 
-    public LocalDate getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDate createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
-
-    public MedicalRecord getMedicalRecord() {
-        return medicalRecord;
-    }
-
-    public void setMedicalRecord(MedicalRecord medicalRecord) {
-        this.medicalRecord = medicalRecord;
-    }
-
 
     public Patient getPatientId() {
         return patientId;
@@ -118,20 +106,28 @@ public class Appointment implements Serializable {
         this.patientId = patientId;
     }
 
-    public Schedules getScheduleId() {
+    public Schedule getScheduleId() {
         return scheduleId;
     }
 
-    public void setScheduleId(Schedules scheduleId) {
+    public void setScheduleId(Schedule scheduleId) {
         this.scheduleId = scheduleId;
     }
 
-    public Collection<LabResults> getLabResultsCollection() {
-        return labResultsCollection;
+    public Collection<LabResult> getLabResultCollection() {
+        return labResultCollection;
     }
 
-    public void setLabResultsCollection(Collection<LabResults> labResultsCollection) {
-        this.labResultsCollection = labResultsCollection;
+    public void setLabResultCollection(Collection<LabResult> labResultCollection) {
+        this.labResultCollection = labResultCollection;
+    }
+
+    public Collection<Payment> getPaymentCollection() {
+        return paymentCollection;
+    }
+
+    public void setPaymentCollection(Collection<Payment> paymentCollection) {
+        this.paymentCollection = paymentCollection;
     }
 
     public Conversation getConversation() {
@@ -140,6 +136,14 @@ public class Appointment implements Serializable {
 
     public void setConversation(Conversation conversation) {
         this.conversation = conversation;
+    }
+
+    public MedicalRecord getMedicalRecord() {
+        return medicalRecord;
+    }
+
+    public void setMedicalRecord(MedicalRecord medicalRecord) {
+        this.medicalRecord = medicalRecord;
     }
 
     @Override
@@ -165,20 +169,6 @@ public class Appointment implements Serializable {
     @Override
     public String toString() {
         return "com.hb.pojo.Appointment[ id=" + id + " ]";
-    }
-
-    /**
-     * @return the payments
-     */
-    public Collection<Payment> getPayments() {
-        return payments;
-    }
-
-    /**
-     * @param payments the payments to set
-     */
-    public void setPayments(Collection<Payment> payments) {
-        this.payments = payments;
     }
     
 }
