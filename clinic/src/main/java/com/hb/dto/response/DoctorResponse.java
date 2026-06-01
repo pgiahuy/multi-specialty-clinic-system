@@ -16,7 +16,7 @@ public class DoctorResponse {
     private String fullName;
     private String description;
     private List<SpecialtyResponse> specialtiesOfDoctor;
-    private double rating;  
+    private Float rating;  
     private String email;
     private String gender;
 
@@ -134,14 +134,14 @@ public class DoctorResponse {
     /**
      * @return the rating
      */
-    public double getRating() {
+    public Float getRating() {
         return rating;
     }
 
     /**
      * @param rating the rating to set
      */
-    public void setRating(double rating) {
+    public void setRating(Float rating) {
         this.rating = rating;
     }
 

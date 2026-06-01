@@ -62,16 +62,6 @@ public class ScheduleServiceImpl implements ScheduleService {
             throw new BadRequestException("Ngày đăng ký không hợp lệ!");
         }
 
-        this.checkDoctorAvailability(req);
-        this.checkRoomAvailability(req);
-
-        Schedule schedule = new Schedule();
-
-        schedule.setDate(req.getDate());
-
-        schedule.setMaxPatients(req.getMaxPatients());
-        schedule.setCurrentPatients(0);
-
         Doctor doctor = doctorRepo.getDoctorById(req.getDoctorId());
         if (doctor == null) {
             throw new ResourceNotFoundException("Không tìm thấy bác sĩ!");
@@ -100,6 +90,21 @@ public class ScheduleServiceImpl implements ScheduleService {
             throw new BadRequestException("Phòng này không thuộc chuyên khoa của ca khám!");
         }
 
+        boolean isDoctorAvailable = this.scheduleRepo.checkDoctorAvailability(doctor.getId(), req.getDate(), shift.getId(), null);
+        if (!isDoctorAvailable) {
+            throw new DuplicateResourceException("Bác sĩ " + doctor.getFullName() + " đã có lịch trực vào ca này trong ngày rồi!");
+        }
+
+        boolean isRoomAvailable = this.scheduleRepo.checkRoomAvailability(room.getId(), req.getDate(), shift.getId(), null);
+        if (!isRoomAvailable) {
+            throw new DuplicateResourceException("Phòng " + room.getRoomNumber() + " đã được xếp cho ca trực khác mất rồi!");
+        }
+
+        Schedule schedule = new Schedule();
+        schedule.setDate(req.getDate());
+        schedule.setMaxPatients(req.getMaxPatients());
+        schedule.setCurrentPatients(0);
+
         schedule.setDoctorId(doctor);
         schedule.setSpecialtyId(specialty);
         schedule.setShiftId(shift);
@@ -124,23 +129,6 @@ public class ScheduleServiceImpl implements ScheduleService {
         return scheduleRepo.count(params, Schedule.class);
     }
 
-    @Override
-    public void checkDoctorAvailability(ScheduleCreateRequest req) {
-        boolean isAvailable = this.scheduleRepo
-                .checkDoctorAvailability(req.getDoctorId(), req.getDate(), req.getShiftId(), null);
-
-        if (!isAvailable) {
-            throw new DuplicateResourceException("Bác sĩ đã đăng ký lịch làm việc khác trong ca này rồi!");
-        }
-    }
-
-    @Override
-    public void checkRoomAvailability(ScheduleCreateRequest req) {
-        boolean isAvailable = this.scheduleRepo.
-                checkRoomAvailability(req.getRoomId(), req.getDate(), req.getShiftId(), null);
-        if (!isAvailable) {
-            throw new DuplicateResourceException("Phòng bệnh này đã được xếp cho bác sĩ khác trong ca này!");
-        }
-    }
+    
 
 }

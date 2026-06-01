@@ -56,7 +56,7 @@ const DoctorProfile = () => {
                         <Card className="shadow-sm border-0 rounded-4 h-100">
                             <Card.Body className="p-4 text-center">
                                 <img
-                                    src={profile?.avatar || "/default-avatar.png"}
+                                    src={profile?.avatar || "/doctor-avatar.png"}
                                     alt="avatar"
                                     className="rounded-circle mb-3"
                                     style={{ width: 120, height: 120, objectFit: "cover" }}

@@ -5,6 +5,9 @@ public class RoomResponse {
     private String roomNumber;
     private String areaName;
     private Integer locationFloor;
+    
+    private Long specialtyId;
+    private String specialtyName;
 
     public RoomResponse() {
     }
@@ -46,5 +49,33 @@ public class RoomResponse {
 
     public void setLocationFloor(Integer locationFloor) {
         this.locationFloor = locationFloor;
+    }
+
+    /**
+     * @return the specialtyId
+     */
+    public Long getSpecialtyId() {
+        return specialtyId;
+    }
+
+    /**
+     * @param specialtyId the specialtyId to set
+     */
+    public void setSpecialtyId(Long specialtyId) {
+        this.specialtyId = specialtyId;
+    }
+
+    /**
+     * @return the specialtyName
+     */
+    public String getSpecialtyName() {
+        return specialtyName;
+    }
+
+    /**
+     * @param specialtyName the specialtyName to set
+     */
+    public void setSpecialtyName(String specialtyName) {
+        this.specialtyName = specialtyName;
     }
 }

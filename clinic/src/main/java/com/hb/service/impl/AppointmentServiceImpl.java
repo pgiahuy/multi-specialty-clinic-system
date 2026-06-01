@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -73,6 +74,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
+    @Transactional
     public AppointmentResponse registerAppointment(AppointmentCreateRequest req) {
 
         Patient patient = patientRepo.getPatientById(req.getPatientId());
@@ -86,24 +88,21 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
 
         boolean isAlreadyBooked = appointmentRepo.isPatientAlreadyBookedInSchedule(req.getPatientId(), req.getScheduleId());
-
         if (isAlreadyBooked) {
             throw new DuplicateResourceException("Bạn đã đăng ký khám ca này rồi!");
-        }
-
-        if (schedule.getCurrentPatients() >= schedule.getMaxPatients()) {
-            throw new FullSlotException("Rất tiếc, ca khám này đã đủ số lượng người đăng ký!");
         }
 
         if (isDuplicateTimeAppointment(patient.getId(), req.getScheduleId())) {
             throw new DuplicateResourceException("Bạn đã có lịch hẹn vào khung giờ này rồi!");
         }
 
-        schedule.setCurrentPatients(schedule.getCurrentPatients() + 1);
-        scheduleRepo.saveOrUpdate(schedule);
+        int rowsUpdated = scheduleRepo.incrementCurrentPatients(req.getScheduleId());
+
+        if (rowsUpdated == 0) {
+            throw new FullSlotException("Rất tiếc, ca khám này đã đủ số lượng người đăng ký!");
+        }
 
         Appointment appointment = appointmentMapper.toEntity(req, patient, schedule);
-
         appointmentRepo.addOrUpdateAppointment(appointment);
 
         Payment p = paymentService.createPayment(appointment);

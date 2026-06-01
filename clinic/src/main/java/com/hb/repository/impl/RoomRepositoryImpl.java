@@ -5,7 +5,15 @@
 package com.hb.repository.impl;
 
 import com.hb.pojo.Room;
+import com.hb.pojo.Schedule;
 import com.hb.repository.RoomRepository;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.hibernate.Session;
@@ -23,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @Transactional
 public class RoomRepositoryImpl extends BaseRepositoryImpl<Room> implements RoomRepository {
-
 
     @Autowired
     private LocalSessionFactoryBean factory;
@@ -57,6 +64,41 @@ public class RoomRepositoryImpl extends BaseRepositoryImpl<Room> implements Room
             q.setMaxResults(pageSize);
         }
         return q.getResultList();
+    }
+
+    @Override
+    public List<Room> getAvailableRooms(Map<String, String> params) {
+        Session session = this.factory.getObject().getCurrentSession();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+
+        CriteriaQuery<Room> cq = cb.createQuery(Room.class);
+        Root<Room> root = cq.from(Room.class);
+        
+        List<Predicate> mainPredicates = new ArrayList<>();
+
+        if (params != null) {
+            if (params.containsKey("specialtyId") && !params.get("specialtyId").isEmpty()) {
+                mainPredicates.add(cb.equal(root.get("specialtyId").get("id"), Long.valueOf(params.get("specialtyId"))));
+            }
+
+            if (params.containsKey("date") && params.containsKey("shiftId")
+                    && !params.get("date").isEmpty() && !params.get("shiftId").isEmpty()) {
+
+                Subquery<Long> subquery = cq.subquery(Long.class);
+                Root<Schedule> subRoot = subquery.from(Schedule.class);
+                subquery.select(subRoot.get("roomId").get("id"));
+
+                List<Predicate> subPredicates = new ArrayList<>();
+                subPredicates.add(cb.equal(subRoot.get("date"), LocalDate.parse(params.get("date"))));
+                subPredicates.add(cb.equal(subRoot.get("shiftId").get("id"), Long.valueOf(params.get("shiftId"))));
+                subquery.where(subPredicates.toArray(new Predicate[0]));
+
+                mainPredicates.add(cb.not(root.get("id").in(subquery)));
+            }
+        }
+
+        cq.select(root).where(mainPredicates.toArray(new Predicate[0]));
+        return session.createQuery(cq).getResultList();
     }
 
     @Override
@@ -97,10 +139,10 @@ public class RoomRepositoryImpl extends BaseRepositoryImpl<Room> implements Room
     @Override
     public Room saveOrUpdate(Room a) {
         Session session = this.factory.getObject().getCurrentSession();
-        if (a.getId()==null) {
+        if (a.getId() == null) {
             session.persist(a);
             return a;
-        }else{
+        } else {
             return session.merge(a);
         }
     }

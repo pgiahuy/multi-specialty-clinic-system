@@ -21,7 +21,4 @@ public interface ScheduleService {
     void deleteSchedule(Long id);
     long countSchedules(Map<String, String> params);
     
-    void checkDoctorAvailability(ScheduleCreateRequest req);
-    void checkRoomAvailability(ScheduleCreateRequest req);
-
 }
