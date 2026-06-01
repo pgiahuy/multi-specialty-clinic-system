@@ -5,9 +5,9 @@
 package com.hb.controllers.api;
 
 import com.hb.dto.request.LabTestResultRequest;
+import com.hb.dto.request.TestDetailRequest;
 import com.hb.dto.response.LabTestResponse;
 import com.hb.dto.response.LabTestResultResponse;
-import com.hb.exception.ForbiddenException;
 import com.hb.mapper.LabTestMapper;
 import com.hb.mapper.LabTestResultMapper;
 import com.hb.pojo.LabResults;
@@ -40,7 +40,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/secure")
-public class ApiLabTestController {
+public class ApiLabTestResultController {
     
     @Autowired
     private LabTestService testService;
@@ -56,13 +56,10 @@ public class ApiLabTestController {
     
 
 
-    @PostMapping("/tests")
-    public ResponseEntity<List<LabTestResultResponse>> create(@RequestBody List<LabTestResultRequest> reqs, Principal principal) {
-        List<LabResults> res = testResultService.addMutipleTest(reqs);
-        List<LabTestResultResponse> responseList = res.stream()
-                .map(testResultMapper::toResponse)
-                .toList();
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseList);
+    @PostMapping("/lab-results")
+    public ResponseEntity<?> create(@RequestBody LabTestResultRequest req) {
+        testResultService.labTestOrder(req);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/tests/{patientId}")

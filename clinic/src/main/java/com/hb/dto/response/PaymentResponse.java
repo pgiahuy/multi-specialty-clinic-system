@@ -25,7 +25,7 @@ public class PaymentResponse {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private LocalDateTime paidAt;
     private Long appointmentId;
-    private List<PaymentItemResponse> paymentItems;
+    private List<PaymentItemResponse> paymentItemsCollection;
     
 
     public PaymentResponse() {
@@ -40,7 +40,7 @@ public class PaymentResponse {
         this.status = status;
         this.paidAt = paidAt;
         this.appointmentId = appointmentId;
-        this.paymentItems = paymentItems;
+        this.paymentItemsCollection = paymentItems;
     }
 
     
@@ -137,19 +137,7 @@ public class PaymentResponse {
         this.createdAt = createdAt;
     }
 
-    /**
-     * @return the paymentItems
-     */
-    public List<PaymentItemResponse> getPaymentItems() {
-        return paymentItems;
-    }
-
-    /**
-     * @param paymentItems the paymentItems to set
-     */
-    public void setPaymentItems(List<PaymentItemResponse> paymentItems) {
-        this.paymentItems = paymentItems;
-    }
+    
 
     /**
      * @return the status
@@ -163,6 +151,20 @@ public class PaymentResponse {
      */
     public void setStatus(PaymentStatus status) {
         this.status = status;
+    }
+
+    /**
+     * @return the paymentItemsCollection
+     */
+    public List<PaymentItemResponse> getPaymentItemsCollection() {
+        return paymentItemsCollection;
+    }
+
+    /**
+     * @param paymentItemsCollection the paymentItemsCollection to set
+     */
+    public void setPaymentItemsCollection(List<PaymentItemResponse> paymentItemsCollection) {
+        this.paymentItemsCollection = paymentItemsCollection;
     }
     
 }

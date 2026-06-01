@@ -26,8 +26,6 @@ public class LabTestResultMapper {
         
         labResult.setAppointmentId(appointment);
         labResult.setCreatedAt(LocalDateTime.now());
-       
-        
         return labResult;
     }
     

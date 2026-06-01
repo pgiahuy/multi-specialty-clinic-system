@@ -4,6 +4,9 @@
  */
 package com.hb.dto.request;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 /**
  *
  * @author DELL
@@ -11,31 +14,26 @@ package com.hb.dto.request;
 public class LabTestResultRequest {
     private Long id;
     private Long appointId;
-    private Long testId;
-    private String result;
-    private Boolean isNormal;
+    private LocalDateTime createdAt;
+    private LocalDateTime testAt;
+    private List<TestDetailRequest> details;
+    
 
     public LabTestResultRequest() {
     }
 
-    public LabTestResultRequest(Long id, Long appointId, Long testId, String result, Boolean isNormal) {
+    public LabTestResultRequest(Long id, Long appointId, LocalDateTime createdAt, LocalDateTime testAt, List<TestDetailRequest> details) {
         this.id = id;
         this.appointId = appointId;
-        this.testId = testId;
-        this.result = result;
-        this.isNormal = isNormal;
+        this.createdAt = createdAt;
+        this.testAt = testAt;
+        this.details = details;
     }
 
-    public Boolean getIsNormal() {
-        return isNormal;
-    }
-
-    public void setIsNormal(Boolean isNormal) {
-        this.isNormal = isNormal;
-    }
-    
     
 
+    
+    
     /**
      * @return the appointId
      */
@@ -50,33 +48,7 @@ public class LabTestResultRequest {
         this.appointId = appointId;
     }
 
-    /**
-     * @return the testId
-     */
-    public Long getTestId() {
-        return testId;
-    }
-
-    /**
-     * @param testId the testId to set
-     */
-    public void setTestId(Long testId) {
-        this.testId = testId;
-    }
-
-    /**
-     * @return the result
-     */
-    public String getResult() {
-        return result;
-    }
-
-    /**
-     * @param result the result to set
-     */
-    public void setResult(String result) {
-        this.result = result;
-    }
+   
 
     /**
      * @return the id
@@ -90,6 +62,48 @@ public class LabTestResultRequest {
      */
     public void setId(Long id) {
         this.id = id;
+    }
+
+    /**
+     * @return the createdAt
+     */
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    /**
+     * @param createdAt the createdAt to set
+     */
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    /**
+     * @return the testAt
+     */
+    public LocalDateTime getTestAt() {
+        return testAt;
+    }
+
+    /**
+     * @param testAt the testAt to set
+     */
+    public void setTestAt(LocalDateTime testAt) {
+        this.testAt = testAt;
+    }
+
+    /**
+     * @return the details
+     */
+    public List<TestDetailRequest> getDetails() {
+        return details;
+    }
+
+    /**
+     * @param details the details to set
+     */
+    public void setDetails(List<TestDetailRequest> details) {
+        this.details = details;
     }
     
     
