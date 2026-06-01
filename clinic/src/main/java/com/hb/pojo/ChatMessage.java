@@ -21,6 +21,7 @@ import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -37,12 +38,6 @@ import java.util.Date;
     @NamedQuery(name = "ChatMessage.findByCreatedAt", query = "SELECT c FROM ChatMessage c WHERE c.createdAt = :createdAt")})
 public class ChatMessage implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "id")
-    private Long id;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 50)
@@ -57,7 +52,14 @@ public class ChatMessage implements Serializable {
     private String content;
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt;
+    private LocalDateTime createdAt;
+
+    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id")
+    private Long id;
     @JoinColumn(name = "conversation_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Conversation conversationId;
@@ -101,19 +103,12 @@ public class ChatMessage implements Serializable {
         this.messageType = messageType;
     }
 
-    public String getContent() {
-        return content;
-    }
 
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public Date getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
@@ -157,5 +152,16 @@ public class ChatMessage implements Serializable {
     public String toString() {
         return "com.hb.pojo.ChatMessage[ id=" + id + " ]";
     }
+
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+
     
 }

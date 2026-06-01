@@ -38,6 +38,8 @@ import ScheduleManagement from "./screens/Doctor/ScheduleManagement";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AppointmentOfSchedule from "./screens/Doctor/AppointmentOfSchedule";
 import LabTest from "./screens/Doctor/LabTest";
+import MessageBox from "./screens/User/MessageBox";
+import ConsultationPage from "./screens/Doctor/ConsultationPage";
 
 const initUserState = () => {
   const savedUser = localStorage.getItem("user");
@@ -98,9 +100,8 @@ function App() {
             </Route>
 
 
-
-
             <Route element={<ProtectedRoute />}>
+              <Route path="/doctor/consultations" element={<ConsultationPage />} />
               <Route path="/doctors" element={<ListDoctor />} />
               <Route path="/appointments/:appointmentId" element={<AppointmentDetail />} />
             </Route>

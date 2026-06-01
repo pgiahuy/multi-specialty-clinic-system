@@ -32,15 +32,16 @@ import java.util.Collection;
     @NamedQuery(name = "Room.findByRoomNumber", query = "SELECT r FROM Room r WHERE r.roomNumber = :roomNumber")})
 public class Room implements Serializable {
 
+    @Size(max = 20)
+    @Column(name = "room_number")
+    private String roomNumber;
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
-    @Size(max = 20)
-    @Column(name = "room_number")
-    private String roomNumber;
     @JoinColumn(name = "area_id", referencedColumnName = "id")
     @ManyToOne
     private Area areaId;
@@ -121,5 +122,7 @@ public class Room implements Serializable {
     public String toString() {
         return "com.hb.pojo.Room[ id=" + id + " ]";
     }
+
+ 
     
 }

@@ -39,12 +39,6 @@ import java.util.Collection;
     @NamedQuery(name = "Doctor.findByCccd", query = "SELECT d FROM Doctor d WHERE d.cccd = :cccd")})
 public class Doctor implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "id")
-    private Long id;
     @Size(max = 255)
     @Column(name = "full_name")
     private String fullName;
@@ -57,12 +51,19 @@ public class Doctor implements Serializable {
     private String gender;
     @Column(name = "is_active")
     private boolean isActive;
-    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
-    @Column(name = "rating")
-    private Float rating;
     @Size(max = 12)
     @Column(name = "cccd")
     private String cccd;
+
+    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id")
+    private Long id;
+    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    @Column(name = "rating")
+    private Float rating;
     @JoinTable(name = "specialty_doctor", joinColumns = {
         @JoinColumn(name = "doctor_id", referencedColumnName = "id")}, inverseJoinColumns = {
         @JoinColumn(name = "specialty_id", referencedColumnName = "id")})
@@ -99,21 +100,6 @@ public class Doctor implements Serializable {
         this.fullName = fullName;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
 
     public boolean getIsActive() {
         return isActive;
@@ -131,13 +117,6 @@ public class Doctor implements Serializable {
         this.rating = rating;
     }
 
-    public String getCccd() {
-        return cccd;
-    }
-
-    public void setCccd(String cccd) {
-        this.cccd = cccd;
-    }
 
     public Collection<Specialty> getSpecialtyCollection() {
         return specialtyCollection;
@@ -194,6 +173,33 @@ public class Doctor implements Serializable {
     @Override
     public String toString() {
         return "com.hb.pojo.Doctor[ id=" + id + " ]";
+    }
+
+ 
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+
+    public String getCccd() {
+        return cccd;
+    }
+
+    public void setCccd(String cccd) {
+        this.cccd = cccd;
     }
     
 }
