@@ -54,9 +54,9 @@ public class ApiPaymentController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private PaymentMapper payMapper;
-    
+//    @Autowired
+//    private PaymentMapper payMapper;
+//    
     @Autowired
     private Environment env;
     
@@ -72,9 +72,9 @@ public class ApiPaymentController {
         if (u == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        List<Payment> payments = this.paymentService.getPayments(params);
+        
 
-        return ResponseEntity.ok(payments.stream().map(payMapper::toResponse).toList());
+        return ResponseEntity.ok(paymentService.getPayments(params));
 
     }
 

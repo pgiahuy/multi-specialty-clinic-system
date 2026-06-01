@@ -6,19 +6,16 @@ package com.hb.service.impl;
 
 import com.hb.dto.request.LabResultCreateRequest;
 import com.hb.dto.request.LabResultDetailRequest;
-import com.hb.dto.response.LabTestResultResponse;
+import com.hb.dto.response.LabResultResponse;
 import com.hb.enums.LabResultStatus;
 import com.hb.exception.ResourceNotFoundException;
-import com.hb.mapper.LabTestResultMapper;
+import com.hb.mapper.LabResultMapper;
 import com.hb.pojo.Appointment;
 import com.hb.pojo.LabResult;
-import com.hb.pojo.LabResultDetail;
-import com.hb.pojo.LabTest;
 import com.hb.pojo.Payment;
-import com.hb.repository.LabResultDetailRepository;
 import com.hb.repository.LabTestResultRepository;
 import com.hb.service.AppointmentService;
-import com.hb.service.LabTestResultService;
+import com.hb.service.LabResultDetailService;
 import com.hb.service.LabTestService;
 import com.hb.service.PaymentItemsService;
 import com.hb.service.PaymentService;
@@ -28,13 +25,14 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.hb.service.LabResultService;
 
 /**
  *
  * @author DELL
  */
 @Service
-public class LabTestResultServiceImpl implements LabTestResultService {
+public class LabResultServiceImpl implements LabResultService {
     
     @Autowired
     private LabTestResultRepository labResultRepo;
@@ -46,7 +44,7 @@ public class LabTestResultServiceImpl implements LabTestResultService {
     private LabTestService testService;
     
     @Autowired
-    private LabTestResultMapper resultMapper;
+    private LabResultMapper resultMapper;
     
     @Autowired
     private PaymentService payService;
@@ -55,54 +53,40 @@ public class LabTestResultServiceImpl implements LabTestResultService {
     private PaymentItemsService itemService;
     
     @Autowired
-    private LabResultDetailRepository labResultDetailRepo;
+    private LabResultDetailService resultDetailService;
     
     @Override
     @Transactional
-    public LabResult addOrUpdateTestResult(LabResultCreateRequest request) {
+    public LabResult addOrUpdateLabResult(LabResultCreateRequest request) {
         LabResult labResult;
         
         if (request.getId() != null) {
             labResult = labResultRepo.getLabResultById(request.getId());
+            labResult.setTestAt(request.getTestAt());
+            labResult.setStatus(request.getStatus());
+            resultDetailService.updateDetails(labResult.getId(), request.getDetails());
             labResultRepo.addOrUpdateTestResult(labResult);
             return labResult;
         }
         
         labResult = new LabResult();
-        Appointment a = appointSer.getAppointmentById(request.getAppointId());
+        Appointment a = appointSer.getAppointmentById(request.getAppointmentId());
 
         if (a != null) {
             labResult.setAppointmentId(a);
             labResult.setCreatedAt(LocalDateTime.now());
             labResult.setStatus(LabResultStatus.PENDING);
-
         }
+        
         labResultRepo.addOrUpdateTestResult(labResult);
         
         return labResult;
-        
     }
     
-    @Override
-    @Transactional
-    public void addDetailsToTestResult(Long labResultId, List<LabResultDetailRequest> requests) {
-        
-        LabResult labResult = labResultRepo.getLabResultById(labResultId);
-        
-        for (LabResultDetailRequest req : requests) {
-            LabResultDetail detail = new LabResultDetail();
-            detail.setLabResultsId(labResult);
-            LabTest labtest = testService.getLabTestById(req.getTestId());
-            detail.setTestId(labtest);
-            labResultDetailRepo.addOrUpdate(detail);            
-
-        }
-        
-    }
     
     @Override
-    public List<LabTestResultResponse> getTestResults(Long patientId, Map<String, String> params) {
-        List<LabResult> res = labResultRepo.getTestResults(patientId, params);
+    public List<LabResultResponse> getLabResults(Map<String, String> params) {
+        List<LabResult> res = labResultRepo.getLabResults(params);
         return res.stream().map(resultMapper::toResponse).toList();
     }
     
@@ -111,29 +95,41 @@ public class LabTestResultServiceImpl implements LabTestResultService {
         return this.labResultRepo.getLabResultsByAppointment(appointmentId);
     }
     
-    @Override
-    public List<LabResult> addMutipleTest(List<LabResultCreateRequest> req) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-    
+   
     @Override
     @Transactional
     public void labTestOrder(LabResultCreateRequest request) {
-        LabResult labResult = this.addOrUpdateTestResult(request);
+        LabResult labResult = this.addOrUpdateLabResult(request);
         List<LabResultDetailRequest> details = request.getDetails();
 
         if (labResult == null && details == null) {
             throw new ResourceNotFoundException("Failed to create lab result or no test details provided");
         }
-        this.addDetailsToTestResult(labResult.getId(), details);
-        Payment payment = payService.createPayment(request.getAppointId());
+        resultDetailService.addDetailsToLabResult(labResult.getId(), details);
+        
+        Payment payment = payService.createPayment(request.getAppointmentId());
         
         for (LabResultDetailRequest req : details) {
-            itemService.addLabTestItems(payment, req.getTestId());
+            itemService.addLabTestItems(payment, req.getTestId(), labResult.getId());
         }
         
         payService.updatePaymentTotalAmount(payment);
         
+    }
+
+    @Override
+    public LabResult getLabResultById(Long id) {
+        return labResultRepo.getLabResultById(id);
+    }
+
+    @Override
+    public void updateStatusLabResult(Long labResultId, LabResultStatus status) {
+        LabResult labResult = labResultRepo.getLabResultById(labResultId);
+        if (labResult == null) {
+            throw new ResourceNotFoundException("Không tìm thấy phiếu xét nghiệm!");
+        }
+        labResult.setStatus(status);
+        labResultRepo.addOrUpdateTestResult(labResult);
     }
     
 }

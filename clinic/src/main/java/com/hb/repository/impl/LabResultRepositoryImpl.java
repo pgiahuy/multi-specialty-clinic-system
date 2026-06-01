@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Repository
 @Transactional
-public class LabTestResultRepositoryImpl implements LabTestResultRepository {
+public class LabResultRepositoryImpl implements LabTestResultRepository {
 
     @Autowired
     private LocalSessionFactoryBean factory;
@@ -47,7 +47,7 @@ public class LabTestResultRepositoryImpl implements LabTestResultRepository {
     }
 
     @Override
-    public List<LabResult> getTestResults(Long patientId, Map<String, String> params) {
+    public List<LabResult> getLabResults(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
 
         StringBuilder hql = new StringBuilder("SELECT l FROM LabResult l JOIN FETCH l.testId WHERE l.appointmentId.patientId.id = :patientId");
@@ -65,7 +65,7 @@ public class LabTestResultRepositoryImpl implements LabTestResultRepository {
 
         Query<LabResult> query = session.createQuery(hql.toString(), LabResult.class);
 
-        query.setParameter("patientId", patientId);
+//        query.setParameter("patientId", patientId);
 
         if (appointmentIdStr != null && !appointmentIdStr.isEmpty()) {
             query.setParameter("appointmentId", Long.parseLong(appointmentIdStr)); 

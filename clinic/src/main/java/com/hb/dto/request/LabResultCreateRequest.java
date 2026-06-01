@@ -4,6 +4,7 @@
  */
 package com.hb.dto.request;
 
+import com.hb.enums.LabResultStatus;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -13,39 +14,23 @@ import java.util.List;
  */
 public class LabResultCreateRequest {
     private Long id;
-    private Long appointId;
+    private Long appointmentId;
     private LocalDateTime createdAt;
     private LocalDateTime testAt;
+    private LabResultStatus status;
     private List<LabResultDetailRequest> details;
     
 
     public LabResultCreateRequest() {
     }
 
-    public LabResultCreateRequest(Long id, Long appointId, LocalDateTime createdAt, LocalDateTime testAt, List<LabResultDetailRequest> details) {
+    public LabResultCreateRequest(Long id, Long appointmentId, LocalDateTime createdAt, LocalDateTime testAt, LabResultStatus status, List<LabResultDetailRequest> details) {
         this.id = id;
-        this.appointId = appointId;
+        this.appointmentId = appointmentId;
         this.createdAt = createdAt;
         this.testAt = testAt;
+        this.status = status;
         this.details = details;
-    }
-
-    
-
-    
-    
-    /**
-     * @return the appointId
-     */
-    public Long getAppointId() {
-        return appointId;
-    }
-
-    /**
-     * @param appointId the appointId to set
-     */
-    public void setAppointId(Long appointId) {
-        this.appointId = appointId;
     }
 
    
@@ -104,6 +89,34 @@ public class LabResultCreateRequest {
      */
     public void setDetails(List<LabResultDetailRequest> details) {
         this.details = details;
+    }
+
+    /**
+     * @return the appointmentId
+     */
+    public Long getAppointmentId() {
+        return appointmentId;
+    }
+
+    /**
+     * @param appointmentId the appointmentId to set
+     */
+    public void setAppointmentId(Long appointmentId) {
+        this.appointmentId = appointmentId;
+    }
+
+    /**
+     * @return the status
+     */
+    public LabResultStatus getStatus() {
+        return status;
+    }
+
+    /**
+     * @param status the status to set
+     */
+    public void setStatus(LabResultStatus status) {
+        this.status = status;
     }
     
     

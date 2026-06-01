@@ -66,14 +66,14 @@ public class PaymentItemsServiceImpl implements PaymentItemsService {
     }
 
     @Override
-    public void addLabTestItems(Payment payment, Long testId) {
+    public void addLabTestItems(Payment payment, Long testId, Long labResultId) {
 
-        LabTest lt = labRepo.getLabTestById(testId);
+        LabTest labtest = labRepo.getLabTestById(testId);
         PaymentItem item = new PaymentItem();
         item.setPaymentId(payment);
         item.setItemType(PaymentItemType.LAB_TEST);
-        item.setAmount(lt.getPrice());
-        item.setReferenceId(testId);
+        item.setAmount(labtest.getPrice());
+        item.setReferenceId(labResultId);
         itemRepo.addOrUpdateItem(item);
         payService.updatePaymentTotalAmount(payment);
 

@@ -179,21 +179,46 @@ const PaymentDetail = () => {
         }
     };
 
+
+
+    const parseVietnameseDate = (dateString) => {
+        if (!dateString) return null;
+
+
+        const parts = dateString.split(' ');
+        const datePart = parts[0];
+        const timePart = parts[1] || '00:00:00';
+
+
+        const [day, month, year] = datePart.split('/');
+
+
+        if (!day || !month || !year) return new Date(dateString);
+
+
+        return new Date(`${year}-${month}-${day}T${timePart}`);
+    };
+
     const isPaymentInRange = (payment) => {
         const rawDate = payment.createdDate || payment.createdAt || '';
-        const invoiceDate = rawDate
-            ? new Date(rawDate + 'T00:00:00')
-            : null;
+
+
+        const invoiceDate = parseVietnameseDate(rawDate);
+
         if (!invoiceDate || Number.isNaN(invoiceDate.getTime())) return true;
 
         if (fromDate) {
-            const from = new Date(fromDate + 'T00:00:00');
+            const from = new Date(fromDate);
+            from.setHours(0, 0, 0, 0);
             if (invoiceDate < from) return false;
         }
+
         if (toDate) {
-            const to = new Date(toDate + 'T23:59:59');
+            const to = new Date(toDate);
+            to.setHours(23, 59, 59, 999);
             if (invoiceDate > to) return false;
         }
+
         return true;
     };
 
