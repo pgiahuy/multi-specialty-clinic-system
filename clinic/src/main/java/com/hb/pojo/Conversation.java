@@ -23,6 +23,7 @@ import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
 
@@ -40,30 +41,34 @@ import java.util.Date;
     @NamedQuery(name = "Conversation.findByCreatedAt", query = "SELECT c FROM Conversation c WHERE c.createdAt = :createdAt")})
 public class Conversation implements Serializable {
 
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 50)
+    @Column(name = "conversation_type")
+    private String conversationType;
+    @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime createdAt;
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 50)
-    @Column(name = "conversation_type")
-    private String conversationType;
     @Column(name = "is_active")
     private Boolean isActive;
-    @Column(name = "created_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "conversationId")
     private Collection<ChatMessage> chatMessageCollection;
     @JoinColumn(name = "appointment_id", referencedColumnName = "id")
     @OneToOne
     private Appointment appointmentId;
+    
+    
     @JoinColumn(name = "patient_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
-    private User patientId;
+    private Patient patientId;
+    
     @JoinColumn(name = "receiver_id", referencedColumnName = "id")
     @ManyToOne
     private User receiverId;
@@ -104,11 +109,11 @@ public class Conversation implements Serializable {
         this.isActive = isActive;
     }
 
-    public Date getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
@@ -128,11 +133,11 @@ public class Conversation implements Serializable {
         this.appointmentId = appointmentId;
     }
 
-    public User getPatientId() {
+    public Patient getPatientId() {
         return patientId;
     }
 
-    public void setPatientId(User patientId) {
+    public void setPatientId(Patient patientId) {
         this.patientId = patientId;
     }
 
@@ -168,5 +173,7 @@ public class Conversation implements Serializable {
     public String toString() {
         return "com.hb.pojo.Conversation[ id=" + id + " ]";
     }
+
+    
     
 }

@@ -47,19 +47,13 @@ import java.util.Date;
     @NamedQuery(name = "Patient.findByIsActive", query = "SELECT p FROM Patient p WHERE p.isActive = :isActive")})
 public class Patient implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "id")
-    private Long id;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 12)
     @Column(name = "cccd")
     private String cccd;
     @Basic(optional = false)
-    @NotNull
+    @NotNull()
     @Size(min = 1, max = 255)
     @Column(name = "full_name")
     private String fullName;
@@ -76,7 +70,7 @@ public class Patient implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 255)
-    @Column(name = "address")
+    @Column(name =  "address")
     private String address;
     // @Pattern(regexp="^\\(?(\\d{3})\\)?[- ]?(\\d{3})[- ]?(\\d{4})$", message="Invalid phone/fax format, should be as xxx-xxx-xxxx")//if the field contains phone or fax number consider using this annotation to enforce field validation
     @Size(max = 20)
@@ -86,8 +80,17 @@ public class Patient implements Serializable {
     @Column(name = "relationship")
     @Enumerated(EnumType.STRING)
     private PatientRelationship relationship;
+    // @Pattern(regexp="^\\(?(\\d{3})\\)?[- ]?(\\d{3})[- ]?(\\d{4})$", message="Invalid phone/fax format, should be as xxx-xxx-xxxx")//if the field contains phone or fax number consider using this annotation to enforce field validation
     @Column(name = "is_active")
     private boolean isActive;
+    @OneToMany(mappedBy = "patientId")
+    private Collection<Conversation> conversationCollection;
+    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id")
+    private Long id;
     @OneToMany(mappedBy = "patientId")
     private Collection<Appointment> appointmentCollection;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
@@ -118,13 +121,6 @@ public class Patient implements Serializable {
         this.id = id;
     }
 
-    public String getCccd() {
-        return cccd;
-    }
-
-    public void setCccd(String cccd) {
-        this.cccd = cccd;
-    }
 
     public String getFullName() {
         return fullName;
@@ -134,45 +130,6 @@ public class Patient implements Serializable {
         this.fullName = fullName;
     }
 
-    public LocalDate getDob() {
-        return dob;
-    }
-
-    public void setDob(LocalDate dob) {
-        this.dob = dob;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public PatientRelationship getRelationship() {
-        return relationship;
-    }
-
-    public void setRelationship(PatientRelationship relationship) {
-        this.relationship = relationship;
-    }
 
     public boolean getIsActive() {
         return isActive;
@@ -221,6 +178,64 @@ public class Patient implements Serializable {
     @Override
     public String toString() {
         return "com.hb.pojo.Patient[ id=" + id + " ]";
+    }
+
+    public String getCccd() {
+        return cccd;
+    }
+
+    public void setCccd(String cccd) {
+        this.cccd = cccd;
+    }
+
+    public LocalDate getDob() {
+        return dob;
+    }
+
+    public void setDob(LocalDate dob) {
+        this.dob = dob;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public PatientRelationship getRelationship() {
+        return relationship;
+    }
+
+    public void setRelationship(PatientRelationship relationship) {
+        this.relationship = relationship;
+    }
+
+ 
+
+    public Collection<Conversation> getConversationCollection() {
+        return conversationCollection;
+    }
+
+    public void setConversationCollection(Collection<Conversation> conversationCollection) {
+        this.conversationCollection = conversationCollection;
     }
     
 }
