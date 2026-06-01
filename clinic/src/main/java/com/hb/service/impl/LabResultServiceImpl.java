@@ -13,7 +13,6 @@ import com.hb.mapper.LabResultMapper;
 import com.hb.pojo.Appointment;
 import com.hb.pojo.LabResult;
 import com.hb.pojo.Payment;
-import com.hb.repository.LabTestResultRepository;
 import com.hb.service.AppointmentService;
 import com.hb.service.LabResultDetailService;
 import com.hb.service.LabTestService;
@@ -26,16 +25,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.hb.service.LabResultService;
+import com.hb.repository.LabResultRepository;
 
 /**
  *
  * @author DELL
  */
 @Service
+@Transactional
 public class LabResultServiceImpl implements LabResultService {
     
     @Autowired
-    private LabTestResultRepository labResultRepo;
+    private LabResultRepository labResultRepo;
     
     @Autowired
     private AppointmentService appointSer;
@@ -55,15 +56,14 @@ public class LabResultServiceImpl implements LabResultService {
     @Autowired
     private LabResultDetailService resultDetailService;
     
-    @Override
-    @Transactional
+    @Override    
     public LabResult addOrUpdateLabResult(LabResultCreateRequest request) {
         LabResult labResult;
         
         if (request.getId() != null) {
             labResult = labResultRepo.getLabResultById(request.getId());
             labResult.setTestAt(request.getTestAt());
-            labResult.setStatus(request.getStatus());
+            labResult.setStatus(LabResultStatus.COMPLETED);
             resultDetailService.updateDetails(labResult.getId(), request.getDetails());
             labResultRepo.addOrUpdateTestResult(labResult);
             return labResult;
@@ -84,20 +84,19 @@ public class LabResultServiceImpl implements LabResultService {
     }
     
     
-    @Override
+    @Override    
     public List<LabResultResponse> getLabResults(Map<String, String> params) {
         List<LabResult> res = labResultRepo.getLabResults(params);
         return res.stream().map(resultMapper::toResponse).toList();
     }
     
-    @Override
-    public List<LabResult> getLabResultsesByAppointmentId(Long appointmentId) {
-        return this.labResultRepo.getLabResultsByAppointment(appointmentId);
+    @Override    
+    public LabResultResponse getLabResultsesByAppointmentId(Long appointmentId) {
+        return resultMapper.toResponse(this.labResultRepo.getLabResultsByAppointment(appointmentId));
     }
     
    
     @Override
-    @Transactional
     public void labTestOrder(LabResultCreateRequest request) {
         LabResult labResult = this.addOrUpdateLabResult(request);
         List<LabResultDetailRequest> details = request.getDetails();

@@ -13,16 +13,22 @@ public class LabResultDetailResponse {
     private String testName;
     private String value;
     private Boolean isAbnormal;
+    private String normalRange;
+    private String unit;
 
     public LabResultDetailResponse() {
     }
 
-    public LabResultDetailResponse(Long id, String testName, String value, Boolean isAbnormal) {
+    public LabResultDetailResponse(Long id, String testName, String value, Boolean isAbnormal, String normalRange, String unit) {
         this.id = id;
         this.testName = testName;
         this.value = value;
         this.isAbnormal = isAbnormal;
+        this.normalRange = normalRange;
+        this.unit = unit;
     }
+
+    
 
     /**
      * @return the id
@@ -78,6 +84,34 @@ public class LabResultDetailResponse {
      */
     public void setIsAbnormal(Boolean isAbnormal) {
         this.isAbnormal = isAbnormal;
+    }
+
+    /**
+     * @return the normalRange
+     */
+    public String getNormalRange() {
+        return normalRange;
+    }
+
+    /**
+     * @param normalRange the normalRange to set
+     */
+    public void setNormalRange(String normalRange) {
+        this.normalRange = normalRange;
+    }
+
+    /**
+     * @return the unit
+     */
+    public String getUnit() {
+        return unit;
+    }
+
+    /**
+     * @param unit the unit to set
+     */
+    public void setUnit(String unit) {
+        this.unit = unit;
     }
     
     

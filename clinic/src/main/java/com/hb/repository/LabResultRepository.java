@@ -13,9 +13,9 @@ import java.util.Map;
  *
  * @author DELL
  */
-public interface LabTestResultRepository {
+public interface LabResultRepository {
     LabResult getLabResultById(Long id);
-    List<LabResult> getLabResultsByAppointment(Long appointmentId);
+    LabResult getLabResultsByAppointment(Long appointmentId);
     void addOrUpdateTestResult(LabResult lr);
     List<LabResult> getLabResults(Map<String, String> params);
 }

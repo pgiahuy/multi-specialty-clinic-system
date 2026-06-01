@@ -21,7 +21,7 @@ public interface LabResultService {
     LabResult addOrUpdateLabResult(LabResultCreateRequest request);
     List<LabResultResponse> getLabResults(Map<String, String> params);
     LabResult getLabResultById(Long id);
-    List<LabResult> getLabResultsesByAppointmentId(Long appointmentId);
+    LabResultResponse getLabResultsesByAppointmentId(Long appointmentId);
     void labTestOrder(LabResultCreateRequest request);
     void updateStatusLabResult(Long labResultId, LabResultStatus status);
 
