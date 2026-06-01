@@ -7,6 +7,8 @@ package com.hb.pojo;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -35,15 +37,18 @@ public class LabResultDetail implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Size(max = 45)
     @Column(name = "value")
     private String value;
     @Column(name = "is_abnormal")
     private Short isAbnormal;
-    @JoinColumn(name = "lab_results_id", referencedColumnName = "id")
+    @NotNull
+    @JoinColumn(name = "lab_result_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
-    private LabResult labResultsId;
+    private LabResult labResultId;
+    @NotNull
     @JoinColumn(name = "test_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private LabTest testId;
@@ -80,11 +85,11 @@ public class LabResultDetail implements Serializable {
     }
 
     public LabResult getLabResultsId() {
-        return labResultsId;
+        return labResultId;
     }
 
     public void setLabResultsId(LabResult labResultsId) {
-        this.labResultsId = labResultsId;
+        this.labResultId = labResultsId;
     }
 
     public LabTest getTestId() {

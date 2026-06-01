@@ -33,13 +33,13 @@ public class PaymentItemsServiceImpl implements PaymentItemsService {
 
     @Autowired
     private PaymentItemRepository itemRepo;
-    
+
     @Autowired
     private LabTestRepository labRepo;
-    
+
     @Autowired
     private AppointmentRepository appRepo;
-    
+
     @Autowired
     private PrescriptionRepository presRepo;
 
@@ -62,7 +62,7 @@ public class PaymentItemsServiceImpl implements PaymentItemsService {
         item.setReferenceId(appointmentId);
         itemRepo.addOrUpdateItem(item);
         payService.updatePaymentTotalAmount(payment);
-        
+
     }
 
     @Override
@@ -99,9 +99,10 @@ public class PaymentItemsServiceImpl implements PaymentItemsService {
         payService.updatePaymentTotalAmount(payment);
     }
 
-
     @Override
+
     public PaymentItem getPaymentItemByAppointment(Long  appointmentId) {
+
         return this.itemRepo.getItemByAppointment(appointmentId);
     }
 
