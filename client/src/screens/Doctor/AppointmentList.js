@@ -3,23 +3,33 @@ import Footer from "../../components/Footer";
 import Header from "../../components/Header";
 import { APPOINTMENT_ENDPOINTS, authApis, CLINIC_ENDPOINTS, endpoint } from "../../configs/Apis";
 import { useNavigate, useParams } from "react-router-dom";
-import { Button, Container, Table } from "react-bootstrap";
+import { Button, Col, Container, Row, Table, Form } from "react-bootstrap";
 import MySpinner from "../../components/MySpinner";
 import { tableStyles } from "../Patient/PatientStyle";
 
 const AppointmentList = () => {
 
-    const { scheduleId } = useParams();
     const [appointments, setAppointments] = useState([]);
     const [loading, setLoading] = useState(false);
     const [confirmingAppointmentId, setConfirmingAppointmentId] = useState(null);
+
+    const [filterKw, setFilterKw] = useState("");
+    const [filterDate, setFilterDate] = useState("");
+    const [filterStatus, setFilterStatus] = useState("");
+
     const nav = useNavigate();
 
 
     const loadAppointments = async () => {
         try {
             setLoading(true);
-            const response = await authApis().get(`${APPOINTMENT_ENDPOINTS.APPOINTMENTS}`);
+            const response = await authApis().get(APPOINTMENT_ENDPOINTS.APPOINTMENTS, {
+                params: {
+                    kw: filterKw,
+                    date: filterDate,
+                    status: filterStatus
+                }
+            });
             setAppointments(response.data);
         } catch (error) {
             console.error("Lỗi khi tải danh sách lịch hẹn:", error);
@@ -27,6 +37,10 @@ const AppointmentList = () => {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        loadAppointments();
+    }, [filterKw, filterDate, filterStatus]);
 
     const handleConfirmAppointment = async (appointmentId) => {
         try {
@@ -52,9 +66,7 @@ const AppointmentList = () => {
         }
     };
 
-    useEffect(() => {
-        loadAppointments();
-    }, []);
+
 
 
 
@@ -100,7 +112,7 @@ const AppointmentList = () => {
 
         if (appointment.status === 'IN_PROGRESS' || appointment.status === 'COMPLETED') {
             return {
-                label: 'Xem bệnh án',
+                label: 'Bệnh án',
                 variant: 'primary',
                 onClick: () => nav(`/doctor/appointments/${appointment.id}/medical-record`),
             };
@@ -116,48 +128,112 @@ const AppointmentList = () => {
                 <Header />
                 <Container fluid className="py-4" style={{ width: '97%' }}>
                     <h3 className="mb-4 text-center">DANH SÁCH LỊCH HẸN</h3>
-                    {loading ? (
-                        <div className="text-center">
-                            <MySpinner />
-                        </div>
-                    ) : appointments.length === 0 ? (
-                        <div className="text-center text-muted py-5">
-                            Không có lịch hẹn nào.
-                        </div>
-                    ) : (
-                        <div className="table-responsive w-100 mx-auto" style={tableStyles.container}>
-                            <Table hover className="table" style={tableStyles.table}>
-                                <thead>
-                                    <tr style={tableStyles.headerRow}>
-                                        <th style={tableStyles.headerCell}>STT</th>
-                                        <th style={tableStyles.headerCell}>Bệnh nhân</th>
-                                        <th style={tableStyles.headerCell}>Bác sĩ</th>
-                                        <th style={tableStyles.headerCell}>Chuyên khoa</th>
-                                        <th style={tableStyles.headerCell}>Ngày khám</th>
-                                        <th style={tableStyles.headerCell}>Ca khám</th>
-                                        <th style={tableStyles.headerCell}>Phòng</th>
-                                        <th style={tableStyles.headerCell}>Khu vực</th>
-                                        <th style={tableStyles.headerCell}>Trạng thái</th>
-                                        <th style={tableStyles.headerCell}></th>
+
+                    <Row className="mb-4 g-3 bg-light p-3 pt-0 mt-1 rounded shadow-sm mx-auto" style={{ width: '70%' }}>
+
+                        <Col md={5} sm={12}>
+                            <Form.Group controlId="filterKw">
+                                <Form.Label className="fw-semibold small text-secondary">Tìm theo tên bệnh nhân</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Nhập tên cần tìm..."
+                                    value={filterKw}
+                                    onChange={(e) => setFilterKw(e.target.value)}
+                                />
+                            </Form.Group>
+                        </Col>
+
+                        <Col md={2} sm={6}>
+                            <Form.Group controlId="filterDate">
+                                <Form.Label className="fw-semibold small text-secondary">Chọn ngày hẹn</Form.Label>
+                                <Form.Control
+                                    type="date"
+                                    value={filterDate}
+                                    onChange={(e) => setFilterDate(e.target.value)}
+                                />
+                            </Form.Group>
+                        </Col>
+
+                        <Col md={3} sm={6}>
+                            <Form.Group controlId="filterStatus">
+                                <Form.Label className="fw-semibold small text-secondary">Trạng thái</Form.Label>
+                                <Form.Select
+                                    value={filterStatus}
+                                    onChange={(e) => setFilterStatus(e.target.value)}
+                                >
+                                    <option value="">Tất cả trạng thái</option>
+
+                                    {Object.entries(statusMap).map(([key, value]) => (
+                                        <option key={key} value={key}>
+                                            {value.text}
+                                        </option>
+                                    ))}
+                                </Form.Select>
+                            </Form.Group>
+                        </Col>
+
+                        <Col md={2} sm={12} className="d-flex align-items-end">
+                            <Button
+                                variant="outline-secondary"
+                                className="w-100"
+                                onClick={() => { setFilterKw(""); setFilterDate(""); setFilterStatus(""); }}
+                                disabled={!filterKw && !filterDate && !filterStatus}
+                            >
+                                Xóa bộ lọc
+                            </Button>
+                        </Col>
+                    </Row>
+
+                    <div className="table-responsive w-100 mx-auto" style={tableStyles.container}>
+                        <Table hover className="table" style={tableStyles.table}>
+                            <thead>
+                                <tr style={tableStyles.headerRow}>
+                                    <th style={tableStyles.headerCell}>STT</th>
+                                    <th style={tableStyles.headerCell}>Bệnh nhân</th>
+                                    <th style={tableStyles.headerCell}>Bác sĩ</th>
+                                    <th style={tableStyles.headerCell}>Chuyên khoa</th>
+                                    <th style={tableStyles.headerCell}>Ngày khám</th>
+                                    <th style={tableStyles.headerCell}>Ca</th>
+                                    <th style={tableStyles.headerCell}>Phòng</th>
+                                    <th style={tableStyles.headerCell}>Khu vực</th>
+                                    <th style={tableStyles.headerCell}>Trạng thái</th>
+                                    <th style={tableStyles.headerCell}></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {loading ? (
+
+                                    <tr>
+                                        <td colSpan={10} className="text-center py-4 border-bottom-0" >
+                                            <MySpinner />
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    {appointments.map((appointment, index) => {
+                                ) : appointments.length === 0 ? (
+
+                                    <tr>
+                                        <td colSpan={10} className="text-center text-muted py-5 border-bottom-0">
+                                            Không có lịch hẹn nào phù hợp.
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    appointments.map((appointment, index) => {
                                         const action = getAppointmentAction(appointment);
 
                                         return (
-                                            <tr key={appointment.id}
+                                            <tr
+                                                key={appointment.id}
+                                                className="align-middle"
                                                 style={tableStyles.bodyRow(index)}
                                                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e7f1ff'}
-                                                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = tableStyles.bodyRow(index).backgroundColor}>
+                                                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = tableStyles.bodyRow(index).backgroundColor}
+                                            >
                                                 <td style={tableStyles.dataCell}>{index + 1}</td>
                                                 <td style={tableStyles.dataCell}>{appointment.patientFullName}</td>
                                                 <td style={tableStyles.dataCell}>{appointment.doctorFullName || '-'}</td>
                                                 <td style={tableStyles.dataCell}>{appointment.specialtyName || '-'}</td>
                                                 <td style={tableStyles.dataCell}>{appointment.appointmentDate || '-'}</td>
-                                                <td style={tableStyles.dataCell}>
-                                                    <div className="fw-semibold">{appointment.session || '-'}</div>
-                                                    <div className="small text-muted">{appointment.timeSlot || '-'}</div>
+                                                <td className="text-primary fw-semibold" style={tableStyles.dataCell}>
+                                                    {appointment.timeSlot || '-'}
                                                 </td>
                                                 <td style={tableStyles.dataCell}>{appointment.roomName || '-'}</td>
                                                 <td style={tableStyles.dataCell}>{appointment.areaName || '-'}</td>
@@ -166,7 +242,7 @@ const AppointmentList = () => {
                                                     {action && (
                                                         <Button
                                                             variant={action.variant}
-                                                            className="rounded-4"
+                                                            className="rounded-2 p-2"
                                                             onClick={action.onClick}
                                                             disabled={action.disabled}
                                                         >
@@ -176,11 +252,12 @@ const AppointmentList = () => {
                                                 </td>
                                             </tr>
                                         );
-                                    })}
-                                </tbody>
-                            </Table>
-                        </div>
-                    )}
+                                    })
+                                )}
+                            </tbody>
+                        </Table>
+                    </div>
+
                 </Container>
                 <Footer />
             </div>

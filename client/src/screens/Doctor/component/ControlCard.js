@@ -1,5 +1,5 @@
 import { Card, Row, Col } from 'react-bootstrap';
-import { CalendarPlus, FileEarmarkMedical, PersonCircle, ClockHistory, Receipt, PersonBadge, Droplet, Clipboard2Pulse, DropletHalf } from 'react-bootstrap-icons';
+import { CalendarPlus, FileEarmarkMedical, PersonCircle, ClockHistory, Receipt, PersonBadge, Droplet, Clipboard2Pulse, DropletHalf, Calendar, Calendar2, Calendar2Check, Calendar2Date, Calendar2Event, Calendar2MinusFill, Calendar2Day, Calendar2EventFill, Calendar2Week, Calendar3Range, Calendar2X, CalendarMonth, Calendar3Week, Calendar3WeekFill, CalendarWeek, Hospital, ChatDots, Person, Journal, JournalText } from 'react-bootstrap-icons';
 import { useNavigate } from 'react-router-dom';
 
 const ControlCard = () => {
@@ -8,11 +8,11 @@ const ControlCard = () => {
 
     const navItems = [
         { title: 'Đăng ký lịch làm việc', icon: <CalendarPlus size={30} className="text-primary mb-2" />, path: '/doctor/register-schedule' },
-        { title: 'Lịch làm việc', icon: <PersonBadge size={30} className="text-success mb-2" />, path: '/doctor/schedules' },
-        { title: 'Kê đơn thuốc', icon: <Receipt size={30} className="text-success mb-2" />, path: '/doctor/schedules' },
-        { title: 'Bệnh nhân', icon: <FileEarmarkMedical size={30} className="text-info mb-2" />, path: '/doctor/patients' },
+        { title: 'Lịch làm việc', icon: <CalendarWeek size={30} className="text-success mb-2" />, path: '/doctor/schedules' },
+        { title: 'Kê đơn thuốc', icon: <JournalText size={30} className="text-success mb-2" />, path: '/doctor/schedules' },
+        { title: 'Bệnh nhân', icon: <Person size={30} className="text-info mb-2" />, path: '/doctor/patients' },
         { title: 'Lịch hẹn', icon: <ClockHistory size={30} className="text-warning mb-2" />, path: '/doctor/appointments' },
-        { title: 'Tư vấn', icon: <ClockHistory size={30} className="text-warning mb-2" />, path: '/doctor/consultations' },
+        { title: 'Tư vấn', icon: <ChatDots size={30} className="text-warning mb-2" />, path: '/doctor/consultations' },
         { title: 'Xét nghiệm', icon: <Droplet size={30} className="text-info mb-2" />, path: '/doctor/lab-tests' },
     ];
 
