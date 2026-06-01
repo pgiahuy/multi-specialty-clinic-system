@@ -8,10 +8,13 @@ import { useNavigate } from "react-router-dom";
 import Footer from "../../components/Footer";
 import { MyUserContext } from "../../configs/Contexts";
 import FloatAlert from "../../components/FloatAlert";
+import ScheduleBooking from "./components/ScheduleBooking";
+import { InfoCircle, InfoCircleFill } from "react-bootstrap-icons";
 
 const BookingPage = () => {
     const [user] = useContext(MyUserContext);
     const [loading, setLoading] = useState(false);
+    const [showScheduleModal, setShowScheduleModal] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [loginPromptVisible, setLoginPromptVisible] = useState(false);
     const [alertData, setAlertData] = useState({
@@ -36,6 +39,7 @@ const BookingPage = () => {
     const [showAllSpecialties, setShowAllSpecialties] = useState(false);
     const [doctorSearchLoading, setDoctorSearchLoading] = useState(false);
     const [loadingMoreDoctors, setLoadingMoreDoctors] = useState(false);
+    const [loadingSchedules, setLoadingSchedules] = useState(false);
     const [doctorPage, setDoctorPage] = useState(1);
     const [hasMoreDoctors, setHasMoreDoctors] = useState(true);
 
@@ -65,22 +69,42 @@ const BookingPage = () => {
 
     const loadSchedules = async () => {
         try {
-            if (!selectedSpecialty || !selectedDoctor || !selectedDate) {
+            const hasAnyScheduleFilter = Boolean(selectedSpecialty || selectedDoctor || selectedDate);
+
+            if (!hasAnyScheduleFilter) {
                 setSchedules([]);
+                setSelectedSchedule(null);
                 return;
             }
 
+            const params = {};
+            if (selectedDate) {
+                params.date = selectedDate;
+            }
+            if (selectedSpecialty) {
+                params.specialtyId = selectedSpecialty;
+            }
+            if (selectedDoctor) {
+                params.doctorId = selectedDoctor;
+            }
+
+            setLoadingSchedules(true);
+
             const res = await authApis().get(CLINIC_ENDPOINTS.SCHEDULES, {
-                params: {
-                    specialtyId: selectedSpecialty,
-                    doctorId: selectedDoctor,
-                    date: selectedDate,
-                },
+                params,
             });
 
-            setSchedules(res.data || []);
+            const nextSchedules = res.data || [];
+            setSchedules(nextSchedules);
+
+            if (selectedSchedule && !nextSchedules.some(s => String(s.id) === String(selectedSchedule.id))) {
+                setSelectedSchedule(null);
+            }
         } catch (err) {
             console.log(err);
+            setSchedules([]);
+        } finally {
+            setLoadingSchedules(false);
         }
     };
 
@@ -157,7 +181,17 @@ const BookingPage = () => {
             return;
         }
 
-        if (!selectedPatient || !selectedSpecialty || !selectedDoctor || !selectedDate || !selectedSchedule) {
+        if (!selectedPatient) {
+            handleShowAlert(
+                "Vui lòng chọn hồ sơ bệnh nhân",
+                "Vui lòng chọn hồ sơ bệnh nhân trước khi đăng ký lịch khám.",
+                "warning"
+            );
+            return;
+        }
+
+
+        if (!selectedSchedule) {
             handleShowAlert(
                 "Thiếu thông tin",
                 "Vui lòng chọn đầy đủ hồ sơ, chuyên khoa, bác sĩ, ngày khám và ca khám.",
@@ -290,8 +324,10 @@ const BookingPage = () => {
                 if (sched) {
                     const timeLabel = `${sched.shiftStartTime || ""}${sched.shiftStartTime && sched.shiftEndTime ? " - " : ""}${sched.shiftEndTime || ""}`;
                     setSelectedSchedule({ ...sched, time: timeLabel });
+                    setShowScheduleModal(true);
                 } else {
                     setSelectedSchedule(null);
+                    setShowScheduleModal(false);
                 }
                 break;
             }
@@ -305,31 +341,8 @@ const BookingPage = () => {
         return profile?.fullName || profileId;
     };
 
-    const getDoctorDisplayName = (doctorId) => {
-        const doctor = doctors.find(item => String(item.id) === String(doctorId));
-        return doctor?.fullName || doctorId;
-    };
-
-    const getSpecialtyDisplayName = (specialtyId) => {
-        const specialty = specialties.find(item => String(item.id) === String(specialtyId));
-        return specialty?.name || specialtyId;
-    };
-
     const hasManySpecialties = specialties.length > 8;
     const specialtiesToShow = showAllSpecialties ? specialties : specialties.slice(0, 6);
-
-    const schedulesBySession = schedules.reduce((grouped, schedule) => {
-        if (!schedule.session) {
-            return grouped;
-        }
-
-        if (!grouped[schedule.session]) {
-            grouped[schedule.session] = [];
-        }
-
-        grouped[schedule.session].push(schedule);
-        return grouped;
-    }, {});
 
     const handleCloseModal = () => {
         setShowModal(false);
@@ -347,7 +360,7 @@ const BookingPage = () => {
 
                 <Container style={{ width: "90%" }} className="mt-4 mb-5">
                     <Row className="d-flex flex-row">
-                        <Col lg={8} className="d-flex flex-column gap-3">
+                        <Col lg={6} className="d-flex flex-column gap-3">
                             <Card className="p-4 shadow-sm mb-4 rounded-4">
                                 <Card.Title className="fw-bold mb-3">Thông tin đặt lịch</Card.Title>
                                 <div>
@@ -366,7 +379,7 @@ const BookingPage = () => {
                                             backgroundColor: "#f8f9fa",
                                         }}
                                     >
-                                        <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-2">
+                                        <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-2 g-2">
                                             {patientProfiles.length === 0 ? (
                                                 <div className="text-muted small fst-italic px-2 py-2">Chưa có hồ sơ để hiển thị.</div>
                                             ) : (
@@ -412,6 +425,15 @@ const BookingPage = () => {
                                             )}
                                         </div>
                                     </div>
+                                </div>
+                                <div className="mb-3 d-flex flex-row align-items-center">
+                                    <label className=" p-0 ">Chọn ngày khám:</label> &nbsp;
+                                    <input
+                                        type="date"
+                                        className="form-control w-50"
+                                        value={selectedDate}
+                                        onChange={(e) => handleFilterChange("date", e.target.value)}
+                                    />
                                 </div>
 
                                 <div className="mb-3">
@@ -462,7 +484,7 @@ const BookingPage = () => {
                                         </div>
                                     </div>
 
-                                    <div className="border rounded-4 p-3 bg-light-subtle">
+                                    <div className="border rounded-4 p-3 bg-light-subtle" >
                                         <div className="d-flex align-items-center justify-content-between gap-2 mb-2">
                                             <label className="form-label mb-0 fw-semibold">Chọn bác sĩ</label>
                                         </div>
@@ -480,9 +502,10 @@ const BookingPage = () => {
                                                 maxHeight: "260px",
                                                 overflowY: "auto",
                                                 overscrollBehavior: "contain",
+
                                             }}
                                         >
-                                            <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-2">
+                                            <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-2 g-2" >
                                                 {doctorSearchLoading && doctors.length === 0 ? (
                                                     <div className="text-muted small fst-italic px-2 py-2">Đang tìm bác sĩ...</div>
                                                 ) : doctors.length === 0 ? (
@@ -517,11 +540,11 @@ const BookingPage = () => {
                                                         })();
 
                                                         return (
-                                                            <div className="col" key={doc.id}>
+                                                            <div className="col" key={doc.id} >
                                                                 <div
                                                                     role="button"
                                                                     tabIndex={0}
-                                                                    className={`w-100 h-100 text-start border rounded-4 p-2 bg-white ${selected ? "border-success shadow-sm" : "border-light"}`}
+                                                                    className={`w-100 h-100 text-start border  rounded-4 p-2 ${selected ? "border-success shadow-sm" : "border-light"}`}
                                                                     onClick={() => {
                                                                         if (selected) {
                                                                             handleFilterChange("doctor", "");
@@ -533,18 +556,45 @@ const BookingPage = () => {
                                                                         transition: "all 0.2s ease",
                                                                         outline: "none",
                                                                         cursor: "pointer",
+                                                                        backgroundColor: "#e1f1ff",
+
                                                                     }}
                                                                 >
-                                                                    <div className="d-flex align-items-start gap-2">
+
+
+                                                                    <div className="d-flex align-items-start gap-2 ">
+
+
                                                                         <div
                                                                             className={`d-flex align-items-center justify-content-center rounded-circle flex-shrink-0 ${selected ? "bg-success text-white" : "bg-light text-secondary"}`}
                                                                             style={{ width: "36px", height: "36px", fontWeight: 700, fontSize: "13px" }}
                                                                         >
                                                                             {(doctorName || "B").trim().charAt(0).toUpperCase()}
+
                                                                         </div>
+
+
+
                                                                         <div className="flex-grow-1 min-w-0">
                                                                             <div className="d-flex align-items-center justify-content-between gap-2">
                                                                                 <div className="fw-semibold text-dark text-truncate small">{doctorName}</div>
+                                                                                <div className="d-flex align-items-center justify-content-between gap-2 mt-1">
+
+                                                                                    <Button
+                                                                                        type="button"
+                                                                                        variant="link"
+                                                                                        size="sm"
+                                                                                        className="p-1 d-inline-flex align-items-center justify-content-center text-primary"
+                                                                                        style={{ width: "24px", height: "24px" }}
+                                                                                        onClick={(e) => {
+                                                                                            e.stopPropagation();
+                                                                                            openDoctorDetail(doc.id);
+                                                                                        }}
+                                                                                        title="Xem thông tin"
+                                                                                    >
+                                                                                        <InfoCircle width={18} height={18} />
+                                                                                    </Button>
+                                                                                </div>
                                                                             </div>
                                                                             <div className="d-flex flex-wrap gap-1" style={{ fontSize: "12px", lineHeight: 1.2 }}>
                                                                                 {doctorSpecialties.length === 0 ? (
@@ -556,7 +606,7 @@ const BookingPage = () => {
                                                                                             <button
                                                                                                 key={sp.id || sp.name}
                                                                                                 type="button"
-                                                                                                className={`btn btn-sm ${spSelected ? "btn-primary" : "btn-outline-secondary"} rounded-pill py-0 px-2`}
+                                                                                                className={`btn btn-sm ${spSelected ? "text-primary" : "text-secondary"} border-0 py-0`}
                                                                                                 onClick={(e) => {
                                                                                                     e.stopPropagation();
                                                                                                     if (sp.id) {
@@ -578,24 +628,7 @@ const BookingPage = () => {
                                                                                     })
                                                                                 )}
                                                                             </div>
-                                                                            <div className="d-flex align-items-center justify-content-between gap-2 mt-1">
-                                                                                <div className={`${selected ? "text-primary" : "text-muted"}`} style={{ fontSize: "11px", lineHeight: 1.1 }}>
-                                                                                    {selected ? "Bấm để bỏ chọn" : "Bấm để chọn"}
-                                                                                </div>
-                                                                                <Button
-                                                                                    type="button"
-                                                                                    variant="outline-secondary"
-                                                                                    size="sm"
-                                                                                    className="px-2 py-0"
-                                                                                    style={{ fontSize: "10px" }}
-                                                                                    onClick={(e) => {
-                                                                                        e.stopPropagation();
-                                                                                        openDoctorDetail(doc.id);
-                                                                                    }}
-                                                                                >
-                                                                                    Xem thông tin
-                                                                                </Button>
-                                                                            </div>
+
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -616,121 +649,32 @@ const BookingPage = () => {
                                     </div>
                                 </div>
 
-                                <div className="mb-3">
-                                    <label className="form-label">Chọn ngày khám</label>
-                                    <input
-                                        type="date"
-                                        className="form-control"
-                                        value={selectedDate}
-                                        onChange={(e) => handleFilterChange("date", e.target.value)}
-                                    />
-                                </div>
 
-                                <div className="mb-3">
-                                    <label className="form-label">Chọn ca khám</label>
 
-                                    <div className="d-flex flex-column gap-3">
-                                        {Object.entries(schedulesBySession).map(([sessionName, sessionSchedules]) => (
-                                            <div key={sessionName} className="mb-2">
-                                                <div className="fw-semibold text-dark mb-2">{sessionName}</div>
 
-                                                <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-5 g-2 border rounded-3 p-2">
-                                                    {sessionSchedules.map(schedule => {
-                                                        const timeLabel = `${schedule.shiftStartTime || ""}${schedule.shiftStartTime && schedule.shiftEndTime ? " - " : ""}${schedule.shiftEndTime || ""}`;
-                                                        const selected = selectedSchedule && selectedSchedule.time === timeLabel;
-                                                        const remainingSlots = (schedule.maxPatients || 0) - (schedule.currentPatients || 0);
-                                                        const isFull = remainingSlots <= 0;
-
-                                                        return (
-                                                            <div className="col" key={schedule.id}>
-                                                                <button
-                                                                    type="button"
-                                                                    className={`w-100 text-start p-2 rounded-3 border bg-white ${selected ? "border-success shadow-sm" : "border-default"}`}
-                                                                    onClick={() => {
-                                                                        if (!isFull) {
-                                                                            handleFilterChange("scheduleId", schedule.id);
-                                                                        }
-                                                                    }}
-                                                                    disabled={isFull}
-                                                                    style={{ minHeight: "58px", transition: "all 0.2s ease", opacity: isFull ? 0.55 : 1 }}
-                                                                >
-                                                                    <div className="d-flex flex-column align-items-start gap-1">
-                                                                        <div className="fw-semibold text-dark small">{timeLabel || "Chưa có thời gian"}</div>
-                                                                        <div className={`${isFull ? "text-danger" : ""} ${selected ? "text-success" : ""}`} style={{ fontSize: "12px", lineHeight: 1 }}>
-                                                                            {isFull ? "Hết chỗ" : selected ? "Đã chọn" : "Chọn ca"}
-                                                                        </div>
-                                                                    </div>
-                                                                </button>
-                                                            </div>
-                                                        );
-                                                    })}
-                                                </div>
-                                            </div>
-                                        ))}
-
-                                        {Object.keys(schedulesBySession).length === 0 && (
-                                            <div className="text-muted small fst-italic">Chưa có ca khám phù hợp.</div>
-                                        )}
-                                    </div>
-                                </div>
                             </Card>
                         </Col>
 
-                        <Col lg={4}>
+                        <Col lg={6}>
                             <Card className="shadow-sm border rounded-4 sticky-top" style={{ top: "20px", backgroundColor: "#ffffff" }}>
                                 <Card.Body className="p-3 p-xl-4">
                                     <div className="d-flex align-items-center justify-content-between gap-2 mb-3 pb-2 border-bottom">
                                         <div>
-                                            <Card.Title className="fw-semibold mb-0" style={{ fontSize: "1.05rem" }}>Lịch hẹn</Card.Title>
+                                            <Card.Title className="fw-semibold mb-0" style={{ fontSize: "1.05rem" }}>Lịch khám</Card.Title>
                                         </div>
                                     </div>
 
-                                    <div className="d-flex flex-column gap-2">
-                                        <div className="d-flex align-items-start justify-content-between gap-3 py-2 border-bottom">
-                                            <div className="text-muted small">Người khám</div>
-                                            <div className={`text-end small ${selectedPatient ? "fw-semibold text-dark" : "text-muted fst-italic"}`}>
-                                                {selectedPatient ? getProfileDisplayName(selectedPatient) : "Chưa chọn"}
-                                            </div>
-                                        </div>
-
-                                        <div className="d-flex align-items-start justify-content-between gap-3 py-2 border-bottom">
-                                            <div className="text-muted small">Chuyên khoa</div>
-                                            <div className={`text-end small ${selectedSpecialty ? "fw-semibold text-dark" : "text-muted fst-italic"}`}>
-                                                {selectedSpecialty ? getSpecialtyDisplayName(selectedSpecialty) : "Chưa chọn"}
-                                            </div>
-                                        </div>
-
-                                        <div className="d-flex align-items-start justify-content-between gap-3 py-2 border-bottom">
-                                            <div className="text-muted small">Bác sĩ</div>
-                                            <div className={`text-end small ${selectedDoctor ? "fw-semibold text-dark" : "text-muted fst-italic"}`}>
-                                                {selectedDoctor ? getDoctorDisplayName(selectedDoctor) : "Chưa chọn"}
-                                            </div>
-                                        </div>
-
-                                        <div className="d-flex align-items-start justify-content-between gap-3 py-2 border-bottom">
-                                            <div className="text-muted small">Ngày khám</div>
-                                            <div className={`text-end small ${selectedDate ? "fw-semibold text-dark" : "text-muted fst-italic"}`}>
-                                                {selectedDate || "Chưa chọn"}
-                                            </div>
-                                        </div>
-
-                                        <div className="d-flex align-items-start justify-content-between gap-3 py-2 border-bottom">
-                                            <div className="text-muted small">Ca khám</div>
-                                            <div className={`text-end small ${selectedSchedule && selectedSchedule.time ? "fw-semibold text-dark" : "text-muted fst-italic"}`}>
-                                                {(selectedSchedule && selectedSchedule.time) || "Chưa chọn"}
-                                            </div>
-                                        </div>
-
-                                        <div className="pt-2">
-                                            {loading ? (
-                                                <div className="d-flex justify-content-center py-1"><MySpinner /></div>
-                                            ) : (
-                                                <button className="btn btn-primary w-100 fw-semibold rounded-3 py-2" onClick={registerAppointment}>
-                                                    Xác nhận đặt lịch
-                                                </button>
-                                            )}
-                                        </div>
+                                    <div>
+                                        <ScheduleBooking
+                                            schedules={schedules}
+                                            loading={loadingSchedules}
+                                            hasAnyFilter={Boolean(selectedSpecialty || selectedDoctor || selectedDate)}
+                                            selectedDate={selectedDate}
+                                            selectedScheduleId={selectedSchedule?.id || ""}
+                                            onSelectSchedule={(scheduleId) => handleFilterChange("scheduleId", scheduleId)}
+                                        />
                                     </div>
+
                                 </Card.Body>
                             </Card>
                         </Col>
@@ -745,9 +689,10 @@ const BookingPage = () => {
                         <Modal.Body className="p-4">
                             <div className="bg-light p-3 rounded border">
                                 <p className="mb-2"><strong>Người khám:</strong> {selectedPatient ? getProfileDisplayName(selectedPatient) : ""}</p>
-                                <p className="mb-2"><strong>Bác sĩ:</strong> {selectedDoctor ? getDoctorDisplayName(selectedDoctor) : ""}</p>
-                                <p className="mb-2"><strong>Ngày khám:</strong> {selectedDate || "Chưa chọn"}</p>
-                                <p className="mb-0"><strong>Ca khám:</strong> {(selectedSchedule && selectedSchedule.time) || "Chưa chọn"}</p>
+                                <p className="mb-2"><strong>Chuyên khoa:</strong> {selectedSchedule?.specialtyName || "Chưa có thông tin"}</p>
+                                <p className="mb-2"><strong>Bác sĩ:</strong> {selectedSchedule?.doctorName || "Chưa có thông tin"}</p>
+                                <p className="mb-2"><strong>Ngày khám:</strong> {selectedSchedule?.date || "Chưa có thông tin"}</p>
+                                <p className="mb-0"><strong>Ca khám:</strong> {selectedSchedule?.time || `${selectedSchedule?.shiftStartTime || ""}${selectedSchedule?.shiftStartTime && selectedSchedule?.shiftEndTime ? " - " : ""}${selectedSchedule?.shiftEndTime || ""}` || "Chưa có thời gian"}</p>
                             </div>
                             <p className="text-center text-success fst-italic mt-3">
                                 Thông tin lịch hẹn đã được lưu.<br /> Vui lòng tiến hành thanh toán để hoàn tất quá trình đặt lịch!
@@ -760,6 +705,70 @@ const BookingPage = () => {
                         </Modal.Footer>
                     </Modal>
 
+                    <Modal show={showScheduleModal} onHide={() => setShowScheduleModal(false)} centered size="lg">
+                        <Modal.Header closeButton>
+                            <Modal.Title className="fw-bold">Xác nhận lịch hẹn</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body className="p-4">
+                            {selectedSchedule ? (
+                                <div className="bg-light p-3 rounded border d-flex flex-column gap-2">
+                                    <div className="d-flex justify-content-between gap-3">
+                                        <div className="text-muted small">Người khám</div>
+                                        <div className="fw-semibold text-end">{selectedPatient ? getProfileDisplayName(selectedPatient) : "Chưa chọn"}</div>
+                                    </div>
+                                    <div className="d-flex justify-content-between gap-3">
+                                        <div className="text-muted small">Chuyên khoa</div>
+                                        <div className="fw-semibold text-end">{selectedSchedule.specialtyName || "Chưa có thông tin"}</div>
+                                    </div>
+                                    <div className="d-flex justify-content-between gap-3">
+                                        <div className="text-muted small">Bác sĩ</div>
+                                        <div className="fw-semibold text-end">{selectedSchedule.doctorName || "Chưa có thông tin"}</div>
+                                    </div>
+                                    <div className="d-flex justify-content-between gap-3">
+                                        <div className="text-muted small">Ngày khám</div>
+                                        <div className="fw-semibold text-end">{selectedSchedule.date || "Chưa có thông tin"}</div>
+                                    </div>
+                                    <div className="d-flex justify-content-between gap-3">
+                                        <div className="text-muted small">Ca khám</div>
+                                        <div className="fw-semibold text-end">{selectedSchedule.time || `${selectedSchedule.shiftStartTime || ""}${selectedSchedule.shiftStartTime && selectedSchedule.shiftEndTime ? " - " : ""}${selectedSchedule.shiftEndTime || ""}` || "Chưa có thời gian"}</div>
+                                    </div>
+                                    <div className="d-flex justify-content-between gap-3">
+                                        <div className="text-muted small">Phòng</div>
+                                        <div className="fw-semibold text-end">{selectedSchedule.room || "Chưa có phòng"}</div>
+                                    </div>
+                                    <div className="d-flex justify-content-between gap-3">
+                                        <div className="text-muted small">Khu vực</div>
+                                        <div className="fw-semibold text-end">{selectedSchedule.area || "Chưa có khu vực"}</div>
+                                    </div>
+                                    <div className="d-flex justify-content-between gap-3">
+                                        <div className="text-muted small">Số bệnh nhân</div>
+                                        <div className="fw-semibold text-end">{`${selectedSchedule.currentPatients || 0}/${selectedSchedule.maxPatients || 0}`}</div>
+                                    </div>
+                                    <div className="d-flex justify-content-between gap-3">
+                                        <div className="text-muted small">Trạng thái</div>
+                                        <div className="fw-semibold text-end">
+                                            {(selectedSchedule.maxPatients || 0) - (selectedSchedule.currentPatients || 0) <= 0 ? "Hết chỗ" : `Còn ${(selectedSchedule.maxPatients || 0) - (selectedSchedule.currentPatients || 0)} chỗ`}
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : null}
+                        </Modal.Body>
+                        <Modal.Footer className="justify-content-end border-top-0">
+                            <Button variant="outline-secondary" onClick={() => setShowScheduleModal(false)}>
+                                Trở về
+                            </Button>
+                            <Button
+                                variant="primary"
+                                onClick={async () => {
+                                    setShowScheduleModal(false);
+                                    await registerAppointment();
+                                }}
+                            >
+                                Đặt lịch
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
+
                     <LoginRequiredModal
                         show={loginPromptVisible}
                         onHide={() => setLoginPromptVisible(false)}
@@ -767,7 +776,7 @@ const BookingPage = () => {
                     />
                 </Container>
                 <Footer />
-            </div>
+            </div >
         </>
     );
 };

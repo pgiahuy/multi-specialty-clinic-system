@@ -11,6 +11,7 @@ const ControlCard = () => {
         { title: 'Lịch làm việc', icon: <PersonBadge size={30} className="text-success mb-2" />, path: '/doctor/schedules' },
         { title: 'Kê đơn thuốc', icon: <Receipt size={30} className="text-success mb-2" />, path: '/doctor/schedules' },
         { title: 'Bệnh nhân', icon: <FileEarmarkMedical size={30} className="text-info mb-2" />, path: '/doctor/patients' },
+        { title: 'Lịch hẹn', icon: <ClockHistory size={30} className="text-warning mb-2" />, path: '/doctor/appointments' },
         { title: 'Tư vấn', icon: <ClockHistory size={30} className="text-warning mb-2" />, path: '/doctor/consultations' },
         { title: 'Xét nghiệm', icon: <Droplet size={30} className="text-info mb-2" />, path: '/doctor/lab-tests' },
     ];

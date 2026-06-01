@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Container, Card, Badge, Row, Col, Spinner, Tabs, Tab, Form, Button } from "react-bootstrap";
 import Footer from "../../components/Footer";
 import Header from "../../components/Header";
-import { authApis, CLINIC_ENDPOINTS, endpoint, USER_ENDPOINTS } from "../../configs/Apis";
+import { APPOINTMENT_ENDPOINTS, authApis, CLINIC_ENDPOINTS, endpoint, USER_ENDPOINTS } from "../../configs/Apis";
 import { useNavigate } from "react-router-dom";
 import MySpinner from "../../components/MySpinner";
 
@@ -10,14 +10,10 @@ const getStatusVariant = (status) => {
     switch ((status || "").toLowerCase()) {
         case "un_paid":
         case "chưa thanh toán":
-        case "chua thanh toan":
             return "warning";
         case "đã hoàn thành":
         case "completed":
             return "success";
-        case "đang chờ":
-        case "pending":
-            return "warning";
         case "đã hủy":
         case "cancelled":
             return "danger";
@@ -25,8 +21,6 @@ const getStatusVariant = (status) => {
             return "secondary";
     }
 };
-
-
 
 
 const HistoryBooking = () => {
@@ -54,9 +48,15 @@ const HistoryBooking = () => {
                 setAppointments([]);
                 return;
             }
+            const res = await authApis().get(APPOINTMENT_ENDPOINTS.APPOINTMENTS_BY_PATIENT(patientId), {
+                params: {
+                    startDate: fromDate,
+                    endDate: toDate,
+                    status: activeStatus !== 'all' ? activeStatus : undefined,
+                }
+            });
 
-            const url = endpoint['appointment-patient'] ? endpoint['appointment-patient'](patientId) : endpoint['appointments'];
-            const res = await authApis().get(url);
+
             setAppointments(res.data || []);
         } catch (err) {
             console.log(err);
@@ -85,9 +85,10 @@ const HistoryBooking = () => {
         loadPatientProfiles();
     }, []);
 
+
     useEffect(() => {
         if (selectedProfileId) loadAppointments(selectedProfileId);
-    }, [selectedProfileId, fromDate, toDate]);
+    }, [selectedProfileId, activeStatus, fromDate, toDate]);
 
     const statusMatches = (status, filter) => {
         if (!filter || filter === 'all') return true;
@@ -95,9 +96,7 @@ const HistoryBooking = () => {
         const s = String(status).toLowerCase();
         switch (filter) {
             case 'un_paid':
-                return s.includes('un_paid') || s.includes('chưa thanh toán') || s.includes('chua thanh toan');
-            case 'pending':
-                return s.includes('pending') || s.includes('un_paid') || s.includes('đang chờ');
+                return s.includes('un_paid') || s.includes('chưa thanh toán');
             case 'confirmed':
                 return s.includes('confirmed') || s.includes('đã xác nhận');
             case 'in_progress':
@@ -211,7 +210,7 @@ const HistoryBooking = () => {
                     </div>
 
 
-                    <div className="mb-4 d-flex justify-content-start">
+                    <div className="mb-4 d-flex justify-content-center">
                         <Tabs
                             activeKey={activeStatus}
                             onSelect={(k) => setActiveStatus(k)}
@@ -227,17 +226,15 @@ const HistoryBooking = () => {
                             <Tab eventKey="cancelled" title="Đã hủy" tabClassName="rounded-pill px-3 py-2" />
                         </Tabs>
                     </div>
-                    {loading ? (
-                        <div className="d-flex justify-content-center py-5">
-                            <MySpinner />
-                        </div>
-                    ) : filtered.length === 0 ? (
-                        <div className="text-center text-muted py-5">
-                            Chưa có lịch sử đặt khám phù hợp.
-                        </div>
-                    ) : (
-                        <Row className="g-4">
-                            {filtered.map((item) => (
+
+
+
+                    <Row className="g-4" style={{ marginBottom: 30, minHeight: '300px' }}>
+                        {loading ? (
+                            <div className="d-flex justify-content-center py-5">
+                                <MySpinner />
+                            </div>) : (
+                            filtered.length > 0 ? (filtered.map((item) => (
                                 <Col key={item.id} xs={12} md={6} lg={4}>
                                     <Card className="h-100 shadow-sm border-0" style={{ borderRadius: 18, overflow: 'hidden' }}>
 
@@ -267,16 +264,23 @@ const HistoryBooking = () => {
                                                 variant="primary"
                                                 className="w-100 rounded-4 fw-medium"
 
-                                                onClick={() => navigate(`/appointment/${item.id}`)}
+                                                onClick={() => navigate(`/appointments/${item.id}`)}
                                             >
                                                 Xem chi tiết
                                             </Button>
                                         </Card.Body>
                                     </Card>
                                 </Col>
-                            ))}
-                        </Row>
-                    )}
+                            ))) : (
+                                <div className="text-center text-muted py-5">
+                                    Không có lịch hẹn nào.
+                                </div>
+                            ))
+
+
+                        }
+                    </Row>
+
                 </Container>
                 <Footer />
             </div>

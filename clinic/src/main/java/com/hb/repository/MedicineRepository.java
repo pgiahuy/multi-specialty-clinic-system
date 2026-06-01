@@ -4,6 +4,7 @@
  */
 package com.hb.repository;
 
+import com.hb.dto.response.MedicineResponse;
 import com.hb.pojo.Medicine;
 import com.hb.pojo.MedicineBatch;
 import java.time.LocalDate;
@@ -16,6 +17,7 @@ import java.util.Map;
  */
 public interface MedicineRepository extends BaseRepository<Medicine>{
     List<Medicine> getMedicines(Map<String,String> params);
+    List<MedicineResponse> getMedicinesWithStock(Map<String, String> params);
     List<MedicineBatch> getAvailableBatches(Long medicineId, LocalDate minExpiryDate);
     long countMedicines(Map<String, String> params);
     Medicine addMedicine(Medicine d);
