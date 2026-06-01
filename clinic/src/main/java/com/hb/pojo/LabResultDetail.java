@@ -43,7 +43,7 @@ public class LabResultDetail implements Serializable {
     @Column(name = "value")
     private String value;
     @Column(name = "is_abnormal")
-    private Short isAbnormal;
+    private Boolean isAbnormal;
     @NotNull
     @JoinColumn(name = "lab_result_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
@@ -76,11 +76,11 @@ public class LabResultDetail implements Serializable {
         this.value = value;
     }
 
-    public Short getIsAbnormal() {
+    public Boolean getIsAbnormal() {
         return isAbnormal;
     }
 
-    public void setIsAbnormal(Short isAbnormal) {
+    public void setIsAbnormal(Boolean isAbnormal) {
         this.isAbnormal = isAbnormal;
     }
 

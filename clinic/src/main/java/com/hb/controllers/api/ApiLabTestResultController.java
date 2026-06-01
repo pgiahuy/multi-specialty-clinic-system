@@ -7,14 +7,13 @@ package com.hb.controllers.api;
 import com.hb.dto.request.LabResultCreateRequest;
 import com.hb.dto.request.LabResultDetailRequest;
 import com.hb.dto.response.LabTestResponse;
-import com.hb.dto.response.LabTestResultResponse;
+import com.hb.dto.response.LabResultResponse;
 import com.hb.mapper.LabTestMapper;
-import com.hb.mapper.LabTestResultMapper;
+import com.hb.mapper.LabResultMapper;
 import com.hb.pojo.LabResult;
 import com.hb.pojo.LabTest;
 import com.hb.pojo.Patient;
 import com.hb.pojo.User;
-import com.hb.service.LabTestResultService;
 import com.hb.service.LabTestService;
 import com.hb.service.UserService;
 import java.security.Principal;
@@ -33,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.hb.service.LabResultService;
 
 /**
  *
@@ -46,10 +46,10 @@ public class ApiLabTestResultController {
     private LabTestService testService;
 
     @Autowired
-    private LabTestResultService testResultService;
+    private LabResultService testResultService;
 
     @Autowired
-    private LabTestResultMapper testResultMapper;
+    private LabResultMapper testResultMapper;
 
     @Autowired
     private UserService userService;
@@ -63,31 +63,20 @@ public class ApiLabTestResultController {
 
     }
 
-    @GetMapping("/tests/{patientId}")
-    public ResponseEntity<List<LabTestResultResponse>> list(@RequestParam Map<String, String> params, 
-                                                            Principal principal,
-                                                            @PathVariable(value="patientId") Long patientId) {
+    @GetMapping("/lab-results")
+    public ResponseEntity<List<LabResultResponse>> list(@RequestParam Map<String, String> params, 
+                                                            Principal principal)
+                                                            {
         User u = userService.getUserByUsername(principal.getName());
 
         if (u == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-
-        Collection<Patient> patients = u.getPatientCollection();
-
-        List<Long> patientIds = patients.stream()
-                .map(Patient::getId)
-                .collect(Collectors.toList());
-        
-        if (!patientIds.contains(patientId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-
-        return ResponseEntity.ok(this.testResultService.getTestResults(patientId, params));
+        return ResponseEntity.ok(this.testResultService.getLabResults(params));
     }
     
     @GetMapping("/tests/appointment/{appointmentId}")
-    public ResponseEntity<List<LabTestResultResponse>> list(Principal principal, @PathVariable(value = "appointmentId") Long appointmentId) {
+    public ResponseEntity<List<LabResultResponse>> list(Principal principal, @PathVariable(value = "appointmentId") Long appointmentId) {
         User u = userService.getUserByUsername(principal.getName());
 
         if (u == null) {

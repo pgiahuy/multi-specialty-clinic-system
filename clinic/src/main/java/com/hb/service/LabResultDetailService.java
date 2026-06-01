@@ -4,7 +4,9 @@
  */
 package com.hb.service;
 
+import com.hb.dto.request.LabResultDetailRequest;
 import com.hb.pojo.LabResultDetail;
+import java.util.List;
 
 /**
  *
@@ -12,4 +14,6 @@ import com.hb.pojo.LabResultDetail;
  */
 public interface LabResultDetailService {
     LabResultDetail getLabResultDetailById(Long id);
+    void addDetailsToLabResult(Long labResultId, List<LabResultDetailRequest> reqs);
+    void updateDetails(Long labResultId, List<LabResultDetailRequest> reqs);
 }

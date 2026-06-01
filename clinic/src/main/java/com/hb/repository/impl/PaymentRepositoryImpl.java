@@ -50,12 +50,13 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     public List<Payment> getPayments(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
         StringBuilder hql = new StringBuilder("SELECT p FROM Payment p "
-                + "JOIN FETCH p.paymentItem i "
-                + "JOIN FETCH p.appointment a "
-                + "JOIN FETCH a.patientId WHERE 1=1");
+                 + "WHERE 1=1");
+//                + "JOIN FETCH p.appointment a "
+//                + "JOIN FETCH a.patientId WHERE 1=1");
+//+ "JOIN FETCH p.paymentItemCollection i "
 
         if (params != null && params.containsKey("patientId")) {
-            hql.append(" AND a.patientId.id = :patientId");
+            hql.append(" AND p.appointmentId.patientId.id = :patientId");
         }
         if (params != null && params.containsKey("endDate") && params.containsKey("startDate")) {
             hql.append(" AND p.createdAt >= :startDate AND p.createdAt < :endDate");
@@ -79,7 +80,7 @@ public class PaymentRepositoryImpl implements PaymentRepository {
             q.setParameter("endDate", LocalDate.parse(params.get("endDate")).plusDays(1).atStartOfDay());
         }
 
-        if (params != null) {
+        if (params != null && params.containsKey("pageSize")) {
             int pageSize = Integer.parseInt(params.get("pageSize"));
             int page = Integer.parseInt(params.getOrDefault("page", "1"));
             int start = (page - 1) * pageSize;

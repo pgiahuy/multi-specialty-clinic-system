@@ -12,7 +12,6 @@ package com.hb.dto.request;
 
 
 public class AppointmentCreateRequest {
-    
     private Long id;
     private Long patientId;
     private Long scheduleId;

@@ -20,14 +20,11 @@ import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Date;
 
 /**
  *
@@ -51,10 +48,8 @@ public class LabResult implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "created_at")
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
     @Column(name = "test_at")
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime testAt;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -66,6 +61,8 @@ public class LabResult implements Serializable {
     private Appointment appointmentId;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "labResultId")
     private Collection<LabResultDetail> labResultDetailCollection;
+    @Column(name = "dr_id")
+    private Long dr_id;
 
     public LabResult() {
     }
@@ -150,6 +147,20 @@ public class LabResult implements Serializable {
     @Override
     public String toString() {
         return "com.hb.pojo.LabResult[ id=" + id + " ]";
+    }
+
+    /**
+     * @return the dr_id
+     */
+    public Long getDr_id() {
+        return dr_id;
+    }
+
+    /**
+     * @param dr_id the dr_id to set
+     */
+    public void setDr_id(Long dr_id) {
+        this.dr_id = dr_id;
     }
     
 }

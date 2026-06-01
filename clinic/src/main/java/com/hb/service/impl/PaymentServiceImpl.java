@@ -4,10 +4,16 @@
  */
 package com.hb.service.impl;
 
+import com.hb.dto.response.PaymentResponse;
 import com.hb.enums.PaymentMethod;
 import com.hb.enums.PaymentStatus;
 import com.hb.enums.AppointmentStatus;
+import com.hb.enums.LabResultStatus;
+import com.hb.enums.PaymentItemType;
+import com.hb.exception.ResourceNotFoundException;
+import com.hb.mapper.PaymentMapper;
 import com.hb.pojo.Appointment;
+import com.hb.pojo.LabResult;
 import com.hb.pojo.Payment;
 import com.hb.pojo.PaymentItem;
 import com.hb.pojo.User;
@@ -15,16 +21,19 @@ import com.hb.repository.PaymentItemRepository;
 import com.hb.repository.PaymentRepository;
 import com.hb.repository.AppointmentRepository;
 import com.hb.service.AppointmentService;
+import com.hb.service.LabResultService;
 import com.hb.service.NotificationService;
 import com.hb.service.PaymentItemsService;
 import com.hb.service.PaymentService;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -51,11 +60,24 @@ public class PaymentServiceImpl implements PaymentService {
     @Autowired
     private AppointmentRepository appointmentRepo;
 
+    @Autowired
+    private LabResultService labResultService;
+    
+    @Autowired
+    private PaymentMapper payMapper;
+    
     @Override
-    public List<Payment> getPayments(Map<String, String> params) {
-        return this.paymentRepo.getPayments(params);
-    }
-
+    @Transactional
+    public List<PaymentResponse> getPayments(Map<String, String> params) {
+        
+        
+        List<Payment> payments = this.paymentRepo.getPayments(params);
+        
+        
+        return payments.stream()
+                .map(payMapper::toResponse)
+                .toList(); 
+    } 
 
     @Override
     public Payment getPaymentById(Long id) {
@@ -87,6 +109,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    
     public void updatePaymentTotalAmount(Payment payment) {
         List<PaymentItem> items = itemRepo.getItemsByPayment(payment);
 
@@ -115,25 +138,45 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    @Transactional
     public void confirmPaymentSuccess(Long paymentId, PaymentMethod method) {
-        Payment p = paymentRepo.getPaymentById(paymentId);
-        if (p.getStatus() == PaymentStatus.SUCCESS) {
+        Payment payment = paymentRepo.getPaymentById(paymentId);
+        if (payment.getStatus() == PaymentStatus.SUCCESS) {
             return;
         }
 
-        p.setStatus(PaymentStatus.SUCCESS);
-        p.setMethod(method);
-        p.setPaidAt(LocalDateTime.now());
+        payment.setStatus(PaymentStatus.SUCCESS);
+        payment.setMethod(method);
+        payment.setPaidAt(LocalDateTime.now());
 
-        Payment saved = paymentRepo.addOrUpdatePayment(p);
-        if (p.getAppointmentId()!= null) {
-            p.getAppointmentId().setStatus(AppointmentStatus.PENDING);
-            appointmentRepo.addOrUpdateAppointment(p.getAppointmentId());
+        Payment saved = paymentRepo.addOrUpdatePayment(payment);
 
+        Collection<PaymentItem> items = payment.getPaymentItemCollection();
+
+        PaymentItem item = items.stream().findFirst().orElse(null);
+
+        PaymentItemType type = item.getItemType();
+
+        switch (type) {
+            case APPOINTMENT -> {
+                Appointment appointment = appointService.getAppointmentById(item.getReferenceId());
+                this.confirmPaymentForAppointment(appointment.getId());
+
+            }
+
+            case LAB_TEST -> {
+                LabResult labResult = labResultService.getLabResultById(item.getReferenceId());
+                this.confirmPaymentForLabResult(labResult.getId());
+            }
+
+            case PRESCRIPTION -> {
+                this.confirmPaymentForPrescription(paymentId);//chua lam
+            }
         }
+
         try {
-            if (saved != null && saved.getAppointmentId().getPatientId().getUserId()!= null) {
-                
+            if (saved != null && saved.getAppointmentId().getPatientId().getUserId() != null) {
+
                 User patientUser = saved.getAppointmentId().getPatientId().getUserId();
                 if (patientUser != null) {
                     Map<String, String> notiParams = new HashMap<>();
@@ -147,6 +190,7 @@ public class PaymentServiceImpl implements PaymentService {
         } catch (Exception e) {
             System.err.println("Lỗi gửi thông báo: " + e.getMessage());
         }
+
     }
 
     @Override
@@ -161,6 +205,21 @@ public class PaymentServiceImpl implements PaymentService {
         p.setPaidAt(LocalDateTime.now());
 
         paymentRepo.addOrUpdatePayment(p);
+    }
+
+    @Override
+    public void confirmPaymentForAppointment(Long appointmentId) {
+        appointService.updateStatusAppointment(appointmentId, AppointmentStatus.PENDING);
+    }
+
+    @Override
+    public void confirmPaymentForLabResult(Long labResultId) {
+        labResultService.updateStatusLabResult(labResultId, LabResultStatus.CONFIRMED);
+    }
+
+    @Override
+    public void confirmPaymentForPrescription(Long prescriptionId) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
 }
