@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import org.springframework.web.bind.annotation.PostMapping;
@@ -51,6 +52,7 @@ public class ApiPrescriptionController {
     private Environment env;
     
     @PostMapping("/prescriptions")
+    @PreAuthorize("hasRole('DOCTOR')")
     public ResponseEntity<PrescriptionResponse> create(@RequestBody  PrescriptionCreateRequest req, Principal principal){
         Prescription p =  this.prescriptionService.createPrescription(req, principal.getName());
         PrescriptionResponse res = PrescriptionMapper.INSTANCE.toResponse(p);
@@ -58,6 +60,7 @@ public class ApiPrescriptionController {
     }
     
     @PostMapping("/prescriptions/draft")
+    @PreAuthorize("hasRole('DOCTOR')")
     public ResponseEntity<PrescriptionResponse> saveDraft(@RequestBody  PrescriptionCreateRequest req){
         Prescription p =  this.prescriptionService.saveOrUpdateDraftPrescription(req);
         PrescriptionResponse res = PrescriptionMapper.INSTANCE.toResponse(p);
@@ -65,6 +68,7 @@ public class ApiPrescriptionController {
     }
     
     @GetMapping("/prescriptions")
+    @PreAuthorize("hasRole('DOCTOR','PATIENT','STAFF')")
     public ResponseEntity<List<PrescriptionResponse>> list(@RequestParam Map<String,String> params, Principal principal){
         User u = userService.getUserByUsername(principal.getName());
         
@@ -84,6 +88,7 @@ public class ApiPrescriptionController {
     
     
     @GetMapping("prescriptions/medical-record/{recordId}")
+    @PreAuthorize("hasRole('DOCTOR','PATIENT','STAFF')")
     public ResponseEntity<PrescriptionResponse> list(@PathVariable("recordId") Long id, Principal p){
         Prescription prescription = this.prescriptionService.getPrescriptionByMedicalRecordId(id);
         return ResponseEntity.ok().body(PrescriptionMapper.INSTANCE.toResponse(prescription));

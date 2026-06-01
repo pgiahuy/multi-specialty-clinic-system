@@ -20,6 +20,7 @@ const RegisterSchedule = () => {
     const [submitting, setSubmitting] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
+    const [date, setDate] = useState("");
     const [formData, setFormData] = useState({
         date: "",
         shiftId: "",
@@ -79,7 +80,7 @@ const RegisterSchedule = () => {
 
         try {
             setLoadingSpecialties(true);
-            const response = await API.get(CLINIC_ENDPOINTS.SPECIALTIES, {
+            const response = await authApis().get(CLINIC_ENDPOINTS.SPECIALTIES, {
                 params: { doctorId: targetDoctorId },
             });
             setSpecialties(response.data || []);
@@ -90,11 +91,29 @@ const RegisterSchedule = () => {
             setLoadingSpecialties(false);
         }
     };
-
     const loadRooms = async () => {
+        // Only query rooms when the three required fields are selected:
+        // date, shiftId and specialtyId.
+        if (!formData.date || !formData.shiftId || !formData.specialtyId) {
+            setRooms([]);
+            return;
+        }
+
+        if (!doctorId) {
+            setRooms([]);
+            return;
+        }
+
         try {
             setLoadingRooms(true);
-            const response = await API.get(CLINIC_ENDPOINTS.ROOMS);
+            const response = await authApis().get(CLINIC_ENDPOINTS.AVAILABLE_ROOMS, {
+                params: {
+                    doctorId,
+                    specialtyId: formData.specialtyId || undefined,
+                    shiftId: formData.shiftId || undefined,
+                    date: formData.date || undefined,
+                }
+            });
             setRooms(response.data || []);
         } catch (error) {
             console.error("Lỗi khi lấy danh sách phòng:", error);
@@ -105,12 +124,15 @@ const RegisterSchedule = () => {
     };
 
     useEffect(() => {
+        loadRooms();
+    }, [doctorId, formData.specialtyId, formData.shiftId, formData.date]);
+
+    useEffect(() => {
         (async () => {
             const currentDoctorId = await loadCurrentDoctor();
             await loadSpecialties(currentDoctorId);
         })();
         loadShifts();
-        loadRooms();
         loadSchedules();
     }, []);
 
@@ -135,8 +157,14 @@ const RegisterSchedule = () => {
             return false;
         }
 
-        if (Number(formData.roomId) <= 0 || Number(formData.maxPatients) <= 0) {
-            setErrorMessage("Phòng khám và số bệnh nhân tối đa phải lớn hơn 0.");
+        if (Number(formData.maxPatients) <= 0) {
+            setErrorMessage(`Số bệnh nhân tối đa phải lớn hơn 0.`);
+            return false;
+        }
+
+
+        if (Number(formData.maxPatients) > (selectedShift?.maxPatients || 10)) {
+            setErrorMessage(`Số bệnh nhân tối đa phải lớn hơn 0 và không vượt quá ${selectedShift?.maxPatients || 10}.`);
             return false;
         }
 
@@ -204,121 +232,151 @@ const RegisterSchedule = () => {
                 )}
 
                 <Row className="g-4">
-                    <Col lg={4}>
+                    <Col lg={5}>
                         <Card className="border-0 shadow-sm rounded-4">
                             <Card.Body>
-                                <h5 className="fw-bold mb-3">Form đăng ký</h5>
                                 <Form onSubmit={handleSubmit}>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>Ngày làm việc</Form.Label>
-                                        <Form.Control
-                                            type="date"
-                                            name="date"
-                                            value={formData.date}
-                                            min={minDate}
-                                            onChange={handleChange}
-                                            required
-                                        />
-                                    </Form.Group>
 
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>Ca làm việc</Form.Label>
-                                        <Form.Select
-                                            name="shiftId"
-                                            value={formData.shiftId}
-                                            onChange={handleChange}
-                                            required
-                                            disabled={loadingShifts}
-                                        >
-                                            <option value="">-- Chọn ca --</option>
-                                            {shifts.map(shift => (
-                                                <option key={shift.id} value={shift.id}>
-                                                    {shift.session} ({shift.startTime} - {shift.endTime})
-                                                </option>
-                                            ))}
-                                        </Form.Select>
-                                        {selectedShift && (
-                                            <Form.Text className="text-muted">
-                                                Gợi ý số bệnh nhân: {selectedShift.minPatients} - {selectedShift.maxPatients}
+                                    <Row className="mb-3">
+                                        <Form.Group as={Col} md="5" controlId="formDate">
+                                            <Form.Label className="fw-semibold">Ngày làm việc</Form.Label>
+                                            <Form.Control
+                                                type="date"
+                                                name="date"
+                                                value={formData.date}
+                                                min={minDate}
+                                                onChange={handleChange}
+                                                required
+                                            />
+                                        </Form.Group>
+
+                                        <Form.Group as={Col} md="7" controlId="formShiftSelect">
+                                            <Form.Label className="fw-semibold">Ca làm việc</Form.Label>
+                                            <Form.Select
+                                                name="shiftId"
+                                                value={formData.shiftId}
+                                                onChange={handleChange}
+                                                required
+                                                disabled={loadingShifts}
+                                            >
+                                                <option value="">-- Chọn ca --</option>
+                                                {shifts.map(shift => (
+                                                    <option key={shift.id} value={shift.id}>
+                                                        {shift.session} ({shift.startTime} - {shift.endTime})
+                                                    </option>
+                                                ))}
+                                            </Form.Select>
+                                            {selectedShift && (
+                                                <Form.Text className="text-muted d-block mt-1">
+                                                    Gợi ý số bệnh nhân: {selectedShift.minPatients} - {selectedShift.maxPatients}
+                                                </Form.Text>
+                                            )}
+                                        </Form.Group>
+                                    </Row>
+
+                                    <Row className="mb-3">
+                                        <Form.Group as={Col} md="4" controlId="formMaxPatients">
+                                            <Form.Label className="fw-semibold">Số bệnh nhân tối đa</Form.Label>
+                                            <Form.Control
+                                                type="number"
+                                                name="maxPatients"
+                                                min={selectedShift?.minPatients || 1}
+                                                max={selectedShift?.maxPatients || 10}
+                                                placeholder="Ví dụ: 15"
+                                                value={formData.maxPatients}
+                                                onChange={handleChange}
+                                                required
+                                            />
+                                        </Form.Group>
+
+                                        <Form.Group as={Col} md="8" controlId="formSpecialtySelect">
+                                            <Form.Label className="fw-semibold">Chuyên khoa</Form.Label>
+                                            <Form.Select
+                                                name="specialtyId"
+                                                value={formData.specialtyId}
+                                                onChange={handleChange}
+                                                required
+                                                disabled={loadingSpecialties || doctorId == null}
+                                            >
+                                                <option value="">-- Chọn chuyên khoa --</option>
+                                                {specialties.map(specialty => (
+                                                    <option key={specialty.id} value={specialty.id}>
+                                                        {specialty.name}
+                                                    </option>
+                                                ))}
+                                            </Form.Select>
+                                            <Form.Text className="text-muted d-block mt-1">
+                                                {doctorId == null
+                                                    ? "Đang tải thông tin bác sĩ..."
+                                                    : specialties.length === 0
+                                                        ? "Bác sĩ không thuộc chuyên khoa nào."
+                                                        : "Chọn chuyên khoa của ca làm việc."}
                                             </Form.Text>
+                                        </Form.Group>
+                                    </Row>
+
+
+                                    <Form.Group className="mb-4" controlId="formRoomSelect">
+                                        <Form.Label className="fw-semibold">Phòng khám</Form.Label>
+                                        {loadingRooms ? (
+                                            <Form.Select disabled>
+                                                <option>-- Đang tải phòng... --</option>
+                                            </Form.Select>
+                                        ) : rooms.length === 0 ? (
+                                            <>
+                                                <Form.Select disabled>
+                                                    <option value="">-- Không có phòng phù hợp --</option>
+                                                </Form.Select>
+                                                {formData.date && formData.shiftId && formData.specialtyId ? (
+                                                    <Form.Text className="text-danger text-center  d-block mt-1">
+                                                        Không tìm thấy phòng phù hợp
+                                                    </Form.Text>
+                                                ) : (
+                                                    <Form.Text className="text-warning text-center  d-block mt-1">
+                                                        Vui lòng chọn đầy đủ thông tin để tìm phòng.
+                                                    </Form.Text>)}
+
+
+                                            </>
+                                        ) : (
+                                            <Form.Select
+                                                name="roomId"
+                                                value={formData.roomId}
+                                                onChange={handleChange}
+                                                required
+                                            >
+                                                <option value="">-- Chọn phòng --</option>
+                                                {rooms.map(room => (
+                                                    <option key={room.id} value={room.id}>
+                                                        {room.roomNumber} - {room.areaName || 'Chưa có khu'}
+                                                        {room.locationFloor ? ` (Tầng ${room.locationFloor})` : ''}
+                                                    </option>
+                                                ))}
+                                            </Form.Select>
                                         )}
-                                    </Form.Group>
 
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>Phòng khám</Form.Label>
-                                        <Form.Select
-                                            name="roomId"
-                                            value={formData.roomId}
-                                            onChange={handleChange}
-                                            required
-                                            disabled={loadingRooms}
-                                        >
-                                            <option value="">-- Chọn phòng --</option>
-                                            {rooms.map(room => (
-                                                <option key={room.id} value={room.id}>
-                                                    {room.roomNumber} - {room.areaName || 'Chưa có khu'}
-                                                    {room.locationFloor ? ` (Tầng ${room.locationFloor})` : ''}
-                                                </option>
-                                            ))}
-                                        </Form.Select>
-                                    </Form.Group>
-
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>Chuyên khoa</Form.Label>
-                                        <Form.Select
-                                            name="specialtyId"
-                                            value={formData.specialtyId}
-                                            onChange={handleChange}
-                                            required
-                                            disabled={loadingSpecialties || doctorId == null}
-                                        >
-                                            <option value="">-- Chọn chuyên khoa --</option>
-                                            {specialties.map(specialty => (
-                                                <option key={specialty.id} value={specialty.id}>
-                                                    {specialty.name}
-                                                </option>
-                                            ))}
-                                        </Form.Select>
-                                        <Form.Text className="text-muted">
-                                            {doctorId == null
-                                                ? "Đang tải thông tin bác sĩ..."
-                                                : specialties.length === 0
-                                                    ? "Bác sĩ chưa được gán chuyên khoa nào."
-                                                    : "Chỉ hiển thị chuyên khoa thuộc bác sĩ đang đăng nhập."}
-                                        </Form.Text>
-                                    </Form.Group>
-
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>Số bệnh nhân tối đa</Form.Label>
-                                        <Form.Control
-                                            type="number"
-                                            name="maxPatients"
-                                            min={selectedShift?.minPatients || 1}
-                                            max={selectedShift?.maxPatients || undefined}
-                                            placeholder="Ví dụ: 15"
-                                            value={formData.maxPatients}
-                                            onChange={handleChange}
-                                            required
-                                        />
                                     </Form.Group>
 
                                     <Button className="w-100" type="submit" disabled={submitting}>
                                         {submitting ? (
-                                            <span className="d-inline-flex align-items-center"><MySpinner />Đang đăng ký...</span>
+                                            <span className="d-inline-flex align-items-center">
+                                                <MySpinner /> Đang đăng ký...
+                                            </span>
                                         ) : (
                                             "Đăng ký lịch"
                                         )}
                                     </Button>
+
                                 </Form>
                             </Card.Body>
                         </Card>
                     </Col>
 
-                    <Col lg={8}>
+                    <Col lg={7}>
                         <Card className="border-0 shadow-sm rounded-4 h-100">
                             <Card.Body>
-                                <div className="d-flex justify-content-between align-items-center mb-3">
-                                    <h5 className="fw-bold mb-0">Lịch đã đăng ký</h5>
+                                <div className="d-flex justify-content-between p-1 align-items-center mb-3">
+                                    <h5 className="fw-bold mb-0">Lịch đã đăng ký gần đây</h5>
                                     <Button variant="outline-secondary" size="sm" onClick={loadSchedules} disabled={loadingSchedules}>
                                         Tải lại
                                     </Button>
@@ -348,7 +406,12 @@ const RegisterSchedule = () => {
                                                         <td>{schedule.date}</td>
                                                         <td><Badge bg="primary">{schedule.session}</Badge></td>
                                                         <td>{schedule.shiftStartTime} - {schedule.shiftEndTime}</td>
-                                                        <td>{schedule.room} ({schedule.area})</td>
+                                                        <td>
+                                                            <div className="d-flex align-items-center">
+                                                                <Badge bg="secondary" className="me-2">{schedule.room}</Badge>
+                                                                <small className="text-muted">{schedule.area || ''}{schedule.floor ? ` • Tầng ${schedule.floor}` : ''}</small>
+                                                            </div>
+                                                        </td>
                                                         <td>{schedule.currentPatients}/{schedule.maxPatients}</td>
                                                     </tr>
                                                 ))}

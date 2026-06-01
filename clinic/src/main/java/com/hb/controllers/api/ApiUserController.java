@@ -88,7 +88,6 @@ public class ApiUserController {
             DoctorResponse doctorProfile = doctorMapper.toResponse(user.getDoctor());
             resp.setDoctorProfile(doctorProfile);
         }
-
         if (user.getPatientCollection() != null) {
             List<PatientResponse> patientProfiles = user.getPatientCollection()
                     .stream()

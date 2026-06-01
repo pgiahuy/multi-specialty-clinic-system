@@ -18,8 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -53,12 +53,14 @@ public class ApiMedicalRecordController {
     private MedicalRecordMapper recordMapper;
 
     @PostMapping("/medical-records")
+    @PreAuthorize("hasAnyRole('DOCTOR','STAFF')")
     public ResponseEntity<MedicalRecordResponse> create(@RequestBody MedicalRecordCreateRequest req) {
         MedicalRecord record = medicalRecordService.addOrUpdateMedicalRecord(req);
         return ResponseEntity.status(HttpStatus.CREATED).body(recordMapper.toResponse(record));
     }
 
     @PutMapping("medical-records/{id}")
+    @PreAuthorize("hasAnyRole('DOCTOR','STAFF')")
     public ResponseEntity<MedicalRecordResponse> update(@PathVariable(value = ("id")) Long id
                                                         ,@RequestBody MedicalRecordCreateRequest req) {
         req.setId(id);
@@ -69,6 +71,7 @@ public class ApiMedicalRecordController {
     
 
     @GetMapping("/medical-records")
+    @PreAuthorize("hasAnyRole('DOCTOR','PATIENT','STAFF')")
     public ResponseEntity<List<MedicalRecordResponse>> list(@RequestParam Map<String, String> params, Principal principal) {
         User u = userService.getUserByUsername(principal.getName());
         if (u != null) {
@@ -83,6 +86,7 @@ public class ApiMedicalRecordController {
     }
     
     @GetMapping("/medical-records/{id}")
+    @PreAuthorize("hasAnyRole('DOCTOR','PATIENT','STAFF')")
     public ResponseEntity<MedicalRecordResponse> getById(@PathVariable("id") Long id,Principal principal) {
         String userName = principal.getName();
         User u = userService.getUserByUsername(userName);
@@ -93,11 +97,11 @@ public class ApiMedicalRecordController {
         }
 
         MedicalRecord res = medicalRecordService.getMedicalRecordById(id);
-
         return ResponseEntity.ok(MedicalRecordMapper.INSTANCE.toResponse(res));
     }
 
     @GetMapping("/medical-records/patient/{patient-id}")
+    @PreAuthorize("hasAnyRole('DOCTOR','PATIENT','STAFF')")
     public ResponseEntity<List<MedicalRecordResponse>> getByPatientId(@PathVariable("patient-id") Long patienId, Principal principal) {
         String userName = principal.getName();
         boolean isAccess = medicalRecordService.checkAccessControll(userName, patienId);
@@ -111,6 +115,7 @@ public class ApiMedicalRecordController {
     }
 
     @GetMapping("medical-records/appointment/{appointmentId}")
+    @PreAuthorize("hasAnyRole('DOCTOR','PATIENT','STAFF')")
     public ResponseEntity<MedicalRecordResponse> getByAppointmentId(@PathVariable(value = "appointmentId") Long appointmentId,
             Principal principal) {
         MedicalRecord res = medicalRecordService.getMedicalRecordByAppointmentId(appointmentId);

@@ -165,96 +165,98 @@ const PatientProfile = () => {
                     className="rounded-4"
                     contentClassName="rounded-4 border-0 shadow-lg"
                 >
-                    <Modal.Header closeButton>
-                        <Modal.Title className="fw-bold">Chỉnh sửa hồ sơ</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <Form>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Họ và tên</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    name="fullName"
-                                    value={editData.fullName || ""}
-                                    onChange={handleInputChange}
-                                    className="rounded-4"
-                                />
-                            </Form.Group>
+                    <div className="p-4 rounded-4">
+                        <Modal.Header closeButton>
+                            <Modal.Title className="fw-bold">Chỉnh sửa hồ sơ</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body >
+                            <Form>
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Họ và tên</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        name="fullName"
+                                        value={editData.fullName || ""}
+                                        onChange={handleInputChange}
+                                        className="rounded-4"
+                                    />
+                                </Form.Group>
 
-                            <Form.Group className="mb-3">
-                                <Form.Label>CCCD/CMND</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    name="cccd"
-                                    value={editData.cccd || ""}
-                                    onChange={handleInputChange}
-                                    className="rounded-4"
-                                />
-                            </Form.Group>
+                                <Form.Group className="mb-3">
+                                    <Form.Label>CCCD/CMND</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        name="cccd"
+                                        value={editData.cccd || ""}
+                                        onChange={handleInputChange}
+                                        className="rounded-4"
+                                    />
+                                </Form.Group>
 
-                            <Row>
-                                <Col md={6}>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>Số điện thoại</Form.Label>
-                                        <Form.Control
-                                            type="tel"
-                                            name="phone"
-                                            value={editData.phone || ""}
-                                            onChange={handleInputChange}
-                                            className="rounded-4"
-                                        />
-                                    </Form.Group>
-                                </Col>
-                                <Col md={6}>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>Ngày sinh</Form.Label>
-                                        <Form.Control
-                                            type="date"
-                                            name="dob"
-                                            value={editData.dob || ""}
-                                            onChange={handleInputChange}
-                                            className="rounded-4"
-                                        />
-                                    </Form.Group>
-                                </Col>
-                            </Row>
+                                <Row>
+                                    <Col md={6}>
+                                        <Form.Group className="mb-3">
+                                            <Form.Label>Số điện thoại</Form.Label>
+                                            <Form.Control
+                                                type="tel"
+                                                name="phone"
+                                                value={editData.phone || ""}
+                                                onChange={handleInputChange}
+                                                className="rounded-4"
+                                            />
+                                        </Form.Group>
+                                    </Col>
+                                    <Col md={6}>
+                                        <Form.Group className="mb-3">
+                                            <Form.Label>Ngày sinh</Form.Label>
+                                            <Form.Control
+                                                type="date"
+                                                name="dob"
+                                                value={editData.dob || ""}
+                                                onChange={handleInputChange}
+                                                className="rounded-4"
+                                            />
+                                        </Form.Group>
+                                    </Col>
+                                </Row>
 
-                            <Form.Group className="mb-3">
-                                <Form.Label>Giới tính</Form.Label>
-                                <Form.Select
-                                    name="gender"
-                                    value={editData.gender || ""}
-                                    onChange={handleInputChange}
-                                    className="rounded-4"
-                                >
-                                    <option value="Nam">Nam</option>
-                                    <option value="Nữ">Nữ</option>
-                                    <option value="Khác">Khác</option>
-                                </Form.Select>
-                            </Form.Group>
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Giới tính</Form.Label>
+                                    <Form.Select
+                                        name="gender"
+                                        value={editData.gender || ""}
+                                        onChange={handleInputChange}
+                                        className="rounded-4"
+                                    >
+                                        <option value="Nam">Nam</option>
+                                        <option value="Nữ">Nữ</option>
+                                        <option value="Khác">Khác</option>
+                                    </Form.Select>
+                                </Form.Group>
 
-                            <Form.Group className="mb-3">
-                                <Form.Label>Địa chỉ</Form.Label>
-                                <Form.Control
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Địa chỉ</Form.Label>
+                                    <Form.Control
 
-                                    type="text"
-                                    name="address"
-                                    value={editData.address || ""}
-                                    onChange={handleInputChange}
-                                    className="rounded-4"
-                                />
-                            </Form.Group>
-                        </Form>
-                    </Modal.Body>
-                    <Modal.Footer >
-                        <Button variant="outline-danger" className="rounded-4 px-4" onClick={handleCloseModal}>
-                            Hủy bỏ
-                        </Button>
-                        <Button variant="primary" className="rounded-4 px-4 border-0" onClick={handleSaveChanges}>
-                            Lưu thay đổi
-                        </Button>
-                    </Modal.Footer>
-                </Modal>
+                                        type="text"
+                                        name="address"
+                                        value={editData.address || ""}
+                                        onChange={handleInputChange}
+                                        className="rounded-4"
+                                    />
+                                </Form.Group>
+                            </Form>
+                        </Modal.Body>
+                        <Modal.Footer >
+                            <Button variant="outline-danger" className="rounded-4 px-4" onClick={handleCloseModal}>
+                                Hủy bỏ
+                            </Button>
+                            <Button variant="primary" className="rounded-4 px-4 border-0" onClick={handleSaveChanges}>
+                                Lưu thay đổi
+                            </Button>
+                        </Modal.Footer>
+                    </div >
+                </Modal >
                 <MyModal
                     show={showDeleteModal}
                     onHide={() => {
@@ -286,7 +288,7 @@ const PatientProfile = () => {
                     </div>
                 </MyModal>
 
-            </div>
+            </div >
 
         </>
     );
