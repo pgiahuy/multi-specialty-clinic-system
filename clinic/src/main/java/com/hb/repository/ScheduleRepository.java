@@ -20,5 +20,6 @@ public interface ScheduleRepository extends BaseRepository<Schedule>{
     void deleteSchedule(Long id);
     boolean checkDoctorAvailability(Long doctorId, LocalDate date, Long shiftId, Long excludeId);
     boolean checkRoomAvailability(Long roomId, LocalDate date, Long shiftId, Long excludeId);
+    int incrementCurrentPatients(Long scheduleId);
     
 }

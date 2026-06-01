@@ -13,7 +13,7 @@ public enum UserRole {
     ROLE_PATIENT("Bệnh nhân"),
     ROLE_DOCTOR("Bác sĩ"),
     ROLE_ADMIN("Quản trị viên"),
-    ROLE_RECEPTIONIST("Nhân viên y tế"),
+    ROLE_STAFF("Nhân viên y tế"),
     ROLE_STOREKEEPER("Thủ kho");
     
     private final String label;

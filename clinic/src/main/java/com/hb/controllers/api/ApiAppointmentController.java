@@ -6,6 +6,8 @@ package com.hb.controllers.api;
 
 import com.hb.dto.request.AppointmentCreateRequest;
 import com.hb.dto.response.AppointmentResponse;
+import com.hb.enums.UserRole;
+import com.hb.exception.ResourceNotFoundException;
 import com.hb.mapper.AppointmentMapper;
 import com.hb.pojo.Appointment;
 
@@ -22,6 +24,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -54,8 +57,6 @@ public class ApiAppointmentController {
 
     @Autowired
     private UserService userService;
-    
-
 
     @PostMapping("/secure/appointments")
     public ResponseEntity<AppointmentResponse> register(@RequestBody AppointmentCreateRequest req) {
@@ -64,13 +65,16 @@ public class ApiAppointmentController {
     }
 
     @GetMapping("/secure/appointments")
+    @PreAuthorize("hasAnyRole('DOCTOR','PATIENT','STAFF')")
     public ResponseEntity<?> list(@RequestParam Map<String, String> params, Principal principal) {
         User u = userService.getUserByUsername(principal.getName());
-
-        if (u != null) {
-            params.put("currentUserId", String.valueOf(u.getId()));
-            params.put("currentUserRole", u.getRole().toString());
+        
+        if (u == null) {
+            throw new ResourceNotFoundException("Không tìm thấy người dùng đang đăng nhập!");
         }
+
+        params.put("currentUserId", String.valueOf(u.getId()));
+        params.put("currentUserRole", u.getRole().toString());
 
         int pageSize = this.env.getProperty("admin.page_size", Integer.class, 10);
         params.put("pageSize", String.valueOf(pageSize));
@@ -79,15 +83,15 @@ public class ApiAppointmentController {
         return ResponseEntity.ok(res.stream().map(appMapper::toResponse).toList());
     }
 
-
     @GetMapping("/secure/appointment/{id}")
-    public ResponseEntity<AppointmentResponse> getAppointment(@PathVariable(value = "id") Long id) {
+    @PreAuthorize("hasAnyRole('DOCTOR','PATIENT','STAFF')")
+    public ResponseEntity<AppointmentResponse> getAppointment(@PathVariable(value = "id") Long id, Principal principal) {
         Appointment res = this.appointmentService.getAppointmentById(id);
         return ResponseEntity.ok(appMapper.toResponse(res));
     }
 
-
     @PostMapping("/secure/appointments/{id}/confirm")
+    @PreAuthorize("hasRole('DOCTOR')")
     public ResponseEntity<?> update(@PathVariable("id") Long id, Principal principal) {
 
         User currentUser = userService.getUserByUsername(principal.getName());
@@ -98,8 +102,8 @@ public class ApiAppointmentController {
         }
 
         boolean isOwner = false;
-        
-        if ("ROLE_DOCTOR".equals(currentUser.getRole())) {
+
+        if (UserRole.ROLE_DOCTOR.equals(currentUser.getRole().toString())) {
             if (appointment.getScheduleId() != null && appointment.getScheduleId().getDoctorId() != null) {
                 isOwner = appointment.getScheduleId().getDoctorId().getUserId().getId().equals(currentUser.getId());
             }
@@ -119,6 +123,7 @@ public class ApiAppointmentController {
     }
 
     @PostMapping("/secure/appointments/{id}/start")
+    @PreAuthorize("hasRole('DOCTOR')")
     public ResponseEntity<?> start(@PathVariable("id") Long id, Principal principal) {
 
         User currentUser = userService.getUserByUsername(principal.getName());
@@ -126,7 +131,7 @@ public class ApiAppointmentController {
 
         boolean isOwner = false;
 
-        if ("ROLE_DOCTOR".equals(currentUser.getRole())) {
+        if (UserRole.ROLE_DOCTOR.equals(currentUser.getRole())) {
             if (appointment.getScheduleId() != null && appointment.getScheduleId().getDoctorId() != null) {
                 isOwner = appointment.getScheduleId().getDoctorId().getUserId().getId().equals(currentUser.getId());
             }
@@ -143,19 +148,21 @@ public class ApiAppointmentController {
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Chỉ có thể bắt đầu khám khi lịch hẹn đang ở trạng thái đã xác nhận!");
         }
-    
+
     }
-    
+
     @GetMapping("/secure/appointments/patient/{patientId}")
-    public ResponseEntity<List<AppointmentResponse>> getAppointByPatientId(@PathVariable(value="patientId") Long patientId,
+    @PreAuthorize("hasAnyRole('DOCTOR','PATIENT','STAFF')")
+    public ResponseEntity<List<AppointmentResponse>> getAppointByPatientId(@PathVariable(value = "patientId") Long patientId,
             @RequestParam Map<String, String> params) {
         List<Appointment> res = appointmentService.getAppointmentsByPatientId(patientId, params);
         return ResponseEntity.ok(res.stream().map(appMapper::toResponse).toList());
-        
+
     }
-    
+
     @PutMapping("/secure/appointment/{id}/cancel")
-    public ResponseEntity<?> cancel(@PathVariable(value="id") Long id, Principal principal) {
+    @PreAuthorize("hasRole('PATIENT')")
+    public ResponseEntity<?> cancel(@PathVariable(value = "id") Long id, Principal principal) {
         appointmentService.cancelAppointment(id, userService.getUserByUsername(principal.getName()));
         return ResponseEntity.ok().build();
     }

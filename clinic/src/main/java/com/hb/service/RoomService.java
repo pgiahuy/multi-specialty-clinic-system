@@ -5,7 +5,10 @@
 package com.hb.service;
 
 import com.hb.dto.request.form.RoomForm;
+import com.hb.dto.response.RoomResponse;
 import com.hb.pojo.Room;
+import com.hb.pojo.User;
+import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +19,8 @@ import java.util.Map;
 public interface RoomService {
 
     List<Room> getRooms(Map<String, String> params);
+    
+    List<RoomResponse> getAvailableRoomsForDoctor(Map<String, String> params, User currentUser);
 
     Room getRoomById(Long id);
 
