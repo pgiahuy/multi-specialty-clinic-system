@@ -7,6 +7,12 @@ package com.hb.repository.impl;
 import com.hb.exception.ResourceNotFoundException;
 import com.hb.pojo.Doctor;
 import com.hb.repository.DoctorRepository;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +38,7 @@ public class DoctorRepositoryImpl extends BaseRepositoryImpl<Doctor> implements 
     private boolean hasText(String value) {
         return value != null && !value.trim().isEmpty();
     }
-    
+
     @Override
     public List<Doctor> getAllDoctors() {
         Session session = this.factory.getObject().getCurrentSession();
@@ -88,7 +94,6 @@ public class DoctorRepositoryImpl extends BaseRepositoryImpl<Doctor> implements 
             hql.append(" AND d.fullName LIKE :dName");
         }
         hql.append(" AND d.isActive=true");
-        
 
         Query<Long> q = session.createQuery(hql.toString(), Long.class);
         if (hasText(params.get("specialtyId"))) {
@@ -115,14 +120,24 @@ public class DoctorRepositoryImpl extends BaseRepositoryImpl<Doctor> implements 
     @Override
     public Doctor getDoctorById(Long id) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<Doctor> q = session.createQuery(
-                "SELECT DISTINCT d FROM Doctor d "
-                + "LEFT JOIN FETCH d.specialtyCollection "
-                + "LEFT JOIN FETCH d.userId "
-                + "WHERE d.id = :id",
-                Doctor.class);
-        q.setParameter("id", id);
-        return q.getSingleResult();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+
+        CriteriaQuery<Doctor> cq = cb.createQuery(Doctor.class);
+        Root<Doctor> root = cq.from(Doctor.class);
+        cq.select(root).distinct(true);
+
+        root.fetch("specialtyCollection", JoinType.LEFT);
+        root.fetch("userId", JoinType.LEFT);
+
+        cq.where(cb.equal(root.get("id"), id));
+
+        Query<Doctor> q = session.createQuery(cq);
+
+        try {
+            return q.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 
     @Override
@@ -137,6 +152,24 @@ public class DoctorRepositoryImpl extends BaseRepositoryImpl<Doctor> implements 
         }
     }
 
-    
+    @Override
+    public Doctor getDoctorByUserId(Long id) {
+        Session session = this.factory.getObject().getCurrentSession();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<Doctor> cq = cb.createQuery(Doctor.class);
+        Root<Doctor> root = cq.from(Doctor.class);
+
+        root.fetch("specialtyCollection", JoinType.LEFT);
+        Predicate p = cb.equal(root.get("userId").get("id"), id);
+        cq.where(p);
+
+        Query<Doctor> q = session.createQuery(cq);
+
+        try {
+            return q.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
 
 }
