@@ -6,6 +6,7 @@ package com.hb.controllers.api;
 
 import com.hb.dto.request.ScheduleCreateRequest;
 import com.hb.dto.response.ScheduleRepsonse;
+import com.hb.enums.UserRole;
 import com.hb.mapper.ScheduleMapper;
 import com.hb.pojo.Schedule;
 import com.hb.pojo.User;
@@ -55,7 +56,7 @@ public class ApiScheduleController {
 
         User u = userService.getUserByUsername(principal.getName());
         
-        if ("ROLE_DOCTOR".equals(u.getRole())) {
+        if (UserRole.ROLE_DOCTOR.equals(u.getRole())) {
             if (u.getDoctor() != null) {
                 params.put("doctorId", String.valueOf(u.getDoctor().getId()));
             }

@@ -4,6 +4,7 @@
  */
 package com.hb.repository.impl;
 
+import com.hb.dto.response.MedicineResponse;
 import com.hb.pojo.Medicine;
 import com.hb.pojo.MedicineBatch;
 import com.hb.repository.MedicineRepository;
@@ -39,12 +40,44 @@ public class MedicineRepositoryImpl extends BaseRepositoryImpl<Medicine> impleme
                 + "WHERE mb.medicineId.id = :medicineId "
                 + "AND mb.quantity > 0 "
                 + "AND mb.expiryDate >= :minExpiryDate "
-                + "ORDER BY mb.expiryDate ASC, mb.importDate ASC"; // FIFO: Hạn gần xếp trước
+                + "ORDER BY mb.expiryDate ASC, mb.importDate ASC";
 
         return session.createQuery(hql, MedicineBatch.class)
                 .setParameter("medicineId", medicineId)
                 .setParameter("minExpiryDate", minExpiryDate)
                 .getResultList();
+    }
+
+    
+    @Override
+    public List<MedicineResponse> getMedicinesWithStock(Map<String, String> params) {
+        Session session = this.factory.getObject().getCurrentSession();
+        StringBuilder hql = new StringBuilder(
+                "SELECT new com.hb.dto.response.MedicineResponse(m.id, m.code, m.name, m.price, m.unit, SUM(mb.quantity)) "
+                + "FROM Medicine m "
+                + "LEFT JOIN MedicineBatch mb ON mb.medicineId = m "
+                + "WHERE 1=1"
+        );
+
+        if (params != null && hasText(params.get("kw"))) {
+            hql.append(" AND (m.name LIKE :kw OR m.code LIKE :kw)");
+        }
+        hql.append(" GROUP BY m.id, m.code, m.name, m.price, m.unit");
+
+        Query<MedicineResponse> q = session.createQuery(hql.toString(), MedicineResponse.class);
+
+        if (params != null && hasText(params.get("kw"))) {
+            q.setParameter("kw", "%" + params.get("kw").trim() + "%");
+        }
+        if (params != null && params.containsKey("pageSize") && hasText(params.get("pageSize"))) {
+            int pageSize = Integer.parseInt(params.get("pageSize"));
+            int page = Integer.parseInt(params.getOrDefault("page", "1"));
+            int start = (page - 1) * pageSize;
+            q.setMaxResults(pageSize);
+            q.setFirstResult(start);
+        }
+
+        return q.getResultList();
     }
 
     @Override
@@ -119,4 +152,5 @@ public class MedicineRepositoryImpl extends BaseRepositoryImpl<Medicine> impleme
 
         return q.getSingleResult();
     }
+
 }

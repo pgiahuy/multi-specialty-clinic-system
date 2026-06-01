@@ -36,6 +36,7 @@ import PatientList from "./screens/Doctor/PatientList";
 import AppointmentDetail from "./screens/Patient/AppointmentDetail";
 import ScheduleManagement from "./screens/Doctor/ScheduleManagement";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AppointmentOfSchedule from "./screens/Doctor/AppointmentOfSchedule";
 import LabTest from "./screens/Doctor/LabTest";
 
 const initUserState = () => {
@@ -85,7 +86,8 @@ function App() {
               <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
               <Route path="/doctor/create-medical-record" element={<CreateMedicalRecord />} />
               <Route path="/doctor/schedules" element={<ScheduleManagement />} />
-              <Route path="/doctor/:scheduleId/appointments" element={<AppointmentList />} />
+              <Route path="/doctor/:scheduleId/appointments" element={<AppointmentOfSchedule />} />
+              <Route path="/doctor/appointments" element={<AppointmentList />} />
               <Route path="/doctor/profile" element={<DoctorProfile />} />
               <Route path="/doctor/register-schedule" element={<RegisterSchedule />} />
               <Route path="/doctor/appointments/:appointmentId/medical-record" element={<MedicalRecord />} />
@@ -100,7 +102,7 @@ function App() {
 
             <Route element={<ProtectedRoute />}>
               <Route path="/doctors" element={<ListDoctor />} />
-              <Route path="/appointment/:appointmentId" element={<AppointmentDetail />} />
+              <Route path="/appointments/:appointmentId" element={<AppointmentDetail />} />
             </Route>
 
             <Route path="/doctor/detail/:doctorId" element={<DoctorDetail />} />

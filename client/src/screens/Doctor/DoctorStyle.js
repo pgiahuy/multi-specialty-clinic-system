@@ -31,7 +31,7 @@ export const tableStyles = {
         padding: '12px 16px',
         fontSize: '14px',
         textAlign: 'center',
-        color: '#6c757d'
+        color: '#000000'
     },
     dataCellLeft: {
         padding: '12px 16px',

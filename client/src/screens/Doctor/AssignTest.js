@@ -183,7 +183,7 @@ const AssignTest = () => {
             <Header />
             <FloatAlert {...alertData} />
 
-            <Container className="py-4 flex-grow-1" style={{ maxWidth: '900px' }}>
+            <Container className="py-4 flex-grow-1" style={{ width: '70%' }}>
                 <div className="text-center mb-4">
                     <h4 className="fw-bold text-primary mb-0">
                         Chỉ định xét nghiệm
@@ -232,7 +232,7 @@ const AssignTest = () => {
                                             <th style={{ ...tableStyles.headerCell, textAlign: 'center', width: '8%' }}>Mã</th>
                                             <th style={tableStyles.headerCell}>Tên xét nghiệm</th>
                                             <th style={{ ...tableStyles.headerCell, textAlign: 'center', width: '15%' }}>Đơn vị</th>
-                                            <th style={{ ...tableStyles.headerCell, textAlign: 'center', width: '15%' }}>Khoảng bình thường</th>
+                                            <th style={{ ...tableStyles.headerCell, textAlign: 'center', width: '15%' }}>Tham chiếu</th>
                                             <th style={{ ...tableStyles.headerCell, textAlign: 'center', width: '15%' }}>Giá</th>
                                             <th style={{ ...tableStyles.headerCell, textAlign: 'center', width: '10%' }}>Chọn</th>
                                         </tr>

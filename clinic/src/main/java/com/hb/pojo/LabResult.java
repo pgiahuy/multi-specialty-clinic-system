@@ -20,11 +20,15 @@ import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Date;
 
 /**
  *
@@ -40,17 +44,20 @@ import java.util.Collection;
     @NamedQuery(name = "LabResult.findById", query = "SELECT l FROM LabResult l WHERE l.id = :id")})
 public class LabResult implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    @Size(max = 10)
+    @Size(max = 9)
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private LabResultStatus status;
     @Basic(optional = false)
-    @NotNull
+    @NotNull()
     @Column(name = "created_at")
     private LocalDateTime createdAt;
     @Column(name = "test_at")
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime testAt;
+    @Column(name = "dr_id")
+    private Long drId;
+    private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
@@ -61,8 +68,6 @@ public class LabResult implements Serializable {
     private Appointment appointmentId;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "labResultId")
     private Collection<LabResultDetail> labResultDetailCollection;
-    @Column(name = "dr_id")
-    private Long dr_id;
 
     public LabResult() {
     }
@@ -76,29 +81,7 @@ public class LabResult implements Serializable {
         this.createdAt = createdAt;
     }
 
-    public LabResultStatus getStatus() {
-        return status;
-    }
 
-    public void setStatus(LabResultStatus status) {
-        this.status = status;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getTestAt() {
-        return testAt;
-    }
-
-    public void setTestAt(LocalDateTime testAt) {
-        this.testAt = testAt;
-    }
 
     public Long getId() {
         return id;
@@ -152,15 +135,39 @@ public class LabResult implements Serializable {
     /**
      * @return the dr_id
      */
-    public Long getDr_id() {
-        return dr_id;
+    public LabResultStatus getStatus() {
+        return status;
     }
 
     /**
      * @param dr_id the dr_id to set
      */
-    public void setDr_id(Long dr_id) {
-        this.dr_id = dr_id;
+    public void setStatus(LabResultStatus status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getTestAt() {
+        return testAt;
+    }
+
+    public void setTestAt(LocalDateTime testAt) {
+        this.testAt = testAt;
+    }
+
+    public Long getDrId() {
+        return drId;
+    }
+
+    public void setDrId(Long drId) {
+        this.drId = drId;
     }
     
 }
