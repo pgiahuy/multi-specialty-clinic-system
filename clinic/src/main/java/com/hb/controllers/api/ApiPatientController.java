@@ -6,6 +6,7 @@ package com.hb.controllers.api;
 
 import com.hb.dto.request.PatientCreateRequest;
 import com.hb.dto.response.PatientResponse;
+import com.hb.enums.UserRole;
 import com.hb.mapper.PatientMapper;
 import com.hb.pojo.Patient;
 import com.hb.pojo.User;
@@ -16,8 +17,8 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -50,13 +51,14 @@ public class ApiPatientController {
     private UserService userService;
 
     @GetMapping("/secure/patients")
+    @PreAuthorize("hasAnyRole('DOCTOR','PATIENT','STAFF')")
     public ResponseEntity<?> list(@RequestParam Map<String, String> params, Principal principal) {
         User user = userService.getUserByUsername(principal.getName());
 
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Tài khoản không hợp lệ");
         }
-        if (!user.getRole().equals("ROLE_DOCTOR")) {
+        if (!user.getRole().equals(UserRole.ROLE_DOCTOR)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Không có quyền truy cập!");
         }
         if (user.getDoctor() != null) {
@@ -68,6 +70,7 @@ public class ApiPatientController {
     }
 
     @PostMapping("/secure/profiles")
+    @PreAuthorize("hasRole('PATIENT'")
     @Transactional
     public ResponseEntity<?> create(@ModelAttribute PatientCreateRequest req, Principal principal) {
         
@@ -76,6 +79,7 @@ public class ApiPatientController {
     }
 
     @GetMapping("/secure/profile/{patientId}")
+    @PreAuthorize("hasRole('PATIENT'")
     public ResponseEntity<?> getProfile(@PathVariable(value = "patientId") Long id, Principal principal) {
         User u = userService.getUserByUsername(principal.getName());
         
@@ -94,6 +98,7 @@ public class ApiPatientController {
     }
 
     @GetMapping("/secure/profiles")
+    @PreAuthorize("hasRole('PATIENT'")
     @Transactional
     public ResponseEntity<List<PatientResponse>> getProfiles(Principal principal) {
         User u = this.userService.getUserByUsername(principal.getName());
@@ -103,6 +108,7 @@ public class ApiPatientController {
     
     
     @PutMapping("/secure/profile/{patientId}")
+    @PreAuthorize("hasRole('PATIENT'")
     @Transactional
     public ResponseEntity<?> updateProfile(Principal principal,
             @PathVariable(value = "patientId") Long patientId,
@@ -121,7 +127,7 @@ public class ApiPatientController {
     }
     
     @DeleteMapping("/secure/profile/{patientId}")
-   
+    @PreAuthorize("hasRole('PATIENT'")
     public ResponseEntity<?> destroy(@PathVariable(value="patientId") Long id, Principal principal) {
         User u = userService.getUserByUsername(principal.getName());
         

@@ -61,7 +61,7 @@ export const CLINIC_ENDPOINTS = {
     DOCTORS: 'doctors',
     PATIENTS: 'patients',
     SPECIALTIES: 'specialties',
-    ROOMS: 'rooms',
+    AVAILABLE_ROOMS: 'secure/available-rooms',
     SHIFTS: 'shifts',
     SCHEDULES: 'secure/schedules',
     DOCTOR_APPOINTMENTS: (scheduleId) => `secure/appointments?scheduleId=${scheduleId}`,

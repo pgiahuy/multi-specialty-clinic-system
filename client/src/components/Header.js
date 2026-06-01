@@ -67,7 +67,7 @@ const Header = () => {
                                     setShowLoginRequired(true);
                                     return;
                                 }
-                                navigate(user.role === 'ROLE_DOCTOR' ? '/doctor/dashboard' : '/patient/dashboard');
+                                navigate(user?.role === 'ROLE_DOCTOR' ? '/doctor/dashboard' : '/patient/dashboard');
                             }}
                         >
                             {user?.role === 'ROLE_DOCTOR' ? 'Công việc' : 'Dịch vụ'}
@@ -75,12 +75,12 @@ const Header = () => {
 
 
 
-                        {user && user.role === 'ROLE_PATIENT' && (
+                        {user && user?.role === 'ROLE_PATIENT' && (
                             <Nav.Link className="header-navlink" onClick={() => navigate('/doctors')}>
                                 Bác sĩ
                             </Nav.Link>
                         )}
-                        {user && user.role === 'ROLE_DOCTOR' && (
+                        {user && user?.role === 'ROLE_DOCTOR' && (
                             <Nav.Link className="header-navlink" onClick={() => navigate('/doctor/appointments')}>
                                 Lịch hẹn
                             </Nav.Link>
@@ -97,7 +97,7 @@ const Header = () => {
 
 
 
-                        {{ user } && user.role === 'ROLE_PATIENT' && (
+                        {{ user } && user?.role === 'ROLE_PATIENT' && (
                             <Nav.Link className="header-navlink" onClick={() => navigate('/')}>
                                 Liên hệ
                             </Nav.Link>
@@ -115,7 +115,7 @@ const Header = () => {
                         ) : (
                             <div className="ms-auto d-flex align-items-center">
                                 <Nav>
-                                    {user.role === 'ROLE_DOCTOR' ? (
+                                    {user?.role === 'ROLE_DOCTOR' ? (
                                         <div>Chào bác sĩ {user?.doctorProfile ? user.doctorProfile.fullName : ''} !&nbsp;&nbsp;</div>
                                     ) : (
                                         <div>Chào {user?.name || 'bạn'} !&nbsp;&nbsp;</div>
@@ -143,10 +143,10 @@ const Header = () => {
                                     title={
                                         <span className="d-inline-flex align-items-center">
                                             <img
-                                                src={user?.avatar}
+                                                src={user?.avatar || '/doctor-avatar.png'}
                                                 className="rounded-circle header-avatar"
                                                 alt="avatar"
-                                                onError={(e) => e.target.src = '/default-avatar.png'}
+                                                onError={(e) => { e.target.src = '/doctor-avatar.png'; }}
                                             />
                                         </span>
                                     }>

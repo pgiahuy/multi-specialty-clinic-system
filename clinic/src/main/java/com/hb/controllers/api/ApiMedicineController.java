@@ -22,6 +22,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -48,6 +49,7 @@ public class ApiMedicineController {
     private UserService userService;
     
     @GetMapping("/medicines")
+    @PreAuthorize("hasAnyRole('DOCTOR','STAFF')")
     public ResponseEntity<List<MedicineResponse>> list(@RequestParam Map<String,String> params, Principal principal ){
         if (principal == null || principal.getName() == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

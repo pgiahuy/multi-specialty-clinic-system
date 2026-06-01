@@ -5,6 +5,7 @@
 package com.hb.repository;
 
 import com.hb.pojo.Room;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +15,7 @@ import java.util.Map;
  */
 public interface RoomRepository extends BaseRepository<Room>{
     List<Room> getRooms(Map<String,String> params);
+    List<Room> getAvailableRooms(Map<String, String> params);
     Room getRoomById(Long id);
     Room saveOrUpdate(Room a);
     void deleteRoom(Long id);
