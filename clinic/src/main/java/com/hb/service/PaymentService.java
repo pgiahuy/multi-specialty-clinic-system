@@ -20,7 +20,7 @@ public interface PaymentService {
     Payment getPaymentById(Long id);
     Payment getPaymentByAppoint(Long appointmentId);
     void deletePayment(Long id);
-    Payment createPayment(Appointment appointment);
+    Payment createPayment(Long appointmentId);
     void confirmPaymentSuccess(Long paymentId, PaymentMethod method);
     void confirmPaymentFailed(Long paymentId, PaymentMethod method);
     void updatePaymentTotalAmount(Payment payment);

@@ -4,10 +4,13 @@
  */
 package com.hb.pojo;
 
+import com.hb.enums.LabResultStatus;
 import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -43,7 +46,8 @@ public class LabResult implements Serializable {
     private static final long serialVersionUID = 1L;
     @Size(max = 10)
     @Column(name = "status")
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private LabResultStatus status;
     @Basic(optional = false)
     @NotNull
     @Column(name = "created_at")
@@ -60,7 +64,7 @@ public class LabResult implements Serializable {
     @JoinColumn(name = "appointment_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Appointment appointmentId;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "labResultsId")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "labResultId")
     private Collection<LabResultDetail> labResultDetailCollection;
 
     public LabResult() {
@@ -75,11 +79,11 @@ public class LabResult implements Serializable {
         this.createdAt = createdAt;
     }
 
-    public String getStatus() {
+    public LabResultStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(LabResultStatus status) {
         this.status = status;
     }
 
