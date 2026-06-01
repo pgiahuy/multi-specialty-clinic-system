@@ -30,6 +30,7 @@ export const patientInfoCard = {
 
 export const tableStyles = {
     container: {
+        minHeight: 250,
         padding: '0 15px 0 15px',
         boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
         borderRadius: '8px',
@@ -52,6 +53,9 @@ export const tableStyles = {
         borderBottom: 'none'
     },
     bodyRow: (index) => ({
+
+        padding: '0',
+        magin: 0,
         backgroundColor: index % 2 === 0 ? '#fff' : '#f8f9fa',
         transition: 'background-color 0.2s ease',
         borderBottom: '1px solid #e9ecef'
@@ -60,10 +64,10 @@ export const tableStyles = {
         backgroundColor: '#e7f1ff'
     },
     dataCell: {
-        padding: '12px 0',
+        padding: '7px 0',
         fontSize: '14px',
         textAlign: 'center',
-        color: '#6c757d'
+        color: '#000000'
     },
     dataCellLeft: {
         padding: '12px 0',
