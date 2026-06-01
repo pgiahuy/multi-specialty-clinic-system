@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import Footer from "../../components/Footer";
 import Header from "../../components/Header";
 import { APPOINTMENT_ENDPOINTS, authApis, CLINIC_ENDPOINTS, endpoint } from "../../configs/Apis";
-import { useNavigate, useParams } from "react-router-dom";
 import { Button, Col, Container, Row, Table, Form } from "react-bootstrap";
+
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+
 import MySpinner from "../../components/MySpinner";
 import { tableStyles } from "../Patient/PatientStyle";
 
@@ -31,6 +33,7 @@ const AppointmentList = () => {
                 }
             });
             setAppointments(response.data);
+
         } catch (error) {
             console.error("Lỗi khi tải danh sách lịch hẹn:", error);
         } finally {

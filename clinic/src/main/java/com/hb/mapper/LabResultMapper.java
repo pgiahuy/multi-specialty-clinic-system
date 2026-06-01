@@ -20,6 +20,7 @@ public interface LabResultMapper {
     
     @Mapping(source = "appointmentId.patientId.fullName", target = "patientName")
     @Mapping(source = "labResultDetailCollection", target = "resultDetails")
+    @Mapping(source = "appointmentId.scheduleId.doctorId.fullName", target = "doctorName")
     LabResultResponse toResponse(LabResult labResult);
     
     

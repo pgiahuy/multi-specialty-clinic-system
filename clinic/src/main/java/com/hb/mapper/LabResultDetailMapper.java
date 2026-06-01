@@ -16,8 +16,11 @@ import org.mapstruct.factory.Mappers;
  */
 @Mapper(componentModel = "spring")
 public interface LabResultDetailMapper {
+
     LabResultDetailMapper INSTANCE = Mappers.getMapper(LabResultDetailMapper.class);
-    
+
     @Mapping(source = "testId.testName", target = "testName")
+    @Mapping(source = "testId.normalRange", target = "normalRange")
+    @Mapping(source = "testId.unit", target = "unit")
     LabResultDetailResponse toResponse(LabResultDetail labResultDetail);
 }
