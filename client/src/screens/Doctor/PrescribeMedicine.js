@@ -49,6 +49,14 @@ const PrescribeMedicine = () => {
         return { totalItems: prescriptionItems.length, totalQuantity };
     }, [prescriptionItems]);
 
+
+    const renderStockStatus = (stock) => {
+        if (!stock || stock <= 0) return <span className="text-danger ">Hết hàng</span>;
+        if (stock > 99) return <span className="text-success ">99+</span>;
+        if (stock <= 10) return <span className="text-danger ">{stock}</span>;
+        return <span className="text-warning ">{stock}</span>;
+    };
+
     const formatVnd = (value) => {
         const numericValue = Number(value);
         if (!Number.isFinite(numericValue)) {
@@ -594,8 +602,9 @@ const PrescribeMedicine = () => {
                                                                             <td className="text-center">
                                                                                 <small className="text-success fw-semibold">{formatVnd(medicine.price)}</small>
                                                                             </td>
-                                                                            <td className="text-center text-muted small fw-semibold py-1">
-                                                                                {medicine.totalStock ?? 0}
+
+                                                                            <td className="text-center small py-1">
+                                                                                {renderStockStatus(medicine.totalStock)}
                                                                             </td>
                                                                             <td className="text-center small py-1">
                                                                                 {medicine.unit || "Viên"}
