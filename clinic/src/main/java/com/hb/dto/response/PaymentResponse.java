@@ -137,19 +137,7 @@ public class PaymentResponse {
         this.createdAt = createdAt;
     }
 
-    /**
-     * @return the paymentItems
-     */
-    public List<PaymentItemResponse> getPaymentItems() {
-        return paymentItems;
-    }
-
-    /**
-     * @param paymentItems the paymentItems to set
-     */
-    public void setPaymentItems(List<PaymentItemResponse> paymentItems) {
-        this.paymentItems = paymentItems;
-    }
+    
 
     /**
      * @return the status
@@ -164,5 +152,22 @@ public class PaymentResponse {
     public void setStatus(PaymentStatus status) {
         this.status = status;
     }
+
+    /**
+     * @return the paymentItems
+     */
+    public List<PaymentItemResponse> getPaymentItems() {
+        return paymentItems;
+    }
+
+    /**
+     * @param paymentItems the paymentItems to set
+     */
+    public void setPaymentItems(List<PaymentItemResponse> paymentItems) {
+        this.paymentItems = paymentItems;
+    }
+
+
+    
     
 }

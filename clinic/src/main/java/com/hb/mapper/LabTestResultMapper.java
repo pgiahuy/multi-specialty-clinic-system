@@ -4,7 +4,7 @@
  */
 package com.hb.mapper;
 
-import com.hb.dto.request.LabTestResultRequest;
+import com.hb.dto.request.LabResultCreateRequest;
 import com.hb.dto.response.LabTestResultResponse;
 import com.hb.pojo.Appointment;
 import com.hb.pojo.LabResult;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class LabTestResultMapper {
-    public LabResult toEntity(LabTestResultRequest req, Appointment appointment, LabTest labTest) {
+    public LabResult toEntity(LabResultCreateRequest req, Appointment appointment, LabTest labTest) {
         if (req == null) {
             return null;
         }
@@ -26,8 +26,6 @@ public class LabTestResultMapper {
         
         labResult.setAppointmentId(appointment);
         labResult.setCreatedAt(LocalDateTime.now());
-       
-        
         return labResult;
     }
     
