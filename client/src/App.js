@@ -76,7 +76,7 @@ function App() {
               <Route path="/patient/booking" element={<BookingPage />} />
               <Route path="/patient/history-booking" element={<HistoryBooking />} />
               <Route path="/patient/test-results" element={<TestResultDetail />} />
-              <Route path="/patient/payment/:patientId?" element={<PaymentDetail />} />
+              <Route path="/patient/payments" element={<PaymentDetail />} />
               <Route path="/patient/payment-result" element={<PaymentResult />} />
             </Route>
 

@@ -11,5 +11,6 @@ import com.hb.pojo.LabResultDetail;
  * @author DELL
  */
 public interface LabResultDetailRepository {
+    LabResultDetail getLabResultDetailById(Long id);
     void addOrUpdate(LabResultDetail detail);
 }

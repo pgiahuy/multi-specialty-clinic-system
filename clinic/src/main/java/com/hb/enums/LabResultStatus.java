@@ -10,6 +10,6 @@ package com.hb.enums;
  */
 public enum LabResultStatus {
     PENDING,
-    PROCESSING,
-    COMPLETE
+    CONFIRMED,
+    COMPLETED
 }

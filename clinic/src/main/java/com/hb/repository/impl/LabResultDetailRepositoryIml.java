@@ -7,6 +7,7 @@ package com.hb.repository.impl;
 import com.hb.pojo.LabResultDetail;
 import com.hb.repository.LabResultDetailRepository;
 import org.hibernate.Session;
+import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Repository;
@@ -30,6 +31,15 @@ public class LabResultDetailRepositoryIml implements LabResultDetailRepository{
         } else {
             session.merge(detail);
         }
+        
+    }
+
+    @Override
+    public LabResultDetail getLabResultDetailById(Long id) {
+        Session session = this.factory.getObject().getCurrentSession();
+        Query<LabResultDetail> query = session.createNamedQuery("LabResultDetail.findById", LabResultDetail.class);
+        query.setParameter("id", id);
+        return query.getSingleResult();
         
     }
 }
