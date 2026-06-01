@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { authApis, endpoint } from "../../configs/Apis";
+import { authApis, endpoint, TEST_ENDPOINTS } from "../../configs/Apis";
 import Header from "../../components/Header";
 import MySpinner from "../../components/MySpinner";
 import Footer from "../../components/Footer";
@@ -22,13 +22,24 @@ const MedicalRecord = () => {
     const { appointmentId } = useParams();
     const [loading, setLoading] = useState(false);
     const [medicalRecord, setMedicalRecord] = useState(null);
-    const [testResults, setTestResults] = useState([]);
+    const [labResult, setLabResult] = useState([]);
+    const [labResultStatus, setLabResultStatus] = useState(null);
     const [showTestResultsModal, setShowTestResultsModal] = useState(false);
     const [editableDiagnosis, setEditableDiagnosis] = useState('');
     const [editableNotes, setEditableNotes] = useState('');
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const nav = useNavigate();
+
+    const getStatusInVietnamese = (status) => {
+        const statusMap = {
+            'CONFIRMED': 'Chưa có kết quả',
+            'PENDING': 'Chưa thanh toán',
+            'COMPLETED': 'Đã xét nghiệm',
+            
+        };
+        return statusMap[status] || status;
+    };
 
     const loadMedicalRecord = async () => {
         try {
@@ -46,8 +57,29 @@ const MedicalRecord = () => {
 
     const loadTestResults = async () => {
         try {
-            const response = await authApis().get(endpoint['test-result-appointment'](appointmentId));
-            setTestResults(response.data);
+            
+            const response = await authApis().get(TEST_ENDPOINTS.LAB_RESULTS_BY_APPOINTMENT(appointmentId));
+            
+            // Set status
+            if (response.data && response.data.status) {
+                setLabResultStatus(response.data.status);
+            }
+            
+            if (response.data && response.data.resultDetails) {
+                const transformedResults = response.data.resultDetails.map(result => ({
+                    id: result.id,
+                    testName: result.testName,
+                    value: result.value,
+                    resultValue: result.value, 
+                    unit: result.unit || '', 
+                    normalRange: result.normalRange || '', 
+                    isNormal: result.isAbnormal === false, 
+                    isAbnormal: result.isAbnormal
+                }));
+                setLabResult(transformedResults);
+            } else {
+                setLabResult(response.data);
+            }
         } catch (error) {
             console.error("Tải kết quả xét nghiệm thất bại:", error);
         }
@@ -207,24 +239,31 @@ const MedicalRecord = () => {
                                 <div>
                                     <div className="fw-bold text-dark">Kết quả xét nghiệm cận lâm sàng</div>
                                     <small className="text-muted">
-                                        {testResults.length === 0 ? "Bệnh án này không có dữ liệu xét nghiệm." : `Có ${testResults.length} chỉ số xét nghiệm.`}
+                                        {labResult && labResult.length > 0 ? (
+                                            <>
+                                                {labResultStatus && <p className="pt-3 me-2">{getStatusInVietnamese(labResultStatus)}</p>}
+                                                
+                                            </>
+                                        ) : (
+                                            "Bệnh án này không có dữ liệu xét nghiệm."
+                                        )}
                                     </small>
                                 </div>
-                                {testResults.length === 0 ? (
+                                {labResult && labResult.length > 0 ? (
+                                    <Button
+                                        variant="primary"
+                                        className="fw-semibold px-3 btn-sm rounded-pill"
+                                        onClick={() => setShowTestResultsModal(true)}
+                                    >
+                                        Xem kết quả ({labResult.length})
+                                    </Button>
+                                ) : (
                                     <Button
                                         variant="outline-danger"
                                         className="fw-semibold px-3 btn-sm rounded-pill"
                                         onClick={() => nav(`/doctor/assign-test/${appointmentId}`)}
                                     >
                                         <PlusCircleFill className="me-1 mb-1" /> Chỉ định ngay
-                                    </Button>
-                                ) : (
-                                    <Button
-                                        variant="primary"
-                                        className="fw-semibold px-3 btn-sm rounded-pill"
-                                        onClick={() => setShowTestResultsModal(true)}
-                                    >
-                                        Xem kết quả ({testResults.length})
                                     </Button>
                                 )}
                             </div>
@@ -287,7 +326,7 @@ const MedicalRecord = () => {
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body className="p-0">
-                    {testResults.length > 0 ? (
+                    {labResult ? (
                         <div style={tableStyles.container} className="border-0 m-0 rounded-0">
                             <Table hover responsive style={tableStyles.table} className="mb-0">
                                 <thead>
@@ -301,7 +340,7 @@ const MedicalRecord = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {testResults.map((result, index) => (
+                                    {labResult.map((result, index) => (
                                         <tr
                                             key={result.id}
                                             style={tableStyles.bodyRow(index)}

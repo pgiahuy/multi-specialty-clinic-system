@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { authApis, endpoint } from "../../configs/Apis";
+import { authApis, endpoint, TEST_ENDPOINTS } from "../../configs/Apis";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import MySpinner from "../../components/MySpinner";
+import FloatAlert from "../../components/FloatAlert";
 import { Button, Card, Container, Table, Form, Pagination } from "react-bootstrap";
 import { CheckCircle, XCircle } from "react-bootstrap-icons";
 import { tableStyles, emptyState } from "./DoctorStyle";
@@ -21,6 +22,9 @@ const AssignTest = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [searchInput, setSearchInput] = useState('');
     const [appointment, setAppointment] = useState(null);
+    const [alertData, setAlertData] = useState({ show: false, heading: '', message: '', variant: '' });
+    const alertTimerRef = useRef(null);
+    const navTimerRef = useRef(null);
     const navigate = useNavigate();
 
     const loadAppointment = async () => {
@@ -94,6 +98,34 @@ const AssignTest = () => {
         applySearchAndPagination();
     }, [allLabTests, currentPage, searchTerm]);
 
+    useEffect(() => {
+        return () => {
+            if (alertTimerRef.current) {
+                clearTimeout(alertTimerRef.current);
+            }
+            if (navTimerRef.current) {
+                clearTimeout(navTimerRef.current);
+            }
+        };
+    }, []);
+
+    const handleShowAlert = (heading, message, variant) => {
+        if (alertTimerRef.current) {
+            clearTimeout(alertTimerRef.current);
+        }
+
+        setAlertData({
+            show: true,
+            heading,
+            message,
+            variant,
+        });
+
+        alertTimerRef.current = setTimeout(() => {
+            setAlertData(prev => ({ ...prev, show: false }));
+        }, 2000);
+    };
+
     const handleCheckboxChange = (testId) => {
         const newSelected = new Set(selectedTests);
         if (newSelected.has(testId)) {
@@ -106,37 +138,35 @@ const AssignTest = () => {
 
     const handleAssignTests = async () => {
         if (selectedTests.size === 0) {
-            alert("Vui lòng chọn ít nhất một xét nghiệm");
+            handleShowAlert('Lỗi', 'Vui lòng chọn ít nhất một xét nghiệm.', 'danger');
             return;
         }
 
         try {
             setIsSaving(true);
-            const testsToAssign = Array.from(selectedTests).map(testId => {
-                return allLabTests.find(test => test.id === testId);
-            });
 
-            const payload = Array.from(selectedTests).map(testId => {
-                return {
-                    appointId: parseInt(appointmentId),
+            const payload = {
+                appointmentId: parseInt(appointmentId),
+                details: Array.from(selectedTests).map(testId => ({
                     testId: testId
-                };
-            });
+                }))
+            };
 
-            const response = await authApis().post(endpoint['lab-test'], payload);
+            const response = await authApis().post(TEST_ENDPOINTS.LAB_RESULTS, payload);
             if (response.status === 200 || response.status === 201) {
-                alert("Chỉ định xét nghiệm thành công!");
-
-                navigate(-1);
+                handleShowAlert('Thành công', 'Chỉ định xét nghiệm thành công!', 'success');
+                navTimerRef.current = setTimeout(() => {
+                    navigate(-1);
+                }, 1800);
+            } else {
+                handleShowAlert('Lỗi', 'Chỉ định xét nghiệm thất bại. Vui lòng thử lại!', 'danger');
             }
 
         } catch (error) {
-            alert("Chỉ định xét nghiệm thất bại. Vui lòng thử lại!");
-
+            handleShowAlert('Lỗi', 'Chỉ định xét nghiệm thất bại. Vui lòng thử lại!', 'danger');
         } finally {
             setIsSaving(false);
         }
-
     };
 
     const formatCurrency = (value) => {
@@ -151,6 +181,7 @@ const AssignTest = () => {
     return (
         <div className="d-flex flex-column min-vh-100 bg-light">
             <Header />
+            <FloatAlert {...alertData} />
 
             <Container className="py-4 flex-grow-1" style={{ maxWidth: '900px' }}>
                 <div className="text-center mb-4">
