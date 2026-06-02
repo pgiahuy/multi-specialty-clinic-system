@@ -2,16 +2,25 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { authApis, CLINIC_ENDPOINTS } from "../../configs/Apis";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import FloatAlert from "../../components/FloatAlert";
 
 const CreateMedicalRecord = () => {
     const navigate = useNavigate();
+    const alertTimerRef = useRef(null);
+
     const [searchParams] = useSearchParams();
     const [loading, setLoading] = useState(false);
     const [appointment, setAppointment] = useState(null);
     const appointmentId = searchParams.get('appointmentId');
     const [diagnosis, setDiagnosis] = useState('');
     const [note, setNote] = useState('');
+    const [alertData, setAlertData] = useState({
+        show: false,
+        heading: '',
+        message: '',
+        variant: 'info'
+    });
 
     const loadAppointment = async (id) => {
         try {
@@ -19,11 +28,30 @@ const CreateMedicalRecord = () => {
             const response = await authApis().get(CLINIC_ENDPOINTS.APPOINTMENT_BY_ID(id));
             setAppointment(response.data);
         } catch (error) {
-            alert("Không thể tải thông tin lịch hẹn.");
+            console.error("Không thể tải thông tin lịch hẹn.", error);
         } finally {
             setLoading(false);
         }
     }
+
+    const handleShowAlert = (heading, message, variant) => {
+        if (alertTimerRef.current) {
+            clearTimeout(alertTimerRef.current);
+        }
+
+        setAlertData({
+            show: true,
+            heading,
+            message,
+            variant,
+        });
+        window.scrollTo({ top: 0, behavior: "smooth" });
+
+        alertTimerRef.current = setTimeout(() => {
+            setAlertData(prev => ({ ...prev, show: false }));
+        }, 2000);
+    };
+
 
     useEffect(() => {
         if (appointmentId) {
@@ -34,7 +62,7 @@ const CreateMedicalRecord = () => {
 
     const handleCreateMedicalRecord = async () => {
         if (!diagnosis.trim()) {
-            alert("Vui lòng nhập chẩn đoán trước khi lưu!");
+            handleShowAlert("Vui lòng nhập chẩn đoán!", "", "danger");
             return;
         }
 
@@ -46,13 +74,20 @@ const CreateMedicalRecord = () => {
                 note: note,
             };
 
-            await authApis().post(CLINIC_ENDPOINTS.CREATE_MEDICAL_RECORD, requestData);
+            const response = await authApis().post(CLINIC_ENDPOINTS.CREATE_MEDICAL_RECORD, requestData);
+            if (response.status === 200 || response.status === 201) {
 
-            alert("Tạo bệnh án thành công!");
-            navigate(`/doctor/appointments/${appointmentId}/medical-record`);
+                handleShowAlert('Thành công', 'Tạo bệnh án thành công!', 'success');
+                alertTimerRef.current = setTimeout(() => {
+                    navigate(`/doctor/appointments/${appointmentId}/medical-record`);
+                }, 1800);
+            } else {
+                handleShowAlert('Lỗi', 'Tạo bệnh án thất bại. Vui lòng thử lại!', 'danger');
+            }
+
         } catch (error) {
             console.error("Tạo bệnh án thất bại:", error);
-            alert("Tạo bệnh án thất bại. Vui lòng thử lại!");
+            handleShowAlert("Tạo bệnh án thất bại!", "Vui lòng thử lại!", "danger");
         } finally {
             setLoading(false);
         }
@@ -61,6 +96,10 @@ const CreateMedicalRecord = () => {
     return (
         <div className="d-flex flex-column min-vh-100 bg-light">
             <Header />
+            <div>
+                <FloatAlert show={alertData.show} heading={alertData.heading} variant={alertData.variant} message={alertData.message} >
+                </FloatAlert>
+            </div>
 
             <div className="container mt-4 mb-4 flex-grow-1 d-flex justify-content-center align-items-center">
                 <div className="card shadow border-0 w-100" style={{ maxWidth: '700px', borderRadius: '12px' }}>

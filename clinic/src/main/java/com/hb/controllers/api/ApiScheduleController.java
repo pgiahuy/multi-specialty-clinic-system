@@ -61,6 +61,9 @@ public class ApiScheduleController {
                 params.put("doctorId", String.valueOf(u.getDoctor().getId()));
             }
         }
+        else if (UserRole.ROLE_PATIENT.equals(u.getRole())) {
+            params.put("role", "patient");
+        }
 
         int page = params.containsKey("page") ? Integer.parseInt(params.get("page")) : 1;
 

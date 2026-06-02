@@ -201,6 +201,32 @@ const BookingPage = () => {
         }
 
         try {
+            const bookingDateStr = selectedSchedule?.date || selectedDate;
+            if (bookingDateStr) {
+
+                let normalizedBookingDate = bookingDateStr;
+                if (bookingDateStr.includes('/')) {
+
+                    const parts = bookingDateStr.split('/');
+                    if (parts.length === 3) {
+                        normalizedBookingDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                    }
+                }
+                console.log('Validating booking date:', normalizedBookingDate, 'against tomorrow:', todayStr);
+                if (normalizedBookingDate < todayStr) {
+                    handleShowAlert(
+                        "Ngày không hợp lệ",
+                        "Không thể đặt lịch cho ngày hôm nay hoặc ngày đã qua. Vui lòng chọn ngày từ ngày mai trở đi.",
+                        "warning"
+                    );
+                    return;
+                }
+            }
+        } catch (e) {
+            console.warn('Date validation parse error', e);
+        }
+
+        try {
             setLoading(true);
             await authApis().post(CLINIC_ENDPOINTS.PATIENT_BOOKING_APPOINTMENT, {
                 patientId: selectedPatient,
@@ -292,6 +318,11 @@ const BookingPage = () => {
     useEffect(() => {
         loadSchedules();
     }, [selectedDoctor, selectedDate, selectedSpecialty]);
+
+    // Allow booking from tomorrow onwards
+    const tomorrowDate = new Date();
+    tomorrowDate.setDate(tomorrowDate.getDate() + 1);
+    const todayStr = tomorrowDate.toISOString().split('T')[0];
 
     useEffect(() => {
         return () => {
@@ -431,7 +462,9 @@ const BookingPage = () => {
                                         type="date"
                                         className="form-control w-50"
                                         value={selectedDate}
+                                        min={todayStr}
                                         onChange={(e) => handleFilterChange("date", e.target.value)}
+                                        title="Chỉ được chọn từ ngày mai trở đi"
                                     />
                                 </div>
 
