@@ -23,20 +23,24 @@ public class LabResultResponse {
     private LocalDateTime testAt;
     private LabResultStatus status;
     private String doctorName;
+    private String doctorTestName;
     private List<LabResultDetailResponse> resultDetails;
 
     public LabResultResponse() {
     }
 
-    public LabResultResponse(Long id, String patientName, LocalDateTime createdAt, LocalDateTime testAt, LabResultStatus status, String doctorName, List<LabResultDetailResponse> resultDetails) {
+    public LabResultResponse(Long id, String patientName, LocalDateTime createdAt, LocalDateTime testAt, LabResultStatus status, String doctorName, String doctorTestName, List<LabResultDetailResponse> resultDetails) {
         this.id = id;
         this.patientName = patientName;
         this.createdAt = createdAt;
         this.testAt = testAt;
         this.status = status;
         this.doctorName = doctorName;
+        this.doctorTestName = doctorTestName;
         this.resultDetails = resultDetails;
     }
+
+    
 
     
 
@@ -140,6 +144,20 @@ public class LabResultResponse {
      */
     public void setDoctorName(String doctorName) {
         this.doctorName = doctorName;
+    }
+
+    /**
+     * @return the doctorTestName
+     */
+    public String getDoctorTestName() {
+        return doctorTestName;
+    }
+
+    /**
+     * @param doctorTestName the doctorTestName to set
+     */
+    public void setDoctorTestName(String doctorTestName) {
+        this.doctorTestName = doctorTestName;
     }
     
     
