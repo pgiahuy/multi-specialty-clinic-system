@@ -141,13 +141,10 @@ const HistoryBooking = () => {
 
     return (
         <>
-            <div className="d-flex flex-column min-vh-100">
+            <div className="d-flex flex-column min-vh-100 bg-light">
                 <Header />
                 <Container className="py-4">
-                    <style>{`.nav-pills .nav-link{transition: transform .12s ease, box-shadow .12s ease; cursor: pointer;}
-                                .nav-pills .nav-link:hover{transform: translateY(-4px); box-shadow: 0 10px 30px rgba(13,110,253,0.12);} 
-                                .nav-pills .nav-link.active{transform: none; box-shadow: none;}`}</style>
-
+                  
                     <div className="mb-4 pb-3 border-bottom">
                         <div className="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3">
 
@@ -251,7 +248,7 @@ const HistoryBooking = () => {
                                         <Card.Body className="p-4">
                                             <div className="d-flex justify-content-between align-items-center mb-3">
                                                 <div className="small text-muted">Bệnh nhân</div>
-                                                <div className="fw-semibold text-dark text-end">{item.patientFullName || '-'}</div>
+                                                <div className="fw-bold text-dark text-end text-uppercase">{item.patientFullName || '-'}</div>
                                             </div>
 
                                             <div className="d-flex justify-content-between align-items-center mb-4">
@@ -261,7 +258,7 @@ const HistoryBooking = () => {
 
 
                                             <Button
-                                                variant="primary"
+                                                variant="outline-primary"
                                                 className="w-100 rounded-4 fw-medium"
 
                                                 onClick={() => navigate(`/appointments/${item.id}`)}

@@ -61,36 +61,36 @@ const TestResultDetail = () => {
                                 </div>
                                 <Row className="mb-4 g-3">
                                     <Col md={6}>
-                                        <Table borderless size="sm" className="mb-0">
+                                        <Table borderless size="sm" className="mb-0 small" style={{ fontSize: '0.88rem', lineHeight: 1.25 }}>
                                             <tbody>
                                                 <tr>
-                                                    <td className="text-muted w-25">Bệnh nhân:</td>
-                                                    <td className="fw-bold fs-6">{labResult.patientName || 'Không xác định'}</td>
+                                                    <td className="text-muted w-25 py-1">Bệnh nhân:</td>
+                                                    <td className="fw-bold" style={{ fontSize: '0.92rem' }}>{labResult.patientName || 'Không xác định'}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td className="text-muted">Ngày chỉ định:</td>
+                                                    <td className="text-muted py-1">Ngày chỉ định:</td>
                                                     <td className="fw-semibold">{labResult.createdAt || '-'}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td className="text-muted">Trạng thái:</td>
+                                                    <td className="text-muted py-1">Trạng thái:</td>
                                                     <td className="fw-bold text-success">{renderResultStatus(labResult.status)}</td>
                                                 </tr>
                                             </tbody>
                                         </Table>
                                     </Col>
                                     <Col md={6}>
-                                        <Table borderless size="sm" className="mb-0">
+                                        <Table borderless size="sm" className="mb-0 small" style={{ fontSize: '0.88rem', lineHeight: 1.25 }}>
                                             <tbody>
                                                 <tr>
-                                                    <td className="text-muted w-25">Bác sĩ chỉ định:</td>
+                                                    <td className="text-muted w-25 py-1">Bác sĩ chỉ định:</td>
                                                     <td className="fw-semibold">{labResult.doctorName || '-'}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td className="text-muted">Người thực hiện:</td>
+                                                    <td className="text-muted py-1">Người thực hiện:</td>
                                                     <td className="fw-semibold">{labResult.doctorTestName || '-'}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td className="text-muted">Ngày thực hiện:</td>
+                                                    <td className="text-muted py-1">Ngày thực hiện:</td>
                                                     <td className="fw-semibold">{labResult.testAt || '-'}</td>
                                                 </tr>
                                             </tbody>
@@ -101,14 +101,14 @@ const TestResultDetail = () => {
 
                                 {details.length > 0 ? (
                                     <div className="rounded-3 overflow-hidden mb-4">
-                                        <Table hover responsive className="align-middle mb-0 bg-white">
+                                        <Table hover responsive size="sm" className="align-middle mb-0 bg-white small" style={{ fontSize: '0.88rem', lineHeight: 1.25 }}>
                                             <thead className="bg-gray text-dark text-center">
                                                 <tr>
-                                                    <th className="py-3 px-3 w-25">Xét nghiệm</th>
-                                                    <th className="py-3 px-3">Kết quả</th>
-                                                    <th className="py-3 px-3">Đơn vị</th>
-                                                    <th className="py-3 px-3">Tham chiếu</th>
-                                                    <th className="py-3 px-3">Kết luận</th>
+                                                    <th className="py-1 px-2 w-30">Xét nghiệm</th>
+                                                    <th className="py-1 px-2">Kết quả</th>
+                                                    <th className="py-1 px-2">Đơn vị</th>
+                                                    <th className="py-1 px-2">Tham chiếu</th>
+                                                    <th className="py-1 px-2">Kết luận</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="text-dark border-top-0">
@@ -118,8 +118,8 @@ const TestResultDetail = () => {
 
                                                     return (
                                                         <tr key={result.id} className={`${hasValue && isAbnormal ? 'table-danger' : ''}`}>
-                                                            <td className="py-3 px-3 fw-semibold">{result.testName}</td>
-                                                            <td className="py-3 px-3 text-center fs-5" style={{ fontFamily: 'monospace, sans-serif' }}>
+                                                            <td className="py-2 px-2 fw-semibold">{result.testName}</td>
+                                                            <td className="py-2 px-2 text-center fs-6" style={{ fontFamily: 'monospace, sans-serif' }}>
                                                                 {!hasValue ? (
                                                                     <span className="text-muted opacity-50">-</span>
                                                                 ) : (
@@ -128,9 +128,9 @@ const TestResultDetail = () => {
                                                                     </span>
                                                                 )}
                                                             </td>
-                                                            <td className="py-3 px-3 text-center text-secondary small">{result.unit || '-'}</td>
-                                                            <td className="py-3 px-3 text-center text-secondary small">{result.normalRange || '-'}</td>
-                                                            <td className="py-3 px-3 text-center fw-semibold">
+                                                            <td className="py-2 px-2 text-center text-secondary small">{result.unit || '-'}</td>
+                                                            <td className="py-2 px-2 text-center text-secondary small">{result.normalRange || '-'}</td>
+                                                            <td className="py-2 px-2 text-center fw-semibold">
                                                                 {!hasValue ? (
                                                                     <span className="text-muted fst-italic small">Chưa có kết quả</span>
                                                                 ) : isAbnormal ? (
