@@ -20,7 +20,6 @@ const ListDoctor = () => {
             const params = {};
             if (name && name.trim()) params.doctorName = name.trim();
             if (specialty) params.specialty = specialty;
-
             const res = await authApis().get(CLINIC_ENDPOINTS.DOCTORS, { params });
             setDoctors(res.data || []);
         } catch (err) {
@@ -40,7 +39,7 @@ const ListDoctor = () => {
 
     const didMountRef = useRef(true);
 
-    
+
     useEffect(() => {
         if (didMountRef.current) {
             didMountRef.current = false;
@@ -48,7 +47,7 @@ const ListDoctor = () => {
         }
 
         const q = (searchTerm || '').trim();
-        if (q.length === 1) return; 
+        if (q.length === 1) return;
 
         const t = setTimeout(() => {
             loadDoctors(searchTerm, selectedSpecialty);
@@ -61,7 +60,7 @@ const ListDoctor = () => {
         <>
             <div className="d-flex flex-column min-vh-100">
                 <Header />
-                <Container className="py-4">
+                <Container className="py-4 " style={{ minHeight: '650px' }}>
                     <div>
                         <Form>
                             <Row>
@@ -92,7 +91,7 @@ const ListDoctor = () => {
                     <h3 className="mb-4">Danh sách bác sĩ</h3>
 
                     {loading ? (
-                        <div className="text-center py-5"><MySpinner/></div>
+                        <div className="text-center py-5"><MySpinner /></div>
                     ) : doctors.length === 0 ? (
                         <div className="text-center text-muted py-5">Không có bác sĩ để hiển thị.</div>
                     ) : (

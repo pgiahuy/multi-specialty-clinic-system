@@ -26,6 +26,7 @@ CREATE TABLE `appointment` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `patient_id` bigint DEFAULT NULL,
   `status` enum('UN_PAID','PENDING','CONFIRMED','IN_PROGRESS','COMPLETED','CANCELLED') DEFAULT 'PENDING',
+  `reminder_sent` tinyint(1) DEFAULT 0,
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   `schedule_id` bigint NOT NULL,
   PRIMARY KEY (`id`),

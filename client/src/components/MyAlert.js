@@ -8,7 +8,6 @@ const MyAlert = ({
   onClose,
 }) => {
   if (!show) return null;
-
   return (
     <Alert variant={variant} dismissible onClose={onClose}>
       <Alert.Heading className="fs-5">{heading}</Alert.Heading>

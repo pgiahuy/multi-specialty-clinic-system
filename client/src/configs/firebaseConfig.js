@@ -1,5 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
+import { getDatabase } from "firebase/database";
 
 const firebaseConfig = {
     apiKey: "AIzaSyDsDX-j9Jom_u_ccVvm4Q6RcTQ6wNicC2M",
@@ -14,6 +15,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const messaging = getMessaging(app);
+const db = getDatabase(app);
 
 export const requestForToken = () => {
     return getToken(messaging, { vapidKey: "BHzjcKnvfNLBpVhFYgY64BBnVK3ElRPl_PirgJvVExgr6pvoDd3B6oObKwYgGOcab0dWrRWLGGDYHOZUzHslsPY" })
@@ -31,3 +33,5 @@ export const onMessageListener = () =>
             resolve(payload);
         });
     });
+
+export { db };
