@@ -10,7 +10,7 @@ import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import com.hb.pojo.ChatMessage;
 import com.hb.service.FcmService;
-import java.time.format.DateTimeFormatter;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.scheduling.annotation.Async;
@@ -70,9 +70,10 @@ public class FcmServiceImpl implements FcmService {
             dataPayload.put("sender_type", message.getSenderType());
             dataPayload.put("message_type", message.getMessageType());
             dataPayload.put("content", message.getContent());
-            
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            dataPayload.put("created_at", message.getCreatedAt().format(formatter));
+            dataPayload.put("created_at", String.valueOf(message.getCreatedAt()
+                    .atZone(ZoneId.systemDefault())
+                    .toInstant()
+                    .toEpochMilli()));
 
             Message fcmMessage = Message.builder()
                     .setToken(token)
