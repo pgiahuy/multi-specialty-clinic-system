@@ -93,18 +93,12 @@ public class User implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "senderId")
-    private Collection<ChatMessage> chatMessageCollection;
     @OneToMany(mappedBy = "userId")
     private Collection<Notification> notificationCollection;
     @OneToMany(mappedBy = "userId")
     private Collection<Patient> patientCollection;
     @OneToMany(mappedBy = "userId")
     private Collection<SocialAccount> socialAccountCollection;
-    
-
-    @OneToMany(mappedBy = "receiverId")
-    private Collection<Conversation> conversationCollection;
     
     @OneToOne(mappedBy = "userId")
     private Doctor doctor;
@@ -172,14 +166,6 @@ public class User implements Serializable {
         this.isActive = isActive;
     }
 
-    public Collection<ChatMessage> getChatMessageCollection() {
-        return chatMessageCollection;
-    }
-
-    public void setChatMessageCollection(Collection<ChatMessage> chatMessageCollection) {
-        this.chatMessageCollection = chatMessageCollection;
-    }
-
     public Collection<Notification> getNotificationCollection() {
         return notificationCollection;
     }
@@ -202,14 +188,6 @@ public class User implements Serializable {
 
     public void setSocialAccountCollection(Collection<SocialAccount> socialAccountCollection) {
         this.socialAccountCollection = socialAccountCollection;
-    }
-
-    public Collection<Conversation> getConversationCollection() {
-        return conversationCollection;
-    }
-
-    public void setConversationCollection(Collection<Conversation> conversationCollection) {
-        this.conversationCollection = conversationCollection;
     }
 
   

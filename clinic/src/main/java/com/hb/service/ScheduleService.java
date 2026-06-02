@@ -18,6 +18,7 @@ public interface ScheduleService {
     List<Schedule> getSchedules(Map<String, String> params);
     ScheduleRepsonse addSchedule(ScheduleCreateRequest req);
     Schedule getScheduleById(Long id);
+    Schedule getScheduleByDoctor(Map<String, String> params);
     void deleteSchedule(Long id);
     long countSchedules(Map<String, String> params);
     

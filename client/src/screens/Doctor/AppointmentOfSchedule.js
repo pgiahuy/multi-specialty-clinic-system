@@ -10,14 +10,25 @@ import { tableStyles } from "../Patient/PatientStyle";
 const AppointmentOfSchedule = () => {
 
     const { scheduleId } = useParams();
+    const [scheduleDetails, setScheduleDetails] = useState(null);
     const [appointments, setAppointments] = useState([]);
     const [loading, setLoading] = useState(false);
     const [confirmingAppointmentId, setConfirmingAppointmentId] = useState(null);
     const nav = useNavigate();
 
+    const loadScheduleDetails = async () => {
+        try {
+            setLoading(true);
+            const response = await authApis().get(`${CLINIC_ENDPOINTS.DOCTOR_GET_SCHEDULES_BY_ID(scheduleId)}`);
+            setScheduleDetails(response.data);
+        } catch (error) {
+            console.error("Lỗi khi tải chi tiết lịch khám:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-
-    const loadAppointments = async (scheduleId) => {
+    const loadAppointments = async () => {
         try {
             setLoading(true);
             const response = await authApis().get(`${CLINIC_ENDPOINTS.DOCTOR_APPOINTMENTS(scheduleId)}`);
@@ -54,9 +65,8 @@ const AppointmentOfSchedule = () => {
     };
 
     useEffect(() => {
-        if (scheduleId) {
-            loadAppointments(scheduleId);
-        }
+        loadScheduleDetails();
+        loadAppointments();
     }, [scheduleId]);
 
 
@@ -125,12 +135,12 @@ const AppointmentOfSchedule = () => {
 
                                 <Card className="mb-3 border-0 shadow-sm bg-light rounded-3">
                                     <Card.Body className="p-4">
-                                        <div className="d-flex flex-column gap-2 text-secondary small">
+                                        <div className="d-flex flex-column gap-2 text-secondary small p-2">
                                             <div>
                                                 <div className="text-muted fw-bold mb-1" style={{ fontSize: '11px' }}>BÁC SĨ PHỤ TRÁCH</div>
-                                                <h5 className="mb-0 fw-bold text-dark">{appointments[0]?.doctorFullName || 'Chưa phân công'}</h5>
+                                                <h5 className="mb-0 fw-bold text-dark">{scheduleDetails?.doctorName || 'Chưa phân công'}</h5>
                                                 <span className="badge bg-primary-subtle text-primary mt-2 px-2 py-2 rounded-pill">
-                                                    {appointments[0]?.specialtyName || 'Chuyên khoa'}
+                                                    {scheduleDetails?.specialtyName || 'Chuyên khoa'}
                                                 </span>
                                             </div>
 
@@ -138,9 +148,12 @@ const AppointmentOfSchedule = () => {
 
                                             <div>
                                                 <div className="text-muted fw-bold mb-1" style={{ fontSize: '11px' }}>THỜI GIAN LÀM VIỆC</div>
-                                                <h6 className="mb-0 fw-bold text-dark">{appointments[0]?.appointmentDate || '-'}</h6>
+                                                <h6 className="mb-0 fw-bold text-dark">{scheduleDetails?.date || '-'}</h6>
+                                                <div className="text-primary fw-bold mt-1">
+                                                    Buổi: {scheduleDetails?.session || '-'}
+                                                </div>
                                                 <div className="text-success fw-bold mt-1">
-                                                    Ca khám: {appointments[0]?.timeSlot || '-'}
+                                                    Ca khám: {scheduleDetails?.shiftStartTime || '-'} - {scheduleDetails?.shiftEndTime || '-'}
                                                 </div>
                                             </div>
 
@@ -148,10 +161,17 @@ const AppointmentOfSchedule = () => {
 
                                             <div>
                                                 <div className="text-muted fw-bold mb-1" style={{ fontSize: '11px' }}>ĐỊA ĐIỂM KHÁM</div>
-                                                <h6 className="mb-0 fw-bold text-dark">{appointments[0]?.roomName || '-'}</h6>
+                                                <h6 className="mb-0 fw-bold text-dark">Phòng {scheduleDetails?.room || '-'}</h6>
                                                 <div className="text-muted mt-1">
-                                                    <span className="fw-semibold text-dark">{appointments[0]?.areaName || '-'}</span>
+                                                    <span className="fw-semibold text-dark">{scheduleDetails?.area || '-'}</span>
                                                 </div>
+                                            </div>
+
+                                            <hr className="my-2 text-muted" />
+
+                                            <div className="d-flex flex-row gap-1 align-items-center  justify-content-between">
+                                                <div className="text-muted fw-bold" style={{ fontSize: '14px' }}>SỐ BỆNH NHÂN HIỆN CÓ</div>
+                                                <h2 className="mb-0 fw-bold text-dark">{scheduleDetails?.currentPatients || 0} / {scheduleDetails?.maxPatients || 0}</h2>
                                             </div>
                                         </div>
                                     </Card.Body>

@@ -73,7 +73,7 @@ function App() {
             <Route element={<ProtectedRoute allowedRoles={["ROLE_PATIENT"]} />}>
               <Route path="/patient/dashboard" element={<PatientDashboard />} />
               <Route path="/patient/notifications" element={<AllNotifications />} />
-              <Route path="/patient/prescriptions" element={<Prescriptions />} />
+              <Route path="/patient/prescriptions/:prescriptionId?" element={<Prescriptions />} />
               <Route path="/patient/profiles" element={<PatientProfile />} />
               <Route path="/patient/account" element={<PatientAccount />} />
               <Route path="/patient/register-record" element={<RegisterRecord />} />
@@ -82,6 +82,7 @@ function App() {
               <Route path="/patient/test-results" element={<TestResultDetail />} />
               <Route path="/patient/payments" element={<PaymentDetail />} />
               <Route path="/patient/payment-result" element={<PaymentResult />} />
+              <Route path="/patient/chat" element={<MessageBox />} />
             </Route>
 
             <Route element={<ProtectedRoute allowedRoles={["ROLE_DOCTOR"]} />}>

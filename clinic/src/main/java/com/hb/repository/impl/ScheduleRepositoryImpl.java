@@ -176,6 +176,20 @@ public class ScheduleRepositoryImpl extends BaseRepositoryImpl<Schedule> impleme
     }
 
     @Override
+    public Schedule getScheduleByDoctor(Map<String, String> params) {
+        Session session = this.factory.getObject().getCurrentSession();
+        Query<Schedule> q = session.createQuery("SELECT s FROM Schedule s WHERE s.id = :scheduleId "
+                + "AND s.doctorId.id =: doctorId", Schedule.class);
+
+        if (params != null && params.containsKey("scheduleId") && params.containsKey("doctorId")) {
+            q.setParameter("scheduleId", params.get("scheduleId"));
+            q.setParameter("doctorId", params.get("doctorId"));
+        }
+
+        return q.getSingleResult();
+    }
+
+    @Override
     public long count(Map<String, String> params, Class<Schedule> clazz) {
         Session session = this.factory.getObject().getCurrentSession();
         CriteriaBuilder cb = session.getCriteriaBuilder();
@@ -238,6 +252,19 @@ public class ScheduleRepositoryImpl extends BaseRepositoryImpl<Schedule> impleme
 
         String hql = "UPDATE Schedule s SET s.currentPatients = s.currentPatients + 1 "
                 + "WHERE s.id = :id AND s.currentPatients < s.maxPatients";
+        MutationQuery query = session.createMutationQuery(hql);
+        query.setParameter("id", scheduleId);
+
+        return query.executeUpdate();
+    }
+
+    @Override
+    public int decrementCurrentPatients(Long scheduleId) {
+        Session session = this.factory.getObject().getCurrentSession();
+
+        String hql = "UPDATE Schedule s SET s.currentPatients = s.currentPatients - 1 "
+                + "WHERE s.id = :id AND s.currentPatients > 0";
+
         MutationQuery query = session.createMutationQuery(hql);
         query.setParameter("id", scheduleId);
 

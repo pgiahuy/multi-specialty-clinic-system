@@ -5,9 +5,10 @@
 package com.hb.service.impl;
 
 import com.hb.dto.request.MedicalRecordCreateRequest;
+import com.hb.enums.PrescriptionStatus;
+import com.hb.exception.DuplicateResourceException;
 import com.hb.exception.ResourceNotFoundException;
 import com.hb.pojo.Appointment;
-import com.hb.pojo.Doctor;
 import com.hb.pojo.MedicalRecord;
 import com.hb.pojo.Patient;
 import com.hb.pojo.User;
@@ -35,10 +36,10 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 
     @Autowired
     private UserRepository userRepo;
-    
+
     @Autowired
     private DoctorRepository doctorRepo;
-    
+
     @Autowired
     private PatientRepository patientRepo;
 
@@ -51,6 +52,9 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 
         if (req.getId() != null) {
             m = medicalRecordRepo.getMedicalRecordById(req.getId());
+            if (m.getPrescription() != null && m.getPrescription().getStatus() == PrescriptionStatus.PUBLIC) {
+                throw new DuplicateResourceException("Hồ sơ bệnh án này đã khám xong, không thể chỉnh sửa!");
+            }
 
         } else {
             m = new MedicalRecord();
@@ -100,7 +104,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
     }
 
     @Override
-    public boolean checkAccessControll(User user,Long medicalRecordId) {
+    public boolean checkAccessControll(User user, Long medicalRecordId) {
         return this.medicalRecordRepo.checkAccessControll(user, medicalRecordId);
     }
 
