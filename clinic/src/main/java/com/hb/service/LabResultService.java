@@ -22,7 +22,7 @@ public interface LabResultService {
     List<LabResultResponse> getLabResults(Map<String, String> params);
     LabResult getLabResultById(Long id);
     LabResultResponse getLabResultsesByAppointmentId(Long appointmentId);
-    void labTestOrder(LabResultCreateRequest request);
+    LabResultResponse labTestOrder(LabResultCreateRequest request);
     void updateStatusLabResult(Long labResultId, LabResultStatus status);
 
 }

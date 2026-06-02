@@ -78,9 +78,8 @@ public class ApiLabResultController {
         if (!isOwner) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Không có quyền chỉ định xét nghiệm!");
         }
-        labResultService.labTestOrder(req);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
 
+        return ResponseEntity.status(HttpStatus.CREATED).body(labResultService.labTestOrder(req));
     }
 
     @GetMapping("/lab-results")

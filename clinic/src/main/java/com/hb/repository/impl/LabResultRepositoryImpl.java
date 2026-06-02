@@ -4,6 +4,7 @@
  */
 package com.hb.repository.impl;
 
+import com.hb.enums.LabResultStatus;
 import com.hb.pojo.LabResult;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -16,6 +17,8 @@ import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import com.hb.repository.LabResultRepository;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 /**
  *
@@ -59,35 +62,60 @@ public class LabResultRepositoryImpl implements LabResultRepository {
             hql.append(" AND p.id = :patientId");
         }
 
+        if (params != null && params.containsKey("kw") && !params.get("kw").isEmpty()) {
+            hql.append(" AND LOWER(p.fullName) LIKE :kw");
+        }
+
         String appointmentIdStr = params.get("appointmentId");
         if (appointmentIdStr != null && !appointmentIdStr.isEmpty()) {
             hql.append(" AND l.appointmentId.id = :appointmentId");
         }
 
-        String startDateStr = params.get("startDate");
-        String endDateStr = params.get("endDate");
-        if (startDateStr != null && !startDateStr.isEmpty() && endDateStr != null && !endDateStr.isEmpty()) {
-            hql.append(" AND l.createdAt BETWEEN :startDate AND :endDate");
+        String dateStr = params != null ? params.get("date") : null;
+        if (dateStr != null && !dateStr.isEmpty()) {
+            hql.append(" AND l.createdAt >= :startOfDay AND l.createdAt <= :endOfDay");
         }
+
+        String statusStr = params != null ? params.get("status") : null;
+        if (statusStr != null && !statusStr.isEmpty() && !statusStr.equals("all")) {
+            hql.append(" AND l.status = :status");
+        }
+
+        hql.append(" ORDER BY l.createdAt DESC");
 
         Query<LabResult> query = session.createQuery(hql.toString(), LabResult.class);
 
         if (params.containsKey("patientId") && !params.get("patientId").isEmpty()) {
             query.setParameter("patientId", Long.parseLong(params.get("patientId")));
-
-            if (appointmentIdStr != null && !appointmentIdStr.isEmpty()) {
-                query.setParameter("appointmentId", Long.parseLong(appointmentIdStr));
-            }
-
-            if (startDateStr != null && !startDateStr.isEmpty() && endDateStr != null && !endDateStr.isEmpty()) {
-
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                query.setParameter("startDate", LocalDateTime.parse(startDateStr, formatter));
-                query.setParameter("endDate", LocalDateTime.parse(endDateStr, formatter));
-            }
-
         }
-         return query.getResultList();
+
+        if (params != null && params.containsKey("kw") && !params.get("kw").isEmpty()) {
+           query.setParameter("kw", "%" + params.get("kw").toLowerCase() + "%");
+        }
+
+        if (appointmentIdStr != null && !appointmentIdStr.isEmpty()) {
+            query.setParameter("appointmentId", Long.parseLong(appointmentIdStr));
+        }
+
+        if (dateStr != null && !dateStr.isEmpty()) {
+
+            LocalDate localDate = LocalDate.parse(dateStr);
+            
+            LocalDateTime startOfDay = localDate.atStartOfDay();
+            
+            LocalDateTime endOfDay = localDate.atTime(LocalTime.MAX); 
+
+            query.setParameter("startOfDay", startOfDay);
+            query.setParameter("endOfDay", endOfDay);
+        }
+
+        if (statusStr != null && !statusStr.isEmpty() && !statusStr.equals("all")) {
+            
+            String upperStatus = statusStr.toUpperCase();
+            query.setParameter("status", LabResultStatus.valueOf(upperStatus));
+        }
+
+        return query.getResultList();
     }
 
     @Override

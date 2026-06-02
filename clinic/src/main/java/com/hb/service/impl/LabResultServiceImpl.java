@@ -11,6 +11,7 @@ import com.hb.enums.LabResultStatus;
 import com.hb.exception.ResourceNotFoundException;
 import com.hb.mapper.LabResultMapper;
 import com.hb.pojo.Appointment;
+import com.hb.pojo.Doctor;
 import com.hb.pojo.LabResult;
 import com.hb.pojo.Payment;
 import com.hb.service.AppointmentService;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.hb.service.LabResultService;
 import com.hb.repository.LabResultRepository;
+import com.hb.service.DoctorService;
 
 /**
  *
@@ -56,6 +58,9 @@ public class LabResultServiceImpl implements LabResultService {
     @Autowired
     private LabResultDetailService resultDetailService;
     
+    @Autowired
+    private DoctorService doctorService;
+    
     @Override    
     public LabResult addOrUpdateLabResult(LabResultCreateRequest request) {
         LabResult labResult;
@@ -64,6 +69,8 @@ public class LabResultServiceImpl implements LabResultService {
             labResult = labResultRepo.getLabResultById(request.getId());
             labResult.setTestAt(request.getTestAt());
             labResult.setStatus(LabResultStatus.COMPLETED);
+            Doctor d = doctorService.getDoctorById(request.getDrId());
+            labResult.setDrId(d);
             resultDetailService.updateDetails(labResult.getId(), request.getDetails());
             labResultRepo.addOrUpdateTestResult(labResult);
             return labResult;
@@ -97,7 +104,7 @@ public class LabResultServiceImpl implements LabResultService {
     
    
     @Override
-    public void labTestOrder(LabResultCreateRequest request) {
+    public LabResultResponse labTestOrder(LabResultCreateRequest request) {
         LabResult labResult = this.addOrUpdateLabResult(request);
         List<LabResultDetailRequest> details = request.getDetails();
 
@@ -113,7 +120,7 @@ public class LabResultServiceImpl implements LabResultService {
         }
         
         payService.updatePaymentTotalAmount(payment);
-        
+        return resultMapper.toResponse(labResult);
     }
 
     @Override
