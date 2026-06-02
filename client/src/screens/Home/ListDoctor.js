@@ -13,13 +13,14 @@ const ListDoctor = () => {
     const nav = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedSpecialty, setSelectedSpecialty] = useState('');
+    const [specialties, setSpecialties] = useState([]);
 
     const loadDoctors = async (name = '', specialty = '') => {
         try {
             setLoading(true);
             const params = {};
             if (name && name.trim()) params.doctorName = name.trim();
-            if (specialty) params.specialty = specialty;
+            if (specialty) params.specialtyId = specialty;
             const res = await authApis().get(CLINIC_ENDPOINTS.DOCTORS, { params });
             setDoctors(res.data || []);
         } catch (err) {
@@ -35,6 +36,17 @@ const ListDoctor = () => {
 
     useEffect(() => {
         loadDoctors();
+
+        const loadSpecialties = async () => {
+            try {
+                const res = await authApis().get(CLINIC_ENDPOINTS.SPECIALTIES);
+                setSpecialties(res.data || []);
+            } catch (err) {
+                console.error('Failed to load specialties', err);
+            }
+        };
+
+        loadSpecialties();
     }, []);
 
     const didMountRef = useRef(true);
@@ -58,7 +70,7 @@ const ListDoctor = () => {
 
     return (
         <>
-            <div className="d-flex flex-column min-vh-100">
+            <div className="d-flex flex-column min-vh-100 bg-light">
                 <Header />
                 <Container className="py-4 " style={{ minHeight: '650px' }}>
                     <div>
@@ -77,11 +89,13 @@ const ListDoctor = () => {
                                 <Col md={4}>
                                     <Form.Select className="mb-4" value={selectedSpecialty} onChange={(e) => setSelectedSpecialty(e.target.value)}>
                                         <option value="">---Chuyên khoa---</option>
-                                        <option value="cardiology">Tim mạch</option>
-                                        <option value="dermatology">Da liễu</option>
-                                        <option value="neurology">Thần kinh</option>
-                                        <option value="pediatrics">Nhi khoa</option>
-                                        <option value="psychiatry">Tâm thần</option>
+                                        {Array.isArray(specialties) && specialties.length > 0 ? (
+                                            specialties.map(s => (
+                                                <option key={s.id} value={s.id}>{s.name}</option>
+                                            ))
+                                        ) : (
+                                            <></>
+                                        )}
                                     </Form.Select>
                                 </Col>
                             </Row>
@@ -112,7 +126,12 @@ const ListDoctor = () => {
                                                 </div>
                                                 <div>
                                                     <div className="fw-bold">{doc.fullName || doc.name}</div>
-                                                    <div className="text-muted small">{doc.specialtyName || doc.specialty || 'Chuyên khoa'}</div>
+                                                    <div className="text-muted small">
+                                                        {Array.isArray(doc.specialtiesOfDoctor) && doc.specialtiesOfDoctor.length > 0
+                                                            ? doc.specialtiesOfDoctor.map(s => s.name).join(', ')
+                                                            : (doc.specialtyName || doc.specialty || 'Chuyên khoa')
+                                                        }
+                                                    </div>
                                                 </div>
                                             </div>
 

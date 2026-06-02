@@ -127,9 +127,9 @@ const PaymentResult = () => {
 
                             <button
                                 className="btn btn-primary w-100 rounded-pill py-2 fw-bold"
-                                onClick={() => navigate('/patient/dashboard')}
+                                onClick={() => navigate('/patient/payments')}
                             >
-                                Quay về dashboard
+                                Quay về
                             </button>
                         </div>
                     )}
