@@ -236,14 +236,14 @@ const TestResults = () => {
                                                 <div className="h-100 d-flex flex-column bg-white">
                                                     <Card.Header className="bg-white border-0 p-4">
                                                         <div className="d-flex justify-content-between align-items-center">
-                                                            
+
                                                             <div className="text-start">
                                                                 <h6 className="fw-bold text-primary text-uppercase mb-0">
-                                                                   phiếu xét nghiệm #{labResult.id}
+                                                                    phiếu xét nghiệm
                                                                 </h6>
                                                             </div>
 
-                                                            
+
                                                             <div>
                                                                 {renderStatusBadge(labResult.status)}
                                                             </div>
@@ -251,25 +251,30 @@ const TestResults = () => {
                                                     </Card.Header>
                                                     <Card.Body className="d-flex flex-column px-4">
                                                         <div className="text-start">
-                                                                <h6 className="fw-bold text-dark text-uppercase mb-0">
-                                                                    {labResult.patientName || 'Không xác định'}
-                                                                </h6>
-                                                            </div>
-                                                        <div className="row p-3 rounded-3 mb-4 mx-0 bg-light border">
-                                                            <div className="col-12 mb-2 pb-2 border-bottom border-secondary border-opacity-25 text-center">
-                                                                <small className="text-muted">Ngày chỉ định</small>
-                                                                <div className="fw-semibold text-dark">{labResult.createdAt || '-'}</div>
-                                                            </div>
-                                                            <div className="col-6 text-center px-1">
-                                                                <small className="text-muted">Bác sĩ chỉ định</small>
-                                                                <div className="fw-semibold text-dark">{labResult.doctorName || 'N/A'}</div>
-                                                            </div>
-                                                            <div className="col-6 border-opacity-25 text-center px-1">
-                                                                <small className="text-muted">Ngày xét nghiệm</small>
-                                                                <div className="fw-semibold text-dark">{labResult.testAt || '-'}</div>
-                                                            </div>
+                                                            <h5 className="fw-bold text-dark text-uppercase text-center mb-3">
+                                                                {labResult.patientName || 'Không xác định'}
+                                                            </h5>
                                                         </div>
-
+                                                        <Row className="mb-3 g-2 p-3 rounded-3">
+                                                            
+                                                            <Col md={6}>
+                                                                    <small className="text-muted">Bác sĩ chỉ định</small>
+                                                                    <div className="fw-semibold text-dark">{labResult.doctorName || 'N/A'}</div>
+                                                            </Col>
+                                                            <Col md={6} className="px-1">
+                                                                    <small className="text-muted">Ngày chỉ định</small>
+                                                                    <div className="fw-semibold text-dark">{labResult.createdAt || '-'}</div>                                                               
+                                                            </Col>
+                                                            
+                                                            <Col md={6}>
+                                                                 <small className="text-muted">Người thực hiện</small>
+                                                                <div className="fw-semibold text-dark">{labResult.doctorTestName || '-'}</div>
+                                                            </Col>
+                                                            <Col md={6}>
+                                                                 <small className="text-muted">Ngày xét nghiệm</small>
+                                                                <div className="fw-semibold text-dark">{labResult.testAt || '-'}</div>
+                                                            </Col>
+                                                        </Row>
                                                         <div className="mt-auto">
                                                             <Button
                                                                 variant="outline-primary"

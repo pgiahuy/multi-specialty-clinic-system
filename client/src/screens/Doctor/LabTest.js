@@ -1,5 +1,5 @@
-import { useContext, useEffect, useRef, useState } from "react";
-import { Card, Col, Container, Row, Table, Spinner, Form, Button } from "react-bootstrap";
+import { Fragment, useContext, useEffect, useRef, useState } from "react";
+import { Card, Col, Container, Row, Table, Spinner, Form, Button, Pagination } from "react-bootstrap";
 import { authApis, TEST_ENDPOINTS } from "../../configs/Apis";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
@@ -15,7 +15,11 @@ const LabTest = () => {
     const [saving, setSaving] = useState(false);
     const [saveError, setSaveError] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalResults, setTotalResults] = useState(0);
     const [statusFilter, setStatusFilter] = useState('all');
+    const pageSize = 10;
+    const totalPages = Math.max(1, Math.ceil(totalResults / pageSize));
     const [alertData, setAlertData] = useState({
         show: false,
         heading: 'Thông báo',
@@ -44,12 +48,13 @@ const LabTest = () => {
             newParams.delete(key);
         }
         setSearchParams(newParams);
+        setCurrentPage(1);
     };
 
 
     const STATUS_LAB = {
         'PENDING': { text: 'Chưa thanh toán', textClass: 'text-danger' },
-        'CONFIRMED': { text: 'Đã thanh toán', textClass: 'text-primary' },
+        'CONFIRMED': { text: 'Đã xác nhận', textClass: 'text-primary' },
         'COMPLETED': { text: 'Đã xét nghiệm', textClass: 'text-success' },
     };
 
@@ -65,7 +70,7 @@ const LabTest = () => {
     };
 
 
-    const loadLabResults = async () => {
+    const loadLabResults = async (page = 1) => {
         try {
             setLoading(true);
 
@@ -73,6 +78,8 @@ const LabTest = () => {
             if (filterKw) params.kw = filterKw;
             if (filterDate) params.date = filterDate;
             if (filterStatus) params.status = filterStatus;
+            params.pageSize = pageSize;
+            params.page = page;
 
             const res = await authApis().get(TEST_ENDPOINTS.LAB_RESULTS, { params });
 
@@ -82,6 +89,18 @@ const LabTest = () => {
                 resultDetails: item.resultDetails || item.details || [],
             })) : [];
             setLabResults(results);
+            
+            let total = 0;
+            if (Array.isArray(res.data)) {
+                total = parseInt(res.headers?.['x-total-count'] || res.headers?.['X-Total-Count'] || '0', 10) || 0;
+            } else if (res.data && typeof res.data === 'object') {
+                if (Array.isArray(res.data.items)) {
+                    total = res.data.totalItems || res.data.total || res.data.count || 0;
+                } else {
+                    total = 1;
+                }
+            }
+            setTotalResults(total);
         } catch (err) {
             console.error("Failed to load lab results", err);
         } finally {
@@ -228,10 +247,10 @@ const LabTest = () => {
 
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
-            loadLabResults();
+            loadLabResults(currentPage);
         }, 500);
         return () => clearTimeout(delayDebounceFn);
-    }, [filterKw, filterDate, filterStatus]);
+    }, [filterKw, filterDate, filterStatus, currentPage]);
 
     useEffect(() => {
         return () => {
@@ -323,7 +342,7 @@ const LabTest = () => {
                                                         value={filterStatus}
                                                         onChange={(e) => updateFilter("status", e.target.value)}
                                                     >
-                                                        <option value="">Tất cả trạng thái</option>
+                                                        <option value="">-------Tất cả------</option>
 
                                                         {Object.entries(STATUS_LAB).map(([key, value]) => (
                                                             <option key={key} value={key}>
@@ -408,11 +427,50 @@ const LabTest = () => {
                                                 </Table>
                                             </div>
                                         )}
+
+                                        <div className="d-flex justify-content-center gap-2 mt-3">
+                                            <Pagination>
+                                                <Pagination.First
+                                                    onClick={() => setCurrentPage(1)}
+                                                    disabled={currentPage === 1 || loading}
+                                                />
+                                                <Pagination.Prev
+                                                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                                                    disabled={currentPage === 1 || loading}
+                                                />
+
+                                                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                                                    .filter(page => page === 1 || page === totalPages || (page >= currentPage - 1 && page <= currentPage + 1))
+                                                    .map((page, index, arr) => (
+                                                        <Fragment key={page}>
+                                                            {index > 0 && arr[index - 1] !== page - 1 && (
+                                                                <Pagination.Ellipsis key={`ellipsis-${page}`} disabled />
+                                                            )}
+                                                            <Pagination.Item
+                                                                key={`page-${page}`}
+                                                                active={currentPage === page}
+                                                                onClick={() => setCurrentPage(page)}
+                                                                disabled={loading}
+                                                            >
+                                                                {page}
+                                                            </Pagination.Item>
+                                                        </Fragment>
+                                                    ))}
+
+                                                <Pagination.Next
+                                                    onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                                                    disabled={currentPage >= totalPages || loading}
+                                                />
+                                                <Pagination.Last
+                                                    onClick={() => setCurrentPage(totalPages)}
+                                                    disabled={currentPage >= totalPages || loading}
+                                                />
+                                            </Pagination>
+                                        </div>
                                     </Card.Body>
                                 </Card>
                             </Col>
                         )}
-
                         {!showLabList && selectedLabResult && (
                             <Col>
                                 <Card className="border-0 shadow-sm rounded-4 h-100">
@@ -448,14 +506,13 @@ const LabTest = () => {
                                                 </Col>
                                             </Row>
                                         </div>
-
                                         {hasDetails ? (
                                             <div className="table-responsive border rounded-3 overflow-hidden">
                                                 <Table hover className="align-middle mb-0">
                                                     <thead className="table-light text-muted small">
                                                         <tr>
                                                             <th className="fw-semibold py-3 px-3">Xét nghiệm</th>
-                                                            <th className="fw-semibold py-3">Giá trị</th>
+                                                            <th className="fw-semibold py-3">Kết quả</th>
                                                             <th className="fw-semibold py-3">Tham chiếu</th>
                                                             <th className="fw-semibold py-3">Đơn vị</th>
                                                             <th className="fw-semibold py-3 px-3">Kết luận</th>
@@ -470,7 +527,7 @@ const LabTest = () => {
                                                                         type="text"
                                                                         value={detail.value ?? ''}
                                                                         onChange={(e) => updateDetail(detail.id, 'value', e.target.value)}
-                                                                        placeholder="Nhập giá trị..."
+                                                                        placeholder="Nhập kết quả..."
                                                                         disabled={selectedLabResult?.status === 'COMPLETED' && !isEditing}
                                                                     />
                                                                 </td>
@@ -499,12 +556,8 @@ const LabTest = () => {
                                                 Chưa có chỉ số xét nghiệm để nhập.
                                             </div>
                                         )}
-
                                         <div className="d-flex justify-content-end mt-4 gap-2">
-                                            {selectedLabResult?.status !== 'COMPLETED' && (
-                                                
-                                           
-                                               
+                                            {selectedLabResult?.status !== 'COMPLETED' && (                                    
                                                 <>
                                                     <Button
                                                         variant="outline-secondary"
@@ -540,10 +593,10 @@ const LabTest = () => {
                 onConfirm={() => executeSave(pendingStatus)}
             >
                 <div className="text-center p-2">
-                    <i className="bi bi-exclamation-triangle text-warning display-5 d-block mb-3"></i>
+                    
                     <p className="mb-1 fw-bold text-dark fs-5">Bạn có chắc chắn lưu kết quả xét nghiệm này?</p>
                     <p className="text-danger small mb-0">
-                        <i className="bi bi-info-circle me-1"></i> 
+                        
                         Sau khi bấm xác nhận, <strong>không cho phép chỉnh sửa</strong> kết quả này nữa.
                     </p>
                 </div>

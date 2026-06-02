@@ -5,6 +5,7 @@
 package com.hb.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.hb.enums.PaymentMethod;
 import com.hb.enums.PaymentStatus;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -25,6 +26,7 @@ public class PaymentResponse {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime paidAt;
     private Long appointmentId;
+    private PaymentMethod method;
     private List<PaymentItemResponse> paymentItems;
     
 
@@ -32,7 +34,7 @@ public class PaymentResponse {
         
     }
 
-    public PaymentResponse(Long id, String patientName, BigDecimal totalAmount, LocalDateTime createdAt, PaymentStatus status, LocalDateTime paidAt, Long appointmentId, List<PaymentItemResponse> paymentItems) {
+    public PaymentResponse(Long id, String patientName, BigDecimal totalAmount, LocalDateTime createdAt, PaymentStatus status, LocalDateTime paidAt, Long appointmentId, PaymentMethod method, List<PaymentItemResponse> paymentItems) {
         this.id = id;
         this.patientName = patientName;
         this.totalAmount = totalAmount;
@@ -40,8 +42,11 @@ public class PaymentResponse {
         this.status = status;
         this.paidAt = paidAt;
         this.appointmentId = appointmentId;
+        this.method = method;
         this.paymentItems = paymentItems;
     }
+
+    
 
 
     
@@ -161,6 +166,20 @@ public class PaymentResponse {
      */
     public void setPaymentItems(List<PaymentItemResponse> paymentItems) {
         this.paymentItems = paymentItems;
+    }
+
+    /**
+     * @return the method
+     */
+    public PaymentMethod getMethod() {
+        return method;
+    }
+
+    /**
+     * @param method the method to set
+     */
+    public void setMethod(PaymentMethod method) {
+        this.method = method;
     }
 
 
