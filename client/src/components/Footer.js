@@ -1,6 +1,6 @@
 import React from "react";
 import { Container, Row, Col } from "react-bootstrap";
-import { Link } from "react-router-dom"; 
+import { Link } from "react-router-dom";
 
 const Footer = () => {
     return (
@@ -14,8 +14,8 @@ const Footer = () => {
         >
             <Container>
                 <Row className="gy-4">
-                    
-                    
+
+
                     <Col lg={5} md={12} className="mb-4 mb-md-0">
                         <h4 className="fw-bold text-primary mb-3">
                             <i className="bi bi-hospital me-2"></i> OU-Clinic
@@ -25,12 +25,12 @@ const Footer = () => {
                         </p>
                     </Col>
 
-                    
+
                     <Col lg={3} md={6} className="mb-4 mb-md-0">
                         <h6 className="fw-bold text-uppercase mb-3">Dịch vụ</h6>
                         <ul className="list-unstyled mb-0">
                             <li className="mb-2">
-                               
+
                                 <Link to="/" className="text-muted text-decoration-none">Trang chủ</Link>
                             </li>
                             <li className="mb-2">
@@ -45,25 +45,28 @@ const Footer = () => {
                         </ul>
                     </Col>
 
-                   
+
                     <Col lg={4} md={6} className="mb-4 mb-md-0">
                         <h6 className="fw-bold text-uppercase mb-3">Hỗ trợ khách hàng</h6>
                         <ul className="list-unstyled text-muted">
                             <li className="mb-2">
-                                <strong>Hotline:</strong> 1900 xxxx
+                                <strong>Hotline:</strong> 1900 1234
                             </li>
                             <li className="mb-2">
                                 <strong>Email:</strong> support@ouclinic.com
                             </li>
                             <li className="mb-2">
-                                <strong>Giờ làm việc:</strong> 07:00 - 17:00 (Thứ 2 - Thứ 7)
+                                <strong>Địa chỉ:</strong> 123 Đường Sức Khỏe, Quận 1, TP.HCM
+                            </li>
+                            <li>
+                                <Link to="/contact" className="text-muted text-decoration-none">Trang liên hệ</Link>
                             </li>
                         </ul>
                     </Col>
                 </Row>
             </Container>
 
-            
+
             <Container className="mt-4">
                 <div className="pt-3 border-top border-secondary-subtle text-center text-muted">
                     <small>© 2026 OU-Clinic. All rights reserved.</small>

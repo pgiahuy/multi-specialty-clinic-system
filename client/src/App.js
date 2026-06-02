@@ -24,6 +24,7 @@ import PaymentDetail from "./screens/Patient/PaymentDetail";
 import PaymentResult from "./screens/Patient/PaymentResult";
 import HistoryBooking from "./screens/Patient/BookingHistory";
 import ListDoctor from "./screens/Home/ListDoctor";
+import Contact from "./screens/Home/Contact";
 import AppointmentList from "./screens/Doctor/AppointmentList";
 import DoctorProfile from "./screens/Doctor/DoctorProfile";
 import RegisterSchedule from "./screens/Doctor/RegisterSchedule";
@@ -62,6 +63,15 @@ function App() {
                   <Home />
                 </Container>
 
+                <Footer />
+              </>
+            } />
+            <Route path="/contact" element={
+              <>
+                <Header />
+                <Container>
+                  <Contact />
+                </Container>
                 <Footer />
               </>
             } />

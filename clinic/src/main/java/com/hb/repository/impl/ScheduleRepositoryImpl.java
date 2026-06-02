@@ -70,6 +70,8 @@ public class ScheduleRepositoryImpl extends BaseRepositoryImpl<Schedule> impleme
             boolean hasFromDate = params.containsKey("fromDate") && !params.get("fromDate").isEmpty();
             boolean hasToDate = params.containsKey("toDate") && !params.get("toDate").isEmpty();
 
+            boolean hasAnyDateParam = hasFromDate || hasToDate || (params.containsKey("date") && !params.get("date").isEmpty());
+
             if (hasFromDate && hasToDate) {
                 LocalDate from = LocalDate.parse(params.get("fromDate"));
                 LocalDate to = LocalDate.parse(params.get("toDate"));
@@ -85,6 +87,11 @@ public class ScheduleRepositoryImpl extends BaseRepositoryImpl<Schedule> impleme
             if (params.containsKey("date") && !params.get("date").isEmpty()) {
                 LocalDate singleDate = LocalDate.parse(params.get("date"));
                 predicates.add(cb.equal(root.get("date"), singleDate));
+            }
+
+            if (params.containsKey("role") && "patient".equalsIgnoreCase(params.get("role")) && !hasAnyDateParam) {
+                LocalDate today = LocalDate.now();
+                predicates.add(cb.greaterThan(root.get("date"), today));
             }
         }
 
@@ -219,6 +226,7 @@ public class ScheduleRepositoryImpl extends BaseRepositoryImpl<Schedule> impleme
 
             boolean hasFromDate = params.containsKey("fromDate") && !params.get("fromDate").isEmpty();
             boolean hasToDate = params.containsKey("toDate") && !params.get("toDate").isEmpty();
+            boolean hasAnyDateParam = hasFromDate || hasToDate || (params.containsKey("date") && !params.get("date").isEmpty());
 
             if (hasFromDate && hasToDate) {
                 LocalDate from = LocalDate.parse(params.get("fromDate"));
@@ -236,6 +244,11 @@ public class ScheduleRepositoryImpl extends BaseRepositoryImpl<Schedule> impleme
                 LocalDate singleDate = LocalDate.parse(params.get("date"));
                 predicates.add(cb.equal(root.get("date"), singleDate));
             }
+
+                if (params.containsKey("role") && "patient".equalsIgnoreCase(params.get("role")) && !hasAnyDateParam) {
+                    LocalDate today = LocalDate.now();
+                    predicates.add(cb.greaterThan(root.get("date"), today));
+                }
         }
 
         cq.where(predicates.toArray(new Predicate[0]));

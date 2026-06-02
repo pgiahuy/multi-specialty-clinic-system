@@ -7,7 +7,7 @@ import cookies from 'react-cookies';
 import API, { AUTH_ENDPOINTS, authApis, USER_ENDPOINTS } from '../../configs/Apis';
 import { MyUserContext } from '../../configs/Contexts';
 
-const FacebookLoginButton = () => {
+const FacebookLoginButton = ({ loading }) => {
     const nav = useNavigate();
     const [, dispatch] = useContext(MyUserContext);
     const [error, setError] = useState('');
@@ -71,7 +71,7 @@ const FacebookLoginButton = () => {
                         }
                     }, { scope: 'email,public_profile' });
                 }}
-                disabled={!isSecureOrigin}
+                disabled={loading || !isSecureOrigin}
                 aria-label="Đăng nhập bằng Facebook"
             >
                 <svg viewBox="0 0 24 24" fill="white">
