@@ -36,35 +36,48 @@ import com.hb.service.DoctorService;
 @Service
 @Transactional
 public class LabResultServiceImpl implements LabResultService {
-    
+
     @Autowired
     private LabResultRepository labResultRepo;
-    
+
     @Autowired
     private AppointmentService appointSer;
-    
+
     @Autowired
-    private LabTestService testService;
-    
-    @Autowired
-    private LabResultMapper resultMapper;
-    
+    private LabResultMapper labResultMapper;
+
     @Autowired
     private PaymentService payService;
-    
+
     @Autowired
     private PaymentItemsService itemService;
-    
+
     @Autowired
     private LabResultDetailService resultDetailService;
-    
+
     @Autowired
     private DoctorService doctorService;
-    
-    @Override    
+
+    @Override
+    public List<LabResultResponse> getLabResults(Map<String, String> params) {
+        List<LabResult> res = labResultRepo.getLabResults(params);
+        return res.stream().map(labResultMapper::toResponse).toList();
+    }
+
+    @Override
+    public LabResultResponse getLabResultById(Long id) {
+        return labResultMapper.toResponse(labResultRepo.getLabResultById(id));
+    }
+
+    @Override
+    public LabResultResponse getLabResultsesByAppointmentId(Long appointmentId) {
+        return labResultMapper.toResponse(this.labResultRepo.getLabResultsByAppointment(appointmentId));
+    }
+
+    @Override
     public LabResult addOrUpdateLabResult(LabResultCreateRequest request) {
         LabResult labResult;
-        
+
         if (request.getId() != null) {
             labResult = labResultRepo.getLabResultById(request.getId());
             labResult.setTestAt(request.getTestAt());
@@ -75,7 +88,7 @@ public class LabResultServiceImpl implements LabResultService {
             labResultRepo.addOrUpdateTestResult(labResult);
             return labResult;
         }
-        
+
         labResult = new LabResult();
         Appointment a = appointSer.getAppointmentById(request.getAppointmentId());
 
@@ -84,48 +97,26 @@ public class LabResultServiceImpl implements LabResultService {
             labResult.setCreatedAt(LocalDateTime.now());
             labResult.setStatus(LabResultStatus.PENDING);
         }
-        
+
         labResultRepo.addOrUpdateTestResult(labResult);
-        
+
         return labResult;
     }
-    
-    
-    @Override    
-    public List<LabResultResponse> getLabResults(Map<String, String> params) {
-        List<LabResult> res = labResultRepo.getLabResults(params);
-        return res.stream().map(resultMapper::toResponse).toList();
-    }
-    
-    @Override    
-    public LabResultResponse getLabResultsesByAppointmentId(Long appointmentId) {
-        return resultMapper.toResponse(this.labResultRepo.getLabResultsByAppointment(appointmentId));
-    }
-    
-   
+
     @Override
     public LabResultResponse labTestOrder(LabResultCreateRequest request) {
         LabResult labResult = this.addOrUpdateLabResult(request);
         List<LabResultDetailRequest> details = request.getDetails();
-
         if (labResult == null && details == null) {
             throw new ResourceNotFoundException("Failed to create lab result or no test details provided");
         }
         resultDetailService.addDetailsToLabResult(labResult.getId(), details);
-        
         Payment payment = payService.createPayment(request.getAppointmentId());
-        
         for (LabResultDetailRequest req : details) {
             itemService.addLabTestItems(payment, req.getTestId(), labResult.getId());
         }
-        
         payService.updatePaymentTotalAmount(payment);
-        return resultMapper.toResponse(labResult);
-    }
-
-    @Override
-    public LabResult getLabResultById(Long id) {
-        return labResultRepo.getLabResultById(id);
+        return labResultMapper.toResponse(labResult);
     }
 
     @Override
@@ -137,5 +128,10 @@ public class LabResultServiceImpl implements LabResultService {
         labResult.setStatus(status);
         labResultRepo.addOrUpdateTestResult(labResult);
     }
-    
+
+    @Override
+    public LabResult getLabResultEntityById(Long id) {
+        return labResultRepo.getLabResultById(id);
+    }
+
 }

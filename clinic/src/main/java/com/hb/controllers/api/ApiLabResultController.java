@@ -99,6 +99,11 @@ public class ApiLabResultController {
         return ResponseEntity.ok(this.labResultService.getLabResults(params));
     }
     
+    @GetMapping("lab-results/{id}")
+    public ResponseEntity<?> getLabResult(@PathVariable(value="id") Long id){
+        return ResponseEntity.ok(this.labResultService.getLabResultById(id));
+    }
+    
     
     @PutMapping("/lab-results/{id}")
     public ResponseEntity<?> update(@RequestBody LabResultCreateRequest req) {

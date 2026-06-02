@@ -20,7 +20,8 @@ import java.util.Map;
 public interface LabResultService {
     LabResult addOrUpdateLabResult(LabResultCreateRequest request);
     List<LabResultResponse> getLabResults(Map<String, String> params);
-    LabResult getLabResultById(Long id);
+    LabResultResponse getLabResultById(Long id);
+    LabResult getLabResultEntityById(Long id);
     LabResultResponse getLabResultsesByAppointmentId(Long appointmentId);
     LabResultResponse labTestOrder(LabResultCreateRequest request);
     void updateStatusLabResult(Long labResultId, LabResultStatus status);

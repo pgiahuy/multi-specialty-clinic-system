@@ -1,10 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Card, Col, Container, Row, Table, Spinner, Form, Button } from "react-bootstrap";
 import { authApis, TEST_ENDPOINTS } from "../../configs/Apis";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import FloatAlert from "../../components/FloatAlert";
 import { useSearchParams } from "react-router-dom";
+import { MyUserContext } from "../../configs/Contexts";
+import MyModal from "../../components/MyModal";
 
 const LabTest = () => {
     const [labResults, setLabResults] = useState([]);
@@ -29,6 +31,10 @@ const LabTest = () => {
     const filterKw = searchParams.get("kw") || "";
     const filterDate = searchParams.get("date") || "";
     const filterStatus = searchParams.get("status") || "";
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [pendingStatus, setPendingStatus] = useState(null);
+
+    const [user] = useContext(MyUserContext);
 
     const updateFilter = (key, value) => {
         const newParams = new URLSearchParams(searchParams);
@@ -138,20 +144,23 @@ const LabTest = () => {
         return `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
     };
 
-    const handleSave = async () => {
-        if (!selectedLabResult) return;
+    
+    const executeSave = async (statusToSave) => {
         setSaveError(null);
         setSuccessMessage(null);
         setSaving(true);
 
         try {
-            const { id, patientName, createdAt, testAt, status, resultDetails } = selectedLabResult;
+            const { id, patientName, createdAt, testAt, resultDetails } = selectedLabResult;
+            const currentDoctorName = user?.doctorProfile?.fullName;
+
             const payload = {
                 id,
                 patientName,
                 createdAt: parseLocalDateTime(createdAt),
                 testAt: parseLocalDateTime(testAt),
-                status,
+                drId: user?.doctorProfile?.id,
+                status: statusToSave,
                 details: (resultDetails || []).map((detail) => ({
                     id: detail.id,
                     testName: detail.testName,
@@ -160,25 +169,60 @@ const LabTest = () => {
                 })),
             };
 
-
             const res = await authApis().put(TEST_ENDPOINTS.UPDATE_LAB_RESULT(selectedLabResult.id), payload);
 
-            const updated = res.data || selectedLabResult;
+            const updated = res.data || { ...selectedLabResult, status: statusToSave };
             const normalizedUpdated = {
                 ...updated,
+                status: updated.status || statusToSave,
+                doctorTestName: updated.doctorTestName || currentDoctorName || selectedLabResult.doctorTestName,
                 resultDetails: updated.resultDetails || updated.details || [],
             };
-            
+
             setSelectedLabResult(normalizedUpdated);
             setLabResults((prev) => prev.map((item) => (item.id === normalizedUpdated.id ? normalizedUpdated : item)));
-            setSuccessMessage('Lưu kết quả xét nghiệm thành công.');
-            handleShowAlert('Thành công', 'Lưu kết quả xét nghiệm thành công.', 'success');
+            const isCompleted = statusToSave === 'COMPLETED';
+            const alertMessage = isCompleted 
+                ? 'Lưu kết quả xét nghiệm thành công.' 
+                : 'Lưu bản nháp thành công.';
+            
+            setSuccessMessage(alertMessage);
+            handleShowAlert('Thành công', alertMessage, 'success');
             setIsEditing(false);
         } catch (err) {
             setSaveError('Không thể lưu kết quả. Vui lòng thử lại.');
             handleShowAlert('Lỗi', 'Không thể lưu kết quả. Vui lòng thử lại.', 'danger');
         } finally {
             setSaving(false);
+            setShowConfirmModal(false); 
+        }
+    };
+
+    
+    const handleSave = (newStatus) => {
+        if (!selectedLabResult) return;
+
+        const { resultDetails } = selectedLabResult;
+        const statusToSave = newStatus || selectedLabResult.status;
+
+       
+        if (statusToSave === 'COMPLETED') {
+            const isIncomplete = (resultDetails || []).some(
+                (detail) => !detail.value || String(detail.value).trim() === ""
+            );
+
+            if (isIncomplete) {
+                handleShowAlert('Cảnh báo', 'Vui lòng nhập đầy đủ giá trị kết quả cho tất cả các chỉ số xét nghiệm!', 'warning');
+                return;
+            }
+        }
+
+        
+        if (statusToSave === 'COMPLETED') {
+            setPendingStatus(statusToSave); 
+            setShowConfirmModal(true);    
+        } else {
+            executeSave(statusToSave);     
         }
     };
 
@@ -452,38 +496,23 @@ const LabTest = () => {
                                             </div>
                                         ) : (
                                             <div className="text-center text-muted py-5 bg-light rounded-3">
-                                                <i className="bi bi-file-earmark-x fs-1 d-block mb-3 opacity-50"></i>
                                                 Chưa có chỉ số xét nghiệm để nhập.
                                             </div>
                                         )}
 
                                         <div className="d-flex justify-content-end mt-4 gap-2">
-                                            {selectedLabResult?.status === 'COMPLETED' ? (
-                                                /* KỊCH BẢN 1: ĐÃ HOÀN THÀNH */
-                                                !isEditing ? (
-                                                    <Button variant="warning" className="px-4" onClick={() => setIsEditing(true)}>
-                                                        <i className="bi bi-pencil-square me-2"></i> Chỉnh sửa
-                                                    </Button>
-                                                ) : (
-                                                    <>
-                                                        <Button variant="light" className="border px-4" onClick={() => setIsEditing(false)} disabled={saving}>
-                                                            Hủy
-                                                        </Button>
-                                                        <Button variant="primary" className="px-4 shadow-sm" disabled={saving} onClick={() => handleSave('COMPLETED')}>
-                                                            {saving ? 'Đang lưu...' : 'Lưu kết quả'}
-                                                        </Button>
-                                                    </>
-                                                )
-                                            ) : (
+                                            {selectedLabResult?.status !== 'COMPLETED' && (
                                                 
+                                           
+                                               
                                                 <>
                                                     <Button
-                                                        variant="outline-primary"
-                                                        className="px-4 shadow-sm bg-white"
+                                                        variant="outline-secondary"
+                                                        className="px-4 shadow-sm"
                                                         disabled={saving}
                                                         onClick={() => handleSave(selectedLabResult.status)}
                                                     >
-                                                        <i className="bi bi-save2 me-2"></i> {saving ? 'Đang lưu...' : 'Lưu nháp'}
+                                                        {saving ? 'Đang lưu...' : 'Lưu nháp'}
                                                     </Button>
 
                                                     <Button
@@ -492,7 +521,7 @@ const LabTest = () => {
                                                         disabled={saving}
                                                         onClick={() => handleSave('COMPLETED')}
                                                     >
-                                                        <i className="bi bi-check2-circle me-2"></i> {saving ? 'Đang lưu...' : 'Hoàn thành xét nghiệm'}
+                                                        {saving ? 'Đang lưu...' : 'Lưu kết quả'}
                                                     </Button>
                                                 </>
                                             )}
@@ -502,6 +531,23 @@ const LabTest = () => {
                             </Col>
                         )}
                     </Row>
+                    <MyModal
+                show={showConfirmModal}
+                onHide={() => setShowConfirmModal(false)}
+                title="Xác nhận lưu kết quả"
+                confirmText={saving ? "Đang xử lý..." : "Xác nhận"}
+                cancelText="Hủy bỏ"
+                onConfirm={() => executeSave(pendingStatus)}
+            >
+                <div className="text-center p-2">
+                    <i className="bi bi-exclamation-triangle text-warning display-5 d-block mb-3"></i>
+                    <p className="mb-1 fw-bold text-dark fs-5">Bạn có chắc chắn lưu kết quả xét nghiệm này?</p>
+                    <p className="text-danger small mb-0">
+                        <i className="bi bi-info-circle me-1"></i> 
+                        Sau khi bấm xác nhận, <strong>không cho phép chỉnh sửa</strong> kết quả này nữa.
+                    </p>
+                </div>
+            </MyModal>
                 </Container>
                 <Footer />
             </div>

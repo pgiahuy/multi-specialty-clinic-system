@@ -114,6 +114,14 @@ public class LabResultRepositoryImpl implements LabResultRepository {
             String upperStatus = statusStr.toUpperCase();
             query.setParameter("status", LabResultStatus.valueOf(upperStatus));
         }
+        
+        if (params != null && params.containsKey("pageSize")) {
+            int pageSize = Integer.parseInt(params.get("pageSize"));
+            int page = Integer.parseInt(params.getOrDefault("page", "1"));
+            int start = (page - 1) * pageSize;
+            query.setMaxResults(pageSize);
+            query.setFirstResult(start);
+        }
 
         return query.getResultList();
     }
