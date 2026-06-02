@@ -47,6 +47,8 @@ public class Appointment implements Serializable {
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private AppointmentStatus status;
+    @Column(name = "reminder_sent")
+    private Boolean reminderSent = false;
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -174,6 +176,20 @@ public class Appointment implements Serializable {
 
     public void setStatus(AppointmentStatus status) {
         this.status = status;
+    }
+
+    /**
+     * @return the reminderSent
+     */
+    public Boolean getReminderSent() {
+        return reminderSent;
+    }
+
+    /**
+     * @param reminderSent the reminderSent to set
+     */
+    public void setReminderSent(Boolean reminderSent) {
+        this.reminderSent = reminderSent;
     }
 
    

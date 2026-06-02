@@ -5,7 +5,6 @@
 package com.hb.pojo;
 
 import jakarta.persistence.Basic;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -15,7 +14,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
@@ -24,7 +22,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.Date;
 
 /**
@@ -58,8 +55,6 @@ public class Conversation implements Serializable {
     private Long id;
     @Column(name = "is_active")
     private Boolean isActive;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "conversationId")
-    private Collection<ChatMessage> chatMessageCollection;
     @JoinColumn(name = "appointment_id", referencedColumnName = "id")
     @OneToOne
     private Appointment appointmentId;
@@ -115,14 +110,6 @@ public class Conversation implements Serializable {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public Collection<ChatMessage> getChatMessageCollection() {
-        return chatMessageCollection;
-    }
-
-    public void setChatMessageCollection(Collection<ChatMessage> chatMessageCollection) {
-        this.chatMessageCollection = chatMessageCollection;
     }
 
     public Appointment getAppointmentId() {

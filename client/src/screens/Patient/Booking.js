@@ -183,8 +183,8 @@ const BookingPage = () => {
 
         if (!selectedPatient) {
             handleShowAlert(
-                "Vui lòng chọn hồ sơ bệnh nhân",
-                "Vui lòng chọn hồ sơ bệnh nhân trước khi đăng ký lịch khám.",
+                "Thiếu thông tin",
+                "Vui lòng chọn hồ sơ bệnh nhân để đăng ký lịch khám.",
                 "warning"
             );
             return;
@@ -364,8 +364,7 @@ const BookingPage = () => {
                             <Card className="p-4 shadow-sm mb-4 rounded-4">
                                 <Card.Title className="fw-bold mb-3">Thông tin đặt lịch</Card.Title>
                                 <div>
-                                    <FloatAlert show={alertData.show} heading={alertData.heading} variant={alertData.variant}>
-                                        {alertData.message}
+                                    <FloatAlert show={alertData.show} heading={alertData.heading} variant={alertData.variant} message={alertData.message} >
                                     </FloatAlert>
                                 </div>
 

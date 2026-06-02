@@ -180,13 +180,10 @@ public class AppointmentServiceImpl implements AppointmentService {
         if (appointment == null) {
             throw new ResourceNotFoundException("Lịch hẹn không tồn tại");
         }
-
         Long ownerUserId = appointment.getPatientId().getUserId().getId();
-
         if (!ownerUserId.equals(u.getId())) {
             throw new ForbiddenException("Bạn không có quyền hủy lịch hẹn của người khác.");
         }
-
         AppointmentStatus status = appointment.getStatus();
 
         if (status == AppointmentStatus.COMPLETED || status == AppointmentStatus.CANCELLED) {
@@ -211,6 +208,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
 
         appointment.setStatus(AppointmentStatus.CANCELLED);
+        this.scheduleRepo.decrementCurrentPatients(appointment.getScheduleId().getId());
         appointmentRepo.addOrUpdateAppointment(appointment);
 
     }
