@@ -18,9 +18,8 @@ import { MyUserContext } from "./configs/Contexts";
 import { useReducer } from "react";
 import MyUserReducers from "./reducers/MyUserReducers";
 import RegisterRecord from "./screens/Patient/RegisterRecord";
-import TestResultDetail from "./screens/Patient/TestResultDetail";
 import PaymentDetail from "./screens/Patient/PaymentDetail";
-
+import TestResults from "./screens/Patient/TestResults";
 import PaymentResult from "./screens/Patient/PaymentResult";
 import HistoryBooking from "./screens/Patient/BookingHistory";
 import ListDoctor from "./screens/Home/ListDoctor";
@@ -40,6 +39,7 @@ import AppointmentOfSchedule from "./screens/Doctor/AppointmentOfSchedule";
 import LabTest from "./screens/Doctor/LabTest";
 import MessageBox from "./screens/User/MessageBox";
 import ConsultationPage from "./screens/Doctor/ConsultationPage";
+import TestResultDetail from "./screens/Patient/TestResultDetail";
 
 const initUserState = () => {
   const savedUser = localStorage.getItem("user");
@@ -79,7 +79,8 @@ function App() {
               <Route path="/patient/register-record" element={<RegisterRecord />} />
               <Route path="/patient/booking" element={<BookingPage />} />
               <Route path="/patient/history-booking" element={<HistoryBooking />} />
-              <Route path="/patient/test-results" element={<TestResultDetail />} />
+              <Route path="/patient/test-results" element={<TestResults />} />
+              <Route path="/patient/test-results/:labResultId" element={<TestResultDetail />} />
               <Route path="/patient/payments" element={<PaymentDetail />} />
               <Route path="/patient/payment-result" element={<PaymentResult />} />
               <Route path="/patient/chat" element={<MessageBox />} />
