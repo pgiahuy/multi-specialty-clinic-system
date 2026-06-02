@@ -41,12 +41,6 @@ import java.util.Date;
     @NamedQuery(name = "Shift.findByMinPatients", query = "SELECT s FROM Shift s WHERE s.minPatients = :minPatients")})
 public class Shift implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "id")
-    private Long id;
     @Column(name = "start_time")
     @Temporal(TemporalType.TIME)
     private LocalTime startTime;
@@ -57,6 +51,13 @@ public class Shift implements Serializable {
     @Column(name = "session")
     @Enumerated(EnumType.STRING)
     private SessionShift session;
+
+    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id")
+    private Long id;
     @Column(name = "max_patients")
     private Integer maxPatients;
     @Column(name = "min_patients")
@@ -95,13 +96,6 @@ public class Shift implements Serializable {
         this.endTime = endTime;
     }
 
-    public SessionShift getSession() {
-        return session;
-    }
-
-    public void setSession(SessionShift session) {
-        this.session = session;
-    }
 
     public Integer getMaxPatients() {
         return maxPatients;
@@ -150,6 +144,14 @@ public class Shift implements Serializable {
     @Override
     public String toString() {
         return "com.hb.pojo.Shift[ id=" + id + " ]";
+    }
+
+    public SessionShift getSession() {
+        return session;
+    }
+
+    public void setSession(SessionShift session) {
+        this.session = session;
     }
     
 }

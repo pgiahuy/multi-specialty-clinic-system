@@ -85,7 +85,7 @@ public class DoctorServiceImpl implements DoctorService {
     public Doctor getDoctorById(Long id) {
         Doctor d = doctorRepo.getDoctorById(id);
         if (d == null) {
-            throw new RuntimeException("Doctor not found!");
+            throw new RuntimeException("Không tìm thấy bác sĩ!");
         }
         return d;
     }
@@ -107,4 +107,5 @@ public class DoctorServiceImpl implements DoctorService {
         return dr;
     }
 
+   
 }

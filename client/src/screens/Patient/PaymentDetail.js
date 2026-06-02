@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Card, Col, Container, Row, Badge, Form, Tabs, Tab, Button, Modal } from "react-bootstrap";
+import { Card, Col, Container, Row, Badge, Form, Tabs, Tab, Button, Modal, Image } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import Footer from "../../components/Footer";
 import Header from "../../components/Header";
@@ -44,33 +44,21 @@ const PaymentDetail = () => {
             const res = await authApis().get(USER_ENDPOINTS.PATIENT_PROFILES);
             const profiles = res.data || [];
             setPatientProfiles(profiles);
-
-            // if (!patientId && profiles.length > 0) {
-            //     const firstPatientId = String(profiles[0].id);
-            //     setSelectedPatientId(firstPatientId);
-            //     navigate(`/patient/payments`, { replace: true });
-            // } else if (patientId) {
-            //     setSelectedPatientId(String(patientId));
-            // }
         } catch (err) {
             console.log(err);
         }
     };
 
     const loadPayments = async (patientId, startDate, endDate) => {
-
         setLoadingPayments(true);
         try {
             const params = {};
-
             if (patientId) params.patientId = patientId;
             if (startDate) params.startDate = startDate;
             if (endDate) params.endDate = endDate;
-
             const res = await authApis().get(PAYMENT_ENDPOINTS.HISTORY, { params });
             const paymentList = res.data || [];
             setPayments(paymentList);
-            loadTestNames(paymentList);
         } catch (err) {
             console.log(err);
             setPayments([]);
@@ -78,44 +66,6 @@ const PaymentDetail = () => {
             setLoadingPayments(false);
         }
     };
-
-
-    const loadTestNames = async (paymentsList) => {
-        const idsToFetch = new Set();
-
-
-        paymentsList.forEach(p => {
-            p.paymentItems?.forEach(item => {
-                if (String(item.itemType) === 'LAB_TEST' && item.referenceId && !testNamesMap[item.referenceId]) {
-                    idsToFetch.add(item.referenceId);
-                }
-            });
-        });
-
-        if (idsToFetch.size === 0) return;
-
-        try {
-
-            const promises = Array.from(idsToFetch).map(id => authApis().get(`secure/test/${id}`));
-            const responses = await Promise.all(promises);
-
-            setTestNamesMap(prev => {
-                const newNames = { ...prev };
-
-                responses.forEach(res => {
-                    if (res.data && res.data.id) {
-                        newNames[res.data.id] = res.data.testName || res.data.name;
-                    }
-                });
-
-                return newNames;
-            });
-        } catch (err) {
-            console.error("Lỗi khi load tên xét nghiệm:", err);
-        }
-    };
-
-
 
     useEffect(() => {
         loadPatientProfiles();
@@ -171,9 +121,8 @@ const PaymentDetail = () => {
                 return 'PHÍ KHÁM BỆNH';
             case 'LAB_TEST':
                 return 'PHÍ XÉT NGHIỆM';
-
             case 'PRESCRIPTION':
-                return 'PHÍ MUA THUỐC';
+                return 'PHÍ ĐƠN THUỐC';
             default:
                 return 'HÓA ĐƠN DỊCH VỤ';
         }
@@ -183,42 +132,28 @@ const PaymentDetail = () => {
 
     const parseVietnameseDate = (dateString) => {
         if (!dateString) return null;
-
-
         const parts = dateString.split(' ');
         const datePart = parts[0];
         const timePart = parts[1] || '00:00:00';
-
-
         const [day, month, year] = datePart.split('/');
-
-
         if (!day || !month || !year) return new Date(dateString);
-
-
         return new Date(`${year}-${month}-${day}T${timePart}`);
     };
 
     const isPaymentInRange = (payment) => {
         const rawDate = payment.createdDate || payment.createdAt || '';
-
-
         const invoiceDate = parseVietnameseDate(rawDate);
-
         if (!invoiceDate || Number.isNaN(invoiceDate.getTime())) return true;
-
         if (fromDate) {
             const from = new Date(fromDate);
             from.setHours(0, 0, 0, 0);
             if (invoiceDate < from) return false;
         }
-
         if (toDate) {
             const to = new Date(toDate);
             to.setHours(23, 59, 59, 999);
             if (invoiceDate > to) return false;
         }
-
         return true;
     };
 
@@ -286,28 +221,15 @@ const PaymentDetail = () => {
         <>
             <div className="d-flex flex-column min-vh-100 bg-light">
                 <Header />
-
-
                 <Container className="py-4">
-                    <style>{`.nav-pills .nav-link{transition: transform .12s ease, box-shadow .12s ease; cursor: pointer;}
-                                .nav-pills .nav-link:hover{transform: translateY(-4px); box-shadow: 0 10px 30px rgba(13,110,253,0.12);} 
-                                .nav-pills .nav-link.active{transform: none; box-shadow: none;}`}</style>
-
                     <div className="mb-4 pb-3 border-bottom">
                         <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3">
-
-
                             <div>
                                 <h2 className="fw-bold mb-2 text-primary">Danh sách hóa đơn</h2>
                             </div>
-
-
                             <div className="d-flex flex-column flex-md-row align-items-md-end gap-3">
-
-
                                 <div>
                                     <Form.Label className="small text-muted mb-1">Bệnh nhân</Form.Label>
-
                                     <Form.Select
                                         value={selectedPatientId}
                                         className="rounded-3 shadow-sm px-3"
@@ -387,89 +309,99 @@ const PaymentDetail = () => {
                                         className="h-100 shadow-sm border-0"
                                         style={{
                                             borderRadius: '20px',
-                                            overflow: 'hidden',
-                                            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-                                            cursor: 'pointer'
-                                        }}
-                                        onMouseEnter={(e) => {
-                                            e.currentTarget.style.transform = 'translateY(-5px)';
-                                            e.currentTarget.classList.replace('shadow-sm', 'shadow');
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            e.currentTarget.style.transform = 'translateY(0)';
-                                            e.currentTarget.classList.replace('shadow', 'shadow-sm');
+                                            overflow: 'hidden'
                                         }}
                                     >
                                         <div className="h-100 d-flex flex-column bg-white">
-
-
                                             <Card.Header className="bg-white border-0 p-4 pb-0">
-                                                <div className="d-flex justify-content-between align-items-start gap-3">
-                                                    <h5 className="text-primary fw-bold mb-2" style={{ lineHeight: '1.4' }}>
-                                                        {getInvoiceTitle(p)}
-                                                    </h5>
-                                                    <div>
-                                                        <Badge
-                                                            bg="transparent"
-                                                            className={`rounded-pill px-3 py-2 border ${p.status === 'SUCCESS'
-                                                                ? 'border-success text-success bg-success-subtle'
-                                                                : 'border-warning text-warning bg-warning-subtle'
-                                                                }`}
-                                                        >
-                                                            {p.status === 'SUCCESS' ? 'ĐÃ THANH TOÁN' : 'CHỜ THANH TOÁN'}
-                                                        </Badge>
+                                                <div className="d-flex justify-content-between align-items-start gap-3 mb-2">
+                                                    <div className="flex-grow-1">
+                                                        <h5 className="text-primary fw-bold mb-1" style={{ lineHeight: '1.4' }}>
+                                                            {getInvoiceTitle(p)}
+                                                        </h5>
+                                                        <div className="mt-2 text-dark fw-medium">
+                                                            {p.patientName}
+                                                        </div>
                                                     </div>
-
-
+                                                    <Badge
+                                                        bg="transparent"
+                                                        className={`rounded-pill px-3 py-2 border text-nowrap ${p.status === 'SUCCESS'
+                                                            ? 'border-success text-success bg-success-subtle'
+                                                            : 'border-warning text-warning bg-warning-subtle'
+                                                            }`}
+                                                    >
+                                                        {p.status === 'SUCCESS' ? 'ĐÃ THANH TOÁN' : 'CHỜ THANH TOÁN'}
+                                                    </Badge>
                                                 </div>
-                                                <div>
-
-                                                    <div className="text d-flex align-items-center mb-2">
-                                                        {p.patientName}
-                                                    </div>
+                                                <div className="d-flex flex-column gap-2 fw-medium">
+                                                    <div>Ngày tạo: {p.createdAt}</div>
                                                     {p.paidAt && (
-                                                        <div className="text-success small d-flex align-items-center mt-1">
+                                                        <div className="text-success small mt-1">
+                                                           
                                                             Ngày thanh toán: {p.paidAt}
+                                                            {p.method && (
+                                                                <span className="ms-2">
+                                                                    - {p.method}
+                                                                </span>
+                                                            )}
                                                         </div>
                                                     )}
                                                 </div>
                                             </Card.Header>
-
-
-                                            <Card.Body className="d-flex flex-column px-4 py-4">
-
+                                            <Card.Body className="d-flex flex-column px-4">
                                                 <div className="mb-auto">
-                                                    {p.paymentItems && p.paymentItems.length > 0 && String(p.paymentItems[0].itemType).toUpperCase() === 'APPOINTMENT' && (
-                                                        <Button
-                                                            variant="outline-primary"
-                                                            className="rounded-pill px-3 py-2 w-100 fw-medium"
-                                                            onClick={() => navigate(`/appointment/${p.paymentItems[0].referenceId}`)}
-                                                        >
-                                                            <i className="bi bi-info-circle me-2"></i> Xem chi tiết
-                                                        </Button>
-                                                    )}
+                                                    {p.paymentItems && p.paymentItems.length > 0 && (() => {
+                                                        const itemType = String(p.paymentItems[0].itemType).toUpperCase();
+                                                        const refId = p.paymentItems[0].referenceId;
+
+                                                        let path = '';
+                                                        let label = '';
+
+
+                                                        switch (itemType) {
+                                                            case 'APPOINTMENT':
+                                                                path = `/appointments/${refId}`;
+                                                                label = 'Xem lịch hẹn';
+                                                                break;
+                                                            case 'LAB_TEST':
+                                                                path = `/patient/test-results/${refId}`;
+                                                                label = 'Xem phiếu xét nghiệm';
+                                                                break;
+                                                            case 'PRESCRIPTION':
+                                                                path = `/prescriptions/${refId}`;
+                                                                label = 'Xem đơn thuốc';
+                                                                break;
+                                                            default:
+                                                                return null;
+                                                        }
+                                                        return (
+                                                            <Button
+                                                                variant="outline-primary"
+                                                                className="rounded-pill px-3 py-2 w-100 fw-medium"
+                                                                onClick={() => navigate(path)}
+                                                            >
+                                                                {label}
+                                                            </Button>
+                                                        );
+                                                    })()}
                                                 </div>
-
-
-                                                <div className="mt-4 pt-3 border-top border-light">
+                                                <div className="mt-2 pt-3 border-top border-light">
                                                     <div className="d-flex justify-content-between align-items-baseline mb-3">
                                                         <span className="text-secondary small fw-medium">Tổng cộng:</span>
                                                         <span className="fs-5 fw-bold text-danger">
                                                             {(p.totalAmount || 0).toLocaleString('vi-VN')} đ
                                                         </span>
                                                     </div>
-
                                                     {!isPaidInvoice(p) && activeTab === 'unpaid' && (
                                                         <Button
                                                             variant="primary"
                                                             className="w-100 rounded-pill py-2 fw-bold shadow-sm"
                                                             onClick={() => handlePayClick(p)}
                                                         >
-                                                            <i className="bi bi-credit-card me-2"></i> Thanh toán ngay
+                                                            Thanh toán ngay
                                                         </Button>
                                                     )}
                                                 </div>
-
                                             </Card.Body>
                                         </div>
                                     </Card>
@@ -478,10 +410,7 @@ const PaymentDetail = () => {
                         )}
                     </Row>
                 </Container>
-
-
                 <Footer />
-
                 <Modal show={showPaymentModal} onHide={closePaymentModal} centered>
                     <Modal.Header closeButton className="border-0 pb-0">
                         <Modal.Title className="fw-bold fs-5">Xác nhận thanh toán</Modal.Title>
@@ -489,74 +418,83 @@ const PaymentDetail = () => {
                     <Modal.Body>
                         <div className="mb-4">
                             <div className="small text-muted mb-2">Chọn phương thức thanh toán</div>
-
-
-                            <div
-                                className={`d-flex align-items-center p-3 mb-2 border rounded-3 ${selectedPaymentMethod === 'CASH' ? 'border-primary bg-primary bg-opacity-10' : 'bg-white'}`}
-                                style={{ cursor: 'pointer', transition: 'all 0.2s' }}
-                                onClick={() => setSelectedPaymentMethod('CASH')}
-                            >
-                                <div className="flex-grow-1">
-                                    <div className="fw-bold text-dark">Tiền mặt tại quầy</div>
-                                    <div className="small text-muted">Thanh toán trực tiếp cho thu ngân</div>
-                                </div>
-                                <div>
-                                    <Form.Check type="radio" checked={selectedPaymentMethod === 'CASH'} readOnly />
-                                </div>
-                            </div>
-
-
-                            <div
-                                className={`d-flex align-items-center p-3 mb-2 border rounded-3 ${selectedPaymentMethod === 'MOMO' ? 'border-danger bg-danger bg-opacity-10' : 'bg-white'}`}
-                                style={{ cursor: 'pointer', transition: 'all 0.2s' }}
-                                onClick={() => setSelectedPaymentMethod('MOMO')}
-                            >
-                                <div className="flex-grow-1">
-                                    <div className="fw-bold" style={{ color: '#a50064' }}>Ví điện tử MoMo</div>
-                                    <div className="small text-muted">Thanh toán quét mã QR</div>
-                                </div>
-                                <div>
-                                    <Form.Check type="radio" checked={selectedPaymentMethod === 'MOMO'} readOnly style={{ accentColor: '#a50064' }} />
-                                </div>
-                            </div>
-
-
-                            <div
-                                className={`d-flex align-items-center p-3 border rounded-3 ${selectedPaymentMethod === 'VNPAY' ? 'border-info bg-info bg-opacity-10' : 'bg-white'}`}
-                                style={{ cursor: 'pointer', transition: 'all 0.2s' }}
-                                onClick={() => setSelectedPaymentMethod('VNPAY')}
-                            >
-                                <div className="flex-grow-1">
-
-                                    <div className="fw-bold" style={{ color: '#005baa' }}>Cổng thanh toán VNPAY</div>
-                                    <div className="small text-muted">Thẻ ATM / Thẻ tín dụng / QR Code</div>
-                                </div>
-                                <div>
-                                    <Form.Check type="radio" checked={selectedPaymentMethod === 'VNPAY'} readOnly style={{ accentColor: '#005baa' }} />
-                                </div>
-                            </div>
+                            <Row className="g-3">
+                                <Col xs={12} md={4}>
+                                    <div
+                                        className={`d-flex align-items-center p-3 h-100 border rounded-3 ${selectedPaymentMethod === 'CASH' ? 'border-success bg-success bg-opacity-10' : 'bg-white'}`}
+                                        style={{ cursor: 'pointer', transition: 'all 0.2s' }}
+                                        onClick={() => setSelectedPaymentMethod('CASH')}
+                                    >
+                                        <div className="flex-grow-1">
+                                            <div className="fw-bold text-dark">Tiền mặt</div>
+                                            
+                                        </div>
+                                        <div>
+                                            <Form.Check type="radio" checked={selectedPaymentMethod === 'CASH'} readOnly />
+                                        </div>
+                                    </div>
+                                </Col>
+                                <Col xs={12} md={4}>
+                                    <div
+                                        className={`d-flex align-items-center p-3 h-100 border rounded-3 ${selectedPaymentMethod === 'MOMO' ? 'border-danger bg-danger bg-opacity-10' : 'bg-white'}`}
+                                        style={{ cursor: 'pointer', transition: 'all 0.2s' }}
+                                        onClick={() => setSelectedPaymentMethod('MOMO')}
+                                    >
+                                        <div className="flex-grow-1">
+                                            <Image
+                                                src="/logo_momo.png"
+                                                fluid
+                                                style={{ width: '48px', height: '48px', objectFit: 'contain', marginBottom: '0.5rem' }}
+                                                alt="Logo MoMo"
+                                            />
+                                            <div className="fw-bold" style={{ color: '#a50064' }}>Ví điện tử MoMo</div>
+                                        </div>
+                                        <div>
+                                            <Form.Check type="radio" checked={selectedPaymentMethod === 'MOMO'} readOnly style={{ accentColor: '#a50064' }} />
+                                        </div>
+                                    </div>
+                                </Col>
+                                <Col xs={12} md={4}>
+                                    <div
+                                        className={`d-flex align-items-center p-3 h-100 border rounded-3 ${selectedPaymentMethod === 'VNPAY' ? 'border-info bg-info bg-opacity-10' : 'bg-white'}`}
+                                        style={{ cursor: 'pointer', transition: 'all 0.2s' }}
+                                        onClick={() => setSelectedPaymentMethod('VNPAY')}
+                                    >
+                                        <div className="flex-grow-1">
+                                            <Image
+                                                src="/logo_vnp.webp"
+                                                fluid
+                                                style={{ width: '48px', height: '48px', objectFit: 'contain', marginBottom: '0.5rem' }}
+                                                alt="Logo VNPAY"
+                                            />
+                                            <div className="fw-bold" style={{ color: '#005baa' }}>Cổng thanh toán VNPAY</div>
+                                           
+                                        </div>
+                                        <div>
+                                            <Form.Check type="radio" checked={selectedPaymentMethod === 'VNPAY'} readOnly style={{ accentColor: '#005baa' }} />
+                                        </div>
+                                    </div>
+                                </Col>
+                            </Row>
                         </div>
-
                         <div className="border rounded-3 p-3 bg-light">
                             <div className="small text-muted text-center mb-1">Số tiền cần thanh toán</div>
-                            <div className="fw-bold fs-3 text-center text-primary">
+                            <div className="fw-bold fs-3 text-center text-danger">
                                 {(currentInvoice?.totalAmount || 0).toLocaleString('vi-VN')} đ
                             </div>
                         </div>
                     </Modal.Body>
-
                     <Modal.Footer className="justify-content-between border-0 pt-0">
                         <Button variant="outline-secondary" className="px-4 rounded-pill" onClick={closePaymentModal}>
                             Hủy bỏ
                         </Button>
                         <Button
-                            className="px-4 rounded-pill fw-bold border-0 text-white transition-all"
+                            className="p-2 px-4 rounded-pill fw-bold border-0 text-white transition-all"
                             style={{
-
                                 backgroundColor:
                                     selectedPaymentMethod === 'MOMO' ? '#a50064' :
                                         selectedPaymentMethod === 'VNPAY' ? '#005baa' :
-                                            '#0d6efd'
+                                            '#105915'
                             }}
                             onClick={handleConfirmPayment}
                         >

@@ -8,8 +8,12 @@ import com.hb.enums.AppointmentStatus;
 import com.hb.pojo.Appointment;
 import com.hb.pojo.Patient;
 import com.hb.pojo.Schedule;
+import com.hb.pojo.Shift;
 import com.hb.repository.AppointmentRepository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -207,6 +211,31 @@ public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> i
         Long count = query.uniqueResult();
 
         return count != null && count > 0;
+    }
+
+    @Override
+    public List<Appointment> getConfirmedAppointmentsForReminder(LocalDateTime from, LocalDateTime to) {
+        Session session = this.factory.getObject().getCurrentSession();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<Appointment> cq = cb.createQuery(Appointment.class);
+        Root<Appointment> root = cq.from(Appointment.class);
+
+        root.fetch("patientId", JoinType.LEFT);
+        Fetch<Appointment, Schedule> scheduleFetch = root.fetch("scheduleId", JoinType.LEFT);
+        Join<Appointment, Schedule> scheduleJoin = (Join<Appointment, Schedule>) scheduleFetch;
+        Join<Schedule, Shift> shiftJoin = scheduleJoin.join("shiftId", JoinType.LEFT);
+
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(cb.equal(root.get("status"), AppointmentStatus.CONFIRMED));
+        predicates.add(cb.or(cb.isFalse(root.get("reminderSent")), cb.isNull(root.get("reminderSent"))));
+        predicates.add(cb.equal(scheduleJoin.get("date"), from.toLocalDate()));
+        predicates.add(cb.between(shiftJoin.get("startTime"), from.toLocalTime(), to.toLocalTime()));
+
+        cq.select(root).distinct(true);
+        cq.where(predicates.toArray(new Predicate[0]));
+
+        Query<Appointment> query = session.createQuery(cq);
+        return query.getResultList();
     }
 
     @Override

@@ -92,8 +92,7 @@ const RegisterSchedule = () => {
         }
     };
     const loadRooms = async () => {
-        // Only query rooms when the three required fields are selected:
-        // date, shiftId and specialtyId.
+
         if (!formData.date || !formData.shiftId || !formData.specialtyId) {
             setRooms([]);
             return;

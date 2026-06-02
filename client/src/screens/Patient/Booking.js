@@ -183,8 +183,8 @@ const BookingPage = () => {
 
         if (!selectedPatient) {
             handleShowAlert(
-                "Vui lòng chọn hồ sơ bệnh nhân",
-                "Vui lòng chọn hồ sơ bệnh nhân trước khi đăng ký lịch khám.",
+                "Thiếu thông tin",
+                "Vui lòng chọn hồ sơ bệnh nhân để đăng ký lịch khám.",
                 "warning"
             );
             return;
@@ -198,6 +198,32 @@ const BookingPage = () => {
                 "warning"
             );
             return;
+        }
+
+        try {
+            const bookingDateStr = selectedSchedule?.date || selectedDate;
+            if (bookingDateStr) {
+
+                let normalizedBookingDate = bookingDateStr;
+                if (bookingDateStr.includes('/')) {
+
+                    const parts = bookingDateStr.split('/');
+                    if (parts.length === 3) {
+                        normalizedBookingDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                    }
+                }
+                console.log('Validating booking date:', normalizedBookingDate, 'against tomorrow:', todayStr);
+                if (normalizedBookingDate < todayStr) {
+                    handleShowAlert(
+                        "Ngày không hợp lệ",
+                        "Không thể đặt lịch cho ngày hôm nay hoặc ngày đã qua. Vui lòng chọn ngày từ ngày mai trở đi.",
+                        "warning"
+                    );
+                    return;
+                }
+            }
+        } catch (e) {
+            console.warn('Date validation parse error', e);
         }
 
         try {
@@ -293,6 +319,11 @@ const BookingPage = () => {
         loadSchedules();
     }, [selectedDoctor, selectedDate, selectedSpecialty]);
 
+    // Allow booking from tomorrow onwards
+    const tomorrowDate = new Date();
+    tomorrowDate.setDate(tomorrowDate.getDate() + 1);
+    const todayStr = tomorrowDate.toISOString().split('T')[0];
+
     useEffect(() => {
         return () => {
             if (alertTimerRef.current) {
@@ -364,8 +395,7 @@ const BookingPage = () => {
                             <Card className="p-4 shadow-sm mb-4 rounded-4">
                                 <Card.Title className="fw-bold mb-3">Thông tin đặt lịch</Card.Title>
                                 <div>
-                                    <FloatAlert show={alertData.show} heading={alertData.heading} variant={alertData.variant}>
-                                        {alertData.message}
+                                    <FloatAlert show={alertData.show} heading={alertData.heading} variant={alertData.variant} message={alertData.message} >
                                     </FloatAlert>
                                 </div>
 
@@ -432,7 +462,9 @@ const BookingPage = () => {
                                         type="date"
                                         className="form-control w-50"
                                         value={selectedDate}
+                                        min={todayStr}
                                         onChange={(e) => handleFilterChange("date", e.target.value)}
+                                        title="Chỉ được chọn từ ngày mai trở đi"
                                     />
                                 </div>
 

@@ -44,7 +44,7 @@ public class LabResultDetailServiceImpl implements LabResultDetailService{
     @Override
     @Transactional
     public void addDetailsToLabResult(Long labResultId, List<LabResultDetailRequest> reqs) {
-        LabResult labResult = labResultService.getLabResultById(labResultId);
+        LabResult labResult = labResultService.getLabResultEntityById(labResultId);
         
         if (labResult == null) {
             throw new ResourceNotFoundException("Không tìm thấy phiếu xét nghiệm!");
@@ -62,7 +62,7 @@ public class LabResultDetailServiceImpl implements LabResultDetailService{
     @Override
     @Transactional
     public void updateDetails(Long labResultId, List<LabResultDetailRequest> reqs) {
-        LabResult labResult = labResultService.getLabResultById(labResultId);
+        LabResult labResult = labResultService.getLabResultEntityById(labResultId);
         
         if (labResult == null) {
             throw new ResourceNotFoundException("Không tìm thấy phiếu xét nghiệm!");

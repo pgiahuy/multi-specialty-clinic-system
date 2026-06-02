@@ -18,8 +18,8 @@ const ShiftCard = ({ schedule }) => {
             <p className="text-muted mb-1">
                 <strong>{schedule.specialtyName}</strong>
             </p>
-            <p className="text-muted mb-1">
-                Khu {schedule.area || "N/A"}
+            <p className="text-muted mb-1 small">
+                {schedule.area || "N/A"}
             </p>
 
             <p className="text-muted mb-3">

@@ -39,14 +39,14 @@ export const endpoint = {
     'momo-return': '/secure/payments/momo/return',
     'payments': (patientId) => `/secure/payments/${patientId}`,
     'payment-items': (paymentId) => `/secure/payment-items/${paymentId}`,
-    'test-results': (patientId) => `/secure/tests/${patientId}`,
+    'lab-results': (patientId) => `/secure/lab-results/${patientId}`,
     'lab-test': '/secure/tests',
-    'test-result-appointment': (appointmentId) => `/secure/tests/appointment/${appointmentId}`,
+    'lab-result-appointment': (appointmentId) => `/secure/lab-results/appointment/${appointmentId}`,
     'patient-profile': (patientId) => `/secure/profile/${patientId}`,
     'specialties': '/specialties',
     'medical-record': (appointmentId) => `/secure/medical-records/appointment/${appointmentId}`,
     'medical-record-update': (medicalRecordId) => `/secure/medical-records/${medicalRecordId}`,
-    'test': (testId) => `/secure/test/${testId}`,
+    'lab-result': (labResultId) => `/secure/lab-results/${labResultId}`,
 };
 export const AUTH_ENDPOINTS = {
     REGISTER: 'auth/register',
@@ -68,9 +68,10 @@ export const CLINIC_ENDPOINTS = {
     DOCTOR_CONFIRM_APPOINTMENT: (appointmentId) => `secure/appointments/${appointmentId}/confirm`,
     DOCTOR_START_APPOINTMENT: (appointmentId) => `secure/appointments/${appointmentId}/start`,
     DOCTOR_GET_PATIENTS: 'secure/patients',
+    DOCTOR_GET_SCHEDULES_BY_ID: (scheduleId) => `secure/doctors/schedules/${scheduleId}`,
     CREATE_MEDICAL_RECORD: 'secure/medical-records',
     PATIENT_BOOKING_APPOINTMENT: 'secure/appointments',
-    TEST_RESULTS: (patientId) => `secure/test/${patientId}`,
+    LAB_RESULTS: (patientId) => `secure/lab-results/${patientId}`,
     APPOINTMENT_BY_ID: (id) => `secure/appointment/${id}`,
     MEDICAL_RECORD_BY_ID: (id) => `secure/medical-records/${id}`,
     MEDICAL_RECORD_BY_PATIENT_ID: (id) => `secure/medical-records/patient/${id}`,
@@ -78,7 +79,7 @@ export const CLINIC_ENDPOINTS = {
     MEDICINES: 'secure/medicines',
     CREATE_PRESCRIPTIONS: 'secure/prescriptions',
     SAVE_DRAFT_PRESCRIPTIONS: 'secure/prescriptions/draft',
-    TEST_RESULTS_APPOINTMENT: (appointmentId) => `secure/tests/appointment/${appointmentId}`,
+    LAB_RESULTS_APPOINTMENT: (appointmentId) => `secure/lab-results/appointment/${appointmentId}`,
 };
 
 
@@ -109,9 +110,16 @@ export const PAYMENT_ENDPOINTS = {
 
 export const TEST_ENDPOINTS = {
     LAB_RESULTS: 'secure/lab-results',
-    TEST_RESULT_DETAIL: (testId) => `secure/test/${testId}`,
+    LAB_RESULT_DETAIL: (labResultId) => `secure/lab-results/${labResultId}`,
     UPDATE_LAB_RESULT: (labResultId) => `secure/lab-results/${labResultId}`,
     LAB_RESULTS_BY_APPOINTMENT: (appointmentId) => `secure/lab-results/appointment/${appointmentId}`,
+};
+
+export const CHAT_ENDPOINTS = {
+    CONVERSATIONS: 'secure/conversations',
+    START_CONVERSATION: 'secure/conversations/quick-start',
+    MESSAGES: (conversationId) => `secure/chat-messages/conversation/${conversationId}`,
+    SEND_MESSAGE: 'secure/chat-messages/send',
 };
 
 

@@ -76,9 +76,14 @@ const Header = () => {
 
 
                         {user && user?.role === 'ROLE_PATIENT' && (
-                            <Nav.Link className="header-navlink" onClick={() => navigate('/doctors')}>
-                                Bác sĩ
-                            </Nav.Link>
+                            <>
+                                <Nav.Link className="header-navlink" onClick={() => navigate('/doctors')}>
+                                    Bác sĩ
+                                </Nav.Link>
+                                <Nav.Link className="header-navlink" onClick={() => navigate('/patient/chat')}>
+                                    Tin nhắn
+                                </Nav.Link>
+                            </>
                         )}
                         {user && user?.role === 'ROLE_DOCTOR' && (
                             <Nav.Link className="header-navlink" onClick={() => navigate('/doctor/appointments')}>
@@ -97,11 +102,9 @@ const Header = () => {
 
 
 
-                        {{ user } && user?.role === 'ROLE_PATIENT' && (
-                            <Nav.Link className="header-navlink" onClick={() => navigate('/')}>
-                                Liên hệ
-                            </Nav.Link>
-                        )}
+                        <Nav.Link className="header-navlink" onClick={() => navigate('/contact')}>
+                            Liên hệ
+                        </Nav.Link>
 
                         {user === null ? (
                             <div className="ms-auto d-flex align-items-center">

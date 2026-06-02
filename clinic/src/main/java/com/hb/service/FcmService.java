@@ -4,53 +4,13 @@
  */
 package com.hb.service;
 
-//import com.google.firebase.messaging.FirebaseMessaging;
-//import com.google.firebase.messaging.Message;
-//import com.google.firebase.messaging.Notification;
-//import com.google.protobuf.Message;
-//import com.hb.pojo.Notification;
-//import org.springframework.scheduling.annotation.Async;
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.Message;
-import com.google.firebase.messaging.Notification;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
+import com.hb.pojo.ChatMessage;
 
 /**
  *
  * @author HUY
  */
-@Service
-public class FcmService {
-
-    @Async("taskExecutor")
-    public void sendPushNotification(String token, String notiId, String title, String content, String path) {
-        if (token == null || token.isEmpty()) {
-            return;
-        }
-
-        Notification notification = Notification.builder()
-                .setTitle(title)
-                .setBody(content)
-                .build();
-
-        Message.Builder messageBuilder = Message.builder()
-                .setToken(token)
-                .setNotification(notification);
-
-        if (path != null && !path.isEmpty()) {
-            messageBuilder.putData("path", path);
-        }
-        
-        messageBuilder.putData("id", notiId);
-
-        Message message = messageBuilder.build();
-
-        try {
-            String response = FirebaseMessaging.getInstance().send(message);
-            System.out.println("Firebase: Gửi thành công! ID: " + response);
-        } catch (Exception e) {
-            System.err.println("Firebase Error: " + e.getMessage());
-        }
-    }
+public interface FcmService {
+    void sendPushNotification(String token, String notiId, String title, String content, String path);
+    void sendChatMessageToUserDevice(String token, ChatMessage message);
 }

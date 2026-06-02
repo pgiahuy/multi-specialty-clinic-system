@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Button, ButtonGroup, Badge, Card, Col, Container, Form, InputGroup, Row, Table } from "react-bootstrap";
+import { Button, ButtonGroup, Badge, Card, Col, Container, Form, InputGroup, Row, Table, Alert } from "react-bootstrap";
 import { ArrowLeft, Plus, PlusSquare, PlusSquareFill, XCircleFill, Save, CheckCircle, XSquareFill, TwitterX, XSquare, Receipt } from "react-bootstrap-icons";
 import Footer from "../../components/Footer";
 import Header from "../../components/Header";
 import { authApis, CLINIC_ENDPOINTS, clinicApis } from "../../configs/Apis";
 import MySpinner from "../../components/MySpinner";
+import MyAlert from "../../components/MyAlert";
 
 const MEDICINE_PAGE_SIZE = 15;
+const DRAFT_STORAGE_KEY_PREFIX = "prescriptionDraft_";
 
 const PrescribeMedicine = () => {
     const navigate = useNavigate();
@@ -31,12 +33,45 @@ const PrescribeMedicine = () => {
     const [isPrescriptionLoaded, setIsPrescriptionLoaded] = useState(false);
     const [isAppointmentLoaded, setIsAppointmentLoaded] = useState(false);
 
-    const [statusMessage, setStatusMessage] = useState("");
+    const [statusMessage, setStatusMessage] = useState(null);
+    const [hasDraftLoaded, setHasDraftLoaded] = useState(false);
 
     const medicineListContainerRef = useRef(null);
     const medicineLoadMoreRef = useRef(null);
     const savingDraftLockRef = useRef(false);
     const savingPublishLockRef = useRef(false);
+
+    const getDraftKey = () => `${DRAFT_STORAGE_KEY_PREFIX}${medicalRecordId}`;
+
+    const saveDraftToLocalStorage = (items) => {
+        if (!medicalRecordId || items.length === 0) return;
+        try {
+            const draft = { items, savedAt: new Date().toISOString() };
+            localStorage.setItem(getDraftKey(), JSON.stringify(draft));
+        } catch (error) {
+            console.error("Lỗi khi lưu draft vào localStorage:", error);
+        }
+    };
+
+    const loadDraftFromLocalStorage = () => {
+        if (!medicalRecordId) return null;
+        try {
+            const draft = localStorage.getItem(getDraftKey());
+            return draft ? JSON.parse(draft) : null;
+        } catch (error) {
+            console.error("Lỗi khi tải draft từ localStorage:", error);
+            return null;
+        }
+    };
+
+    const clearDraftFromLocalStorage = () => {
+        if (!medicalRecordId) return;
+        try {
+            localStorage.removeItem(getDraftKey());
+        } catch (error) {
+            console.error("Lỗi khi xoá draft từ localStorage:", error);
+        }
+    };
 
     const stickyStyle = { top: "75px" };
     const scrollableStyle = { paddingRight: "6px" };
@@ -48,6 +83,14 @@ const PrescribeMedicine = () => {
         const totalQuantity = prescriptionItems.reduce((sum, it) => sum + (Number(it.quantity) || 0), 0);
         return { totalItems: prescriptionItems.length, totalQuantity };
     }, [prescriptionItems]);
+
+
+    const renderStockStatus = (stock) => {
+        if (!stock || stock <= 0) return <span className="text-danger ">Hết hàng</span>;
+        if (stock > 99) return <span className="text-success ">99+</span>;
+        if (stock <= 10) return <span className="text-danger ">{stock}</span>;
+        return <span className="text-warning ">{stock}</span>;
+    };
 
     const formatVnd = (value) => {
         const numericValue = Number(value);
@@ -199,25 +242,44 @@ const PrescribeMedicine = () => {
                 setPrescriptionId(response.data?.id ?? null);
                 setPrescriptionStatus(response.data?.status ?? null);
                 const loadedItems = Array.isArray(response.data?.items) ? response.data.items : [];
-                setPrescriptionItems(
-                    loadedItems.map((item) => ({
 
-                        id: item.medicineId ?? item.id,
-                        prescriptionItemId: item.id,
-                        name: item.medicineName,
-                        code: item.medicineCode,
-                        image: item.medicineImage,
-                        price: item.medicinePrice,
-                        unit: item.unit || "Viên",
-                        quantity: item.quantity ?? 1,
-                        daysToUse: item.daysToUse ?? 7,
-                        note: item.note ?? "",
-                        source: "prescription",
-                    }))
-                );
+                if (loadedItems.length > 0) {
+                    setPrescriptionItems(
+                        loadedItems.map((item) => ({
+                            id: item.medicineId ?? item.id,
+                            prescriptionItemId: item.id,
+                            name: item.medicineName,
+                            code: item.medicineCode,
+                            image: item.medicineImage,
+                            price: item.medicinePrice,
+                            unit: item.unit || "Viên",
+                            quantity: item.quantity ?? 1,
+                            daysToUse: item.daysToUse ?? 7,
+                            note: item.note ?? "",
+                            source: "prescription",
+                        }))
+                    );
+                    clearDraftFromLocalStorage();
+                } else {
+
+                    const draft = loadDraftFromLocalStorage();
+                    if (draft?.items && draft.items.length > 0) {
+                        setPrescriptionItems(draft.items);
+                        setHasDraftLoaded(true);
+                    } else {
+                        setPrescriptionItems([]);
+                    }
+                }
             } catch (error) {
                 console.error("Lỗi khi tải thông tin đơn thuốc!:", error);
-                setPrescriptionItems([]);
+
+                const draft = loadDraftFromLocalStorage();
+                if (draft?.items && draft.items.length > 0) {
+                    setPrescriptionItems(draft.items);
+                    setHasDraftLoaded(true);
+                } else {
+                    setPrescriptionItems([]);
+                }
                 setPrescriptionId(null);
                 setPrescriptionStatus(null);
             } finally {
@@ -234,11 +296,20 @@ const PrescribeMedicine = () => {
 
     }, [medicalRecord]);
 
+
+    useEffect(() => {
+        const normalizedStatus = String(prescriptionStatus || "").toUpperCase();
+        const isPublishedStatus = normalizedStatus === "PUBLIC";
+        if (!isPublishedStatus && prescriptionItems.length > 0) {
+            saveDraftToLocalStorage(prescriptionItems);
+        }
+    }, [prescriptionItems, prescriptionStatus]);
+
     useEffect(() => {
         const trimmedSearchTerm = searchTerm.trim();
 
         if (!trimmedSearchTerm) {
-            setStatusMessage("");
+            setStatusMessage(null);
             setHasMoreMedicines(true);
             setMedicinePage(1);
             loadMedicines({ page: 1, replace: true });
@@ -314,7 +385,7 @@ const PrescribeMedicine = () => {
         e.preventDefault();
         setSearchTerm("");
         setSearchResults([]);
-        setStatusMessage("");
+        setStatusMessage(null);
     };
 
     const handleMedicineListScroll = () => {
@@ -337,7 +408,7 @@ const PrescribeMedicine = () => {
         }
 
         if (medicine.totalStock !== undefined && medicine.totalStock <= 0) {
-            alert("Thuốc này hiện không còn tồn kho.");
+            setStatusMessage({ header: "Thông báo", message: "Thuốc này hiện không còn tồn kho.", variant: "warning" });
             return;
         }
 
@@ -375,7 +446,7 @@ const PrescribeMedicine = () => {
             ];
         });
 
-        setStatusMessage(`Đã thêm ${medicine.name} vào toa thuốc.`);
+        setStatusMessage({ header: "Thành công", message: `Đã thêm ${medicine.name} vào toa thuốc.`, variant: "success" });
     };
 
     const updatePrescriptionQuantity = (medicineId, value) => {
@@ -414,6 +485,12 @@ const PrescribeMedicine = () => {
         setPrescriptionItems((currentItems) => currentItems.filter((item) => item.id !== medicineId));
     };
 
+    const getAvailableStock = (medicineId, totalStock) => {
+        const prescriptionItem = prescriptionItems.find(item => item.id === medicineId);
+        if (!prescriptionItem) return totalStock;
+        return Math.max(0, (totalStock || 0) - (prescriptionItem.quantity || 0));
+    };
+
     const normalizedPrescriptionStatus = String(prescriptionStatus || "").toUpperCase();
     const isPublished = normalizedPrescriptionStatus === "PUBLIC";
     const isInitialDataLoading = !isMedicalRecordLoaded || !isPrescriptionLoaded || !isAppointmentLoaded;
@@ -429,19 +506,19 @@ const PrescribeMedicine = () => {
         }
 
         if (!medicalRecordId) {
-            alert("Không tìm thấy hồ sơ bệnh án.");
+            console.log("Không tìm thấy hồ sơ bệnh án.");
             return;
         }
 
         if (prescriptionItems.length === 0) {
-            alert("Hãy thêm ít nhất một thuốc vào toa trước khi lưu.");
+            setStatusMessage({ header: "Cảnh báo", message: "Hãy thêm ít nhất một thuốc vào toa trước khi lưu.", variant: "warning" });
             return;
         }
 
         try {
             savingPublishLockRef.current = true;
             setSaving(true);
-            setStatusMessage("");
+            setStatusMessage(null);
 
             const payload = {
                 id: prescriptionId,
@@ -458,14 +535,15 @@ const PrescribeMedicine = () => {
             if (response?.data?.id) {
                 setPrescriptionId(response.data.id);
                 setPrescriptionStatus(response.data.status);
+                clearDraftFromLocalStorage();
             }
 
-            setStatusMessage("Đã lưu toa thuốc thành công.");
-
+            setStatusMessage({ header: "Thành công", message: "Đã lưu toa thuốc thành công.", variant: "success" });
 
         } catch (error) {
             console.error("Lưu toa thuốc thất bại:", error);
-            alert(error.response?.data?.message || "Lưu toa thuốc thất bại. Vui lòng thử lại!");
+            const errorMessage = error.response?.data?.message || error.message || "Lưu toa thuốc thất bại. Vui lòng thử lại!";
+            setStatusMessage({ header: "Lỗi", message: errorMessage, variant: "danger" });
         } finally {
             savingPublishLockRef.current = false;
             setSaving(false);
@@ -478,19 +556,19 @@ const PrescribeMedicine = () => {
         }
 
         if (!medicalRecordId) {
-            alert("Không tìm thấy hồ sơ bệnh án.");
+            setStatusMessage({ header: "Lỗi", message: "Không tìm thấy hồ sơ bệnh án.", variant: "danger" });
             return;
         }
 
         if (prescriptionItems.length === 0) {
-            alert("Hãy thêm ít nhất một thuốc vào toa trước khi lưu.");
+            setStatusMessage({ header: "Cảnh báo", message: "Hãy thêm ít nhất một thuốc vào toa trước khi lưu.", variant: "warning" });
             return;
         }
 
         try {
             savingDraftLockRef.current = true;
             setSavingDraft(true);
-            setStatusMessage("");
+            setStatusMessage(null);
 
             const payload = {
                 id: prescriptionId,
@@ -509,7 +587,7 @@ const PrescribeMedicine = () => {
                 setPrescriptionStatus(response.data.status);
             }
 
-            setStatusMessage("Đã lưu nháp toa thuốc thành công.");
+            setStatusMessage({ header: "Thành công", message: "Đã lưu nháp toa thuốc thành công.", variant: "success" });
 
 
         } catch (error) {
@@ -522,6 +600,11 @@ const PrescribeMedicine = () => {
 
     const handleSearchMedicine = (value) => {
         setSearchTerm(value);
+    };
+
+    const handleShowAlert = (header, message, variant) => {
+        setStatusMessage({ header, message, variant });
+        window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
     const isBrowsingMedicines = !searchTerm.trim();
@@ -557,7 +640,7 @@ const PrescribeMedicine = () => {
                                                     </InputGroup>
                                                 </Row>
                                             </div>
-                                            {statusMessage ? <div className="alert alert-success py-1 small mb-1">{statusMessage}</div> : null}
+
 
                                             <div className="mb-2 d-flex flex-column" style={{ minHeight: 0, flex: 1 }}>
 
@@ -594,8 +677,9 @@ const PrescribeMedicine = () => {
                                                                             <td className="text-center">
                                                                                 <small className="text-success fw-semibold">{formatVnd(medicine.price)}</small>
                                                                             </td>
-                                                                            <td className="text-center text-muted small fw-semibold py-1">
-                                                                                {medicine.totalStock ?? 0}
+
+                                                                            <td className="text-center small py-1">
+                                                                                {renderStockStatus(getAvailableStock(medicine.id, medicine.totalStock))}
                                                                             </td>
                                                                             <td className="text-center small py-1">
                                                                                 {medicine.unit || "Viên"}
@@ -653,6 +737,9 @@ const PrescribeMedicine = () => {
 
 
                         <Col xs={12} lg={isPublished ? 10 : 7} className={isPublished ? "mx-auto" : ""}>
+                            {statusMessage && <Alert dismissible onClose={() => setStatusMessage(null)} className="mb-2 p-3" variant={statusMessage.variant}>
+                                {statusMessage.message}
+                            </Alert>}
                             <Card className="border-0 shadow-sm rounded-3 ">
                                 <Card.Body className="p-2 p-xl-3 d-flex flex-column gap-3" style={scrollableStyle}>
                                     <div className="clinical-meta p-3 bg-light border border-light-subtle rounded-2">
@@ -814,6 +901,11 @@ const PrescribeMedicine = () => {
                                                 <Button className="rounded-2 me-3" variant="outline-secondary" onClick={() => navigate(-1)} disabled={savingDraft || saving}>
                                                     Quay lại
                                                 </Button>
+                                                {!isPublished && hasDraftLoaded ? (
+                                                    <Button className="rounded-2" variant="outline-danger" onClick={() => { clearDraftFromLocalStorage(); setHasDraftLoaded(false); setStatusMessage({ header: "Thông báo", message: "Đã xoá bản nháp tạm.", variant: "info" }); }} disabled={savingDraft || saving}>
+                                                        Xoá nháp
+                                                    </Button>
+                                                ) : null}
                                                 {!isPublished ? (
                                                     <Button className="rounded-2" variant="primary" onClick={() => handleSaveDraftPrescription()} disabled={savingDraft}>
                                                         {savingDraft ? <MySpinner size="1" /> : "Lưu nháp"}

@@ -13,10 +13,8 @@ const PaymentResult = () => {
 
     useEffect(() => {
         const verifyPayment = async () => {
-            const searchString = location.search;
-            
+            const searchString = location.search;           
             if (!searchString) {
-                
                 if (!paymentStatus) {
                     setPaymentStatus('FAILED');
                     setPaymentMessage('Không tìm thấy thông tin giao dịch.');
@@ -50,15 +48,10 @@ const PaymentResult = () => {
                 
                
                 try {
-                 
-                    
-                    authApis().get(PAYMENT_ENDPOINTS.VNPAY_IPN + searchString)
-                        
+                    authApis().get(PAYMENT_ENDPOINTS.VNPAY_IPN + searchString)    
                 } catch (error) {
                     console.log("Lỗi proxy IPN:", error);
                 }
-                
-             
                 setSearchParams({}, { replace: true });
                 return;
             }
@@ -134,9 +127,9 @@ const PaymentResult = () => {
 
                             <button
                                 className="btn btn-primary w-100 rounded-pill py-2 fw-bold"
-                                onClick={() => navigate('/patient/dashboard')}
+                                onClick={() => navigate('/patient/payments')}
                             >
-                                Quay về dashboard
+                                Quay về
                             </button>
                         </div>
                     )}

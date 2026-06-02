@@ -165,7 +165,7 @@ public class PaymentServiceImpl implements PaymentService {
             }
 
             case LAB_TEST -> {
-                LabResult labResult = labResultService.getLabResultById(item.getReferenceId());
+                LabResult labResult = labResultService.getLabResultEntityById(item.getReferenceId());
                 this.confirmPaymentForLabResult(labResult.getId());
             }
 

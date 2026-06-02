@@ -18,12 +18,12 @@ import { MyUserContext } from "./configs/Contexts";
 import { useReducer } from "react";
 import MyUserReducers from "./reducers/MyUserReducers";
 import RegisterRecord from "./screens/Patient/RegisterRecord";
-import TestResultDetail from "./screens/Patient/TestResultDetail";
 import PaymentDetail from "./screens/Patient/PaymentDetail";
-
+import TestResults from "./screens/Patient/TestResults";
 import PaymentResult from "./screens/Patient/PaymentResult";
 import HistoryBooking from "./screens/Patient/BookingHistory";
 import ListDoctor from "./screens/Home/ListDoctor";
+import Contact from "./screens/Home/Contact";
 import AppointmentList from "./screens/Doctor/AppointmentList";
 import DoctorProfile from "./screens/Doctor/DoctorProfile";
 import RegisterSchedule from "./screens/Doctor/RegisterSchedule";
@@ -38,6 +38,9 @@ import ScheduleManagement from "./screens/Doctor/ScheduleManagement";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AppointmentOfSchedule from "./screens/Doctor/AppointmentOfSchedule";
 import LabTest from "./screens/Doctor/LabTest";
+import MessageBox from "./screens/User/MessageBox";
+import ConsultationPage from "./screens/Doctor/ConsultationPage";
+import TestResultDetail from "./screens/Patient/TestResultDetail";
 
 const initUserState = () => {
   const savedUser = localStorage.getItem("user");
@@ -63,6 +66,15 @@ function App() {
                 <Footer />
               </>
             } />
+            <Route path="/contact" element={
+              <>
+                <Header />
+                <Container>
+                  <Contact />
+                </Container>
+                <Footer />
+              </>
+            } />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
 
@@ -71,15 +83,17 @@ function App() {
             <Route element={<ProtectedRoute allowedRoles={["ROLE_PATIENT"]} />}>
               <Route path="/patient/dashboard" element={<PatientDashboard />} />
               <Route path="/patient/notifications" element={<AllNotifications />} />
-              <Route path="/patient/prescriptions" element={<Prescriptions />} />
+              <Route path="/patient/prescriptions/:prescriptionId?" element={<Prescriptions />} />
               <Route path="/patient/profiles" element={<PatientProfile />} />
               <Route path="/patient/account" element={<PatientAccount />} />
               <Route path="/patient/register-record" element={<RegisterRecord />} />
               <Route path="/patient/booking" element={<BookingPage />} />
               <Route path="/patient/history-booking" element={<HistoryBooking />} />
-              <Route path="/patient/test-results" element={<TestResultDetail />} />
+              <Route path="/patient/test-results" element={<TestResults />} />
+              <Route path="/patient/test-results/:labResultId" element={<TestResultDetail />} />
               <Route path="/patient/payments" element={<PaymentDetail />} />
               <Route path="/patient/payment-result" element={<PaymentResult />} />
+              <Route path="/patient/chat" element={<MessageBox />} />
             </Route>
 
             <Route element={<ProtectedRoute allowedRoles={["ROLE_DOCTOR"]} />}>
@@ -98,9 +112,8 @@ function App() {
             </Route>
 
 
-
-
             <Route element={<ProtectedRoute />}>
+              <Route path="/doctor/consultations" element={<ConsultationPage />} />
               <Route path="/doctors" element={<ListDoctor />} />
               <Route path="/appointments/:appointmentId" element={<AppointmentDetail />} />
             </Route>

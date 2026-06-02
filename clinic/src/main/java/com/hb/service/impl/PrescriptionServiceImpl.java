@@ -2,9 +2,11 @@ package com.hb.service.impl;
 
 import com.hb.dto.request.PrescriptionCreateRequest;
 import com.hb.dto.request.PrescriptionItemCreateRequest;
+import com.hb.enums.AppointmentStatus;
 import com.hb.enums.InventoryLogType;
 import com.hb.enums.PrescriptionStatus;
 import com.hb.exception.BadRequestException;
+import com.hb.exception.DuplicateResourceException;
 import com.hb.exception.ResourceNotFoundException;
 import com.hb.pojo.InventoryLog;
 import com.hb.pojo.MedicalRecord;
@@ -34,7 +36,7 @@ import com.hb.repository.InventoryLogRepository;
 
 @Service
 public class PrescriptionServiceImpl implements PrescriptionService {
-
+    
     @Autowired
     private PrescriptionRepository prescriptionRepo;
     @Autowired
@@ -49,13 +51,13 @@ public class PrescriptionServiceImpl implements PrescriptionService {
     private InventoryLogRepository inventoryLogRepo;
     @Autowired
     private MedicineBatchRepository medicineBatchRepo;
-
+    
     @Override
     @Transactional(readOnly = true)
     public List<Prescription> getPrescriptions(Map<String, String> params) {
         return this.prescriptionRepo.getPrescriptions(params);
     }
-
+    
     private void validateReq(PrescriptionCreateRequest req) {
         if (req == null) {
             throw new BadRequestException("Thiếu thông tin đơn thuốc!");
@@ -67,7 +69,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
             throw new BadRequestException("Cần ít nhất một loại thuốc để tạo đơn!");
         }
     }
-
+    
     private Medicine validateReqItem(PrescriptionItemCreateRequest item) {
         if (item == null) {
             throw new BadRequestException("Prescription item is required");
@@ -78,24 +80,24 @@ public class PrescriptionServiceImpl implements PrescriptionService {
         if (item.getQuantity() <= 0) {
             throw new BadRequestException("Số lượng phải lớn hơn 0 !");
         }
-
+        
         Medicine m = medicineRepo.getMedicineById(item.getMedicineId());
         if (m == null) {
             throw new ResourceNotFoundException("Không tìm thấy thuốc này!");
         }
         return m;
     }
-
+    
     @Override
     @Transactional
     public Prescription saveOrUpdateDraftPrescription(PrescriptionCreateRequest req) {
         this.validateReq(req);
         Prescription prescription;
-
+        
         if (req.getId() == null) {
             prescription = new Prescription();
             prescription.setCreatedAt(LocalDateTime.now());
-
+            
             MedicalRecord mr = medicalRecordRepo.getMedicalRecordById(req.getMedicalRecordId());
             if (mr == null) {
                 throw new ResourceNotFoundException("Không tìm thấy bệnh án!!");
@@ -103,7 +105,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
             if (mr.getPrescription() != null) {
                 throw new BadRequestException("Đã có đơn thuốc cho hồ sơ này!");
             }
-
+            
             prescription.setMedicalRecordId(mr);
             prescription.setPrescriptionItemCollection(new ArrayList<>());
             prescription = prescriptionRepo.saveOrUpdate(prescription);
@@ -112,7 +114,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
             if (prescription == null) {
                 throw new ResourceNotFoundException("Không tìm thấy đơn thuốc nháp cần cập nhật!");
             }
-
+            
             if (prescription.getPrescriptionItemCollection() != null) {
                 for (PrescriptionItem oldItem : prescription.getPrescriptionItemCollection()) {
                     prescriptionItemRepo.delete(oldItem);
@@ -120,40 +122,44 @@ public class PrescriptionServiceImpl implements PrescriptionService {
                 prescription.getPrescriptionItemCollection().clear();
             }
         }
-
+        
         List<PrescriptionItem> items = new ArrayList<>();
         for (var i : req.getItems()) {
             Medicine medicine = validateReqItem(i);
-
+            
             PrescriptionItem item = new PrescriptionItem();
             item.setMedicineId(medicine);
             item.setQuantity(i.getQuantity());
             item.setDaysToUse(i.getDaysToUse());
             item.setNote(i.getNote());
             item.setPrescriptionId(prescription);
-
+            
             prescriptionItemRepo.save(item);
             items.add(item);
         }
-
+        
         prescription.setPrescriptionItemCollection(items);
         prescription.setStatus(PrescriptionStatus.DRAFT);
         return prescriptionRepo.saveOrUpdate(prescription);
     }
-
+    
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Prescription createPrescription(PrescriptionCreateRequest req, String username) {
         this.validateReq(req);
         Prescription p;
-
+        
         if (req.getId() != null) {
-
+            
             p = this.prescriptionRepo.getPrescriptionById(req.getId());
             if (p == null) {
                 throw new ResourceNotFoundException("Không tìm thấy đơn thuốc nháp cần phát hành!");
             }
-
+            
+            if (p.getStatus() == PrescriptionStatus.PUBLIC) {
+                throw new DuplicateResourceException("Bệnh nhân này đã khám xong, không thể chỉnh sửa đơn thuốc!");
+            }
+            
             if (p.getPrescriptionItemCollection() != null) {
                 for (PrescriptionItem oldItem : p.getPrescriptionItemCollection()) {
                     prescriptionItemRepo.delete(oldItem);
@@ -163,7 +169,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
         } else {
             p = new Prescription();
             p.setCreatedAt(LocalDateTime.now());
-
+            
             MedicalRecord mr = medicalRecordRepo.getMedicalRecordById(req.getMedicalRecordId());
             if (mr == null) {
                 throw new ResourceNotFoundException("Không tìm thấy bệnh án!");
@@ -172,48 +178,48 @@ public class PrescriptionServiceImpl implements PrescriptionService {
                 throw new BadRequestException("Đã có đơn thuốc cho hồ sơ này!");
             }
             p.setMedicalRecordId(mr);
-
+            
             p = prescriptionRepo.saveOrUpdate(p);
         }
-
+        
         List<PrescriptionItem> items = new ArrayList<>();
-        int bufferDays = 3; 
-
+        int bufferDays = 3;        
+        
         for (var i : req.getItems()) {
             Medicine m = validateReqItem(i);
             int requiredQty = i.getQuantity();
-
-            int daysToUse = (i.getDaysToUse()> 0) ? i.getDaysToUse() : 7;
-
+            
+            int daysToUse = (i.getDaysToUse() > 0) ? i.getDaysToUse() : 7;
+            
             LocalDate minExpiryDate = LocalDate.now().plusDays(daysToUse + bufferDays);
-
+            
             List<MedicineBatch> availableBatches = medicineRepo.getAvailableBatches(m.getId(), minExpiryDate);
-
+            
             int totalAvailable = availableBatches.stream().mapToInt(MedicineBatch::getQuantity).sum();
             if (totalAvailable < requiredQty) {
                 throw new BadRequestException("Thuốc [" + m.getName() + "] không đủ số lượng đạt chuẩn trong kho cho đợt điều trị "
                         + daysToUse + " ngày! (Yêu cầu: " + requiredQty + ", Khả dụng thực tế: " + totalAvailable + ")");
             }
-
+            
             PrescriptionItem item = new PrescriptionItem();
             item.setMedicineId(m);
             item.setQuantity(requiredQty);
             item.setPrescriptionId(p);
             item.setDaysToUse(daysToUse);
-            item.setNote(i.getNote());   
-
+            item.setNote(i.getNote());            
+            
             prescriptionItemRepo.save(item);
             items.add(item);
-
+            
             int remainingQtyToDeduct = requiredQty;
             for (MedicineBatch batch : availableBatches) {
                 if (remainingQtyToDeduct <= 0) {
                     break;
                 }
-
+                
                 int batchQty = batch.getQuantity();
                 int qtyDeducted = 0;
-
+                
                 if (batchQty >= remainingQtyToDeduct) {
                     qtyDeducted = remainingQtyToDeduct;
                     batch.setQuantity(batchQty - remainingQtyToDeduct);
@@ -223,71 +229,73 @@ public class PrescriptionServiceImpl implements PrescriptionService {
                     remainingQtyToDeduct -= batchQty;
                     batch.setQuantity(0);
                 }
-
+                
                 medicineBatchRepo.saveOrUpdate(batch);
-
+                
                 InventoryLog log = new InventoryLog();
                 log.setMedicineId(m);
                 log.setBatchId(batch);
-                log.setChangeAmount(-qtyDeducted);            
+                log.setChangeAmount(-qtyDeducted);                
                 log.setReason(InventoryLogType.PRESCRIPTION_EXPORT);
                 log.setReferenceId(p.getId());
                 log.setCreatedAt(LocalDateTime.now());
                 log.setCreatedBy(username);
-
+                
                 inventoryLogRepo.createInventoryLog(log);
             }
         }
-
+        
         p.setStatus(PrescriptionStatus.PUBLIC);
         p.setPublicAt(LocalDateTime.now());
         p.setPrescriptionItemCollection(items);
-
+        
+        p.getMedicalRecordId().getAppointmentId().setStatus(AppointmentStatus.COMPLETED);
+        
         Prescription saved = prescriptionRepo.saveOrUpdate(p);
-
+        
         this.pushPrescriptionNotify(saved);
-
+        
         return saved;
-
+        
     }
-
+    
     @Override
     @Transactional(readOnly = true)
     public Prescription getPrescriptionById(Long id) {
-
+        
         Prescription prescription = this.prescriptionRepo.getPrescriptionById(id);
         if (prescription == null) {
             throw new ResourceNotFoundException("Không tìm thấy đơn thuốc!");
         }
         return prescription;
     }
-
+    
     @Override
     @Transactional
     public void deletePrescription(Long id) {
         this.prescriptionRepo.deletePrescription(id);
     }
-
+    
     @Override
     @Transactional(readOnly = true)
     public long countPrescription(Map<String, String> params) {
         return this.prescriptionRepo.count(params, Prescription.class);
     }
-
+    
     private void pushPrescriptionNotify(Prescription saved) {
         try {
             MedicalRecord currentMr = saved.getMedicalRecordId();
             if (currentMr != null && currentMr.getAppointmentId() != null
                     && currentMr.getAppointmentId().getPatientId() != null) {
-
+                
                 User patientUser = currentMr.getAppointmentId().getPatientId().getUserId();
                 if (patientUser != null) {
                     Map<String, String> notiParams = new HashMap<>();
                     notiParams.put("username", patientUser.getUsername());
                     notiParams.put("title", "Đơn thuốc mới");
                     notiParams.put("content", "Bác sĩ vừa kê đơn thuốc mới cho bạn. Vui lòng kiểm tra!");
-                    notiParams.put("path", "/api/secure/prescriptions/" + saved.getId());
-
+                    notiParams.put("path", "/patient/prescriptions/" + saved.getId());
+                    
                     this.notificationService.addNotification(notiParams);
                 }
             }
@@ -295,7 +303,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
             System.err.println("Lỗi gửi thông báo: " + e.getMessage());
         }
     }
-
+    
     @Override
     public Prescription getPrescriptionByMedicalRecordId(Long recordId) {
         return this.prescriptionRepo.getPrescriptionByMedicalRecordId(recordId);

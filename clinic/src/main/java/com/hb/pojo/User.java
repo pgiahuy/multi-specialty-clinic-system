@@ -50,27 +50,23 @@ import java.util.Date;
     @NamedQuery(name = "User.findByName", query = "SELECT u FROM User u WHERE u.name = :name")})
 public class User implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "id")
-    private Long id;
+    // @Pattern(regexp="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", message="Invalid email")//if the field contains email address consider using this annotation to enforce field validation
     // @Pattern(regexp="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", message="Invalid email")//if the field contains email address consider using this annotation to enforce field validation
     @Size(max = 100)
     @Column(name = "email")
     private String email;
     @Basic(optional = false)
-    @NotNull
+    @NotNull()
     @Size(min = 1, max = 255)
     @Column(name = "password")
     private String password;
+    // @Pattern(regexp="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", message="Invalid email")//if the field contains email address consider using this annotation to enforce field validation
     @Basic(optional = false)
-    @NotNull
+    @NotNull()
     @Size(min = 1, max = 100)
     @Column(name = "username")
     private String username;
-    @Size(max = 12)
+    @Size(max = 16)
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
     private UserRole role;
@@ -82,7 +78,7 @@ public class User implements Serializable {
     @Size(max = 255)
     @Column(name = "public_id")
     private String publicId;
-    @Lob
+    @Lob()
     @Size(max = 65535)
     @Column(name = "fcm_token")
     private String fcmToken;
@@ -91,18 +87,19 @@ public class User implements Serializable {
     @Size(max = 255)
     @Column(name = "name")
     private String name;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "senderId")
-    private Collection<ChatMessage> chatMessageCollection;
+    private static long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id")
+    private Long id;
     @OneToMany(mappedBy = "userId")
     private Collection<Notification> notificationCollection;
     @OneToMany(mappedBy = "userId")
     private Collection<Patient> patientCollection;
     @OneToMany(mappedBy = "userId")
     private Collection<SocialAccount> socialAccountCollection;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "patientId")
-    private Collection<Conversation> conversationCollection;
-    @OneToMany(mappedBy = "receiverId")
-    private Collection<Conversation> conversationCollection1;
+    
     @OneToOne(mappedBy = "userId")
     private Doctor doctor;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
@@ -127,38 +124,6 @@ public class User implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-    
-    public UserRole getRole() {
-        return role;
-    }
-
-    public void setRole(UserRole role) {
-        this.role = role;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -194,27 +159,11 @@ public class User implements Serializable {
     }
 
     public boolean getIsActive() {
-        return isActive;
+        return isIsActive();
     }
 
     public void setIsActive(boolean isActive) {
         this.isActive = isActive;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Collection<ChatMessage> getChatMessageCollection() {
-        return chatMessageCollection;
-    }
-
-    public void setChatMessageCollection(Collection<ChatMessage> chatMessageCollection) {
-        this.chatMessageCollection = chatMessageCollection;
     }
 
     public Collection<Notification> getNotificationCollection() {
@@ -241,22 +190,7 @@ public class User implements Serializable {
         this.socialAccountCollection = socialAccountCollection;
     }
 
-    public Collection<Conversation> getConversationCollection() {
-        return conversationCollection;
-    }
-
-    public void setConversationCollection(Collection<Conversation> conversationCollection) {
-        this.conversationCollection = conversationCollection;
-    }
-
-    public Collection<Conversation> getConversationCollection1() {
-        return conversationCollection1;
-    }
-
-    public void setConversationCollection1(Collection<Conversation> conversationCollection1) {
-        this.conversationCollection1 = conversationCollection1;
-    }
-
+  
     public Doctor getDoctor() {
         return doctor;
     }
@@ -276,7 +210,7 @@ public class User implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
+        hash += (getId() != null ? getId().hashCode() : 0);
         return hash;
     }
 
@@ -287,7 +221,7 @@ public class User implements Serializable {
             return false;
         }
         User other = (User) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.getId() == null && other.getId() != null) || (this.getId() != null && !this.id.equals(other.id))) {
             return false;
         }
         return true;
@@ -295,7 +229,101 @@ public class User implements Serializable {
 
     @Override
     public String toString() {
-        return "com.hb.pojo.User[ id=" + id + " ]";
+        return "com.hb.pojo.User[ id=" + getId() + " ]";
     }
+
+    /**
+     * @return the email
+     */
+    public String getEmail() {
+        return email;
+    }
+
+    /**
+     * @param email the email to set
+     */
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    /**
+     * @return the password
+     */
+    public String getPassword() {
+        return password;
+    }
+
+    /**
+     * @param password the password to set
+     */
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    /**
+     * @return the username
+     */
+    public String getUsername() {
+        return username;
+    }
+
+    /**
+     * @param username the username to set
+     */
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    /**
+     * @return the role
+     */
+    public UserRole getRole() {
+        return role;
+    }
+
+    /**
+     * @param role the role to set
+     */
+    public void setRole(UserRole role) {
+        this.role = role;
+    }
+
+    /**
+     * @return the isActive
+     */
+    public boolean isIsActive() {
+        return isActive;
+    }
+
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * @return the serialVersionUID
+     */
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+    /**
+     * @param aSerialVersionUID the serialVersionUID to set
+     */
+    public static void setSerialVersionUID(long aSerialVersionUID) {
+        serialVersionUID = aSerialVersionUID;
+    }
+
+
     
+
 }

@@ -122,6 +122,7 @@ const Login = () => {
                                 value={user.username || ''}
                                 onChange={handleInputChange}
                                 style={formCardStyle.input}
+                                disabled={loading}
                             />
                             <Form.Label htmlFor="loginEmail">Tên tài khoản</Form.Label>
                         </Form.Floating>
@@ -134,6 +135,7 @@ const Login = () => {
                                 value={user.password || ''}
                                 onChange={handleInputChange}
                                 style={formCardStyle.input}
+                                disabled={loading}
                             />
                             <Form.Label htmlFor="loginPassword">Mật khẩu</Form.Label>
                         </Form.Floating>
@@ -146,7 +148,7 @@ const Login = () => {
                             {loading ? <MySpinner /> : 'Đăng nhập'}
                         </Button>
                         <div className="d-flex justify-content-center gap-2 mt-3 position-relative">
-                            <FacebookLoginButton />
+                            <FacebookLoginButton loading={loading} />
                             <GoogleLoginButton loading={loading} setLoading={setLoading} setErr={setErr} />
                         </div>
                     </Form>

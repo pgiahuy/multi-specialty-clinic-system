@@ -11,6 +11,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -25,44 +26,45 @@ import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
 
 /**
  *
- * @author HUY
+ * @author DELL
  */
 @Entity
 @Table(name = "lab_result")
 @NamedQueries({
     @NamedQuery(name = "LabResult.findAll", query = "SELECT l FROM LabResult l"),
+    @NamedQuery(name = "LabResult.findById", query = "SELECT l FROM LabResult l WHERE l.id = :id"),
     @NamedQuery(name = "LabResult.findByStatus", query = "SELECT l FROM LabResult l WHERE l.status = :status"),
     @NamedQuery(name = "LabResult.findByCreatedAt", query = "SELECT l FROM LabResult l WHERE l.createdAt = :createdAt"),
-    @NamedQuery(name = "LabResult.findByTestAt", query = "SELECT l FROM LabResult l WHERE l.testAt = :testAt"),
-    @NamedQuery(name = "LabResult.findById", query = "SELECT l FROM LabResult l WHERE l.id = :id")})
+    @NamedQuery(name = "LabResult.findByTestAt", query = "SELECT l FROM LabResult l WHERE l.testAt = :testAt")})
 public class LabResult implements Serializable {
 
-    @Size(max = 9)
-    @Column(name = "status")
-    @Enumerated(EnumType.STRING)
-    private LabResultStatus status;
-    @Basic(optional = false)
-    @NotNull()
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-    @Column(name = "test_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime testAt;
-    @Column(name = "dr_id")
-    private Long drId;
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
+    @Size(max = 9)
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private LabResultStatus status;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime createdAt;
+    @Column(name = "test_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime testAt;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "dr_id") 
+    private Doctor drId;
     @JoinColumn(name = "appointment_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Appointment appointmentId;
@@ -81,8 +83,6 @@ public class LabResult implements Serializable {
         this.createdAt = createdAt;
     }
 
-
-
     public Long getId() {
         return id;
     }
@@ -91,20 +91,28 @@ public class LabResult implements Serializable {
         this.id = id;
     }
 
-    public Appointment getAppointmentId() {
-        return appointmentId;
+    public LabResultStatus getStatus() {
+        return status;
     }
 
-    public void setAppointmentId(Appointment appointmentId) {
-        this.appointmentId = appointmentId;
+    public void setStatus(LabResultStatus status) {
+        this.status = status;
     }
 
-    public Collection<LabResultDetail> getLabResultDetailCollection() {
-        return labResultDetailCollection;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public void setLabResultDetailCollection(Collection<LabResultDetail> labResultDetailCollection) {
-        this.labResultDetailCollection = labResultDetailCollection;
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getTestAt() {
+        return testAt;
+    }
+
+    public void setTestAt(LocalDateTime testAt) {
+        this.testAt = testAt;
     }
 
     @Override
@@ -133,41 +141,45 @@ public class LabResult implements Serializable {
     }
 
     /**
-     * @return the dr_id
+     * @return the drId
      */
-    public LabResultStatus getStatus() {
-        return status;
-    }
-
-    /**
-     * @param dr_id the dr_id to set
-     */
-    public void setStatus(LabResultStatus status) {
-        this.status = status;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getTestAt() {
-        return testAt;
-    }
-
-    public void setTestAt(LocalDateTime testAt) {
-        this.testAt = testAt;
-    }
-
-    public Long getDrId() {
+    public Doctor getDrId() {
         return drId;
     }
 
-    public void setDrId(Long drId) {
+    /**
+     * @param drId the drId to set
+     */
+    public void setDrId(Doctor drId) {
         this.drId = drId;
     }
-    
+
+    /**
+     * @return the appointmentId
+     */
+    public Appointment getAppointmentId() {
+        return appointmentId;
+    }
+
+    /**
+     * @param appointmentId the appointmentId to set
+     */
+    public void setAppointmentId(Appointment appointmentId) {
+        this.appointmentId = appointmentId;
+    }
+
+    /**
+     * @return the labResultDetailCollection
+     */
+    public Collection<LabResultDetail> getLabResultDetailCollection() {
+        return labResultDetailCollection;
+    }
+
+    /**
+     * @param labResultDetailCollection the labResultDetailCollection to set
+     */
+    public void setLabResultDetailCollection(Collection<LabResultDetail> labResultDetailCollection) {
+        this.labResultDetailCollection = labResultDetailCollection;
+    }
+
 }

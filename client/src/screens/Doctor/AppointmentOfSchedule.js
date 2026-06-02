@@ -3,20 +3,32 @@ import Footer from "../../components/Footer";
 import Header from "../../components/Header";
 import { authApis, CLINIC_ENDPOINTS, endpoint } from "../../configs/Apis";
 import { useNavigate, useParams } from "react-router-dom";
-import { Button, Container, Table } from "react-bootstrap";
+import { Button, Card, Col, Container, Row, Table } from "react-bootstrap";
 import MySpinner from "../../components/MySpinner";
 import { tableStyles } from "../Patient/PatientStyle";
 
 const AppointmentOfSchedule = () => {
 
     const { scheduleId } = useParams();
+    const [scheduleDetails, setScheduleDetails] = useState(null);
     const [appointments, setAppointments] = useState([]);
     const [loading, setLoading] = useState(false);
     const [confirmingAppointmentId, setConfirmingAppointmentId] = useState(null);
     const nav = useNavigate();
 
+    const loadScheduleDetails = async () => {
+        try {
+            setLoading(true);
+            const response = await authApis().get(`${CLINIC_ENDPOINTS.DOCTOR_GET_SCHEDULES_BY_ID(scheduleId)}`);
+            setScheduleDetails(response.data);
+        } catch (error) {
+            console.error("Lỗi khi tải chi tiết lịch khám:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-    const loadAppointments = async (scheduleId) => {
+    const loadAppointments = async () => {
         try {
             setLoading(true);
             const response = await authApis().get(`${CLINIC_ENDPOINTS.DOCTOR_APPOINTMENTS(scheduleId)}`);
@@ -53,9 +65,8 @@ const AppointmentOfSchedule = () => {
     };
 
     useEffect(() => {
-        if (scheduleId) {
-            loadAppointments(scheduleId);
-        }
+        loadScheduleDetails();
+        loadAppointments();
     }, [scheduleId]);
 
 
@@ -69,12 +80,10 @@ const AppointmentOfSchedule = () => {
     };
 
     const renderStatusText = (statusEn) => {
-
         const mapped = statusMap[statusEn] || { text: 'Không xác định', textColor: 'text-secondary' };
-
         return (
 
-            <span className={`${mapped.textColor} fw-bold`}>
+            <span className={`${mapped.textColor} `}>
                 {mapped.text}
             </span>
         );
@@ -83,7 +92,7 @@ const AppointmentOfSchedule = () => {
     const getAppointmentAction = (appointment) => {
         if (appointment.status === 'PENDING') {
             return {
-                label: confirmingAppointmentId === appointment.id ? 'Đang xác nhận...' : 'Xác nhận lịch hẹn',
+                label: confirmingAppointmentId === appointment.id ? 'Đang xác nhận...' : 'Xác nhận',
                 variant: 'warning',
                 disabled: confirmingAppointmentId === appointment.id,
                 onClick: () => handleConfirmAppointment(appointment.id),
@@ -92,7 +101,7 @@ const AppointmentOfSchedule = () => {
 
         if (appointment.status === 'CONFIRMED') {
             return {
-                label: confirmingAppointmentId === appointment.id ? 'Đang bắt đầu...' : 'Bắt đầu khám',
+                label: confirmingAppointmentId === appointment.id ? 'Đang bắt đầu...' : 'Vào khám',
                 variant: 'info',
                 disabled: confirmingAppointmentId === appointment.id,
                 onClick: () => handleStartAppointment(appointment.id),
@@ -101,12 +110,11 @@ const AppointmentOfSchedule = () => {
 
         if (appointment.status === 'IN_PROGRESS' || appointment.status === 'COMPLETED') {
             return {
-                label: 'Xem bệnh án',
+                label: 'Bệnh án',
                 variant: 'primary',
                 onClick: () => nav(`/doctor/appointments/${appointment.id}/medical-record`),
             };
         }
-
 
         return null;
     };
@@ -115,73 +123,122 @@ const AppointmentOfSchedule = () => {
         <>
             <div className="d-flex flex-column min-vh-100">
                 <Header />
-                <Container className="py-4">
-                    <h3 className="mb-4 text-center">DANH SÁCH LỊCH HẸN</h3>
-                    {loading ? (
-                        <div className="text-center">
-                            <MySpinner />
-                        </div>
-                    ) : appointments.length === 0 ? (
-                        <div className="text-center text-muted py-5">
-                            Không có lịch hẹn nào.
-                        </div>
-                    ) : (
-                        <div className="table-responsive w-100 mx-auto" style={tableStyles.container}>
-                            <Table hover className="table" style={tableStyles.table}>
-                                <thead>
-                                    <tr style={tableStyles.headerRow}>
-                                        <th style={tableStyles.headerCell}>Số thứ tự</th>
-                                        <th style={tableStyles.headerCell}>Bệnh nhân</th>
-                                        <th style={tableStyles.headerCell}>Bác sĩ</th>
-                                        <th style={tableStyles.headerCell}>Chuyên khoa</th>
-                                        <th style={tableStyles.headerCell}>Ngày khám</th>
-                                        <th style={tableStyles.headerCell}>Ca khám</th>
-                                        <th style={tableStyles.headerCell}>Phòng</th>
-                                        <th style={tableStyles.headerCell}>Khu vực</th>
-                                        <th style={tableStyles.headerCell}>Trạng thái</th>
-                                        <th style={tableStyles.headerCell}></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {appointments.map((appointment, index) => {
-                                        const action = getAppointmentAction(appointment);
+                <Container className="py-4 px-xl-5">
+                    <h3 className="mb-4 text-center text-primary fw-bold">
+                        DANH SÁCH LỊCH HẸN
+                    </h3>
 
-                                        return (
-                                            <tr key={appointment.id}
-                                                style={tableStyles.bodyRow(index)}
-                                                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e7f1ff'}
-                                                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = tableStyles.bodyRow(index).backgroundColor}>
-                                                <td style={tableStyles.dataCell}>{index + 1}</td>
-                                                <td style={tableStyles.dataCell}>{appointment.patientFullName}</td>
-                                                <td style={tableStyles.dataCell}>{appointment.doctorFullName || '-'}</td>
-                                                <td style={tableStyles.dataCell}>{appointment.specialtyName || '-'}</td>
-                                                <td style={tableStyles.dataCell}>{appointment.appointmentDate || '-'}</td>
-                                                <td style={tableStyles.dataCell}>
-                                                    <div className="fw-semibold">{appointment.session || '-'}</div>
-                                                    <div className="small text-muted">{appointment.timeSlot || '-'}</div>
-                                                </td>
-                                                <td style={tableStyles.dataCell}>{appointment.roomName || '-'}</td>
-                                                <td style={tableStyles.dataCell}>{appointment.areaName || '-'}</td>
-                                                <td style={tableStyles.dataCell}>{renderStatusText(appointment.status)}</td>
-                                                <td style={tableStyles.dataCell}>
-                                                    {action && (
-                                                        <Button
-                                                            variant={action.variant}
-                                                            className="rounded-4"
-                                                            onClick={action.onClick}
-                                                            disabled={action.disabled}
-                                                        >
-                                                            {action.label}
-                                                        </Button>
-                                                    )}
-                                                </td>
-                                            </tr>
-                                        );
-                                    })}
-                                </tbody>
-                            </Table>
-                        </div>
-                    )}
+                    <Row className="g-4">
+
+                        <Col lg={4} md={12}>
+                            <div className="sticky-top" style={{ top: '20px', zIndex: 10 }}>
+
+                                <Card className="mb-3 border-0 shadow-sm bg-light rounded-3">
+                                    <Card.Body className="p-4">
+                                        <div className="d-flex flex-column gap-2 text-secondary small p-2">
+                                            <div>
+                                                <div className="text-muted fw-bold mb-1" style={{ fontSize: '11px' }}>BÁC SĨ PHỤ TRÁCH</div>
+                                                <h5 className="mb-0 fw-bold text-dark">{scheduleDetails?.doctorName || 'Chưa phân công'}</h5>
+                                                <span className="badge bg-primary-subtle text-primary mt-2 px-2 py-2 rounded-pill">
+                                                    {scheduleDetails?.specialtyName || 'Chuyên khoa'}
+                                                </span>
+                                            </div>
+
+                                            <hr className="my-2 text-muted" />
+
+                                            <div>
+                                                <div className="text-muted fw-bold mb-1" style={{ fontSize: '11px' }}>THỜI GIAN LÀM VIỆC</div>
+                                                <h6 className="mb-0 fw-bold text-dark">{scheduleDetails?.date || '-'}</h6>
+                                                <div className="text-primary fw-bold mt-1">
+                                                    Buổi: {scheduleDetails?.session || '-'}
+                                                </div>
+                                                <div className="text-success fw-bold mt-1">
+                                                    Ca khám: {scheduleDetails?.shiftStartTime || '-'} - {scheduleDetails?.shiftEndTime || '-'}
+                                                </div>
+                                            </div>
+
+                                            <hr className="my-2 text-muted" />
+
+                                            <div>
+                                                <div className="text-muted fw-bold mb-1" style={{ fontSize: '11px' }}>ĐỊA ĐIỂM KHÁM</div>
+                                                <h6 className="mb-0 fw-bold text-dark">Phòng {scheduleDetails?.room || '-'}</h6>
+                                                <div className="text-muted mt-1">
+                                                    <span className="fw-semibold text-dark">{scheduleDetails?.area || '-'}</span>
+                                                </div>
+                                            </div>
+
+                                            <hr className="my-2 text-muted" />
+
+                                            <div className="d-flex flex-row gap-1 align-items-center  justify-content-between">
+                                                <div className="text-muted fw-bold" style={{ fontSize: '14px' }}>SỐ BỆNH NHÂN HIỆN CÓ</div>
+                                                <h2 className="mb-0 fw-bold text-dark">{scheduleDetails?.currentPatients || 0} / {scheduleDetails?.maxPatients || 0}</h2>
+                                            </div>
+                                        </div>
+                                    </Card.Body>
+                                </Card>
+
+
+                            </div>
+                        </Col>
+
+
+                        <Col lg={8} md={12}>
+                            {loading ? (
+                                <div className="text-center py-5">
+                                    <MySpinner />
+                                </div>
+                            ) : appointments.length === 0 ? (
+                                <div className="text-center text-muted py-5 bg-white rounded-3 shadow-sm">
+                                    Không có lịch hẹn nào trong ca khám này.
+                                </div>
+                            ) : (
+                                <Card className="border-0 shadow-sm rounded-3 overflow-hidden">
+                                    <div className="table-responsive w-100" style={tableStyles.container}>
+                                        <Table hover className="table mb-0" style={tableStyles.table}>
+                                            <thead>
+                                                <tr style={tableStyles.headerRow}>
+                                                    <th style={tableStyles.headerCell}>STT</th>
+                                                    <th style={tableStyles.headerCell}>Bệnh nhân</th>
+                                                    <th style={tableStyles.headerCell}>Trạng thái</th>
+                                                    <th style={tableStyles.headerCell}>Hành động</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {appointments.map((appointment, index) => {
+                                                    const action = getAppointmentAction(appointment);
+
+                                                    return (
+                                                        <tr key={appointment.id}
+                                                            className="align-middle"
+                                                            style={tableStyles.bodyRow(index)}
+                                                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e7f1ff'}
+                                                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = tableStyles.bodyRow(index).backgroundColor}>
+                                                            <td style={tableStyles.dataCell}>{index + 1}</td>
+                                                            <td style={tableStyles.dataCell}>{appointment.patientFullName}</td>
+                                                            <td style={tableStyles.dataCell}>{renderStatusText(appointment.status)}</td>
+                                                            <td style={tableStyles.dataCell}>
+                                                                {action ? (
+                                                                    <Button
+                                                                        variant={action.variant}
+                                                                        className="rounded-2 p-2 my-0 btn-sm"
+                                                                        onClick={action.onClick}
+                                                                        disabled={action.disabled}
+                                                                    >
+                                                                        {action.label}
+                                                                    </Button>
+                                                                ) : "-"}
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })}
+                                            </tbody>
+                                        </Table>
+                                    </div>
+                                </Card>
+                            )}
+                        </Col>
+                    </Row>
+
                 </Container>
                 <Footer />
             </div>

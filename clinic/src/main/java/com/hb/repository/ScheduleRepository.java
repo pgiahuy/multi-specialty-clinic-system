@@ -17,9 +17,11 @@ public interface ScheduleRepository extends BaseRepository<Schedule>{
     List<Schedule> getSchedules(Map<String,String> params);
     Schedule saveOrUpdate(Schedule d);
     Schedule getScheduleById(Long id);
+    Schedule getScheduleByDoctor(Map<String, String> params);
     void deleteSchedule(Long id);
     boolean checkDoctorAvailability(Long doctorId, LocalDate date, Long shiftId, Long excludeId);
     boolean checkRoomAvailability(Long roomId, LocalDate date, Long shiftId, Long excludeId);
     int incrementCurrentPatients(Long scheduleId);
+    int decrementCurrentPatients(Long scheduleId);
     
 }

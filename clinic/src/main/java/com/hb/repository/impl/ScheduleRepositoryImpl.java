@@ -70,6 +70,8 @@ public class ScheduleRepositoryImpl extends BaseRepositoryImpl<Schedule> impleme
             boolean hasFromDate = params.containsKey("fromDate") && !params.get("fromDate").isEmpty();
             boolean hasToDate = params.containsKey("toDate") && !params.get("toDate").isEmpty();
 
+            boolean hasAnyDateParam = hasFromDate || hasToDate || (params.containsKey("date") && !params.get("date").isEmpty());
+
             if (hasFromDate && hasToDate) {
                 LocalDate from = LocalDate.parse(params.get("fromDate"));
                 LocalDate to = LocalDate.parse(params.get("toDate"));
@@ -85,6 +87,11 @@ public class ScheduleRepositoryImpl extends BaseRepositoryImpl<Schedule> impleme
             if (params.containsKey("date") && !params.get("date").isEmpty()) {
                 LocalDate singleDate = LocalDate.parse(params.get("date"));
                 predicates.add(cb.equal(root.get("date"), singleDate));
+            }
+
+            if (params.containsKey("role") && "patient".equalsIgnoreCase(params.get("role")) && !hasAnyDateParam) {
+                LocalDate today = LocalDate.now();
+                predicates.add(cb.greaterThan(root.get("date"), today));
             }
         }
 
@@ -176,6 +183,20 @@ public class ScheduleRepositoryImpl extends BaseRepositoryImpl<Schedule> impleme
     }
 
     @Override
+    public Schedule getScheduleByDoctor(Map<String, String> params) {
+        Session session = this.factory.getObject().getCurrentSession();
+        Query<Schedule> q = session.createQuery("SELECT s FROM Schedule s WHERE s.id = :scheduleId "
+                + "AND s.doctorId.id =: doctorId", Schedule.class);
+
+        if (params != null && params.containsKey("scheduleId") && params.containsKey("doctorId")) {
+            q.setParameter("scheduleId", params.get("scheduleId"));
+            q.setParameter("doctorId", params.get("doctorId"));
+        }
+
+        return q.getSingleResult();
+    }
+
+    @Override
     public long count(Map<String, String> params, Class<Schedule> clazz) {
         Session session = this.factory.getObject().getCurrentSession();
         CriteriaBuilder cb = session.getCriteriaBuilder();
@@ -205,6 +226,7 @@ public class ScheduleRepositoryImpl extends BaseRepositoryImpl<Schedule> impleme
 
             boolean hasFromDate = params.containsKey("fromDate") && !params.get("fromDate").isEmpty();
             boolean hasToDate = params.containsKey("toDate") && !params.get("toDate").isEmpty();
+            boolean hasAnyDateParam = hasFromDate || hasToDate || (params.containsKey("date") && !params.get("date").isEmpty());
 
             if (hasFromDate && hasToDate) {
                 LocalDate from = LocalDate.parse(params.get("fromDate"));
@@ -222,6 +244,11 @@ public class ScheduleRepositoryImpl extends BaseRepositoryImpl<Schedule> impleme
                 LocalDate singleDate = LocalDate.parse(params.get("date"));
                 predicates.add(cb.equal(root.get("date"), singleDate));
             }
+
+                if (params.containsKey("role") && "patient".equalsIgnoreCase(params.get("role")) && !hasAnyDateParam) {
+                    LocalDate today = LocalDate.now();
+                    predicates.add(cb.greaterThan(root.get("date"), today));
+                }
         }
 
         cq.where(predicates.toArray(new Predicate[0]));
@@ -238,6 +265,19 @@ public class ScheduleRepositoryImpl extends BaseRepositoryImpl<Schedule> impleme
 
         String hql = "UPDATE Schedule s SET s.currentPatients = s.currentPatients + 1 "
                 + "WHERE s.id = :id AND s.currentPatients < s.maxPatients";
+        MutationQuery query = session.createMutationQuery(hql);
+        query.setParameter("id", scheduleId);
+
+        return query.executeUpdate();
+    }
+
+    @Override
+    public int decrementCurrentPatients(Long scheduleId) {
+        Session session = this.factory.getObject().getCurrentSession();
+
+        String hql = "UPDATE Schedule s SET s.currentPatients = s.currentPatients - 1 "
+                + "WHERE s.id = :id AND s.currentPatients > 0";
+
         MutationQuery query = session.createMutationQuery(hql);
         query.setParameter("id", scheduleId);
 
