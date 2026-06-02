@@ -59,15 +59,10 @@ public class SpringSecurityConfigs {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.cors(cor -> cor.configurationSource(corsConfigurationSource()))
-                .csrf(c -> c.disable()).authorizeHttpRequests((requests) -> requests
+        http.securityMatcher("/admin/**", "/", "/login").csrf(c -> c.disable()).authorizeHttpRequests((requests) -> requests
                 .requestMatchers("/", "/admin").hasRole("ADMIN")
-                .requestMatchers("/css/**", "/js/**", "/api/**").permitAll()
-                .requestMatchers("/api/secure/**").authenticated()
-                .anyRequest().authenticated()
-        )
-        .addFilterBefore(new JwtFilter(), UsernamePasswordAuthenticationFilter.class)
-        .formLogin(form -> form.loginPage("/admin/login")
+                .anyRequest().permitAll()
+        ).formLogin(form -> form.loginPage("/admin/login")
                 .loginProcessingUrl("/login")
                 .defaultSuccessUrl("/", true)
                 .failureUrl("/admin/login?error=true")
@@ -85,22 +80,5 @@ public class SpringSecurityConfigs {
                         "api_secret", "V6zm1SX3rb4vEO6xbIGPxTWgk98",
                         "secure", true));
         return cloudinary;
-    }
-
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-
-        CorsConfiguration config = new CorsConfiguration();
-
-        config.setAllowedOrigins(List.of("http://localhost:3000","http://127.0.0.1:3000","https://triplehstorage.site"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
-        config.setExposedHeaders(List.of("Authorization"));
-        config.setAllowCredentials(true);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-
-        return source;
     }
 }
