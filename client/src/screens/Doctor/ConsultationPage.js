@@ -1,20 +1,22 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
-import { Container, Row, Col, Card, ListGroup, Form, InputGroup, Button, Stack } from "react-bootstrap";
-import { Search, Send, FileText, Person, ChatDots, CircleFill } from "react-bootstrap-icons";
+import { useSearchParams } from "react-router-dom";
+import { Card, ListGroup, Form, InputGroup, Button, Spinner } from "react-bootstrap";
+import { Search, Send, FileText, Person, ChatDots, CircleFill, ChevronDown } from "react-bootstrap-icons";
 import { authApis, CHAT_ENDPOINTS, CLINIC_ENDPOINTS } from "../../configs/Apis";
 import Header from "../../components/Header";
+import { db } from '../../configs/firebaseConfig';
+import { ref, query as dbQuery, orderByChild, onValue, off } from 'firebase/database';
 
 
 const ConsultationPage = () => {
 
     const [searchParams, setSearchParams] = useSearchParams();
-    const navigate = useNavigate();
 
     const [conversations, setConversations] = useState([]);
     const [allPatients, setAllPatients] = useState([]);
     const [activeChat, setActiveChat] = useState(null);
     const [messages, setMessages] = useState([]);
+    const [loadingMessages, setLoadingMessages] = useState(false);
 
     const [inputText, setInputText] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
@@ -22,7 +24,10 @@ const ConsultationPage = () => {
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
 
     const chatBodyRef = useRef(null);
+    const unsubscribeRef = useRef(null);
     const debounceTimerRef = useRef(null);
+    const shouldAutoScrollRef = useRef(false);
+    const [showScrollBtn, setShowScrollBtn] = useState(false);
 
     useEffect(() => {
         const loadConversations = async () => {
@@ -125,6 +130,12 @@ const ConsultationPage = () => {
     const handleSelectChat = async (chatItem) => {
         setSearchTerm("");
 
+        const existingConvo = conversations.find(c => String(c.patient_id) === String(chatItem.patient_id));
+        if (existingConvo && existingConvo.id) {
+            setSearchParams({ conversationId: existingConvo.id });
+            return;
+        }
+
         if (chatItem.id) {
             setSearchParams({ conversationId: chatItem.id });
             return;
@@ -159,55 +170,112 @@ const ConsultationPage = () => {
             const chat = conversations.find(c => String(c.id) === String(convoId));
             if (chat) {
                 setActiveChat(chat);
-
-                const fetchMessages = async () => {
-                    try {
-                        const res = await authApis().get(CHAT_ENDPOINTS.MESSAGES(convoId));
-
-                        const formattedMsgs = res.data.map(m => ({
-                            id: m.id,
-                            conversation_id: m.conversationId?.id,
-                            sender_id: m.senderId?.id,
-                            sender_type: m.senderType,
-                            content: m.content,
-                            created_at: new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                        }));
-                        setMessages(formattedMsgs);
-                    } catch (err) {
-                        console.error("Lỗi lấy lịch sử tin nhắn:", err);
-                    }
-                };
-                fetchMessages();
             }
         } else if (conversations.length > 0) {
             setSearchParams({ conversationId: conversations[0].id });
         }
-
-        const bcChat = new BroadcastChannel('fcm_chat_messages');
-        bcChat.onmessage = (event) => {
-            const fcmData = event.data;
-
-            if (convoId && String(fcmData.conversation_id) === String(convoId)) {
-                const newIncomingMsg = {
-                    id: fcmData.message_id,
-                    conversation_id: fcmData.conversation_id,
-                    sender_id: fcmData.sender_id,
-                    sender_type: fcmData.sender_type,
-                    content: fcmData.content,
-                    created_at: new Date(Number(fcmData.created_at)).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                };
-                setMessages(prev => [...prev, newIncomingMsg]);
-            }
-        };
-
-        return () => bcChat.close();
     }, [searchParams, conversations]);
 
+    const formatChatTimestamp = (timestamp) => {
+        if (!timestamp) return "";
+        const parsed = typeof timestamp === 'number' || /^[0-9]+$/.test(String(timestamp))
+            ? new Date(Number(timestamp))
+            : new Date(String(timestamp));
+
+        if (!isNaN(parsed.getTime())) {
+            return parsed.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+        return String(timestamp);
+    };
+
     useEffect(() => {
-        if (chatBodyRef.current) {
-            chatBodyRef.current.scrollTop = chatBodyRef.current.scrollHeight;
+        if (unsubscribeRef.current) {
+            unsubscribeRef.current();
+            unsubscribeRef.current = null;
+        }
+
+        if (!activeChat?.id) {
+            setMessages([]);
+            return;
+        }
+
+        setLoadingMessages(true);
+        const messagesRef = dbQuery(ref(db, `chat_messages/${activeChat.id}`), orderByChild('createdAt'));
+
+        const onDataChange = (snapshot) => {
+            const loadedMessages = [];
+            snapshot.forEach(child => {
+                const data = child.val();
+                loadedMessages.push({
+                    id: String(child.key),
+                    sender_id: data.senderId,
+                    sender_type: data.senderType,
+                    content: data.content,
+                    created_at: formatChatTimestamp(data.createdAt),
+                    raw_timestamp: data.createdAt
+                });
+            });
+
+            loadedMessages.sort((a, b) => {
+                const aTime = a.raw_timestamp ? new Date(a.raw_timestamp).getTime() : 0;
+                const bTime = b.raw_timestamp ? new Date(b.raw_timestamp).getTime() : 0;
+                return aTime - bTime;
+            });
+
+            setMessages(loadedMessages);
+            setLoadingMessages(false);
+        };
+
+        const onError = (err) => {
+            console.error('Lỗi realtime Realtime Database trên doctor:', err);
+            setLoadingMessages(false);
+        };
+
+        onValue(messagesRef, onDataChange, onError);
+        unsubscribeRef.current = () => off(messagesRef, 'value', onDataChange);
+
+        return () => {
+            if (unsubscribeRef.current) {
+                unsubscribeRef.current();
+                unsubscribeRef.current = null;
+            }
+        };
+    }, [activeChat]);
+
+    useEffect(() => {
+
+        if (!chatBodyRef.current) return;
+        const el = chatBodyRef.current;
+        const nearBottom = el.scrollHeight - (el.scrollTop + el.clientHeight) < 5;
+
+        if (shouldAutoScrollRef.current || nearBottom) {
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    if (!chatBodyRef.current) return;
+                    chatBodyRef.current.scrollTo({ top: chatBodyRef.current.scrollHeight, behavior: 'smooth' });
+                    shouldAutoScrollRef.current = false;
+                    setShowScrollBtn(false);
+                }, 50);
+            });
         }
     }, [messages]);
+
+    useEffect(() => {
+        shouldAutoScrollRef.current = true;
+        setShowScrollBtn(false);
+    }, [activeChat]);
+
+    const handleScroll = (e) => {
+        const el = e.target;
+        const isNearBottom = el.scrollHeight - (el.scrollTop + el.clientHeight) < 5;
+        setShowScrollBtn(!isNearBottom);
+    };
+
+    const scrollToBottom = () => {
+        if (!chatBodyRef.current) return;
+        chatBodyRef.current.scrollTo({ top: chatBodyRef.current.scrollHeight, behavior: 'smooth' });
+        setShowScrollBtn(false);
+    };
 
     const handleSendMessage = async (e) => {
         e.preventDefault();
@@ -215,6 +283,7 @@ const ConsultationPage = () => {
 
         const currentText = inputText;
         setInputText("");
+        shouldAutoScrollRef.current = true;
 
         try {
             const res = await authApis().post(CHAT_ENDPOINTS.SEND_MESSAGE, {
@@ -224,16 +293,6 @@ const ConsultationPage = () => {
                 sender_type: "DOCTOR"
             });
 
-            const newDocMsg = {
-                id: String(res.data.id),
-                conversation_id: res.data.conversationId?.id,
-                sender_id: res.data.senderId?.id,
-                sender_type: res.data.senderType,
-                content: res.data.content,
-                created_at: new Date(res.data.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            };
-
-            setMessages(prev => [...prev, newDocMsg]);
         } catch (error) {
             console.error("Lỗi không thể gửi tin nhắn:", error);
         }
@@ -297,7 +356,7 @@ const ConsultationPage = () => {
                                             key={c.id || `conversation-${index}`}
                                             action
                                             as="button"
-                                            className={`p-3 border-0 d-flex align-items-center transition-all ${isSelected ? "bg-primary-subtle text-primary border-start border-3 border-primary" : ""}`}
+                                            className={`p-3 border-bottom d-flex align-items-center transition-all ${isSelected ? "bg-primary-subtle text-primary  border-primary" : ""}`}
                                             onClick={() => handleSelectChat(c)}
                                         >
                                             <div className={`rounded-circle d-flex align-items-center justify-content-center text-white fw-bold small ${isSelected ? "bg-primary" : "bg-secondary"}`} style={{ width: "40px", height: "40px", minWidth: "40px" }}>
@@ -324,7 +383,8 @@ const ConsultationPage = () => {
 
                 <div className="flex-grow-1 d-flex flex-column h-100">
                     {activeChat ? (
-                        <Card className="h-100 border-0 shadow-sm rounded-3 overflow-hidden d-flex flex-column bg-white">
+
+                        <Card className="h-100 border-0 shadow-sm rounded-3 overflow-hidden d-flex flex-column bg-white position-relative">
 
                             <div className="p-3 border-bottom bg-white d-flex align-items-center justify-content-between" style={{ height: "60px" }}>
                                 <div className="d-flex align-items-center overflow-hidden">
@@ -343,18 +403,22 @@ const ConsultationPage = () => {
                                 )}
                             </div>
 
-                            <div ref={chatBodyRef} className="p-3 flex-grow-1 overflow-y-auto" style={{ backgroundColor: "#f8f9fa" }}>
-                                <div className="d-flex flex-column gap-3">
-                                    {messages.length > 0 ? (
+                            <div ref={chatBodyRef} onScroll={handleScroll} className="p-3 flex-grow-1 overflow-y-auto" style={{ backgroundColor: "#f8f9fa" }}>
+                                <div className="d-flex flex-column gap-3 pb-4">
+                                    {loadingMessages ? (
+                                        <div className="text-center text-secondary small py-5 my-auto">
+                                            <Spinner animation="border" size="sm" className="me-2" /> Đang tải tin nhắn...
+                                        </div>
+                                    ) : messages.length > 0 ? (
                                         messages.map((msg) => {
-                                            const isDoc = msg.sender_type === "DOCTOR";
+                                            const isDoc = msg.sender_type === "ROLE_DOCTOR" || msg.sender_type === "DOCTOR";
                                             return (
                                                 <div key={msg.id} className={`d-flex ${isDoc ? "justify-content-end" : "justify-content-start"}`}>
-                                                    <div className="d-flex flex-column" style={{ maxWidth: "75%" }}>
+                                                    <div className="d-flex flex-column" style={{ maxWidth: "75%", alignItems: isDoc ? 'flex-end' : 'flex-start' }}>
                                                         <div className={`p-3 rounded-3 shadow-xs small ${isDoc ? "bg-primary text-white rounded-bottom-end-0" : "bg-white text-dark border rounded-bottom-start-0"}`} style={{ lineHeight: "1.5" }}>
                                                             {msg.content}
                                                         </div>
-                                                        <span className="text-muted mx-1 mt-1" style={{ fontSize: "10px", textAlign: isDoc ? "right" : "left" }}>
+                                                        <span className="text-muted mt-1" style={{ fontSize: "10px", textAlign: isDoc ? "right" : "left", width: '100%' }}>
                                                             {msg.created_at}
                                                         </span>
                                                     </div>
@@ -365,13 +429,29 @@ const ConsultationPage = () => {
                                         <div className="text-center text-muted small py-5 my-auto">
                                             <ChatDots size={32} className="mb-2 text-muted" />
                                             <p className="mb-0">Chưa có nội dung trò chuyện cũ.</p>
-                                            <p className="mb-0 text-black-50" style={{ fontSize: "11px" }}>Hãy gửi tin nhắn tư vấn đầu tiên đến bệnh nhân.</p>
                                         </div>
                                     )}
                                 </div>
                             </div>
 
-                            <div className="p-3 border-top bg-white">
+                            {showScrollBtn && (
+                                <Button
+                                    variant="primary"
+                                    size="sm"
+                                    className="position-absolute start-50 translate-middle-x rounded-circle shadow d-flex align-items-center justify-content-center"
+                                    style={{
+                                        bottom: "80px",
+                                        zIndex: 1050,
+                                        width: "36px",
+                                        height: "36px"
+                                    }}
+                                    onClick={scrollToBottom}
+                                >
+                                    <ChevronDown size={16} />
+                                </Button>
+                            )}
+
+                            <div className="p-3 border-top bg-white" style={{ height: "70px" }}>
                                 <Form onSubmit={handleSendMessage}>
                                     <InputGroup>
                                         <Form.Control
@@ -392,20 +472,20 @@ const ConsultationPage = () => {
                     ) : (
                         <Card className="h-100 border-0 shadow-sm rounded-3 d-flex flex-column align-items-center justify-content-center bg-white text-muted small">
                             <Person size={48} className="mb-2 text-black-50" />
-                            Vui lòng chọn một cuộc trò chuyện từ danh sách để bắt đầu tư vấn y tế.
+                            Vui lòng chọn một cuộc trò chuyện.
                         </Card>
                     )}
                 </div>
 
                 {showRightCol && activeChat && (
-                    <div style={{ width: "300px", minWidth: "300px" }} className="d-flex flex-column h-100">
+                    <div style={{ width: "400px", minWidth: "300px" }} className="d-flex flex-column h-100">
                         <Card className="h-100 border-0 shadow-sm rounded-3 overflow-hidden d-flex flex-column bg-white animate-fade-in">
                             <div className="p-3 border-bottom bg-white d-flex align-items-center justify-content-between" style={{ height: "60px" }}>
                                 <span className="fw-bold text-secondary small d-flex align-items-center gap-1">
                                     <FileText size={16} /> THÔNG TIN LÂM SÀNG
                                 </span>
                                 <Button size="sm" variant="link" className="text-muted text-decoration-none p-0 fw-bold small" onClick={() => setShowRightCol(false)}>
-                                    Đóng ✕
+                                    Đóng
                                 </Button>
                             </div>
 
@@ -442,7 +522,7 @@ const ConsultationPage = () => {
                     </div>
                 )}
             </div>
-        </div>
+        </div >
     );
 };
 

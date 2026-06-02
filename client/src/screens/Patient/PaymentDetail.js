@@ -443,7 +443,7 @@ const PaymentDetail = () => {
                                                         <Button
                                                             variant="outline-primary"
                                                             className="rounded-pill px-3 py-2 w-100 fw-medium"
-                                                            onClick={() => navigate(`/appointment/${p.paymentItems[0].referenceId}`)}
+                                                            onClick={() => navigate(`/appointments/${p.paymentItems[0].referenceId}`)}
                                                         >
                                                             <i className="bi bi-info-circle me-2"></i> Xem chi tiết
                                                         </Button>

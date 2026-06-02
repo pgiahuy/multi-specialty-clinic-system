@@ -5,6 +5,7 @@ import com.hb.pojo.User;
 import com.hb.pojo.Patient;
 import com.hb.dto.response.ConversationResponse;
 import com.hb.service.ChatService;
+import com.hb.service.PatientService;
 import com.hb.service.UserService;
 import java.security.Principal;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,9 @@ public class ApiConversationController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private PatientService patientService;
+
     @GetMapping("")
     @PreAuthorize("hasAnyRole('DOCTOR','PATIENT')")
     public ResponseEntity<List<Map<String, Object>>> getConversations(@RequestParam Map<String,String> params, Principal principal) {
@@ -40,7 +44,29 @@ public class ApiConversationController {
                 List<Map<String, Object>> conversations = chatService.getConversationsForDoctor(current.getId());
                 return ResponseEntity.ok(conversations);
             } else if (role != null && role.equals("ROLE_PATIENT")) {
-                List<Map<String, Object>> conversations = chatService.getConversationsForPatient(current.getId());
+                Long patientProfileId = null;
+                if (params.get("patientProfileId") != null && !params.get("patientProfileId").isBlank()) {
+                    try {
+                        patientProfileId = Long.valueOf(params.get("patientProfileId"));
+                    } catch (NumberFormatException ex) {
+                        return ResponseEntity.badRequest().build();
+                    }
+                }
+
+                if (patientProfileId != null) {
+                    if (!patientService.checkAccess(current, patientProfileId)) {
+                        return ResponseEntity.status(403).build();
+                    }
+                } else {
+                    List<Patient> patientProfiles = patientService.getPatientsByUserId(current.getId());
+                    if (patientProfiles.size() == 1) {
+                        patientProfileId = patientProfiles.get(0).getId();
+                    } else {
+                        return ResponseEntity.badRequest().build();
+                    }
+                }
+
+                List<Map<String, Object>> conversations = chatService.getConversationsForPatient(patientProfileId);
                 return ResponseEntity.ok(conversations);
             } else {
                 return ResponseEntity.badRequest().build();
@@ -70,7 +96,23 @@ public class ApiConversationController {
                     return ResponseEntity.badRequest().body("Thiếu patientId trong request body!");
                 }
             } else if (role != null && role.equals("ROLE_PATIENT")) {
-                patientId = current.getId();
+                if (params.get("patientId") != null) {
+                    patientId = params.get("patientId");
+                }
+
+                if (patientId == null) {
+                    List<Patient> patientProfiles = patientService.getPatientsByUserId(current.getId());
+                    if (patientProfiles.size() == 1) {
+                        patientId = patientProfiles.get(0).getId();
+                    } else {
+                        return ResponseEntity.badRequest().body("Thiếu patientId trong request body!");
+                    }
+                }
+
+                if (!patientService.checkAccess(current, patientId)) {
+                    return ResponseEntity.status(403).body("Không có quyền truy cập hồ sơ bệnh nhân này!");
+                }
+
                 if (doctorId == null) {
                     return ResponseEntity.badRequest().body("Thiếu doctorId trong request body!");
                 }

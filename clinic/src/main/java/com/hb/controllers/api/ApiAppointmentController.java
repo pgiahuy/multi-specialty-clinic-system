@@ -59,6 +59,7 @@ public class ApiAppointmentController {
     private UserService userService;
 
     @PostMapping("/secure/appointments")
+    @PreAuthorize("hasRole('PATIENT')")
     public ResponseEntity<AppointmentResponse> register(@RequestBody AppointmentCreateRequest req) {
         AppointmentResponse a = this.appointmentService.registerAppointment(req);
         return new ResponseEntity<>(a, HttpStatus.CREATED);
@@ -102,14 +103,11 @@ public class ApiAppointmentController {
         }
 
         boolean isOwner = false;
-
-        
         if (UserRole.ROLE_DOCTOR.equals(currentUser.getRole())) {
             if (appointment.getScheduleId() != null && appointment.getScheduleId().getDoctorId() != null) {
                 isOwner = appointment.getScheduleId().getDoctorId().getUserId().getId().equals(currentUser.getId());
             }
         }
-
         if (!isOwner) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Không có quyền xác nhận lịch hẹn!");
         }
@@ -137,7 +135,6 @@ public class ApiAppointmentController {
                 isOwner = appointment.getScheduleId().getDoctorId().getUserId().getId().equals(currentUser.getId());
             }
         }
-
         if (!isOwner) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Không có quyền bắt đầu khám!");
         }
@@ -149,7 +146,6 @@ public class ApiAppointmentController {
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Chỉ có thể bắt đầu khám khi lịch hẹn đang ở trạng thái đã xác nhận!");
         }
-
     }
 
     @GetMapping("/secure/appointments/patient/{patientId}")

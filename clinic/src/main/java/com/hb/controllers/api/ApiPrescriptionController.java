@@ -68,7 +68,7 @@ public class ApiPrescriptionController {
     }
     
     @GetMapping("/prescriptions")
-    @PreAuthorize("hasRole('DOCTOR','PATIENT','STAFF')")
+    @PreAuthorize("hasAnyRole('DOCTOR','PATIENT','STAFF')")
     public ResponseEntity<List<PrescriptionResponse>> list(@RequestParam Map<String,String> params, Principal principal){
         User u = userService.getUserByUsername(principal.getName());
         
@@ -88,9 +88,16 @@ public class ApiPrescriptionController {
     
     
     @GetMapping("prescriptions/medical-record/{recordId}")
-    @PreAuthorize("hasRole('DOCTOR','PATIENT','STAFF')")
+    @PreAuthorize("hasAnyRole('DOCTOR','PATIENT','STAFF')")
     public ResponseEntity<PrescriptionResponse> list(@PathVariable("recordId") Long id, Principal p){
         Prescription prescription = this.prescriptionService.getPrescriptionByMedicalRecordId(id);
+        return ResponseEntity.ok().body(PrescriptionMapper.INSTANCE.toResponse(prescription));
+    }
+    
+    @GetMapping("prescriptions/{id}")
+    @PreAuthorize("hasAnyRole('DOCTOR','PATIENT','STAFF')")
+    public ResponseEntity<PrescriptionResponse> getById(@PathVariable("id") Long id, Principal p){
+        Prescription prescription = this.prescriptionService.getPrescriptionById(id);
         return ResponseEntity.ok().body(PrescriptionMapper.INSTANCE.toResponse(prescription));
     }
 }

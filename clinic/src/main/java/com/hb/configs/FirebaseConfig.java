@@ -27,8 +27,9 @@ public class FirebaseConfig {
             ClassPathResource resource = new ClassPathResource("serviceAccountKey.json");
             InputStream serviceAccount = resource.getInputStream();
 
-            FirebaseOptions options = FirebaseOptions.builder()
+                FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                    .setDatabaseUrl("https://multi-specialty-clinic-system-default-rtdb.asia-southeast1.firebasedatabase.app")
                     .build();
 
             if (FirebaseApp.getApps().isEmpty()) {

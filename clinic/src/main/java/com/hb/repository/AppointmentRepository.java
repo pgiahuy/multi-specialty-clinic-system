@@ -5,6 +5,7 @@
 package com.hb.repository;
 
 import com.hb.pojo.Appointment;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -20,5 +21,6 @@ public interface AppointmentRepository extends BaseRepository<Appointment>{
     Appointment addOrUpdateAppointment(Appointment a);
     long countAppointments(Map<String, String> params);
     boolean isPatientAlreadyBookedInSchedule(Long patientId, Long scheduleId);
+    List<Appointment> getConfirmedAppointmentsForReminder(LocalDateTime from, LocalDateTime to);
     
 }

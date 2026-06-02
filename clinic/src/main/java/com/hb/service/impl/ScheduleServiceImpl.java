@@ -21,7 +21,6 @@ import com.hb.repository.ScheduleRepository;
 import com.hb.repository.ShiftRepository;
 import com.hb.repository.SpecialtyRepository;
 import com.hb.service.ScheduleService;
-import com.hb.service.SpecialtyService;
 import java.time.LocalDate;
 
 import java.util.List;
@@ -117,6 +116,11 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     public Schedule getScheduleById(Long id) {
         return this.scheduleRepo.getScheduleById(id);
+    }
+    
+    @Override
+    public Schedule getScheduleByDoctor(Map<String, String> params) {
+        return this.scheduleRepo.getScheduleByDoctor(params);
     }
 
     @Override
