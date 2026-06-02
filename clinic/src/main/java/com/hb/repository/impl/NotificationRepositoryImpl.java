@@ -24,23 +24,29 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @Transactional
 public class NotificationRepositoryImpl implements NotificationRepository {
+
     @Autowired
     private LocalSessionFactoryBean factory;
 
     @Override
     public List<Notification> getNotificationsByUserId(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
-        Query<Notification> q = session.createQuery("SELECT n FROM Notification n WHERE n.userId.id = :userId", Notification.class);
 
-        if (params != null) {
+        String hql = "SELECT n FROM Notification n WHERE n.userId.id = :userId ORDER BY n.createdAt DESC";
+        Query<Notification> q = session.createQuery(hql, Notification.class);
+
+        if (params != null && params.containsKey("userId")) {
             Long userId = Long.valueOf(params.get("userId"));
             q.setParameter("userId", userId);
 
-            int pageSize = Integer.valueOf(params.get("pageSize"));
-            int page = Integer.parseInt(params.getOrDefault("page", "1"));
-            int start = (page - 1) * pageSize;
-            q.setMaxResults(pageSize);
-            q.setFirstResult(start);
+            if (params.containsKey("pageSize")) {
+                int pageSize = Integer.parseInt(params.get("pageSize"));
+                int page = Integer.parseInt(params.getOrDefault("page", "1"));
+                int start = (page - 1) * pageSize;
+
+                q.setMaxResults(pageSize);
+                q.setFirstResult(start);
+            }
         }
 
         return q.getResultList();
@@ -77,7 +83,7 @@ public class NotificationRepositoryImpl implements NotificationRepository {
     public void markAllAsRead(String username) {
         Session session = this.factory.getObject().getCurrentSession();
         MutationQuery q = session.createMutationQuery("UPDATE Notification n SET n.isRead = true"
-            + " WHERE n.userId.username = :username AND n.isRead = false");
+                + " WHERE n.userId.username = :username AND n.isRead = false");
         q.setParameter("username", username);
         q.executeUpdate();
     }
