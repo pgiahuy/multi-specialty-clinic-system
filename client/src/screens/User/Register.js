@@ -8,6 +8,10 @@ import { formCardStyle } from "./UserStyle";
 const Register = () => {
 
     const userInfo = [{
+        field: "name",
+        title: "Họ và tên",
+        type: "text",
+    }, {
         field: "username",
         title: "Tên tài khoản",
         type: "text",
@@ -33,15 +37,68 @@ const Register = () => {
 
 
 
+    const validateUsername = (username) => {
+        if (!username || !username.trim()) return "Tên tài khoản không được để trống!";
+        const value = username.trim();
+        if (value.length < 3 || value.length > 20) return "Tên tài khoản phải có từ 3 đến 20 ký tự!";
+        if (!/^[a-z0-9._-]+$/.test(value)) return "Tên tài khoản chỉ được chứa chữ thường, số, dấu chấm, gạch dưới và gạch ngang!";
+        if (/\s/.test(value)) return "Tên tài khoản không được chứa khoảng trắng!";
+        return null;
+    };
+
+    const validatePassword = (password) => {
+        if (!password || !password.trim()) return "Mật khẩu không được để trống!";
+        if (password.length < 6) return "Mật khẩu phải có ít nhất 6 ký tự!";
+        if (!/[A-Z]/.test(password)) return "Mật khẩu phải chứa ít nhất một chữ cái viết hoa!";
+        if (!/[a-z]/.test(password)) return "Mật khẩu phải chứa ít nhất một chữ cái viết thường!";
+        if (!/\d/.test(password)) return "Mật khẩu phải chứa ít nhất một chữ số!";
+        if (!/[!@#$%^&*()]/.test(password)) return "Mật khẩu phải chứa ít nhất một ký tự đặc biệt!";
+        if (password.includes(" ")) return "Mật khẩu không được chứa khoảng trắng!";
+        return null;
+    };
+
+    const validateEmail = (email) => {
+        if (!email || !email.trim()) return "Email không được để trống!";
+        const value = email.trim();
+        if (!/^[\w.-]+@[\w.-]+\.[a-zA-Z]{2,}$/.test(value)) return "Email không hợp lệ!";
+        if (value.includes(" ")) return "Email không được chứa khoảng trắng!";
+        return null;
+    };
+
     const validate = () => {
-        for (let u of userInfo)
-            if (!(u.field in user) || !user[u.field]) {
+        for (let u of userInfo) {
+            if (u.field === "confirm") continue;
+            if (!(u.field in user) || !user[u.field]?.toString().trim()) {
                 setErr(`Vui lòng nhập ${u.title}!`);
                 return false;
             }
+        }
+
+        const usernameError = validateUsername(user.username);
+        if (usernameError) {
+            setErr(usernameError);
+            return false;
+        }
+
+        const passwordError = validatePassword(user.password);
+        if (passwordError) {
+            setErr(passwordError);
+            return false;
+        }
 
         if (user.password !== user.confirm) {
             setErr('Mật khẩu không khớp!');
+            return false;
+        }
+
+        const emailError = validateEmail(user.email);
+        if (emailError) {
+            setErr(emailError);
+            return false;
+        }
+
+        if (!user.name || !user.name.trim()) {
+            setErr('Họ và tên không được để trống!');
             return false;
         }
 
@@ -80,11 +137,8 @@ const Register = () => {
 
             } catch (error) {
                 if (error.response) {
-                    if (error.response.status === 409) {
-                        setErr(error.response.data);
-                    } else {
-                        setErr("Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.");
-                    }
+                    const serverMessage = error.response.data?.message || error.response.data || error.message;
+                    setErr(serverMessage || "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.");
                 } else {
                     setErr("Không thể kết nối đến máy chủ.");
                 }
@@ -103,17 +157,22 @@ const Register = () => {
                     {err && <Alert variant="danger">{err}</Alert>}
 
                     <Form onSubmit={register}>
-                        {userInfo.map(u => <Form.Floating key={u.field} className="mb-3" controlId={u.field}>
-
-                            <Form.Control id="userInfo"
-                                style={formCardStyle.input}
-                                type={u.type}
-                                placeholder={u.title}
-                                value={user[u.field]}
-                                onChange={e => setUser({ ...user, [u.field]: e.target.value })
-                                } />
-                            <Form.Label htmlFor="userInfo">{u.title}</Form.Label>
-                        </Form.Floating>)}
+                        {userInfo.map(u => {
+                            const controlId = `userInfo-${u.field}`;
+                            return (
+                                <Form.Floating key={u.field} className="mb-3" controlId={controlId}>
+                                    <Form.Control
+                                        id={controlId}
+                                        style={formCardStyle.input}
+                                        type={u.type}
+                                        placeholder={u.title}
+                                        value={user[u.field] || ''}
+                                        onChange={e => setUser({ ...user, [u.field]: e.target.value })}
+                                    />
+                                    <Form.Label htmlFor={controlId}>{u.title}</Form.Label>
+                                </Form.Floating>
+                            );
+                        })}
 
                         <Form.Floating className="mb-3" controlId="avatar">
 

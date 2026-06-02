@@ -77,6 +77,33 @@
   background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
 }
 
+.home-contact-section {
+  background: #ffffff;
+}
+
+.home-contact-content {
+  min-height: 100%;
+}
+
+.home-contact-list li {
+  margin-bottom: 0.85rem;
+  color: #4b5568;
+}
+
+.contact-card {
+  border: 1px solid rgba(13, 110, 253, 0.1);
+  border-radius: 24px;
+}
+
+.contact-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 @media (max-width: 991px) {
   .banner-content {
     padding: 3.5rem 0;
