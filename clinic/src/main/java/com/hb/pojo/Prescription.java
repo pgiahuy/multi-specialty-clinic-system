@@ -41,12 +41,6 @@ import java.util.Date;
     @NamedQuery(name = "Prescription.findByPublicAt", query = "SELECT p FROM Prescription p WHERE p.publicAt = :publicAt")})
 public class Prescription implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "id")
-    private Long id;
     @Column(name = "created_at")
     private LocalDateTime createdAt;
     @Size(max = 9)
@@ -54,9 +48,18 @@ public class Prescription implements Serializable {
     @Enumerated(EnumType.STRING)
     private PrescriptionStatus status;
     @Column(name = "public_at")
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime publicAt;
     @Column(name = "dispensed_at")
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime dispensedAt;
+
+    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id")
+    private Long id;
     @OneToMany(mappedBy = "prescriptionId")
     private Collection<PrescriptionItem> prescriptionItemCollection;
     @JoinColumn(name = "medical_record_id", referencedColumnName = "id")
@@ -86,13 +89,6 @@ public class Prescription implements Serializable {
         this.createdAt = createdAt;
     }
 
-    public PrescriptionStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(PrescriptionStatus status) {
-        this.status = status;
-    }
 
     public LocalDateTime getPublicAt() {
         return publicAt;
@@ -150,5 +146,15 @@ public class Prescription implements Serializable {
     public String toString() {
         return "com.hb.pojo.Prescription[ id=" + id + " ]";
     }
+
+    public PrescriptionStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(PrescriptionStatus status) {
+        this.status = status;
+    }
+
+    
     
 }

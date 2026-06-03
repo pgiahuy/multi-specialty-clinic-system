@@ -172,8 +172,8 @@ const ReceptionPrescriptions = () => {
                                                 : "---"}
                                         </td>
                                         <td>
-                                            <Badge bg={prescription.status === "PUBLIC" ? "success" : "secondary"}>
-                                                {prescription.status === "PUBLIC" ? "Đã kê đơn" : "Chưa kê"}
+                                            <Badge bg={prescription.status === "DISPENSED" ? "info" : prescription.status === "PUBLIC" ? "success" : "secondary"}>
+                                                {prescription.status === "DISPENSED" ? "Đã xuất" : prescription.status === "PUBLIC" ? "Đã kê đơn" : prescription.status}
                                             </Badge>
                                         </td>
                                         <td>

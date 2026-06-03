@@ -12,5 +12,7 @@ import com.hb.pojo.InventoryLog;
  */
 public interface InventoryLogRepository extends BaseRepository<InventoryLog>{
     void createInventoryLog(InventoryLog log);
+    java.util.List<com.hb.pojo.InventoryLog> getUnconfirmedLogsByReferenceIdAndMedicine(Long referenceId, Long medicineId);
+    void updateInventoryLog(InventoryLog log);
     
 }
