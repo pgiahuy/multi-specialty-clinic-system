@@ -108,7 +108,6 @@ public class ApiMedicalRecordController {
         if (!isAccess) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
-
         List<MedicalRecord> res = medicalRecordService.getMedicalRecordsByPatientId(patienId);
 
         return ResponseEntity.ok(res.stream().map(MedicalRecordMapper.INSTANCE::toResponse).toList());
@@ -118,7 +117,13 @@ public class ApiMedicalRecordController {
     @PreAuthorize("hasAnyRole('DOCTOR','PATIENT','STAFF')")
     public ResponseEntity<MedicalRecordResponse> getByAppointmentId(@PathVariable(value = "appointmentId") Long appointmentId,
             Principal principal) {
+        String userName = principal.getName();
+        User u = userService.getUserByUsername(userName);
         MedicalRecord res = medicalRecordService.getMedicalRecordByAppointmentId(appointmentId);
+        boolean isAccess = medicalRecordService.checkAccessControll(u, res.getId());
+        if (!isAccess) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
         return ResponseEntity.ok(MedicalRecordMapper.INSTANCE.toResponse(res));
     }
 

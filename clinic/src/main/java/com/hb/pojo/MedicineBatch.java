@@ -40,12 +40,6 @@ import java.util.Date;
     @NamedQuery(name = "MedicineBatch.findByImportDate", query = "SELECT m FROM MedicineBatch m WHERE m.importDate = :importDate")})
 public class MedicineBatch implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "id")
-    private Long id;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 50)
@@ -63,6 +57,15 @@ public class MedicineBatch implements Serializable {
     @Column(name = "import_date")
     @Temporal(TemporalType.DATE)
     private LocalDate importDate;
+    @Column(name = "is_active")
+    private boolean isActive;
+
+    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id")
+    private Long id;
     @JoinColumn(name = "medicine_id", referencedColumnName = "id")
     @ManyToOne
     private Medicine medicineId;
@@ -107,13 +110,6 @@ public class MedicineBatch implements Serializable {
         this.expiryDate = expiryDate;
     }
 
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
 
     public LocalDate getImportDate() {
         return importDate;
@@ -162,6 +158,25 @@ public class MedicineBatch implements Serializable {
     @Override
     public String toString() {
         return "com.hb.pojo.MedicineBatch[ id=" + id + " ]";
+    }
+
+ 
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+
+    public boolean getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(boolean isActive) {
+        this.isActive = isActive;
     }
     
 }

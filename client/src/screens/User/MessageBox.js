@@ -5,6 +5,7 @@ import { authApis, CHAT_ENDPOINTS, CLINIC_ENDPOINTS, USER_ENDPOINTS } from '../.
 import { db } from '../../configs/firebaseConfig';
 import { ref, query, orderByChild, onValue, off } from 'firebase/database';
 import Header from '../../components/Header';
+import { useNavigate } from 'react-router-dom';
 
 const MessageBox = () => {
     const [patientProfiles, setPatientProfiles] = useState([]);
@@ -24,6 +25,7 @@ const MessageBox = () => {
     const chatBodyRef = useRef(null);
     const shouldAutoScrollRef = useRef(false);
     const [showScrollBtn, setShowScrollBtn] = useState(false);
+    const navigate = useNavigate();
 
     const loadConversations = async (profileId) => {
         setLoadingConversations(true);
@@ -40,6 +42,11 @@ const MessageBox = () => {
             });
             const mapped = (res.data || []).map(item => ({
                 id: item.id != null ? String(item.id) : null,
+                doctorId: item.doctor_id != null ? String(item.doctor_id)
+                    : item.doctorId != null ? String(item.doctorId)
+                        : item.receiverId?.id != null ? String(item.receiverId.id)
+                            : item.receiverId != null ? String(item.receiverId)
+                                : null,
                 doctor_name: item.doctor_name || item.receiverName || 'Bác sĩ',
                 appointment_id: item.appointment_id != null ? String(item.appointment_id) : item.appointmentId ? String(item.appointmentId.id) : null,
                 is_active: item.is_active != null ? item.is_active : item.isActive,
@@ -96,6 +103,7 @@ const MessageBox = () => {
 
             const createdConvo = {
                 id: conversationId,
+                doctorId,
                 doctor_name: doctor.fullName || doctor.name || doctor.doctor_name || responseData.receiverUsername || 'Bác sĩ',
                 appointment_id: responseData.appointmentId != null ? String(responseData.appointmentId) : null,
                 is_active: responseData.isActive,
@@ -364,12 +372,27 @@ const MessageBox = () => {
                     </Card>
 
                     <Card className="shadow-sm border-0 flex-grow-1 d-flex flex-column bg-white" style={{ minHeight: '72vh' }}>
-                        <div className="p-3 border-bottom d-flex align-items-center justify-content-between">
+                        <div className="p-3 border-bottom d-flex align-items-center justify-content-between gap-3 flex-wrap">
                             <div>
                                 <div className="text-secondary small">Bác sĩ</div>
                                 <div className="fw-bold">{activeChat?.doctor_name || 'Chưa chọn bác sĩ'}</div>
                             </div>
-                            <div className="text-muted small">{activeChat ? (activeChat.is_active ? 'Đang hoạt động' : 'Không hoạt động') : ''}</div>
+                            <div className="d-flex align-items-center gap-2 flex-wrap justify-content-end">
+                                <Button
+                                    size="sm"
+                                    variant="outline-primary"
+                                    onClick={() => {
+                                        const params = [];
+                                        if (selectedProfileId) params.push(`patientId=${selectedProfileId}`);
+                                        if (activeChat?.doctorId) params.push(`doctorId=${activeChat.doctorId}`);
+                                        if (activeChat?.id) params.push(`conversationId=${activeChat.id}`);
+                                        const q = params.length ? `?${params.join('&')}` : '';
+                                        navigate(`/patient/booking${q}`);
+                                    }}
+                                >
+                                    Đặt lịch ngay
+                                </Button>
+                            </div>
                         </div>
 
                         <div className="flex-grow-1 position-relative d-flex flex-column" style={{ minHeight: 0 }}>

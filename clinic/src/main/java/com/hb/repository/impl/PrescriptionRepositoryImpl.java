@@ -45,11 +45,13 @@ public class PrescriptionRepositoryImpl extends BaseRepositoryImpl<Prescription>
             hql.append(" AND a.patientId.userId.id = :userId AND p.status = 'PUBLIC'");
         } else if ("ROLE_DOCTOR".equals(role)) {
             hql.append(" AND a.scheduleId.doctorId.userId.id = :userId");
+        } else if ("ROLE_STAFF".equals(role)) {
+            hql.append(" AND p.status = 'PUBLIC'");
         }
 
         Query<Prescription> q = session.createQuery(hql.toString(), Prescription.class);
 
-        if (role != null && userId != null) {
+        if (("ROLE_PATIENT".equals(role) || "ROLE_DOCTOR".equals(role)) && userId != null) {
             q.setParameter("userId", Long.parseLong(userId));
         }
 

@@ -16,7 +16,9 @@ import java.util.Map;
 public interface MedicineBatchRepository extends BaseRepository<MedicineBatch>{
     MedicineBatch saveOrUpdate(MedicineBatch m);
     List<MedicineBatch> getMedicineBatchs(Map<String,String> params);
+    List<MedicineBatch> getExpiringBatches(Map<String, String> params);
     long countMedicineBatchs(Map<String, String> params);
     MedicineBatch getMedicineBatchById(Long id);
     void deleteMedicineBatch(Long id);
+    MedicineBatch getAvailableBatchForMedicine(Long medicineId);
 }

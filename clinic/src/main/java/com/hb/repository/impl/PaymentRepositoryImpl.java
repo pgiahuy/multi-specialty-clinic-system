@@ -36,14 +36,42 @@ public class PaymentRepositoryImpl implements PaymentRepository {
         String userName = params.get("username");
 
         Session session = this.factory.getObject().getCurrentSession();
+        StringBuilder hql = new StringBuilder("SELECT DISTINCT p FROM Payment p "
+                + "JOIN FETCH p.appointmentId a "
+                + "JOIN FETCH a.patientId pt "
+                + "JOIN pt.userId u "
+                + "LEFT JOIN FETCH p.paymentItemCollection "
+                + "WHERE u.username = :username");
 
-        return session.createQuery(
-                "SELECT p FROM Payment p JOIN p.appointmentId a JOIN a.patientId pt JOIN pt.userId u "
-                + "WHERE u.username = :username",
-                Payment.class
-        )
-                .setParameter("username", userName)
-                .getResultList();
+        if (params != null && params.containsKey("endDate") && params.containsKey("startDate")) {
+            hql.append(" AND p.createdAt >= :startDate AND p.createdAt < :endDate");
+        } else if (params != null && params.containsKey("startDate")) {
+            hql.append(" AND p.createdAt >= :startDate");
+        } else if (params != null && params.containsKey("endDate")) {
+            hql.append(" AND p.createdAt < :endDate");
+        }
+
+        hql.append(" ORDER BY p.createdAt DESC");
+
+        Query<Payment> q = session.createQuery(hql.toString(), Payment.class)
+                .setParameter("username", userName);
+
+        if (params != null && params.containsKey("startDate")) {
+            q.setParameter("startDate", LocalDate.parse(params.get("startDate")).atStartOfDay());
+        }
+        if (params != null && params.containsKey("endDate")) {
+            q.setParameter("endDate", LocalDate.parse(params.get("endDate")).plusDays(1).atStartOfDay());
+        }
+
+        if (params != null && params.containsKey("pageSize")) {
+            int pageSize = Integer.parseInt(params.get("pageSize"));
+            int page = Integer.parseInt(params.getOrDefault("page", "1"));
+            int start = (page - 1) * pageSize;
+            q.setMaxResults(pageSize);
+            q.setFirstResult(start);
+        }
+
+        return q.getResultList();
     }
 
     @Override

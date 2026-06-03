@@ -125,13 +125,24 @@ public class ApiConversationController {
             Patient patient = conversation.getPatientId();
             User receiver = conversation.getReceiverId();
             
+            Long latestAppointmentId = null;
+            if (conversation.getAppointmentCollection() != null && !conversation.getAppointmentCollection().isEmpty()) {
+                for (var a : conversation.getAppointmentCollection()) {
+                    if (a != null && a.getId() != null) {
+                        if (latestAppointmentId == null || a.getId() > latestAppointmentId) {
+                            latestAppointmentId = a.getId();
+                        }
+                    }
+                }
+            }
+
             ConversationResponse response = new ConversationResponse(
                 conversation.getId(),
                 patient != null ? patient.getId() : null,
                 patient != null ? patient.getFullName() : null,
                 receiver != null ? receiver.getId() : null,
                 receiver != null ? receiver.getUsername() : null,
-                conversation.getAppointmentId() != null ? conversation.getAppointmentId().getId() : null,
+                latestAppointmentId,
                 conversation.getConversationType(),
                 conversation.getIsActive(),
                 conversation.getCreatedAt()
