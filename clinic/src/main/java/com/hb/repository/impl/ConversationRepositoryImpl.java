@@ -31,11 +31,13 @@ public class ConversationRepositoryImpl implements ConversationRepository {
     public List<Object[]> findAllConversationsWithPatientName(Long doctorId) {
         Session session = this.factory.getObject().getCurrentSession();
         
-        String hql = "SELECT c.id, c.patientId.id, c.receiverId.id, c.appointmentId.id, c.isActive, c.patientId.fullName "
-                   + "FROM Conversation c "
-                   + "JOIN c.patientId p "
-                   + "WHERE c.receiverId.id = :doctorId AND c.isActive = true "
-                   + "ORDER BY c.createdAt DESC";
+        String hql = "SELECT c.id, c.patientId.id, c.receiverId.id, "
+               + "(SELECT max(a.id) FROM Appointment a WHERE a.conversationId.id = c.id), "
+               + "c.isActive, c.patientId.fullName "
+               + "FROM Conversation c "
+               + "JOIN c.patientId p "
+               + "WHERE c.receiverId.id = :doctorId AND c.isActive = true "
+               + "ORDER BY c.createdAt DESC";
         
         Query<Object[]> query = session.createQuery(hql, Object[].class);
         query.setParameter("doctorId", doctorId);
@@ -47,11 +49,13 @@ public class ConversationRepositoryImpl implements ConversationRepository {
     public List<Object[]> findAllConversationsWithDoctorName(Long patientId) {
         Session session = this.factory.getObject().getCurrentSession();
 
-        String hql = "SELECT c.id, c.patientId.id, c.receiverId.id, c.appointmentId.id, c.isActive, r.doctor.fullName "
-                   + "FROM Conversation c "
-                   + "JOIN c.receiverId r "
-                   + "WHERE c.patientId.id = :patientId AND c.isActive = true "
-                   + "ORDER BY c.createdAt DESC";
+        String hql = "SELECT c.id, c.patientId.id, c.receiverId.id, "
+               + "(SELECT max(a.id) FROM Appointment a WHERE a.conversationId.id = c.id), "
+               + "c.isActive, r.doctor.id, r.doctor.fullName "
+               + "FROM Conversation c "
+               + "JOIN c.receiverId r "
+               + "WHERE c.patientId.id = :patientId AND c.isActive = true "
+               + "ORDER BY c.createdAt DESC";
 
         Query<Object[]> query = session.createQuery(hql, Object[].class);
         query.setParameter("patientId", patientId);

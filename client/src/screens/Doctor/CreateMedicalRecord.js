@@ -8,7 +8,6 @@ import FloatAlert from "../../components/FloatAlert";
 const CreateMedicalRecord = () => {
     const navigate = useNavigate();
     const alertTimerRef = useRef(null);
-
     const [searchParams] = useSearchParams();
     const [loading, setLoading] = useState(false);
     const [appointment, setAppointment] = useState(null);
@@ -79,7 +78,7 @@ const CreateMedicalRecord = () => {
 
                 handleShowAlert('Thành công', 'Tạo bệnh án thành công!', 'success');
                 alertTimerRef.current = setTimeout(() => {
-                    navigate(`/doctor/appointments/${appointmentId}/medical-record`);
+                    navigate(`/appointments/${appointmentId}/medical-record`);
                 }, 1800);
             } else {
                 handleShowAlert('Lỗi', 'Tạo bệnh án thất bại. Vui lòng thử lại!', 'danger');

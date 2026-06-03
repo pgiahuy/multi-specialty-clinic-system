@@ -23,12 +23,14 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
  * @author DELL
  */
 @Service
+@Transactional
 public class PaymentItemsServiceImpl implements PaymentItemsService {
 
     @Autowired
@@ -67,7 +69,6 @@ public class PaymentItemsServiceImpl implements PaymentItemsService {
 
     @Override
     public void addLabTestItems(Payment payment, Long testId, Long labResultId) {
-
         LabTest labtest = labRepo.getLabTestById(testId);
         PaymentItem item = new PaymentItem();
         item.setPaymentId(payment);
@@ -76,7 +77,6 @@ public class PaymentItemsServiceImpl implements PaymentItemsService {
         item.setReferenceId(labResultId);
         itemRepo.addOrUpdateItem(item);
         payService.updatePaymentTotalAmount(payment);
-
     }
 
     @Override

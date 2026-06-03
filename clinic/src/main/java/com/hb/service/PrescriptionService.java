@@ -21,4 +21,5 @@ public interface PrescriptionService {
     Prescription getPrescriptionByMedicalRecordId(Long recordId);
     void deletePrescription(Long id);
     long countPrescription(Map<String,String> params);
+    Prescription dispensePrescription(Long id, String username);
 }

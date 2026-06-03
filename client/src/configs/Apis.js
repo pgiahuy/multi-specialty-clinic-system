@@ -17,69 +17,44 @@ const API = axios.create({
 let refreshPromise = null;
 
 
-export const getDoctors = () => API.get("/z");
-export const getSpecialties = (params = {}) => API.get("/specialties", { params });
-export const getSchedule = () => API.get("/schedules");
-
-
-
 export const endpoint = {
-    'register': 'auth/register',
-    'login': 'auth/login',
-    'facebook-login': '/auth/facebook',
-    'patientProfiles': '/secure/profiles',
-    'doctors': '/doctors',
-    'schedules': '/secure/schedules',
-    'notifications': '/secure/users/notifications',
-    'current-user': '/secure/users/profile',
-    'appointments': '/secure/appointments',
     'appointment': (appointmentId) => `/secure/appointment/${appointmentId}`,
-
-    'create-payment': '/secure/payments/create',
-    'momo-return': '/secure/payments/momo/return',
-    'payments': (patientId) => `/secure/payments/${patientId}`,
-    'payment-items': (paymentId) => `/secure/payment-items/${paymentId}`,
-    'lab-results': (patientId) => `/secure/lab-results/${patientId}`,
     'lab-test': '/secure/tests',
-    'lab-result-appointment': (appointmentId) => `/secure/lab-results/appointment/${appointmentId}`,
-    'patient-profile': (patientId) => `/secure/profile/${patientId}`,
-    'specialties': '/specialties',
     'medical-record': (appointmentId) => `/secure/medical-records/appointment/${appointmentId}`,
     'medical-record-update': (medicalRecordId) => `/secure/medical-records/${medicalRecordId}`,
-    'lab-result': (labResultId) => `/secure/lab-results/${labResultId}`,
 };
 export const AUTH_ENDPOINTS = {
     REGISTER: 'auth/register',
     LOGIN: 'auth/login',
     FACEBOOK_LOGIN: 'auth/facebook',
     GOOGLE_LOGIN: 'auth/google',
-    REFRESH_TOKEN: 'auth/refresh',
     LOGOUT: 'auth/logout'
 };
 
 export const CLINIC_ENDPOINTS = {
     DOCTORS: 'doctors',
-    PATIENTS: 'patients',
     SPECIALTIES: 'specialties',
     AVAILABLE_ROOMS: 'secure/available-rooms',
     SHIFTS: 'shifts',
     SCHEDULES: 'secure/schedules',
-    DOCTOR_APPOINTMENTS: (scheduleId) => `secure/appointments?scheduleId=${scheduleId}`,
+    DOCTOR_APPOINTMENTS: (scheduleId) => `secure/appointments/scheduleId=${scheduleId}`,
     DOCTOR_CONFIRM_APPOINTMENT: (appointmentId) => `secure/appointments/${appointmentId}/confirm`,
     DOCTOR_START_APPOINTMENT: (appointmentId) => `secure/appointments/${appointmentId}/start`,
     DOCTOR_GET_PATIENTS: 'secure/patients',
     DOCTOR_GET_SCHEDULES_BY_ID: (scheduleId) => `secure/doctors/schedules/${scheduleId}`,
     CREATE_MEDICAL_RECORD: 'secure/medical-records',
     PATIENT_BOOKING_APPOINTMENT: 'secure/appointments',
-    LAB_RESULTS: (patientId) => `secure/lab-results/${patientId}`,
     APPOINTMENT_BY_ID: (id) => `secure/appointment/${id}`,
     MEDICAL_RECORD_BY_ID: (id) => `secure/medical-records/${id}`,
     MEDICAL_RECORD_BY_PATIENT_ID: (id) => `secure/medical-records/patient/${id}`,
-    PRESCRIPTION_BY_RECORD_ID: (recordId) => `secure/prescriptions/medical-record/${recordId}`,
     MEDICINES: 'secure/medicines',
+    MEDICINE_BATCHS: 'secure/medicine-batchs',
+    MEDICINE_BATCH_DELETE: (id) => `secure/medicine-batchs/${id}`,
+    STOREKEEPER_ALERTS: 'secure/storekeeper/alerts',
+    MEDICINES_COUNT: 'secure/medicines/count',
+    MEDICINE_BATCHS_COUNT: 'secure/medicine-batchs/count',
     CREATE_PRESCRIPTIONS: 'secure/prescriptions',
     SAVE_DRAFT_PRESCRIPTIONS: 'secure/prescriptions/draft',
-    LAB_RESULTS_APPOINTMENT: (appointmentId) => `secure/lab-results/appointment/${appointmentId}`,
 };
 
 
@@ -105,6 +80,8 @@ export const PAYMENT_ENDPOINTS = {
     MOMO_RETURN: 'secure/payments/momo/return',
     VNPAY_IPN: 'secure/payments/vnpay/ipn',
     HISTORY: 'secure/payments',
+    BY_APPOINTMENT: (appointmentId) => `secure/payments/appointment/${appointmentId}`,
+    BY_PAYMENT_ID: (paymentId) => `secure/payments/${paymentId}`,
     ITEMS: (paymentId) => `secure/payment-items/${paymentId}`,
 };
 
@@ -130,6 +107,11 @@ export const clinicApis = {
     getDoctorAppointments: (scheduleId) => authApis().get(CLINIC_ENDPOINTS.APPOINTMENTS(scheduleId)),
     getShifts: () => API.get(CLINIC_ENDPOINTS.SHIFTS),
     getMedicines: (params = {}) => authApis().get(CLINIC_ENDPOINTS.MEDICINES, { params }),
+    getMedicinesCount: (params = {}) => authApis().get(CLINIC_ENDPOINTS.MEDICINES_COUNT, { params }),
+    getMedicineBatchs: (params = {}) => authApis().get(CLINIC_ENDPOINTS.MEDICINE_BATCHS, { params }),
+    deleteMedicineBatch: (id) => authApis().delete(CLINIC_ENDPOINTS.MEDICINE_BATCH_DELETE(id)),
+    getMedicineBatchsCount: (params = {}) => authApis().get(CLINIC_ENDPOINTS.MEDICINE_BATCHS_COUNT, { params }),
+    getStorekeeperAlerts: (params = {}) => authApis().get(CLINIC_ENDPOINTS.STOREKEEPER_ALERTS, { params }),
 };
 
 

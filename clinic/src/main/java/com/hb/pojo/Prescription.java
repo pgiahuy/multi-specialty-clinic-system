@@ -55,6 +55,8 @@ public class Prescription implements Serializable {
     private PrescriptionStatus status;
     @Column(name = "public_at")
     private LocalDateTime publicAt;
+    @Column(name = "dispensed_at")
+    private LocalDateTime dispensedAt;
     @OneToMany(mappedBy = "prescriptionId")
     private Collection<PrescriptionItem> prescriptionItemCollection;
     @JoinColumn(name = "medical_record_id", referencedColumnName = "id")
@@ -98,6 +100,14 @@ public class Prescription implements Serializable {
 
     public void setPublicAt(LocalDateTime publicAt) {
         this.publicAt = publicAt;
+    }
+
+    public LocalDateTime getDispensedAt() {
+        return dispensedAt;
+    }
+
+    public void setDispensedAt(LocalDateTime dispensedAt) {
+        this.dispensedAt = dispensedAt;
     }
 
     public Collection<PrescriptionItem> getPrescriptionItemCollection() {

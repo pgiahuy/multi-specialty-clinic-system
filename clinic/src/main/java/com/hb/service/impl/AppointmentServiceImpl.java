@@ -22,12 +22,14 @@ import com.hb.repository.AppointmentRepository;
 import com.hb.repository.PatientRepository;
 import com.hb.repository.ScheduleRepository;
 import com.hb.service.AppointmentService;
+import com.hb.dto.response.DoctorRankingResponse;
 import com.hb.service.NotificationService;
 import com.hb.service.PaymentItemsService;
 import com.hb.service.PaymentService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.YearMonth;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +63,9 @@ public class AppointmentServiceImpl implements AppointmentService {
     private PaymentService paymentService;
     
     @Autowired
+    private com.hb.repository.ConversationRepository conversationRepo;
+    
+    @Autowired
     private NotificationService notificationService;
 
     @Override
@@ -72,7 +77,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     public Appointment getAppointmentById(Long id) {
         Appointment a = appointmentRepo.getAppointmentById(id);
         if (a == null) {
-            throw new ResourceNotFoundException("Appointment not found!");
+            throw new ResourceNotFoundException("Không tìm thấy lịch hẹn!");
         }
         return a;
     }
@@ -109,6 +114,19 @@ public class AppointmentServiceImpl implements AppointmentService {
         Appointment appointment = appointmentMapper.toEntity(req, patient, schedule);
         appointmentRepo.addOrUpdateAppointment(appointment);
 
+
+        try {
+            if (req.getConversationId() != null) {
+                var conv = conversationRepo.getConversationById(req.getConversationId());
+                if (conv != null) {
+                    appointment.setConversationId(conv);
+                    appointmentRepo.addOrUpdateAppointment(appointment);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Failed linking conversation to appointment: " + e.getMessage());
+        }
+
         Payment p = paymentService.createPayment(appointment.getId());
         itemService.addAppointmentItem(p, appointment.getId());
 
@@ -119,6 +137,36 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public long countAppointments(Map<String, String> params) {
         return appointmentRepo.countAppointments(params);
+    }
+
+    private java.time.LocalDate[] parseMonth(String month) {
+        if (month == null || month.isEmpty()) {
+            return null;
+        }
+        try {
+            YearMonth ym = YearMonth.parse(month);
+            return new java.time.LocalDate[]{ym.atDay(1), ym.atEndOfMonth()};
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @Override
+    public List<DoctorRankingResponse> getTopDoctorsByAppointmentCount(int limit, String month) {
+        java.time.LocalDate[] range = parseMonth(month);
+        if (range == null) {
+            return appointmentRepo.getTopDoctorsByAppointmentCount(limit, null, null);
+        }
+        return appointmentRepo.getTopDoctorsByAppointmentCount(limit, range[0], range[1]);
+    }
+
+    @Override
+    public List<DoctorRankingResponse> getTopDoctorsByConvertedAppointmentCount(int limit, String month) {
+        java.time.LocalDate[] range = parseMonth(month);
+        if (range == null) {
+            return appointmentRepo.getTopDoctorsByConvertedAppointmentCount(limit, null, null);
+        }
+        return appointmentRepo.getTopDoctorsByConvertedAppointmentCount(limit, range[0], range[1]);
     }
 
     @Override
@@ -157,7 +205,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     public boolean doctorStartAppointment(Long appointmentId) {
         Appointment appointment = appointmentRepo.getAppointmentById(appointmentId);
         if (appointment == null) {
-            throw new ResourceNotFoundException("Appointment not found!");
+            throw new ResourceNotFoundException("Không tìm thấy lịch hẹn!");
         }
 
         if (appointment.getStatus() != AppointmentStatus.CONFIRMED) {
@@ -222,11 +270,9 @@ public class AppointmentServiceImpl implements AppointmentService {
         Long newShiftId = scheduleRepo.getScheduleById(scheduleId).getShiftId().getId();
 
         for (Appointment oldApp : appointments) {
-
             if (oldApp.getStatus() == AppointmentStatus.CANCELLED) {
                 continue;
             }
-
             LocalDate oldDate = oldApp.getScheduleId().getDate();
             Long oldShiftId = oldApp.getScheduleId().getShiftId().getId();
 
@@ -234,7 +280,6 @@ public class AppointmentServiceImpl implements AppointmentService {
                 return true;
             }
         }
-
         return false;
     }
 

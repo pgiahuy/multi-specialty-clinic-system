@@ -3,22 +3,18 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package com.hb.controllers.api;
-
 import com.hb.dto.request.AppointmentCreateRequest;
 import com.hb.dto.response.AppointmentResponse;
 import com.hb.enums.UserRole;
 import com.hb.exception.ResourceNotFoundException;
 import com.hb.mapper.AppointmentMapper;
 import com.hb.pojo.Appointment;
-
 import com.hb.pojo.User;
-
 import com.hb.service.AppointmentService;
 import com.hb.service.UserService;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
@@ -28,7 +24,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;

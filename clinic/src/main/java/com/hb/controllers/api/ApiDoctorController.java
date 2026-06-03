@@ -39,23 +39,14 @@ public class ApiDoctorController {
 
     @Autowired
     private DoctorService doctorService;
-    
-    
     @Autowired
     private UserService userService;
-
     @Autowired
     private DoctorMapper doctorMapp;
-    
-    
     @Autowired
     private ScheduleMapper scheduleMapper;
-    
-    
-    
     @Autowired
     private ScheduleService scheduleService;
-
     @Autowired
     private Environment env;
 

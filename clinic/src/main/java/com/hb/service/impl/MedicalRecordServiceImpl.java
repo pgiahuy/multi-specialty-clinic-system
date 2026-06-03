@@ -12,6 +12,7 @@ import com.hb.pojo.Appointment;
 import com.hb.pojo.MedicalRecord;
 import com.hb.pojo.Patient;
 import com.hb.pojo.User;
+import com.hb.enums.UserRole;
 import com.hb.repository.AppointmentRepository;
 import com.hb.repository.DoctorRepository;
 import com.hb.repository.MedicalRecordRepository;
@@ -33,19 +34,12 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 
     @Autowired
     private MedicalRecordRepository medicalRecordRepo;
-
     @Autowired
     private UserRepository userRepo;
-
-    @Autowired
-    private DoctorRepository doctorRepo;
-
     @Autowired
     private PatientRepository patientRepo;
-
     @Autowired
     private AppointmentRepository appointmentRepo;
-
     @Override
     public MedicalRecord addOrUpdateMedicalRecord(MedicalRecordCreateRequest req) {
         MedicalRecord m;
@@ -100,11 +94,31 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
         if (p == null) {
             throw new ResourceNotFoundException("Không tìm thấy bệnh nhân!");
         }
-        return p.getUserId().getUsername().equals(username);
+        User currentUser = userRepo.getUserByUsername(username);
+        if (currentUser == null) {
+            return false;
+        }
+        if (currentUser.getRole() == UserRole.ROLE_PATIENT) {
+            return p.getUserId() != null && p.getUserId().getUsername().equals(username);
+        }
+        if (currentUser.getRole() == UserRole.ROLE_DOCTOR) {
+            return appointmentRepo.existsAppointmentForPatientAndDoctorUser(patientId, currentUser.getId());
+        }
+        if (currentUser.getRole() == UserRole.ROLE_STAFF) {
+            return true;
+        }
+
+        return false;
     }
 
     @Override
     public boolean checkAccessControll(User user, Long medicalRecordId) {
+        if (user == null) {
+            return false;
+        }
+        if (user.getRole() == UserRole.ROLE_STAFF) {
+            return true;
+        }
         return this.medicalRecordRepo.checkAccessControll(user, medicalRecordId);
     }
 
@@ -112,7 +126,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
     public List<MedicalRecord> getMedicalRecordsByPatientId(Long patientId) {
         Patient p = patientRepo.getPatientById(patientId);
         if (p == null) {
-            throw new ResourceNotFoundException("Patient not found!");
+            throw new ResourceNotFoundException("Không tìm thấy bệnh nhân");
         }
 
         List<MedicalRecord> res = medicalRecordRepo.getMedicalRecordsByPatientId(patientId);
@@ -124,7 +138,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
         Appointment a = appointmentRepo.getAppointmentById(appointmentId);
 
         if (a == null) {
-            throw new ResourceNotFoundException("Appointment not found!");
+            throw new ResourceNotFoundException("Không tìm thấy lịch hẹn");
         }
 
         return this.medicalRecordRepo.getMedicalRecordByAppointmentId(appointmentId);

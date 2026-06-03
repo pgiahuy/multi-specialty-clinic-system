@@ -33,7 +33,7 @@ const PaymentDetail = () => {
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [successMessage, setSuccessMessage] = useState('Thanh toán đã được ghi nhận thành công.');
-    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('CASH');
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('MOMO');
     const [currentInvoice, setCurrentInvoice] = useState(null);
     const [fromDate, setFromDate] = useState(getInitialFromDate);
     const [toDate, setToDate] = useState(getInitialToDate);
@@ -129,7 +129,6 @@ const PaymentDetail = () => {
     };
 
 
-
     const parseVietnameseDate = (dateString) => {
         if (!dateString) return null;
         const parts = dateString.split(' ');
@@ -165,7 +164,7 @@ const PaymentDetail = () => {
 
     const handlePayClick = (payment) => {
         setCurrentInvoice(payment);
-        setSelectedPaymentMethod('CASH');
+        setSelectedPaymentMethod('MOMO');
         setShowPaymentModal(true);
     };
 
@@ -244,10 +243,7 @@ const PaymentDetail = () => {
                                             </option>
                                         ))}
                                     </Form.Select>
-
                                 </div>
-
-
                                 <div>
                                     <Form.Label className="small text-muted mb-1">Từ ngày</Form.Label>
                                     <Form.Control
@@ -258,8 +254,6 @@ const PaymentDetail = () => {
                                         style={{ width: '160px' }}
                                     />
                                 </div>
-
-
                                 <div>
                                     <Form.Label className="small text-muted mb-1">Đến ngày</Form.Label>
                                     <Form.Control
@@ -270,12 +264,9 @@ const PaymentDetail = () => {
                                         style={{ width: '160px' }}
                                     />
                                 </div>
-
                             </div>
                         </div>
                     </div>
-
-
                     <div className="mb-4 d-flex justify-content-start">
                         <Tabs
                             activeKey={activeTab}
@@ -337,7 +328,7 @@ const PaymentDetail = () => {
                                                     <div>Ngày tạo: {p.createdAt}</div>
                                                     {p.paidAt && (
                                                         <div className="text-success small mt-1">
-                                                           
+
                                                             Ngày thanh toán: {p.paidAt}
                                                             {p.method && (
                                                                 <span className="ms-2">
@@ -368,7 +359,7 @@ const PaymentDetail = () => {
                                                                 label = 'Xem phiếu xét nghiệm';
                                                                 break;
                                                             case 'PRESCRIPTION':
-                                                                path = `/prescriptions/${refId}`;
+                                                                path = `/patient/prescriptions/${refId}`;
                                                                 label = 'Xem đơn thuốc';
                                                                 break;
                                                             default:
@@ -419,22 +410,7 @@ const PaymentDetail = () => {
                         <div className="mb-4">
                             <div className="small text-muted mb-2">Chọn phương thức thanh toán</div>
                             <Row className="g-3">
-                                <Col xs={12} md={4}>
-                                    <div
-                                        className={`d-flex align-items-center p-3 h-100 border rounded-3 ${selectedPaymentMethod === 'CASH' ? 'border-success bg-success bg-opacity-10' : 'bg-white'}`}
-                                        style={{ cursor: 'pointer', transition: 'all 0.2s' }}
-                                        onClick={() => setSelectedPaymentMethod('CASH')}
-                                    >
-                                        <div className="flex-grow-1">
-                                            <div className="fw-bold text-dark">Tiền mặt</div>
-                                            
-                                        </div>
-                                        <div>
-                                            <Form.Check type="radio" checked={selectedPaymentMethod === 'CASH'} readOnly />
-                                        </div>
-                                    </div>
-                                </Col>
-                                <Col xs={12} md={4}>
+                                <Col xs={12} md={6}>
                                     <div
                                         className={`d-flex align-items-center p-3 h-100 border rounded-3 ${selectedPaymentMethod === 'MOMO' ? 'border-danger bg-danger bg-opacity-10' : 'bg-white'}`}
                                         style={{ cursor: 'pointer', transition: 'all 0.2s' }}
@@ -454,7 +430,7 @@ const PaymentDetail = () => {
                                         </div>
                                     </div>
                                 </Col>
-                                <Col xs={12} md={4}>
+                                <Col xs={12} md={6}>
                                     <div
                                         className={`d-flex align-items-center p-3 h-100 border rounded-3 ${selectedPaymentMethod === 'VNPAY' ? 'border-info bg-info bg-opacity-10' : 'bg-white'}`}
                                         style={{ cursor: 'pointer', transition: 'all 0.2s' }}
@@ -468,7 +444,6 @@ const PaymentDetail = () => {
                                                 alt="Logo VNPAY"
                                             />
                                             <div className="fw-bold" style={{ color: '#005baa' }}>Cổng thanh toán VNPAY</div>
-                                           
                                         </div>
                                         <div>
                                             <Form.Check type="radio" checked={selectedPaymentMethod === 'VNPAY'} readOnly style={{ accentColor: '#005baa' }} />

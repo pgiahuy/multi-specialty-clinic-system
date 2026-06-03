@@ -20,7 +20,7 @@ const AppointmentDetail = () => {
             setAppointment(response.data);
 
         } catch (error) {
-            console.error("Failed to load appointment detail", error);
+            console.error("Tải thông tin lịch hẹn thất bại", error);
         } finally {
             setLoading(false);
         }
@@ -74,7 +74,7 @@ const AppointmentDetail = () => {
 
 
     return (
-        <div className="d-flex flex-column min-vh-100">
+        <div className="d-flex flex-column min-vh-100 bg-light">
             <Header />
             <div className="container py-4">
                 <div>
@@ -94,59 +94,40 @@ const AppointmentDetail = () => {
                                 <Card.Header className="d-flex justify-content-between align-items-center bg-light py-3 border-bottom-0">
                                     <div> Khoa {appointment.specialtyName} </div>
                                     <div> {appointment.roomName} - {appointment.areaName} </div>
-
-
                                 </Card.Header>
-
                                 <Card.Body className="p-4">
-
                                     <div className="d-flex justify-content-between align-items-center mb-3">
                                         <div className="small text-muted">Bệnh nhân</div>
                                         <div className="fw-semibold text-end">{appointment?.patientFullName || '-'}</div>
                                     </div>
-
-
                                     <div className="d-flex justify-content-between align-items-center mb-3">
                                         <div className="small text-muted">Bác sĩ phụ trách</div>
                                         <div className="fw-semibold text-end">{appointment?.doctorFullName || '-'}</div>
                                     </div>
-
-
                                     <div className="d-flex justify-content-between align-items-center mb-3">
                                         <div className="small text-muted">Ngày khám</div>
                                         <div className="fw-bold text-primary text-end">{appointment?.appointmentDate || '-'} ({appointment.session || '-'})</div>
                                     </div>
-
-
                                     <div className="d-flex justify-content-between align-items-center mb-3">
                                         <div className="small text-muted">Giờ khám</div>
                                         <div className="fw-semibold text-end">
                                             {appointment?.timeSlot || '-'}
                                         </div>
                                     </div>
-
                                     <div className="d-flex justify-content-between align-items-center mb-3">
                                         <div className="small text-muted">Giá khám</div>
                                         <div className="fw-bold text-end text-success">
                                             {appointment.price ? `${appointment.price.toLocaleString()} VND` : '-'}
                                         </div>
                                     </div>
-
                                     <div className="d-flex justify-content-between align-items-center mb-3">
                                         <div className="small text-muted">Trạng thái</div>
                                         <div className="fw-semibold text-end">
                                             {renderStatusText(appointment?.status)}
                                         </div>
                                     </div>
-
-
-
-
-
                                 </Card.Body>
-
                                 <Card.Footer className="bg-white border-0 p-4 pt-0">
-
                                     {appointment?.status === 'UN_PAID' && (
                                         <div className="d-flex align-items-center p-3 mb-4 bg-warning bg-opacity-10 border border-warning border-opacity-50 rounded-3">
                                             <i className="bi bi-exclamation-circle-fill text-warning fs-5 me-3"></i>
@@ -155,7 +136,6 @@ const AppointmentDetail = () => {
                                             </div>
                                         </div>
                                     )}
-
                                     {appointment?.status === 'CONFIRMED' && (
                                         <div className="d-flex align-items-center p-3 mb-4 bg-primary bg-opacity-10 border border-primary border-opacity-50 rounded-3">
                                             <i className="bi bi-check-circle-fill text-primary fs-5 me-3"></i>
@@ -180,8 +160,6 @@ const AppointmentDetail = () => {
                                                 Thanh toán
                                             </Button>
                                         )}
-
-
                                     </div>
                                 </Card.Footer>
                             </Card>
@@ -199,7 +177,6 @@ const AppointmentDetail = () => {
             >
                 <div>Bạn có chắc chắn muốn hủy lịch hẹn này không? Hành động này có thể không hoàn tác được.</div>
             </MyModal>
-
             <MyModal
                 show={showCancelErrorModal}
                 onHide={() => setShowCancelErrorModal(false)}

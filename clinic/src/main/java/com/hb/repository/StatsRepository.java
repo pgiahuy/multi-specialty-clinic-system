@@ -13,18 +13,14 @@ import java.util.List;
  * @author HUY
  */
 public interface StatsRepository {
-    
     List<Object[]> countPatientsByGender(LocalDate fromDate, LocalDate toDate);
     List<Object[]> countPatientsByAgeGroup(LocalDate fromDate, LocalDate toDate);
     List<Object[]> countPatientsBySpecialty(LocalDate fromDate, LocalDate toDate);
-
-
     List<Object[]> serviceUsageStats(LocalDate fromDate, LocalDate toDate);
-
-
     List<Object[]> topDiseasesStats(LocalDate fromDate, LocalDate toDate,int limit);
-
-
-    List<Object[]> revenueStats(int year);
+    List<Object[]> medicineInventoryStats(LocalDate fromDate, LocalDate toDate);
+    List<Object[]> statsRevenueByYear(int year);
+    List<Object[]> statsRevenueBySpecialty(int year, int month);
+    List<Object[]> statsRevenueByType(int year, int month);
     List<Object[]> revenueDetailsStats(LocalDate fromDate, LocalDate toDate);
 }

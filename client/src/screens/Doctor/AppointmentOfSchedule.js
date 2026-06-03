@@ -8,7 +8,6 @@ import MySpinner from "../../components/MySpinner";
 import { tableStyles } from "../Patient/PatientStyle";
 
 const AppointmentOfSchedule = () => {
-
     const { scheduleId } = useParams();
     const [scheduleDetails, setScheduleDetails] = useState(null);
     const [appointments, setAppointments] = useState([]);
@@ -19,6 +18,7 @@ const AppointmentOfSchedule = () => {
     const loadScheduleDetails = async () => {
         try {
             setLoading(true);
+            console.log("Loading schedule details for scheduleId:", scheduleId);
             const response = await authApis().get(`${CLINIC_ENDPOINTS.DOCTOR_GET_SCHEDULES_BY_ID(scheduleId)}`);
             setScheduleDetails(response.data);
         } catch (error) {
@@ -69,7 +69,6 @@ const AppointmentOfSchedule = () => {
         loadAppointments();
     }, [scheduleId]);
 
-
     const statusMap = {
         'UN_PAID': { text: 'Chưa thanh toán', textColor: 'text-warning' },
         'PENDING': { text: 'Đang chờ', textColor: 'text-warning' },
@@ -112,10 +111,9 @@ const AppointmentOfSchedule = () => {
             return {
                 label: 'Bệnh án',
                 variant: 'primary',
-                onClick: () => nav(`/doctor/appointments/${appointment.id}/medical-record`),
+                onClick: () => nav(`/appointments/${appointment.id}/medical-record`),
             };
         }
-
         return null;
     };
 
@@ -127,12 +125,9 @@ const AppointmentOfSchedule = () => {
                     <h3 className="mb-4 text-center text-primary fw-bold">
                         DANH SÁCH LỊCH HẸN
                     </h3>
-
                     <Row className="g-4">
-
                         <Col lg={4} md={12}>
                             <div className="sticky-top" style={{ top: '20px', zIndex: 10 }}>
-
                                 <Card className="mb-3 border-0 shadow-sm bg-light rounded-3">
                                     <Card.Body className="p-4">
                                         <div className="d-flex flex-column gap-2 text-secondary small p-2">
@@ -143,9 +138,7 @@ const AppointmentOfSchedule = () => {
                                                     {scheduleDetails?.specialtyName || 'Chuyên khoa'}
                                                 </span>
                                             </div>
-
                                             <hr className="my-2 text-muted" />
-
                                             <div>
                                                 <div className="text-muted fw-bold mb-1" style={{ fontSize: '11px' }}>THỜI GIAN LÀM VIỆC</div>
                                                 <h6 className="mb-0 fw-bold text-dark">{scheduleDetails?.date || '-'}</h6>
@@ -156,9 +149,7 @@ const AppointmentOfSchedule = () => {
                                                     Ca khám: {scheduleDetails?.shiftStartTime || '-'} - {scheduleDetails?.shiftEndTime || '-'}
                                                 </div>
                                             </div>
-
                                             <hr className="my-2 text-muted" />
-
                                             <div>
                                                 <div className="text-muted fw-bold mb-1" style={{ fontSize: '11px' }}>ĐỊA ĐIỂM KHÁM</div>
                                                 <h6 className="mb-0 fw-bold text-dark">Phòng {scheduleDetails?.room || '-'}</h6>
@@ -166,9 +157,7 @@ const AppointmentOfSchedule = () => {
                                                     <span className="fw-semibold text-dark">{scheduleDetails?.area || '-'}</span>
                                                 </div>
                                             </div>
-
                                             <hr className="my-2 text-muted" />
-
                                             <div className="d-flex flex-row gap-1 align-items-center  justify-content-between">
                                                 <div className="text-muted fw-bold" style={{ fontSize: '14px' }}>SỐ BỆNH NHÂN HIỆN CÓ</div>
                                                 <h2 className="mb-0 fw-bold text-dark">{scheduleDetails?.currentPatients || 0} / {scheduleDetails?.maxPatients || 0}</h2>
@@ -176,12 +165,8 @@ const AppointmentOfSchedule = () => {
                                         </div>
                                     </Card.Body>
                                 </Card>
-
-
                             </div>
                         </Col>
-
-
                         <Col lg={8} md={12}>
                             {loading ? (
                                 <div className="text-center py-5">

@@ -15,6 +15,7 @@ public class AppointmentCreateRequest {
     private Long id;
     private Long patientId;
     private Long scheduleId;
+    private Long conversationId;
 
     public AppointmentCreateRequest() {
     }
@@ -23,6 +24,14 @@ public class AppointmentCreateRequest {
         this.id = id;
         this.patientId = patientId;
         this.scheduleId = scheduleId;
+    }
+
+    public Long getConversationId() {
+        return conversationId;
+    }
+
+    public void setConversationId(Long conversationId) {
+        this.conversationId = conversationId;
     }
     
     

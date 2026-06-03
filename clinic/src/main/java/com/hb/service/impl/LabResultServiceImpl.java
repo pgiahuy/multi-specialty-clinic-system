@@ -16,7 +16,6 @@ import com.hb.pojo.LabResult;
 import com.hb.pojo.Payment;
 import com.hb.service.AppointmentService;
 import com.hb.service.LabResultDetailService;
-import com.hb.service.LabTestService;
 import com.hb.service.PaymentItemsService;
 import com.hb.service.PaymentService;
 import java.time.LocalDateTime;
@@ -108,7 +107,7 @@ public class LabResultServiceImpl implements LabResultService {
         LabResult labResult = this.addOrUpdateLabResult(request);
         List<LabResultDetailRequest> details = request.getDetails();
         if (labResult == null && details == null) {
-            throw new ResourceNotFoundException("Failed to create lab result or no test details provided");
+            throw new ResourceNotFoundException("Dữ liệu không hợp lệ!");
         }
         resultDetailService.addDetailsToLabResult(labResult.getId(), details);
         Payment payment = payService.createPayment(request.getAppointmentId());

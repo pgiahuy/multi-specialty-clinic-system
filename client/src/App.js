@@ -41,6 +41,13 @@ import LabTest from "./screens/Doctor/LabTest";
 import MessageBox from "./screens/User/MessageBox";
 import ConsultationPage from "./screens/Doctor/ConsultationPage";
 import TestResultDetail from "./screens/Patient/TestResultDetail";
+import ReceptionAppointments from "./screens/Reception/ReceptionAppointments";
+import ReceptionPayment from "./screens/Reception/ReceptionPayment";
+import ReceptionInvoices from "./screens/Reception/ReceptionInvoices";
+import ReceptionPrescriptions from "./screens/Reception/ReceptionPrescriptions";
+import ReceptionPrescriptionDetail from "./screens/Reception/ReceptionPrescriptionDetail";
+import StoreKeeper from "./screens/StoreKeeper/StoreKeeper";
+import StoreKeeperHome from "./screens/StoreKeeper/StoreKeeperHome";
 
 const initUserState = () => {
   const savedUser = localStorage.getItem("user");
@@ -91,36 +98,56 @@ function App() {
               <Route path="/patient/history-booking" element={<HistoryBooking />} />
               <Route path="/patient/test-results" element={<TestResults />} />
               <Route path="/patient/test-results/:labResultId" element={<TestResultDetail />} />
-              <Route path="/patient/payments" element={<PaymentDetail />} />
               <Route path="/patient/payment-result" element={<PaymentResult />} />
               <Route path="/patient/chat" element={<MessageBox />} />
+              <Route path="/patient/payments" element={<PaymentDetail />} />
+            </Route>
+
+
+
+            <Route element={<ProtectedRoute allowedRoles={["ROLE_DOCTOR", "ROLE_STAFF"]} />}>
+              <Route path="/create-medical-record" element={<CreateMedicalRecord />} />
             </Route>
 
             <Route element={<ProtectedRoute allowedRoles={["ROLE_DOCTOR"]} />}>
               <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
-              <Route path="/doctor/create-medical-record" element={<CreateMedicalRecord />} />
               <Route path="/doctor/schedules" element={<ScheduleManagement />} />
               <Route path="/doctor/:scheduleId/appointments" element={<AppointmentOfSchedule />} />
               <Route path="/doctor/appointments" element={<AppointmentList />} />
               <Route path="/doctor/profile" element={<DoctorProfile />} />
               <Route path="/doctor/register-schedule" element={<RegisterSchedule />} />
-              <Route path="/doctor/appointments/:appointmentId/medical-record" element={<MedicalRecord />} />
               <Route path="/doctor/assign-test/:appointmentId" element={<AssignTest />} />
               <Route path="/doctor/prescribe/:medicalRecordId" element={<PrescribeMedicine />} />
               <Route path="/doctor/patients" element={<PatientList />} />
               <Route path="/doctor/lab-tests" element={<LabTest />} />
             </Route>
 
+            <Route element={<ProtectedRoute allowedRoles={["ROLE_DOCTOR", "ROLE_PATIENT", "ROLE_STAFF"]} />}>
+              <Route path="/appointments/:appointmentId/medical-record" element={<MedicalRecord />} />
+            </Route>
 
             <Route element={<ProtectedRoute />}>
               <Route path="/doctor/consultations" element={<ConsultationPage />} />
               <Route path="/doctors" element={<ListDoctor />} />
               <Route path="/appointments/:appointmentId" element={<AppointmentDetail />} />
+              
+            </Route>
+
+            <Route element={<ProtectedRoute allowedRoles={["ROLE_STAFF"]} />}>
+              <Route path="/reception" element={<ReceptionAppointments />} />
+              <Route path="/reception/invoices" element={<ReceptionInvoices />} />
+              <Route path="/reception/payments/:paymentId" element={<ReceptionPayment />} />
+              <Route path="/reception/prescriptions" element={<ReceptionPrescriptions />} />
+              <Route path="/reception/prescriptions/:prescriptionId" element={<ReceptionPrescriptionDetail />} />
+              
+            </Route>
+
+            <Route element={<ProtectedRoute allowedRoles={["ROLE_STOREKEEPER", "ROLE_STAFF"]} />}>
+              <Route path="/storekeeper" element={<StoreKeeper />} />
+              <Route path="/storekeeper/home" element={<StoreKeeperHome />} />
             </Route>
 
             <Route path="/doctor/detail/:doctorId" element={<DoctorDetail />} />
-
-
           </Routes>
 
         </Container>

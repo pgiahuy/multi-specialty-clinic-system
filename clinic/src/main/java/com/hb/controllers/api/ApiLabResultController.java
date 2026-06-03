@@ -11,7 +11,6 @@ import com.hb.enums.UserRole;
 import com.hb.mapper.LabTestMapper;
 import com.hb.mapper.LabResultMapper;
 import com.hb.pojo.Appointment;
-import com.hb.pojo.LabResult;
 import com.hb.pojo.LabTest;
 import com.hb.pojo.User;
 import com.hb.service.AppointmentService;
@@ -46,19 +45,10 @@ public class ApiLabResultController {
     
     @Autowired
     private LabTestService testService;
-
     @Autowired
     private LabResultService labResultService;
-
-    @Autowired
-    private LabResultMapper testResultMapper;
-
     @Autowired
     private UserService userService;
-    
-    @Autowired
-    private LabResultMapper labResultMapper;
-    
     @Autowired
     private AppointmentService appointmentService;
 

@@ -2,9 +2,9 @@ import { Container, Row, Col, Card, Modal, Button } from "react-bootstrap";
 import Header from "../../components/Header";
 import LoginRequiredModal from "../../components/LoginRequiredModal";
 import { useContext, useEffect, useRef, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { authApis, CLINIC_ENDPOINTS, USER_ENDPOINTS } from "../../configs/Apis";
 import MySpinner from "../../components/MySpinner";
-import { useNavigate } from "react-router-dom";
 import Footer from "../../components/Footer";
 import { MyUserContext } from "../../configs/Contexts";
 import FloatAlert from "../../components/FloatAlert";
@@ -48,6 +48,8 @@ const BookingPage = () => {
     const alertTimerRef = useRef(null);
 
     const nav = useNavigate();
+    const [searchParams] = useSearchParams();
+    const [conversationId, setConversationId] = useState(null);
 
     const loadPatientProfiles = async () => {
         try {
@@ -228,10 +230,14 @@ const BookingPage = () => {
 
         try {
             setLoading(true);
-            await authApis().post(CLINIC_ENDPOINTS.PATIENT_BOOKING_APPOINTMENT, {
+            const payload = {
                 patientId: selectedPatient,
                 scheduleId: selectedSchedule.id,
-            });
+            };
+
+            if (conversationId) payload.conversationId = conversationId;
+
+            await authApis().post(CLINIC_ENDPOINTS.PATIENT_BOOKING_APPOINTMENT, payload);
 
             setShowModal(true);
             handleShowAlert(
@@ -275,7 +281,17 @@ const BookingPage = () => {
     useEffect(() => {
         loadPatientProfiles();
         loadSpecialties();
-    }, []);
+
+        const doctorIdParam = searchParams.get("doctorId");
+        if (doctorIdParam) {
+            setSelectedDoctor(doctorIdParam);
+        }
+        const convParam = searchParams.get("conversationId");
+        if (convParam) setConversationId(convParam);
+
+        const patientIdParam = searchParams.get("patientId");
+        if (patientIdParam) setSelectedPatient(patientIdParam);
+    }, [searchParams]);
 
     useEffect(() => {
         const timerId = setTimeout(() => {
@@ -319,7 +335,6 @@ const BookingPage = () => {
         loadSchedules();
     }, [selectedDoctor, selectedDate, selectedSpecialty]);
 
-    // Allow booking from tomorrow onwards
     const tomorrowDate = new Date();
     tomorrowDate.setDate(tomorrowDate.getDate() + 1);
     const todayStr = tomorrowDate.toISOString().split('T')[0];
@@ -611,7 +626,6 @@ const BookingPage = () => {
                                                                             <div className="d-flex align-items-center justify-content-between gap-2">
                                                                                 <div className="fw-semibold text-dark text-truncate small">{doctorName}</div>
                                                                                 <div className="d-flex align-items-center justify-content-between gap-2 mt-1">
-
                                                                                     <Button
                                                                                         type="button"
                                                                                         variant="link"
@@ -668,11 +682,9 @@ const BookingPage = () => {
                                                         );
                                                     })
                                                 )}
-
                                                 {hasMoreDoctors && doctors.length > 0 && (
                                                     <div className="col-12" ref={doctorLoadMoreRef} style={{ height: "1px" }} />
                                                 )}
-
                                                 {loadingMoreDoctors && doctors.length > 0 && (
                                                     <div className="col-12 text-center text-muted small py-1">Đang tải thêm bác sĩ...</div>
                                                 )}
@@ -680,10 +692,6 @@ const BookingPage = () => {
                                         </div>
                                     </div>
                                 </div>
-
-
-
-
                             </Card>
                         </Col>
 
@@ -695,7 +703,6 @@ const BookingPage = () => {
                                             <Card.Title className="fw-semibold mb-0" style={{ fontSize: "1.05rem" }}>Lịch khám</Card.Title>
                                         </div>
                                     </div>
-
                                     <div>
                                         <ScheduleBooking
                                             schedules={schedules}
@@ -706,7 +713,6 @@ const BookingPage = () => {
                                             onSelectSchedule={(scheduleId) => handleFilterChange("scheduleId", scheduleId)}
                                         />
                                     </div>
-
                                 </Card.Body>
                             </Card>
                         </Col>
@@ -800,7 +806,6 @@ const BookingPage = () => {
                             </Button>
                         </Modal.Footer>
                     </Modal>
-
                     <LoginRequiredModal
                         show={loginPromptVisible}
                         onHide={() => setLoginPromptVisible(false)}

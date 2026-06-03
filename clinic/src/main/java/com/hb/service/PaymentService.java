@@ -18,7 +18,9 @@ import java.util.Map;
  */
 public interface PaymentService {
     List<PaymentResponse> getPayments(Map<String, String> params);
-    Payment getPaymentById(Long id);
+    List<PaymentResponse> getPaymentsByUserName(Map<String, String> params);
+    PaymentResponse getPaymentById(Long id);
+    Payment getPaymentEntityById(Long id);
     Payment getPaymentByAppoint(Long appointmentId);
     void deletePayment(Long id);
     Payment createPayment(Long appointmentId);

@@ -6,8 +6,7 @@ package com.hb.configs;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import com.hb.filters.JwtFilter;
-import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -18,11 +17,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 /**
@@ -59,15 +54,16 @@ public class SpringSecurityConfigs {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.securityMatcher("/admin/**", "/", "/login").csrf(c -> c.disable()).authorizeHttpRequests((requests) -> requests
-                .requestMatchers("/", "/admin").hasRole("ADMIN")
+        http.securityMatcher("/admin/**", "/", "/login", "/logout").csrf(c -> c.disable()).authorizeHttpRequests((requests) -> requests
+                .requestMatchers("/admin/login", "/login", "/logout").permitAll()
+                .requestMatchers("/", "/admin/**").hasRole("ADMIN")
                 .anyRequest().permitAll()
         ).formLogin(form -> form.loginPage("/admin/login")
                 .loginProcessingUrl("/login")
                 .defaultSuccessUrl("/", true)
                 .failureUrl("/admin/login?error=true")
                 .permitAll()
-        ).logout((logout) -> logout.logoutSuccessUrl("/admin/login").permitAll());
+        ).logout((logout) -> logout.logoutUrl("/logout").logoutSuccessUrl("/admin/login").permitAll());
         return http.build();
     }
 

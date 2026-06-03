@@ -40,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author HUY
  */
 @Service
+@Transactional
 public class PaymentServiceImpl implements PaymentService {
 
     @Autowired
@@ -80,8 +81,17 @@ public class PaymentServiceImpl implements PaymentService {
     } 
 
     @Override
-    public Payment getPaymentById(Long id) {
-        return this.paymentRepo.getPaymentById(id);
+    @Transactional
+    public List<PaymentResponse> getPaymentsByUserName(Map<String, String> params) {
+        List<Payment> payments = this.paymentRepo.getPaymentsByUserName(params);
+        return payments.stream()
+                .map(payMapper::toResponse)
+                .toList();
+    }
+
+    @Override
+    public PaymentResponse getPaymentById(Long id) {
+        return payMapper.toResponse(this.paymentRepo.getPaymentById(id));
     }
 
     @Override
@@ -103,13 +113,21 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    @Transactional
     public Payment getPaymentByAppoint(Long appointmentId) {
         PaymentItem item = itemService.getPaymentItemByAppointment(appointmentId);
-        return this.paymentRepo.getPaymentById(item.getPaymentId().getId());
+        if (item == null || item.getPaymentId() == null) {
+            return null;
+        }
+
+        Payment payment = this.paymentRepo.getPaymentById(item.getPaymentId().getId());
+        if (payment != null && payment.getPaymentItemCollection() != null) {
+            payment.getPaymentItemCollection().size();
+        }
+        return payment;
     }
 
     @Override
-    
     public void updatePaymentTotalAmount(Payment payment) {
         List<PaymentItem> items = itemRepo.getItemsByPayment(payment);
 
@@ -169,9 +187,6 @@ public class PaymentServiceImpl implements PaymentService {
                 this.confirmPaymentForLabResult(labResult.getId());
             }
 
-            case PRESCRIPTION -> {
-                this.confirmPaymentForPrescription(paymentId);//chua lam
-            }
         }
 
         try {
@@ -220,6 +235,11 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public void confirmPaymentForPrescription(Long prescriptionId) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public Payment getPaymentEntityById(Long id) {
+        return this.paymentRepo.getPaymentById(id);
     }
 
 }

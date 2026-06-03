@@ -4,13 +4,14 @@
  */
 package com.hb.repository.impl;
 
+import com.hb.dto.response.DoctorRankingResponse;
 import com.hb.enums.AppointmentStatus;
 import com.hb.pojo.Appointment;
+import com.hb.pojo.Doctor;
 import com.hb.pojo.Patient;
 import com.hb.pojo.Schedule;
 import com.hb.pojo.Shift;
 import com.hb.repository.AppointmentRepository;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -24,8 +25,6 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -239,6 +238,46 @@ public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> i
     }
 
     @Override
+    public java.util.List<DoctorRankingResponse> getTopDoctorsByAppointmentCount(int limit, java.time.LocalDate fromDate, java.time.LocalDate toDate) {
+        Session session = this.factory.getObject().getCurrentSession();
+        String hql = "SELECT new com.hb.dto.response.DoctorRankingResponse(d.id, d.fullName, count(a)) "
+                + "FROM Appointment a JOIN a.scheduleId s JOIN s.doctorId d ";
+        if (fromDate != null && toDate != null) {
+            hql += "WHERE s.date BETWEEN :fromDate AND :toDate ";
+        }
+        hql += "GROUP BY d.id, d.fullName "
+                + "ORDER BY count(a) DESC";
+        Query<DoctorRankingResponse> query = session.createQuery(hql, DoctorRankingResponse.class);
+        if (fromDate != null && toDate != null) {
+            query.setParameter("fromDate", fromDate);
+            query.setParameter("toDate", toDate);
+        }
+        query.setMaxResults(limit);
+        return query.getResultList();
+    }
+
+    @Override
+    public java.util.List<DoctorRankingResponse> getTopDoctorsByConvertedAppointmentCount(int limit, java.time.LocalDate fromDate, java.time.LocalDate toDate) {
+        Session session = this.factory.getObject().getCurrentSession();
+        String hql = "SELECT new com.hb.dto.response.DoctorRankingResponse(d.id, d.fullName, count(a)) "
+                + "FROM Appointment a JOIN a.scheduleId s JOIN s.doctorId d ";
+        if (fromDate != null && toDate != null) {
+            hql += "WHERE a.conversationId IS NOT NULL AND s.date BETWEEN :fromDate AND :toDate ";
+        } else {
+            hql += "WHERE a.conversationId IS NOT NULL ";
+        }
+        hql += "GROUP BY d.id, d.fullName "
+                + "ORDER BY count(a) DESC";
+        Query<DoctorRankingResponse> query = session.createQuery(hql, DoctorRankingResponse.class);
+        if (fromDate != null && toDate != null) {
+            query.setParameter("fromDate", fromDate);
+            query.setParameter("toDate", toDate);
+        }
+        query.setMaxResults(limit);
+        return query.getResultList();
+    }
+
+    @Override
     public List<Appointment> getAppointmentByPatientId(Long patientId, Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
         CriteriaBuilder cb = session.getCriteriaBuilder();
@@ -283,6 +322,27 @@ public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> i
 
         Query<Appointment> query = session.createQuery(cq);
         return query.getResultList();
+    }
+
+    @Override
+    public boolean existsAppointmentForPatientAndDoctorUser(Long patientId, Long doctorUserId) {
+        Session session = this.factory.getObject().getCurrentSession();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+        Root<Appointment> root = cq.from(Appointment.class);
+
+        Join<Appointment, Patient> patientJoin = root.join("patientId", JoinType.INNER);
+        Join<Appointment, Schedule> scheduleJoin = root.join("scheduleId", JoinType.INNER);
+        Join<Schedule, Doctor> doctorJoin = scheduleJoin.join("doctorId", JoinType.INNER);
+
+        Predicate patientPredicate = cb.equal(patientJoin.get("id"), patientId);
+        Predicate doctorUserPredicate = cb.equal(doctorJoin.get("userId").get("id"), doctorUserId);
+
+        cq.select(cb.count(root)).where(cb.and(patientPredicate, doctorUserPredicate));
+
+        Query<Long> query = session.createQuery(cq);
+        Long count = query.getSingleResult();
+        return count != null && count > 0;
     }
 
 }

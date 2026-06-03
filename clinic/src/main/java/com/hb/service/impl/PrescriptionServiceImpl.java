@@ -12,6 +12,7 @@ import com.hb.pojo.InventoryLog;
 import com.hb.pojo.MedicalRecord;
 import com.hb.pojo.Medicine;
 import com.hb.pojo.MedicineBatch;
+import com.hb.pojo.Payment;
 import com.hb.pojo.Prescription;
 import com.hb.pojo.PrescriptionItem;
 import com.hb.pojo.User;
@@ -21,6 +22,8 @@ import com.hb.repository.MedicineRepository;
 import com.hb.repository.PrescriptionItemRepository;
 import com.hb.repository.PrescriptionRepository;
 import com.hb.service.NotificationService;
+import com.hb.service.PaymentItemsService;
+import com.hb.service.PaymentService;
 import com.hb.service.PrescriptionService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -51,6 +54,10 @@ public class PrescriptionServiceImpl implements PrescriptionService {
     private InventoryLogRepository inventoryLogRepo;
     @Autowired
     private MedicineBatchRepository medicineBatchRepo;
+    @Autowired
+    private PaymentService paymentService;
+    @Autowired
+    private PaymentItemsService paymentItemsService;
     
     @Override
     @Transactional(readOnly = true)
@@ -183,7 +190,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
         }
         
         List<PrescriptionItem> items = new ArrayList<>();
-        int bufferDays = 3;        
+        int bufferDays = 3;
         
         for (var i : req.getItems()) {
             Medicine m = validateReqItem(i);
@@ -192,9 +199,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
             int daysToUse = (i.getDaysToUse() > 0) ? i.getDaysToUse() : 7;
             
             LocalDate minExpiryDate = LocalDate.now().plusDays(daysToUse + bufferDays);
-            
             List<MedicineBatch> availableBatches = medicineRepo.getAvailableBatches(m.getId(), minExpiryDate);
-            
             int totalAvailable = availableBatches.stream().mapToInt(MedicineBatch::getQuantity).sum();
             if (totalAvailable < requiredQty) {
                 throw new BadRequestException("Thuốc [" + m.getName() + "] không đủ số lượng đạt chuẩn trong kho cho đợt điều trị "
@@ -210,39 +215,6 @@ public class PrescriptionServiceImpl implements PrescriptionService {
             
             prescriptionItemRepo.save(item);
             items.add(item);
-            
-            int remainingQtyToDeduct = requiredQty;
-            for (MedicineBatch batch : availableBatches) {
-                if (remainingQtyToDeduct <= 0) {
-                    break;
-                }
-                
-                int batchQty = batch.getQuantity();
-                int qtyDeducted = 0;
-                
-                if (batchQty >= remainingQtyToDeduct) {
-                    qtyDeducted = remainingQtyToDeduct;
-                    batch.setQuantity(batchQty - remainingQtyToDeduct);
-                    remainingQtyToDeduct = 0;
-                } else {
-                    qtyDeducted = batchQty;
-                    remainingQtyToDeduct -= batchQty;
-                    batch.setQuantity(0);
-                }
-                
-                medicineBatchRepo.saveOrUpdate(batch);
-                
-                InventoryLog log = new InventoryLog();
-                log.setMedicineId(m);
-                log.setBatchId(batch);
-                log.setChangeAmount(-qtyDeducted);                
-                log.setReason(InventoryLogType.PRESCRIPTION_EXPORT);
-                log.setReferenceId(p.getId());
-                log.setCreatedAt(LocalDateTime.now());
-                log.setCreatedBy(username);
-                
-                inventoryLogRepo.createInventoryLog(log);
-            }
         }
         
         p.setStatus(PrescriptionStatus.PUBLIC);
@@ -253,10 +225,22 @@ public class PrescriptionServiceImpl implements PrescriptionService {
         
         Prescription saved = prescriptionRepo.saveOrUpdate(p);
         
+        if (saved.getMedicalRecordId() != null && saved.getMedicalRecordId().getAppointmentId() != null) {
+            Long appointmentId = saved.getMedicalRecordId().getAppointmentId().getId();
+            if (appointmentId != null) {
+                try {
+                    Payment payment = paymentService.createPayment(appointmentId);
+                    paymentItemsService.addPrescriptionItem(payment, saved.getId());
+                } catch (Exception e) {
+
+                    System.err.println("Lỗi tạo thanh toán cho đơn thuốc: " + e.getMessage());
+                }
+            }
+        }
         this.pushPrescriptionNotify(saved);
         
         return saved;
-        
+ 
     }
     
     @Override
@@ -307,5 +291,64 @@ public class PrescriptionServiceImpl implements PrescriptionService {
     @Override
     public Prescription getPrescriptionByMedicalRecordId(Long recordId) {
         return this.prescriptionRepo.getPrescriptionByMedicalRecordId(recordId);
+    }
+
+    @Override
+    @Transactional
+    public Prescription dispensePrescription(Long id, String username) {
+        Prescription prescription = this.prescriptionRepo.getPrescriptionById(id);
+        if (prescription == null) {
+            throw new ResourceNotFoundException("Không tìm thấy đơn thuốc!");
+        }
+        int bufferDays = 3;
+        
+
+        if (prescription.getPrescriptionItemCollection() != null) {
+            for (PrescriptionItem item : prescription.getPrescriptionItemCollection()) {
+                Medicine m = item.getMedicineId();
+                if (m == null) continue;
+                int requiredQty = item.getQuantity();
+                int daysToUse = (item.getDaysToUse() > 0) ? item.getDaysToUse() : 7;                  
+                LocalDate minExpiryDate = LocalDate.now().plusDays(daysToUse + bufferDays);
+                List<MedicineBatch> availableBatches = medicineRepo.getAvailableBatches(m.getId(), minExpiryDate);
+                int remainingQtyToDeduct = requiredQty;
+                for (MedicineBatch batch : availableBatches) {
+                    if (remainingQtyToDeduct <= 0) {
+                        break;
+                    }
+
+                    int batchQty = batch.getQuantity();
+                    int qtyDeducted = 0;
+
+                    if (batchQty >= remainingQtyToDeduct) {
+                        qtyDeducted = remainingQtyToDeduct;
+                        batch.setQuantity(batchQty - remainingQtyToDeduct);
+                        remainingQtyToDeduct = 0;
+                    } else {
+                        qtyDeducted = batchQty;
+                        remainingQtyToDeduct -= batchQty;
+                        batch.setQuantity(0);
+                    }
+
+                    medicineBatchRepo.saveOrUpdate(batch);
+
+                    InventoryLog log = new InventoryLog();
+                    log.setMedicineId(m);
+                    log.setBatchId(batch);
+                    log.setChangeAmount(-qtyDeducted);
+                    log.setReason(InventoryLogType.PRESCRIPTION_EXPORT);
+                    log.setReferenceId(prescription.getId());
+                    log.setCreatedAt(LocalDateTime.now());
+                    log.setCreatedBy(username);
+
+                    inventoryLogRepo.createInventoryLog(log);
+                }
+            }
+        }
+
+        prescription.setDispensedAt(LocalDateTime.now());
+        this.prescriptionRepo.saveOrUpdate(prescription);
+
+        return prescription;
     }
 }
