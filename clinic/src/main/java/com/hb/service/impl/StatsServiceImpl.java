@@ -38,30 +38,29 @@ public class StatsServiceImpl implements StatsService {
                 ).toList();
     }
 
-    @Override
+   @Override
     public List<PatientAgeGroupStatsResponse> getPatientAgeGroupStats(LocalDate fromDate, LocalDate toDate) {
         List<Object[]> res = this.statsRepo.countPatientsByAgeGroup(fromDate, toDate);
-        java.util.Map<String, Long> grouped = new java.util.LinkedHashMap<>();
+        
+        // Dùng TreeMap<Integer, Long> để tự động sắp xếp tuổi tăng dần (1, 2, 3... 10, 20...)
+        java.util.Map<Integer, Long> exactAgeMap = new java.util.TreeMap<>();
+        
         res.forEach(obj -> {
+            // Lấy ngày sinh và số lượng
             LocalDate dob = (LocalDate) obj[0];
             Long count = (Long) obj[1];
+            
+            // Tính tuổi chính xác
             int age = java.time.Period.between(dob, LocalDate.now()).getYears();
-            String ageGroup;
-            if (age < 18) {
-                ageGroup = "Dưới 18";
-            } else if (age < 30) {
-                ageGroup = "18-29";
-            } else if (age < 45) {
-                ageGroup = "30-44";
-            } else if (age < 60) {
-                ageGroup = "45-59";
-            } else {
-                ageGroup = "60+";
-            }
-            grouped.merge(ageGroup, count, Long::sum);
+            
+            // Gộp dữ liệu theo từng tuổi cụ thể (thay vì nhóm tuổi)
+            exactAgeMap.merge(age, count, Long::sum);
         });
-        return grouped.entrySet().stream()
-                .map(entry -> new PatientAgeGroupStatsResponse(entry.getKey(), entry.getValue()))
+        
+        // Chuyển đổi sang List DTO trả về cho Controller
+        return exactAgeMap.entrySet().stream()
+                // Gắn thêm chữ "tuổi" luôn vào DTO để JS không cần xử lý nữa
+                .map(entry -> new PatientAgeGroupStatsResponse(entry.getKey() + " tuổi", entry.getValue()))
                 .toList();
     }
 

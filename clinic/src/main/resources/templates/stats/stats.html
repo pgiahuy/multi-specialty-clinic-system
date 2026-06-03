@@ -78,7 +78,7 @@
             <div class="report-content-section card p-3 bg-light">
 
                 <div th:if="${reportType == 'PATIENT'}" id="patientInPage">
-                    <h3 class="text-secondary mb-3"><i class="fas fa-users text-primary text-center"></i>BÁO CÁO SỐ LƯỢNG BỆNH NHÂN</h3>
+                    <h3 class="text-primary text-center mb-3"><i class="fas fa-users"></i>BÁO CÁO SỐ LƯỢNG BỆNH NHÂN</h3>
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <div class="card p-3 h-100 shadow-sm">
@@ -246,6 +246,8 @@
             if (document.getElementById('ageBarChart')) {
                 var ageLabels = [];
                 var ageValues = [];
+
+                // Tách dữ liệu tuổi
                 if (typeof rawAgeData !== 'undefined' && rawAgeData.length > 0) {
                     rawAgeData.forEach(function (item) {
                         if (item) {
@@ -254,33 +256,46 @@
                         }
                     });
                 }
+
                 var ctx2 = document.getElementById('ageBarChart').getContext('2d');
                 new Chart(ctx2, {
-                    type: 'bar',
+                    type: 'line', 
                     data: {
                         labels: ageLabels,
-                        datasets: [{label: 'Số lượng', data: ageValues, backgroundColor: '#6c757d'}]
+                        datasets: [{
+                                label: 'Số lượng bệnh nhân',
+                                data: ageValues,
+                                borderColor: '#0d6efd', 
+                                backgroundColor: 'rgba(13, 110, 253, 0.2)', )
+                                borderWidth: 2,
+                                fill: true, 
+                                tension: 0.4, 
+                                pointBackgroundColor: '#fff', 
+                                pointBorderColor: '#0d6efd',
+                                pointRadius: 4, 
+                                pointHoverRadius: 6 
+                            }]
                     },
-                    options: {scales: {y: {beginAtZero: true}}}
-                });
-            }
-
-            if (document.getElementById('specialtyBarChart')) {
-                var specialtyLabels = [];
-                var specialtyValues = [];
-                if (typeof rawSpecialtyData !== 'undefined' && rawSpecialtyData.length > 0) {
-                    rawSpecialtyData.forEach(function (item) {
-                        if (item) {
-                            specialtyLabels.push(item.specialtyName);
-                            specialtyValues.push(item.count || 0);
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false, 
+                        plugins: {
+                            legend: {display: false} 
+                        },
+                        scales: {
+                            x: {
+                                grid: {
+                                    display: false 
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)' 
+                                }
+                            }
                         }
-                    });
-                }
-                var ctx3 = document.getElementById('specialtyBarChart').getContext('2d');
-                new Chart(ctx3, {
-                    type: 'bar',
-                    data: {labels: specialtyLabels, datasets: [{label: 'Số lượng', data: specialtyValues, backgroundColor: '#198754'}]},
-                    options: {indexAxis: 'y', scales: {x: {beginAtZero: true}}}
+                    }
                 });
             }
             if (document.getElementById('revenueChart')) {
