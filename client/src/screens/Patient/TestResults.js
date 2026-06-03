@@ -41,7 +41,6 @@ const TestResults = () => {
             setLoading(true);
             const res = await authApis().get(USER_ENDPOINTS.PATIENT_PROFILES);
             setPatientProfiles(res.data);
-
             if (res.data && res.data.length > 0) {
                 setSelectedProfileId(String(res.data[0].id));
             }

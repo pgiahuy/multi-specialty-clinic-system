@@ -245,10 +245,10 @@ public class ScheduleRepositoryImpl extends BaseRepositoryImpl<Schedule> impleme
                 predicates.add(cb.equal(root.get("date"), singleDate));
             }
 
-                if (params.containsKey("role") && "patient".equalsIgnoreCase(params.get("role")) && !hasAnyDateParam) {
-                    LocalDate today = LocalDate.now();
-                    predicates.add(cb.greaterThan(root.get("date"), today));
-                }
+            if (params.containsKey("role") && "patient".equalsIgnoreCase(params.get("role")) && !hasAnyDateParam) {
+                LocalDate today = LocalDate.now();
+                predicates.add(cb.greaterThan(root.get("date"), today));
+            }
         }
 
         cq.where(predicates.toArray(new Predicate[0]));

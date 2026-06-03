@@ -78,7 +78,29 @@
         </table>
 
         <div class="d-flex justify-content-center mt-4" id="schedulesPagination">
-            <div th:replace="~{fragments :: pagination('/admin/schedules', ${totalPages}, ${currentPage})}"></div>
+            <nav aria-label="Page navigation">
+            <ul class="pagination mb-0">
+                <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                    <a class="page-link" th:href="@{${baseUrl}(page=${currentPage - 1})}">&laquo;</a>
+                </li>
+
+                <th:block th:each="i : ${#numbers.sequence(1, totalPages)}">
+                    <li th:if="${i == 1 || i == totalPages || (i >= currentPage - 2 && i <= currentPage + 2)}"
+                        class="page-item" th:classappend="${i == currentPage} ? ' active'">
+                        <a class="page-link" th:href="@{${baseUrl}(page=${i})}" th:text="${i}">1</a>
+                    </li>
+
+                    <li th:if="${(i == 2 && currentPage > 4) || (i == totalPages - 1 && currentPage < totalPages - 3)}"
+                        class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                </th:block>
+
+                <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                    <a class="page-link" th:href="@{${baseUrl}(page=${currentPage + 1})}">&raquo;</a>
+                </li>
+            </ul>
+        </nav>
         </div>
 
         <div th:replace="~{base :: footer}">

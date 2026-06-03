@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
-import { Container, Card, Badge, Row, Col, Spinner, Tabs, Tab, Form, Button } from "react-bootstrap";
+import { Fragment, useEffect, useState } from "react";
+import { Container, Card, Badge, Row, Col, Spinner, Tabs, Tab, Form, Button, Pagination } from "react-bootstrap";
 import Footer from "../../components/Footer";
 import Header from "../../components/Header";
 import { APPOINTMENT_ENDPOINTS, authApis, CLINIC_ENDPOINTS, endpoint, USER_ENDPOINTS } from "../../configs/Apis";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import MySpinner from "../../components/MySpinner";
 
 const getStatusVariant = (status) => {
@@ -24,12 +24,16 @@ const getStatusVariant = (status) => {
 
 
 const HistoryBooking = () => {
+    const [searchParams, setSearchParams] = useSearchParams();
     const [appointments, setAppointments] = useState([]);
     const [loading, setLoading] = useState(false);
     const [activeStatus, setActiveStatus] = useState('all');
     const [patientProfiles, setPatientProfiles] = useState([]);
     const [selectedProfileId, setSelectedProfileId] = useState('');
+    const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get('page') || '1', 10) || 1);
+    const [totalResults, setTotalResults] = useState(0);
     const navigate = useNavigate();
+    const pageSize = 9;
 
     const [fromDate, setFromDate] = useState(() => {
         const date = new Date();
@@ -41,26 +45,66 @@ const HistoryBooking = () => {
         return date.toISOString().slice(0, 10);
     });
 
-    const loadAppointments = async (patientId) => {
+    const updateSearchParams = (updates) => {
+        const newParams = new URLSearchParams(searchParams);
+        Object.entries(updates).forEach(([key, value]) => {
+            if (value === undefined || value === '') {
+                newParams.delete(key);
+            } else {
+                newParams.set(key, value);
+            }
+        });
+        setSearchParams(newParams);
+    };
+
+    const loadAppointments = async () => {
         try {
             setLoading(true);
+            const patientId = searchParams.get('patientId');
             if (!patientId) {
                 setAppointments([]);
                 return;
             }
-            const res = await authApis().get(APPOINTMENT_ENDPOINTS.APPOINTMENTS_BY_PATIENT(patientId), {
+            const res = await authApis().get(APPOINTMENT_ENDPOINTS.APPOINTMENTS, {
                 params: {
+                    patientId: patientId,
                     startDate: fromDate,
                     endDate: toDate,
                     status: activeStatus !== 'all' ? activeStatus : undefined,
+                    pageSize: pageSize,
+                    page: currentPage
                 }
             });
 
+            let appointments = [];
+            let total = 0;
 
-            setAppointments(res.data || []);
+            if (Array.isArray(res.data)) {
+                appointments = res.data;
+                total = parseInt(res.headers?.['x-total-count'] || res.headers?.['X-Total-Count'] || '0', 10) || 0;
+            } else if (res.data && typeof res.data === 'object') {
+                if (Array.isArray(res.data.items)) {
+                    appointments = res.data.items;
+                    total = res.data.totalItems || res.data.total || res.data.count || 0;
+                } else {
+                    appointments = [res.data];
+                }
+            }
+
+            setAppointments(appointments);
+            if (total > 0) {
+                setTotalResults(total);
+            } else if (appointments.length < pageSize && currentPage === 1) {
+                setTotalResults(appointments.length);
+            } else if (appointments.length === pageSize) {
+                setTotalResults(currentPage * pageSize + 1);
+            } else {
+                setTotalResults((currentPage - 1) * pageSize + appointments.length);
+            }
         } catch (err) {
             console.log(err);
             setAppointments([]);
+            setTotalResults(0);
         } finally {
             setLoading(false);
         }
@@ -74,7 +118,14 @@ const HistoryBooking = () => {
             if (profiles.length > 0) {
                 const firstId = String(profiles[0].id);
                 setSelectedProfileId(firstId);
-                loadAppointments(firstId);
+                setCurrentPage(1);
+                updateSearchParams({
+                    patientId: firstId,
+                    fromDate: fromDate,
+                    toDate: toDate,
+                    status: activeStatus !== 'all' ? activeStatus : undefined,
+                    page: 1
+                });
             }
         } catch (err) {
             console.log(err);
@@ -87,8 +138,8 @@ const HistoryBooking = () => {
 
 
     useEffect(() => {
-        if (selectedProfileId) loadAppointments(selectedProfileId);
-    }, [selectedProfileId, activeStatus, fromDate, toDate]);
+        loadAppointments();
+    }, [searchParams, activeStatus, fromDate, toDate, currentPage]);
 
     const statusMatches = (status, filter) => {
         if (!filter || filter === 'all') return true;
@@ -110,7 +161,7 @@ const HistoryBooking = () => {
         }
     };
 
-    const filtered = appointments.filter(a => statusMatches(a.status, activeStatus));
+    const totalPages = Math.max(1, Math.ceil(totalResults / pageSize));
 
     const renderStatusText = (status) => {
         if (!status) return <span className="text-muted">Không rõ</span>;
@@ -119,7 +170,6 @@ const HistoryBooking = () => {
             case 'UN_PAID': return <Badge bg="transparent"
                 className="rounded-pill px-3 py-2 border border-warning text-warning bg-warning-subtle">
                 Chưa thanh toán</Badge>;
-
             case 'PENDING': return <Badge bg="transparent"
                 className="rounded-pill px-3 py-2 border border-secondary text-secondary bg-secondary-subtle">
                 Chờ xác nhận</Badge>;
@@ -135,7 +185,6 @@ const HistoryBooking = () => {
             case 'CANCELLED': return <Badge bg="transparent"
                 className="rounded-pill px-3 py-2 border border-danger text-danger bg-danger-subtle">
                 Đã hủy</Badge>;
-
         }
     };
 
@@ -144,26 +193,29 @@ const HistoryBooking = () => {
             <div className="d-flex flex-column min-vh-100 bg-light">
                 <Header />
                 <Container className="py-4">
-                  
                     <div className="mb-4 pb-3 border-bottom">
                         <div className="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3">
-
-
                             <div>
                                 <h2 className="fw-bold mb-0 text-primary">Lịch sử đặt khám</h2>
                             </div>
-
-
                             <div className="d-flex flex-column flex-md-row align-items-md-end gap-3">
-
-
                                 <div>
                                     <Form.Label className="small text-muted mb-1">Bệnh nhân</Form.Label>
                                     {patientProfiles.length > 0 ? (
                                         <Form.Select
                                             value={selectedProfileId}
                                             className="rounded-3 shadow-sm px-3"
-                                            onChange={(e) => setSelectedProfileId(e.target.value)}
+                                            onChange={(e) => {
+                                                setSelectedProfileId(e.target.value);
+                                                setCurrentPage(1);
+                                                updateSearchParams({
+                                                    patientId: e.target.value,
+                                                    fromDate: fromDate,
+                                                    toDate: toDate,
+                                                    status: activeStatus !== 'all' ? activeStatus : undefined,
+                                                    page: 1
+                                                });
+                                            }}
                                             style={{ minWidth: '250px' }}
                                         >
                                             <option value="">-- Chọn hồ sơ bệnh nhân --</option>
@@ -177,40 +229,63 @@ const HistoryBooking = () => {
                                         <div className="text-muted small py-2 fst-italic">Không có hồ sơ...</div>
                                     )}
                                 </div>
-
-
                                 <div>
                                     <Form.Label className="small text-muted mb-1">Từ ngày</Form.Label>
                                     <Form.Control
                                         type="date"
                                         value={fromDate}
                                         className="rounded-3 shadow-sm px-3"
-                                        onChange={(e) => setFromDate(e.target.value)}
+                                        onChange={(e) => {
+                                            setFromDate(e.target.value);
+                                            setCurrentPage(1);
+                                            updateSearchParams({
+                                                patientId: selectedProfileId,
+                                                fromDate: e.target.value,
+                                                toDate: toDate,
+                                                status: activeStatus !== 'all' ? activeStatus : undefined,
+                                                page: 1
+                                            });
+                                        }}
                                         style={{ width: '150px' }}
                                     />
                                 </div>
-
-
                                 <div>
                                     <Form.Label className="small text-muted mb-1">Đến ngày</Form.Label>
                                     <Form.Control
                                         type="date"
                                         value={toDate}
                                         className="rounded-3 shadow-sm px-3"
-                                        onChange={(e) => setToDate(e.target.value)}
+                                        onChange={(e) => {
+                                            setToDate(e.target.value);
+                                            setCurrentPage(1);
+                                            updateSearchParams({
+                                                patientId: selectedProfileId,
+                                                fromDate: fromDate,
+                                                toDate: e.target.value,
+                                                status: activeStatus !== 'all' ? activeStatus : undefined,
+                                                page: 1
+                                            });
+                                        }}
                                         style={{ width: '150px' }}
                                     />
                                 </div>
-
                             </div>
                         </div>
                     </div>
-
-
                     <div className="mb-4 d-flex justify-content-center">
                         <Tabs
                             activeKey={activeStatus}
-                            onSelect={(k) => setActiveStatus(k)}
+                            onSelect={(k) => {
+                                setActiveStatus(k);
+                                setCurrentPage(1);
+                                updateSearchParams({
+                                    patientId: selectedProfileId,
+                                    fromDate: fromDate,
+                                    toDate: toDate,
+                                    status: k !== 'all' ? k : undefined,
+                                    page: 1
+                                });
+                            }}
                             className="nav-pills px-1 py-1 rounded-4 bg-white d-inline-flex"
                             style={{ boxShadow: '0 12px 30px rgba(13,110,253,0.04)' }}
                         >
@@ -224,59 +299,124 @@ const HistoryBooking = () => {
                         </Tabs>
                     </div>
 
+                    {loading && (
+                        <div className="position-fixed top-0 start-0 vw-100 vh-100 d-flex align-items-center justify-content-center bg-white bg-opacity-75" style={{ zIndex: 1060 }}>
+                            <MySpinner />
+                        </div>
+                    )}
 
-
-                    <Row className="g-4" style={{ marginBottom: 30, minHeight: '300px' }}>
-                        {loading ? (
-                            <div className="d-flex justify-content-center py-5">
-                                <MySpinner />
-                            </div>) : (
-                            filtered.length > 0 ? (filtered.map((item) => (
-                                <Col key={item.id} xs={12} md={6} lg={4}>
-                                    <Card className="h-100 shadow-sm border-0" style={{ borderRadius: 18, overflow: 'hidden' }}>
-
-                                        <div className="bg-light" style={{ padding: '16px 20px', borderBottom: '1px solid #edf2f7' }}>
-                                            <div className="d-flex justify-content-between align-items-center">
-                                                <div className="small text-muted">
-                                                    Ngày đăng ký: {item.createdAt || '-'}
-                                                </div>
-                                                <div>{renderStatusText(item.status)}</div>
+                    {selectedProfileId && (
+                        <>
+                            <div className="row g-3">
+                                {appointments.map((item) => (
+                                    <div key={item.id} className="col-md-6 col-lg-4">
+                                        <Card className="h-100 shadow-sm border-0"
+                                            style={{
+                                                borderRadius: '20px',
+                                                overflow: 'hidden'
+                                            }}>
+                                            <div className="h-100 d-flex flex-column bg-white">
+                                                <Card.Header className="bg-white border-0 p-4">
+                                                    <div className="d-flex justify-content-between align-items-center">
+                                                        <div className="text-start">
+                                                            <h6 className="fw-bold text-primary text-uppercase mb-0">
+                                                                Lịch hẹn
+                                                            </h6>
+                                                        </div>
+                                                        <div>
+                                                            {renderStatusText(item.status)}
+                                                        </div>
+                                                    </div>
+                                                </Card.Header>
+                                                <Card.Body className="d-flex flex-column px-4">
+                                                    <div className="text-start">
+                                                        <h5 className="fw-bold text-dark text-uppercase text-center mb-3">
+                                                            {item.patientFullName || 'Không xác định'}
+                                                        </h5>
+                                                    </div>
+                                                    <Row className="mb-3 g-2 p-3 rounded-3">
+                                                        <Col md={6}>
+                                                            <small className="text-muted">Ngày đăng ký</small>
+                                                            <div className="fw-semibold text-dark">{item.createdAt || 'N/A'}</div>
+                                                        </Col>
+                                                        <Col md={6}>
+                                                            <small className="text-muted">Ngày khám</small>
+                                                            <div className="fw-semibold text-dark">{item.appointmentDate || '-'}</div>
+                                                        </Col>
+                                                    </Row>
+                                                    <div className="mt-auto">
+                                                        <Button
+                                                            variant="outline-primary"
+                                                            className="rounded-pill px-3 py-2 w-100 fw-medium"
+                                                            onClick={() => navigate(`/appointments/${item.id}`)}
+                                                        >
+                                                            Xem chi tiết
+                                                        </Button>
+                                                    </div>
+                                                </Card.Body>
                                             </div>
-                                        </div>
-
-
-                                        <Card.Body className="p-4">
-                                            <div className="d-flex justify-content-between align-items-center mb-3">
-                                                <div className="small text-muted">Bệnh nhân</div>
-                                                <div className="fw-bold text-dark text-end text-uppercase">{item.patientFullName || '-'}</div>
-                                            </div>
-
-                                            <div className="d-flex justify-content-between align-items-center mb-4">
-                                                <div className="small text-muted">Ngày khám</div>
-                                                <div className="fw-bold text-end">{item.appointmentDate || '-'}</div>
-                                            </div>
-
-
-                                            <Button
-                                                variant="outline-primary"
-                                                className="w-100 rounded-4 fw-medium"
-
-                                                onClick={() => navigate(`/appointments/${item.id}`)}
-                                            >
-                                                Xem chi tiết
-                                            </Button>
-                                        </Card.Body>
-                                    </Card>
-                                </Col>
-                            ))) : (
+                                        </Card>
+                                    </div>
+                                ))}
+                            </div>
+                            {appointments.length === 0 && !loading && (
                                 <div className="text-center text-muted py-5">
+                                    <i className="bi bi-inbox fs-3 d-block mb-2 opacity-50"></i>
                                     Không có lịch hẹn nào.
                                 </div>
-                            ))
+                            )}
+                            {appointments.length > 0 && totalPages > 1 && (
+                                <div className="d-flex justify-content-center gap-2 mt-4">
+                                    <Pagination>
+                                        <Pagination.First
+                                            onClick={() => setCurrentPage(1)}
+                                            disabled={currentPage === 1 || loading}
+                                        />
+                                        <Pagination.Prev
+                                            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                                            disabled={currentPage === 1 || loading}
+                                        />
 
+                                        {Array.from({ length: totalPages }, (_, i) => i + 1)
+                                            .filter(page => page === 1 || page === totalPages || (page >= currentPage - 1 && page <= currentPage + 1))
+                                            .map((page, index, arr) => (
+                                                <Fragment key={page}>
+                                                    {index > 0 && arr[index - 1] !== page - 1 && (
+                                                        <Pagination.Ellipsis key={`ellipsis-${page}`} disabled />
+                                                    )}
+                                                    <Pagination.Item
+                                                        key={`page-${page}`}
+                                                        active={currentPage === page}
+                                                        onClick={() => {
+                                                            setCurrentPage(page);
+                                                            updateSearchParams({
+                                                                patientId: selectedProfileId,
+                                                                fromDate: fromDate,
+                                                                toDate: toDate,
+                                                                status: activeStatus !== 'all' ? activeStatus : undefined,
+                                                                page: page
+                                                            });
+                                                        }}
+                                                        disabled={loading}
+                                                    >
+                                                        {page}
+                                                    </Pagination.Item>
+                                                </Fragment>
+                                            ))}
 
-                        }
-                    </Row>
+                                        <Pagination.Next
+                                            onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                                            disabled={currentPage >= totalPages || loading}
+                                        />
+                                        <Pagination.Last
+                                            onClick={() => setCurrentPage(totalPages)}
+                                            disabled={currentPage >= totalPages || loading}
+                                        />
+                                    </Pagination>
+                                </div>
+                            )}
+                        </>
+                    )}
 
                 </Container>
                 <Footer />
