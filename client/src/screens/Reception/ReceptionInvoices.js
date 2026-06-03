@@ -41,6 +41,8 @@ const ReceptionInvoices = () => {
         }
     };
 
+    
+
     const loadInvoices = useCallback(async () => {
         try {
             setLoading(true);
@@ -218,11 +220,11 @@ const ReceptionInvoices = () => {
                                         </td>
                                         <td>{inv.method || "---"}</td>
                                         <td>
-                                            {inv.status === "PENDING" && inv.appointmentId ? (
+                                            {inv.status === "PENDING"  ? (
                                                 <Button
                                                     variant="success"
                                                     size="sm"
-                                                    onClick={() => nav(`/reception/payments/${inv.appointmentId}`)}
+                                                    onClick={() => nav(`/reception/payments/${inv.id}`)}
                                                 >
                                                     Nhận tiền
                                                 </Button>

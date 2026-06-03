@@ -28,7 +28,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public void registerPatient(UserCreateRequest urq) {
-        User u = userService.saveOrUpdateUser(urq);     
+       userService.saveOrUpdateUser(urq);     
     }
 
     @Override

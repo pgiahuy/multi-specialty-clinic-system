@@ -111,6 +111,7 @@ export const PAYMENT_ENDPOINTS = {
     VNPAY_IPN: 'secure/payments/vnpay/ipn',
     HISTORY: 'secure/payments',
     BY_APPOINTMENT: (appointmentId) => `secure/payments/appointment/${appointmentId}`,
+    BY_PAYMENT_ID: (paymentId) => `secure/payments/${paymentId}`,
     ITEMS: (paymentId) => `secure/payment-items/${paymentId}`,
 };
 

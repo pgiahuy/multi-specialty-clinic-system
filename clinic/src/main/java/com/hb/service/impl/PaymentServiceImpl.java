@@ -40,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author HUY
  */
 @Service
+@Transactional
 public class PaymentServiceImpl implements PaymentService {
 
     @Autowired
@@ -89,8 +90,8 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public Payment getPaymentById(Long id) {
-        return this.paymentRepo.getPaymentById(id);
+    public PaymentResponse getPaymentById(Long id) {
+        return payMapper.toResponse(this.paymentRepo.getPaymentById(id));
     }
 
     @Override
@@ -186,9 +187,6 @@ public class PaymentServiceImpl implements PaymentService {
                 this.confirmPaymentForLabResult(labResult.getId());
             }
 
-            case PRESCRIPTION -> {
-                this.confirmPaymentForPrescription(paymentId);//chua lam
-            }
         }
 
         try {
@@ -237,6 +235,11 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public void confirmPaymentForPrescription(Long prescriptionId) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public Payment getPaymentEntityById(Long id) {
+        return this.paymentRepo.getPaymentById(id);
     }
 
 }
