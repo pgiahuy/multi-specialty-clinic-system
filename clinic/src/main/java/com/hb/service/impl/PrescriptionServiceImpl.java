@@ -215,6 +215,16 @@ public class PrescriptionServiceImpl implements PrescriptionService {
             
             prescriptionItemRepo.save(item);
             items.add(item);
+            
+            InventoryLog log = new InventoryLog();
+            log.setMedicineId(m);
+            log.setChangeAmount(-requiredQty);
+            log.setReason(InventoryLogType.PRESCRIPTION_EXPORT);
+            log.setReferenceId(p.getId());
+            log.setCreatedAt(LocalDateTime.now());
+            log.setCreatedBy(username);
+            log.setIsConfirm(false);
+            inventoryLogRepo.createInventoryLog(log);
         }
         
         p.setStatus(PrescriptionStatus.PUBLIC);
@@ -266,27 +276,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
         return this.prescriptionRepo.count(params, Prescription.class);
     }
     
-    private void pushPrescriptionNotify(Prescription saved) {
-        try {
-            MedicalRecord currentMr = saved.getMedicalRecordId();
-            if (currentMr != null && currentMr.getAppointmentId() != null
-                    && currentMr.getAppointmentId().getPatientId() != null) {
-                
-                User patientUser = currentMr.getAppointmentId().getPatientId().getUserId();
-                if (patientUser != null) {
-                    Map<String, String> notiParams = new HashMap<>();
-                    notiParams.put("username", patientUser.getUsername());
-                    notiParams.put("title", "Đơn thuốc mới");
-                    notiParams.put("content", "Bác sĩ vừa kê đơn thuốc mới cho bạn. Vui lòng kiểm tra!");
-                    notiParams.put("path", "/patient/prescriptions/" + saved.getId());
-                    
-                    this.notificationService.addNotification(notiParams);
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("Lỗi gửi thông báo: " + e.getMessage());
-        }
-    }
+    
     
     @Override
     public Prescription getPrescriptionByMedicalRecordId(Long recordId) {
@@ -300,8 +290,12 @@ public class PrescriptionServiceImpl implements PrescriptionService {
         if (prescription == null) {
             throw new ResourceNotFoundException("Không tìm thấy đơn thuốc!");
         }
-        int bufferDays = 3;
         
+        if (prescription.getStatus() != PrescriptionStatus.PUBLIC) {
+            throw new BadRequestException("Chỉ có thể xuất đơn thuốc ở trạng thái PUBLIC!");
+        }
+        
+        int bufferDays = 3;
 
         if (prescription.getPrescriptionItemCollection() != null) {
             for (PrescriptionItem item : prescription.getPrescriptionItemCollection()) {
@@ -312,6 +306,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
                 LocalDate minExpiryDate = LocalDate.now().plusDays(daysToUse + bufferDays);
                 List<MedicineBatch> availableBatches = medicineRepo.getAvailableBatches(m.getId(), minExpiryDate);
                 int remainingQtyToDeduct = requiredQty;
+                
                 for (MedicineBatch batch : availableBatches) {
                     if (remainingQtyToDeduct <= 0) {
                         break;
@@ -332,23 +327,103 @@ public class PrescriptionServiceImpl implements PrescriptionService {
 
                     medicineBatchRepo.saveOrUpdate(batch);
 
-                    InventoryLog log = new InventoryLog();
-                    log.setMedicineId(m);
-                    log.setBatchId(batch);
-                    log.setChangeAmount(-qtyDeducted);
-                    log.setReason(InventoryLogType.PRESCRIPTION_EXPORT);
-                    log.setReferenceId(prescription.getId());
-                    log.setCreatedAt(LocalDateTime.now());
-                    log.setCreatedBy(username);
 
-                    inventoryLogRepo.createInventoryLog(log);
+                    int remainingToAssign = qtyDeducted;
+                    java.util.List<InventoryLog> reservations = inventoryLogRepo.getUnconfirmedLogsByReferenceIdAndMedicine(prescription.getId(), m.getId());
+
+                    for (InventoryLog res : reservations) {
+                        if (remainingToAssign <= 0) break;
+                        int resQty = Math.abs(res.getChangeAmount());
+
+                        if (resQty > remainingToAssign) {
+
+                            InventoryLog confirmed = new InventoryLog();
+                            confirmed.setMedicineId(m);
+                            confirmed.setBatchId(batch);
+                            confirmed.setChangeAmount(-remainingToAssign);
+                            confirmed.setReason(InventoryLogType.PRESCRIPTION_EXPORT);
+                            confirmed.setReferenceId(prescription.getId());
+                            confirmed.setCreatedAt(LocalDateTime.now());
+                            confirmed.setCreatedBy(username);
+                            confirmed.setIsConfirm(true);
+                            inventoryLogRepo.createInventoryLog(confirmed);
+
+
+                            res.setChangeAmount(res.getChangeAmount() + remainingToAssign);
+                            inventoryLogRepo.updateInventoryLog(res);
+
+                            remainingToAssign = 0;
+                            break;
+                        } else if (resQty == remainingToAssign) {
+
+                            res.setBatchId(batch);
+                            res.setIsConfirm(true);
+                            res.setCreatedAt(res.getCreatedAt() == null ? LocalDateTime.now() : res.getCreatedAt());
+                            res.setCreatedBy(res.getCreatedBy() == null ? username : res.getCreatedBy());
+                            inventoryLogRepo.updateInventoryLog(res);
+
+                            remainingToAssign = 0;
+                            break;
+                        } else { 
+
+                            res.setBatchId(batch);
+                            res.setIsConfirm(true);
+                            res.setCreatedAt(res.getCreatedAt() == null ? LocalDateTime.now() : res.getCreatedAt());
+                            res.setCreatedBy(res.getCreatedBy() == null ? username : res.getCreatedBy());
+                            inventoryLogRepo.updateInventoryLog(res);
+
+                            remainingToAssign -= resQty;
+
+                        }
+                    }
+
+                    if (remainingToAssign > 0) {
+
+                        InventoryLog confirmed = new InventoryLog();
+                        confirmed.setMedicineId(m);
+                        confirmed.setBatchId(batch);
+                        confirmed.setChangeAmount(-remainingToAssign);
+                        confirmed.setReason(InventoryLogType.PRESCRIPTION_EXPORT);
+                        confirmed.setReferenceId(prescription.getId());
+                        confirmed.setCreatedAt(LocalDateTime.now());
+                        confirmed.setCreatedBy(username);
+                        confirmed.setIsConfirm(true);
+                        inventoryLogRepo.createInventoryLog(confirmed);
+                    }
                 }
             }
         }
 
         prescription.setDispensedAt(LocalDateTime.now());
+        prescription.setStatus(PrescriptionStatus.DISPENSED);
         this.prescriptionRepo.saveOrUpdate(prescription);
 
         return prescription;
+    }
+    
+    
+    
+    
+    
+    private void pushPrescriptionNotify(Prescription saved) {
+        try {
+            MedicalRecord currentMr = saved.getMedicalRecordId();
+            if (currentMr != null && currentMr.getAppointmentId() != null
+                    && currentMr.getAppointmentId().getPatientId() != null) {
+                
+                User patientUser = currentMr.getAppointmentId().getPatientId().getUserId();
+                if (patientUser != null) {
+                    Map<String, String> notiParams = new HashMap<>();
+                    notiParams.put("username", patientUser.getUsername());
+                    notiParams.put("title", "Đơn thuốc mới");
+                    notiParams.put("content", "Bác sĩ vừa kê đơn thuốc mới cho bạn. Vui lòng kiểm tra!");
+                    notiParams.put("path", "/patient/prescriptions/" + saved.getId());
+                    
+                    this.notificationService.addNotification(notiParams);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Lỗi gửi thông báo: " + e.getMessage());
+        }
     }
 }

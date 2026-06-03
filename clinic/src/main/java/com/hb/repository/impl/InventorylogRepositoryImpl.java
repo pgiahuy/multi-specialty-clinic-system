@@ -33,6 +33,22 @@ public class InventoryLogRepositoryImpl implements InventoryLogRepository{
     }
 
     @Override
+    public java.util.List<InventoryLog> getUnconfirmedLogsByReferenceIdAndMedicine(Long referenceId, Long medicineId) {
+        Session session = this.factory.getObject().getCurrentSession();
+        String hql = "SELECT l FROM InventoryLog l WHERE l.referenceId = :refId AND l.isConfirm = false AND l.medicineId.id = :medId";
+        return session.createQuery(hql, InventoryLog.class)
+                .setParameter("refId", referenceId)
+                .setParameter("medId", medicineId)
+                .getResultList();
+    }
+
+    @Override
+    public void updateInventoryLog(InventoryLog log) {
+        Session session = this.factory.getObject().getCurrentSession();
+        session.merge(log);
+    }
+
+    @Override
     public long count(Map<String, String> params, Class<InventoryLog> clazz) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
