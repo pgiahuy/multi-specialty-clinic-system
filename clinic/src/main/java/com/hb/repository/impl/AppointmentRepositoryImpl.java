@@ -6,6 +6,7 @@ package com.hb.repository.impl;
 
 import com.hb.enums.AppointmentStatus;
 import com.hb.pojo.Appointment;
+import com.hb.pojo.Doctor;
 import com.hb.pojo.Patient;
 import com.hb.pojo.Schedule;
 import com.hb.pojo.Shift;
@@ -24,8 +25,6 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -283,6 +282,27 @@ public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> i
 
         Query<Appointment> query = session.createQuery(cq);
         return query.getResultList();
+    }
+
+    @Override
+    public boolean existsAppointmentForPatientAndDoctorUser(Long patientId, Long doctorUserId) {
+        Session session = this.factory.getObject().getCurrentSession();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+        Root<Appointment> root = cq.from(Appointment.class);
+
+        Join<Appointment, Patient> patientJoin = root.join("patientId", JoinType.INNER);
+        Join<Appointment, Schedule> scheduleJoin = root.join("scheduleId", JoinType.INNER);
+        Join<Schedule, Doctor> doctorJoin = scheduleJoin.join("doctorId", JoinType.INNER);
+
+        Predicate patientPredicate = cb.equal(patientJoin.get("id"), patientId);
+        Predicate doctorUserPredicate = cb.equal(doctorJoin.get("userId").get("id"), doctorUserId);
+
+        cq.select(cb.count(root)).where(cb.and(patientPredicate, doctorUserPredicate));
+
+        Query<Long> query = session.createQuery(cq);
+        Long count = query.getSingleResult();
+        return count != null && count > 0;
     }
 
 }

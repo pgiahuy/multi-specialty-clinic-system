@@ -12,6 +12,7 @@ import com.hb.pojo.Appointment;
 import com.hb.pojo.MedicalRecord;
 import com.hb.pojo.Patient;
 import com.hb.pojo.User;
+import com.hb.enums.UserRole;
 import com.hb.repository.AppointmentRepository;
 import com.hb.repository.DoctorRepository;
 import com.hb.repository.MedicalRecordRepository;
@@ -100,7 +101,25 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
         if (p == null) {
             throw new ResourceNotFoundException("Không tìm thấy bệnh nhân!");
         }
-        return p.getUserId().getUsername().equals(username);
+
+        User currentUser = userRepo.getUserByUsername(username);
+        if (currentUser == null) {
+            return false;
+        }
+
+        if (currentUser.getRole() == UserRole.ROLE_PATIENT) {
+            return p.getUserId() != null && p.getUserId().getUsername().equals(username);
+        }
+
+        if (currentUser.getRole() == UserRole.ROLE_DOCTOR) {
+            return appointmentRepo.existsAppointmentForPatientAndDoctorUser(patientId, currentUser.getId());
+        }
+
+        if (currentUser.getRole() == UserRole.ROLE_STAFF) {
+            return true;
+        }
+
+        return false;
     }
 
     @Override
