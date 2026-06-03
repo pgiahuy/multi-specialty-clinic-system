@@ -75,7 +75,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     public Appointment getAppointmentById(Long id) {
         Appointment a = appointmentRepo.getAppointmentById(id);
         if (a == null) {
-            throw new ResourceNotFoundException("Appointment not found!");
+            throw new ResourceNotFoundException("Không tìm thấy lịch hẹn!");
         }
         return a;
     }
@@ -173,7 +173,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     public boolean doctorStartAppointment(Long appointmentId) {
         Appointment appointment = appointmentRepo.getAppointmentById(appointmentId);
         if (appointment == null) {
-            throw new ResourceNotFoundException("Appointment not found!");
+            throw new ResourceNotFoundException("Không tìm thấy lịch hẹn!");
         }
 
         if (appointment.getStatus() != AppointmentStatus.CONFIRMED) {
@@ -238,11 +238,9 @@ public class AppointmentServiceImpl implements AppointmentService {
         Long newShiftId = scheduleRepo.getScheduleById(scheduleId).getShiftId().getId();
 
         for (Appointment oldApp : appointments) {
-
             if (oldApp.getStatus() == AppointmentStatus.CANCELLED) {
                 continue;
             }
-
             LocalDate oldDate = oldApp.getScheduleId().getDate();
             Long oldShiftId = oldApp.getScheduleId().getShiftId().getId();
 
@@ -250,7 +248,6 @@ public class AppointmentServiceImpl implements AppointmentService {
                 return true;
             }
         }
-
         return false;
     }
 
@@ -260,7 +257,6 @@ public class AppointmentServiceImpl implements AppointmentService {
         if (appointment == null) {
             throw new ResourceNotFoundException("Không tìm thấy lịch hẹn");
         }
-        
         appointment.setStatus(status);
         appointmentRepo.addOrUpdateAppointment(appointment);
     }

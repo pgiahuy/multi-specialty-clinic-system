@@ -368,7 +368,7 @@ const PaymentDetail = () => {
                                                                 label = 'Xem phiếu xét nghiệm';
                                                                 break;
                                                             case 'PRESCRIPTION':
-                                                                path = `/prescriptions/${refId}`;
+                                                                path = `/patient/prescriptions/${refId}`;
                                                                 label = 'Xem đơn thuốc';
                                                                 break;
                                                             default:

@@ -12,6 +12,7 @@ import com.hb.pojo.InventoryLog;
 import com.hb.pojo.MedicalRecord;
 import com.hb.pojo.Medicine;
 import com.hb.pojo.MedicineBatch;
+import com.hb.pojo.Payment;
 import com.hb.pojo.Prescription;
 import com.hb.pojo.PrescriptionItem;
 import com.hb.pojo.User;
@@ -224,27 +225,22 @@ public class PrescriptionServiceImpl implements PrescriptionService {
         
         Prescription saved = prescriptionRepo.saveOrUpdate(p);
         
-        // Create or reuse a payment for the appointment and attach the prescription item
+        
         if (saved.getMedicalRecordId() != null && saved.getMedicalRecordId().getAppointmentId() != null) {
             Long appointmentId = saved.getMedicalRecordId().getAppointmentId().getId();
             if (appointmentId != null) {
                 try {
-                    com.hb.pojo.Payment payment = paymentService.getPaymentByAppoint(appointmentId);
-                    if (payment == null) {
-                        payment = paymentService.createPayment(appointmentId);
-                    }
+                    Payment payment = paymentService.createPayment(appointmentId);
                     paymentItemsService.addPrescriptionItem(payment, saved.getId());
                 } catch (Exception e) {
-                    // Log, but don't block prescription creation if payment setup fails
                     System.err.println("Lỗi tạo thanh toán cho đơn thuốc: " + e.getMessage());
                 }
             }
         }
-        
         this.pushPrescriptionNotify(saved);
         
         return saved;
-        
+ 
     }
     
     @Override
@@ -304,25 +300,16 @@ public class PrescriptionServiceImpl implements PrescriptionService {
         if (prescription == null) {
             throw new ResourceNotFoundException("Không tìm thấy đơn thuốc!");
         }
-
         int bufferDays = 3;
-
-        // Deduct stock for each medicine in the prescription using same logic as createPrescription
+        
         if (prescription.getPrescriptionItemCollection() != null) {
             for (PrescriptionItem item : prescription.getPrescriptionItemCollection()) {
                 Medicine m = item.getMedicineId();
                 if (m == null) continue;
-
                 int requiredQty = item.getQuantity();
-                int daysToUse = (item.getDaysToUse() > 0) ? item.getDaysToUse() : 7;
-                
-                // Calculate minimum expiry date (same logic as createPrescription)
+                int daysToUse = (item.getDaysToUse() > 0) ? item.getDaysToUse() : 7;                  
                 LocalDate minExpiryDate = LocalDate.now().plusDays(daysToUse + bufferDays);
-                
-                // Get available batches (earliest expiry first)
                 List<MedicineBatch> availableBatches = medicineRepo.getAvailableBatches(m.getId(), minExpiryDate);
-
-                // Deduct from batches (same logic as createPrescription)
                 int remainingQtyToDeduct = requiredQty;
                 for (MedicineBatch batch : availableBatches) {
                     if (remainingQtyToDeduct <= 0) {
@@ -344,7 +331,6 @@ public class PrescriptionServiceImpl implements PrescriptionService {
 
                     medicineBatchRepo.saveOrUpdate(batch);
 
-                    // Create inventory log (same as createPrescription)
                     InventoryLog log = new InventoryLog();
                     log.setMedicineId(m);
                     log.setBatchId(batch);
@@ -358,8 +344,6 @@ public class PrescriptionServiceImpl implements PrescriptionService {
                 }
             }
         }
-
-        // Mark prescription as dispensed
         prescription.setDispensedAt(LocalDateTime.now());
         this.prescriptionRepo.saveOrUpdate(prescription);
 

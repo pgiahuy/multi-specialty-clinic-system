@@ -36,15 +36,13 @@ const ReceptionPrescriptionDetail = () => {
         }
     }, [prescriptionId]);
 
-    // Load payment status for this prescription
+
     useEffect(() => {
         const loadPayment = async () => {
             if (!prescription) return;
             try {
-                // Get all payments and find the one for this prescription
                 const response = await authApis().get(PAYMENT_ENDPOINTS.HISTORY);
                 const allPayments = Array.isArray(response.data) ? response.data : [];
-                // Find payment where prescription is in paymentItems
                 const prescriptionPayment = allPayments.find((p) => {
                     if (p.paymentItems && Array.isArray(p.paymentItems)) {
                         return p.paymentItems.some(
@@ -68,7 +66,6 @@ const ReceptionPrescriptionDetail = () => {
         try {
             setDispensing(true);
             await authApis().post(`secure/prescriptions/${prescriptionId}/dispense`);
-            // Reload prescription to update status
             const response = await authApis().get(`secure/prescriptions/${prescriptionId}`);
             setPrescription(response.data);
             setShowDispenseModal(false);
@@ -86,7 +83,7 @@ const ReceptionPrescriptionDetail = () => {
 
     if (loading) {
         return (
-            <div className="d-flex flex-column min-vh-100">
+            <div className="d-flex flex-column min-vh-100 bg-light">
                 <Header />
                 <Container className="d-flex justify-content-center align-items-center" style={{ minHeight: "60vh" }}>
                     <MySpinner />
@@ -98,7 +95,7 @@ const ReceptionPrescriptionDetail = () => {
 
     if (error) {
         return (
-            <div className="d-flex flex-column min-vh-100">
+            <div className="d-flex flex-column min-vh-100 bg-light">
                 <Header />
                 <Container className="py-4">
                     <div className="alert alert-danger">{error}</div>
@@ -111,7 +108,7 @@ const ReceptionPrescriptionDetail = () => {
 
     if (!prescription) {
         return (
-            <div className="d-flex flex-column min-vh-100">
+            <div className="d-flex flex-column min-vh-100 bg-light">
                 <Header />
                 <Container className="py-4">
                     <div className="alert alert-info">Không tìm thấy đơn thuốc.</div>
@@ -123,7 +120,7 @@ const ReceptionPrescriptionDetail = () => {
     }
 
     return (
-        <div className="d-flex flex-column min-vh-100">
+        <div className="d-flex flex-column min-vh-100 bg-light">
             <Header />
             <Container className="py-4" style={{ maxWidth: "900px" }}>
                 <div className="mb-4">
@@ -140,12 +137,8 @@ const ReceptionPrescriptionDetail = () => {
                                 <Badge bg={prescription.status === "PUBLIC" ? "success" : "secondary"}>
                                     {prescription.status === "PUBLIC" ? "Đã kê đơn" : "Chưa kê"}
                                 </Badge>
-                                {isDispensed ? (
+                                {isDispensed && (
                                     <Badge bg="info">Đã xuất thuốc</Badge>
-                                ) : (
-                                    <Badge bg={isPaid ? "success" : "warning"}>
-                                        {isPaid ? "Đã thanh toán" : "Chưa thanh toán"}
-                                    </Badge>
                                 )}
                             </div>
                         </div>
@@ -153,11 +146,18 @@ const ReceptionPrescriptionDetail = () => {
                     <Card.Body>
                         {!isPaid && !isDispensed && (
                             <div className="alert alert-warning mb-4">
-                                <strong>⚠️ Chưa thanh toán:</strong> Bệnh nhân cần thanh toán hoặc staff nhận tiền mặt trước khi xuất thuốc.
+                                <strong>Chưa thanh toán:</strong> Bệnh nhân cần thanh toán hoặc nhân viên nhận tiền mặt trước khi xuất thuốc.
                                 {payment && (
-                                    <div className="mt-2">
-                                        Trạng thái thanh toán: <strong>{payment.status}</strong>
-                                    </div>
+                                    <>
+                                        <Button
+                                            onClick={() => nav(`/reception/payments/${payment.id}`)}
+                                            className="ms-3"
+                                            variant="success"
+                                        >
+                                            Nhận tiền
+                                        </Button>
+                                    </>
+
                                 )}
                             </div>
                         )}
@@ -199,7 +199,7 @@ const ReceptionPrescriptionDetail = () => {
                         {isPaid || isDispensed ? (
                             <>
                                 <h5 className="mb-3">Danh sách thuốc</h5>
-                                <div className="table-responsive mb-4">
+                                <div className="table-responsive mb-6">
                                     <Table hover className="table">
                                         <thead className="table-light">
                                             <tr>
@@ -247,7 +247,7 @@ const ReceptionPrescriptionDetail = () => {
                                 )}
                             </>
                         ) : (
-                            <div className="alert alert-info">
+                            <div className="alert alert-info ">
                                 Vui lòng chờ bệnh nhân thanh toán hoặc nhận tiền mặt trước khi xem chi tiết thuốc.
                             </div>
                         )}

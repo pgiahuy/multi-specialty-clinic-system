@@ -14,14 +14,10 @@ import java.util.Map;
  * @author HUY
  */
 public interface ChatService {
-
     List<Map<String, Object>> getConversationsForDoctor(Long doctorId);
     List<Map<String, Object>> getConversationsForPatient(Long patientId);
-    
     List<ChatMessageResponse> getMessagesByConversation(Long conversationId);
-    
     Conversation quickStartConversation(Long doctorId, Long patientId);
-    
     ChatMessageResponse saveAndPushMessage(Long conversationId, Long senderId, String content, String msgType, String currentSenderType);
     
 }

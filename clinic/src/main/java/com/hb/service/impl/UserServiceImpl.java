@@ -330,7 +330,6 @@ public class UserServiceImpl implements UserService {
         if (password.contains(" ")) {
             throw new BadRequestException("Mật khẩu không được chứa khoảng trắng!");
         }
-
     }
 
 }

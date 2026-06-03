@@ -29,10 +29,6 @@ public class MedicineBatchServiceImpl implements MedicineBatchService {
 
     @Autowired
     private MedicineBatchRepository medicineBatchRepo;
-
-    @Autowired
-    private MedicineRepository medicineRepo;
-
     @Autowired
     private InventoryLogRepository inventoryLogRepo;
 

@@ -14,16 +14,9 @@ import java.util.Map;
  * @author DELL
  */
 public interface PaymentItemsService {
-   
     void addAppointmentItem(Payment payment, Long appointmentId);
-    
     void addLabTestItems(Payment payment,Long testId, Long labResultId);
-    
     void addPrescriptionItem(Payment payment, Long prescriptionId);
-    
-//    void confirmItemsPaid(String transId, String method, List<Long> itemIds);
-    
     PaymentItem getPaymentItemByAppointment(Long  appointmentId);
-    
     List<PaymentItem> getPaymentItemsByPaymentId(Long paymentId, Map<String, String> params);
 }
