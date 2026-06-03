@@ -77,7 +77,7 @@ const Prescriptions = () => {
                     return p.paymentItems.some(
                         (item) =>
                             item.itemType === "PRESCRIPTION" &&
-                            String(item.referenceId) === String(id) // So sánh dạng String cho an toàn
+                            String(item.referenceId) === String(id) 
                     );
                 }
                 return false;

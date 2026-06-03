@@ -14,7 +14,6 @@ const DRAFT_STORAGE_KEY_PREFIX = "prescriptionDraft_";
 const PrescribeMedicine = () => {
     const navigate = useNavigate();
     const { medicalRecordId } = useParams();
-
     const [loading, setLoading] = useState(false);
     const [searching, setSearching] = useState(false);
     const [loadingMoreMedicines, setLoadingMoreMedicines] = useState(false);
@@ -32,10 +31,8 @@ const PrescribeMedicine = () => {
     const [isMedicalRecordLoaded, setIsMedicalRecordLoaded] = useState(false);
     const [isPrescriptionLoaded, setIsPrescriptionLoaded] = useState(false);
     const [isAppointmentLoaded, setIsAppointmentLoaded] = useState(false);
-
     const [statusMessage, setStatusMessage] = useState(null);
     const [hasDraftLoaded, setHasDraftLoaded] = useState(false);
-
     const medicineListContainerRef = useRef(null);
     const medicineLoadMoreRef = useRef(null);
     const savingDraftLockRef = useRef(false);
@@ -723,19 +720,13 @@ const PrescribeMedicine = () => {
                                                             {loadingMoreMedicines ? "Đang tải thêm thuốc..." : "Cuộn xuống để tải thêm"}
                                                         </div>
                                                     ) : null}
-
                                                 </div>
-
                                             </div>
-
-
                                         </Card.Body>
                                     </Card>
                                 </div>
                             </Col>
                         ) : null}
-
-
                         <Col xs={12} lg={isPublished ? 10 : 7} className={isPublished ? "mx-auto" : ""}>
                             {statusMessage && <Alert dismissible onClose={() => setStatusMessage(null)} className="mb-2 p-3" variant={statusMessage.variant}>
                                 {statusMessage.message}
@@ -744,14 +735,10 @@ const PrescribeMedicine = () => {
                                 <Card.Body className="p-2 p-xl-3 d-flex flex-column gap-3" style={scrollableStyle}>
                                     <div className="clinical-meta p-3 bg-light border border-light-subtle rounded-2">
                                         <div className="row g-3">
-
                                             <Col xs={12} md={5} className="d-flex flex-column justify-content-center border-end-md">
-
-
                                                 <h5 className="patient-name fw-bold text-dark mb-1">
                                                     {medicalRecord?.patientName || "—"}
                                                 </h5>
-
                                                 <div className="patient-meta text-secondary small">
                                                     <span className="fw-medium">{medicalRecord?.gender || "-"}</span>
                                                     &nbsp;&nbsp; -&nbsp;&nbsp;&nbsp;
@@ -765,14 +752,11 @@ const PrescribeMedicine = () => {
                                                     {prescriptionStatusLabel}
                                                 </Badge>
                                             </Col>
-
-
                                             <Col xs={12} md={7}>
                                                 <div className="d-flex flex-column gap-2">
                                                     <h5 className="fw-bold text-dark mb-1">
                                                         Bác sĩ: {appointment?.doctorFullName || "—"}
                                                     </h5>
-
                                                     <div className="clinical-card p-2 bg-white border border-light-subtle rounded-2 small">
                                                         <div className="fw-bold text-secondary mb-1" style={{ fontSize: "0.8rem" }}>
                                                             Chuẩn đoán bệnh lý
@@ -793,7 +777,6 @@ const PrescribeMedicine = () => {
                                             </Col>
                                         </div>
                                     </div>
-
                                     <div>
                                         {loading ? (
                                             <div className="text-center py-5">
@@ -896,7 +879,6 @@ const PrescribeMedicine = () => {
                                             Tạm tính: {Number(totalPrice).toLocaleString('vi-VN')}đ
                                         </div>
                                         <div className="">
-
                                             <ButtonGroup aria-label="prescription-actions " className="d-flex flex-wrap justify-content-end gap-2">
                                                 <Button className="rounded-2 me-3" variant="outline-secondary" onClick={() => navigate(-1)} disabled={savingDraft || saving}>
                                                     Quay lại

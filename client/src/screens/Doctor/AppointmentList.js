@@ -3,22 +3,17 @@ import Footer from "../../components/Footer";
 import Header from "../../components/Header";
 import { APPOINTMENT_ENDPOINTS, authApis, CLINIC_ENDPOINTS, endpoint } from "../../configs/Apis";
 import { Button, Col, Container, Row, Table, Form } from "react-bootstrap";
-
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-
 import MySpinner from "../../components/MySpinner";
 import { tableStyles } from "../Patient/PatientStyle";
 
 const AppointmentList = () => {
-
     const [appointments, setAppointments] = useState([]);
     const [loading, setLoading] = useState(false);
     const [confirmingAppointmentId, setConfirmingAppointmentId] = useState(null);
-
     const [filterKw, setFilterKw] = useState("");
     const [filterDate, setFilterDate] = useState("");
     const [filterStatus, setFilterStatus] = useState("");
-
     const nav = useNavigate();
 
 
@@ -69,10 +64,6 @@ const AppointmentList = () => {
         }
     };
 
-
-
-
-
     const statusMap = {
         'UN_PAID': { text: 'Chưa thanh toán', textColor: 'text-warning' },
         'PENDING': { text: 'Đang chờ', textColor: 'text-warning' },
@@ -120,8 +111,6 @@ const AppointmentList = () => {
                 onClick: () => nav(`/appointments/${appointment.id}/medical-record`),
             };
         }
-
-
         return null;
     };
 

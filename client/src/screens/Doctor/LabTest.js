@@ -30,14 +30,12 @@ const LabTest = () => {
     const alertTimerRef = useRef(null);
     const [isEditing, setIsEditing] = useState(false);
     const [showLabList, setShowLabList] = useState(true);
-
     const [searchParams, setSearchParams] = useSearchParams();
     const filterKw = searchParams.get("kw") || "";
     const filterDate = searchParams.get("date") || "";
     const filterStatus = searchParams.get("status") || "";
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [pendingStatus, setPendingStatus] = useState(null);
-
     const [user] = useContext(MyUserContext);
 
     const updateFilter = (key, value) => {
@@ -593,10 +591,8 @@ const LabTest = () => {
                 onConfirm={() => executeSave(pendingStatus)}
             >
                 <div className="text-center p-2">
-                    
                     <p className="mb-1 fw-bold text-dark fs-5">Bạn có chắc chắn lưu kết quả xét nghiệm này?</p>
                     <p className="text-danger small mb-0">
-                        
                         Sau khi bấm xác nhận, <strong>không cho phép chỉnh sửa</strong> kết quả này nữa.
                     </p>
                 </div>

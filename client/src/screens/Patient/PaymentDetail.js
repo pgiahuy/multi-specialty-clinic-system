@@ -129,7 +129,6 @@ const PaymentDetail = () => {
     };
 
 
-
     const parseVietnameseDate = (dateString) => {
         if (!dateString) return null;
         const parts = dateString.split(' ');
@@ -244,10 +243,7 @@ const PaymentDetail = () => {
                                             </option>
                                         ))}
                                     </Form.Select>
-
                                 </div>
-
-
                                 <div>
                                     <Form.Label className="small text-muted mb-1">Từ ngày</Form.Label>
                                     <Form.Control
@@ -258,8 +254,6 @@ const PaymentDetail = () => {
                                         style={{ width: '160px' }}
                                     />
                                 </div>
-
-
                                 <div>
                                     <Form.Label className="small text-muted mb-1">Đến ngày</Form.Label>
                                     <Form.Control
@@ -270,12 +264,9 @@ const PaymentDetail = () => {
                                         style={{ width: '160px' }}
                                     />
                                 </div>
-
                             </div>
                         </div>
                     </div>
-
-
                     <div className="mb-4 d-flex justify-content-start">
                         <Tabs
                             activeKey={activeTab}
