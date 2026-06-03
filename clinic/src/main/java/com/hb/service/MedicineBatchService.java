@@ -16,7 +16,9 @@ import java.util.Map;
 public interface MedicineBatchService {
     MedicineBatch addOrUpdateMedicineBatch(MedicineBatchForm form);
     List<MedicineBatch> getMedicineBatchs(Map<String, String> params);
+    List<MedicineBatch> getExpiringBatches(Map<String, String> params);
     MedicineBatch getMedicineBatchById(Long id);
     void deleteMedicineBatch(Long id);
+    void destroyMedicineBatch(Long id,String username);
     long countMedicineBatchs(Map<String, String> params);
 }

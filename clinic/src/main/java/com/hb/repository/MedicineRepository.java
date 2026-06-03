@@ -18,6 +18,7 @@ import java.util.Map;
 public interface MedicineRepository extends BaseRepository<Medicine>{
     List<Medicine> getMedicines(Map<String,String> params);
     List<MedicineResponse> getMedicinesWithStock(Map<String, String> params);
+    List<MedicineResponse> getLowStockMedicines(Map<String, String> params);
     List<MedicineBatch> getAvailableBatches(Long medicineId, LocalDate minExpiryDate);
     long countMedicines(Map<String, String> params);
     Medicine addMedicine(Medicine d);

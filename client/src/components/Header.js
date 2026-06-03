@@ -46,6 +46,27 @@ const Header = () => {
         loadSpecialties();
     }, []);
 
+    const renderDropdownItems = () => {
+        if (user?.role === 'ROLE_DOCTOR') {
+            return (
+                <NavDropdown.Item onClick={() => navigate('/doctor/profile')}>
+                    Xem hồ sơ
+                </NavDropdown.Item>
+            );
+        }
+
+        if (user?.role === 'ROLE_PATIENT') {
+            return (
+                <>
+                    <NavDropdown.Item onClick={() => navigate('/patient/profiles')}>Hồ sơ sức khỏe</NavDropdown.Item>
+                    <NavDropdown.Item onClick={() => navigate('/patient/account')}>Xem tài khoản</NavDropdown.Item>
+                </>
+            );
+        }
+
+        return null;
+    };
+
     return (
         <Navbar
             expand="lg"
@@ -67,14 +88,34 @@ const Header = () => {
                                     setShowLoginRequired(true);
                                     return;
                                 }
-                                navigate(user?.role === 'ROLE_DOCTOR' ? '/doctor/dashboard' : '/patient/dashboard');
+                                const role = user?.role;
+                                if (role === 'ROLE_DOCTOR') {
+                                    navigate('/doctor/dashboard');
+                                } else if (role === 'ROLE_PATIENT') {
+                                    navigate('/patient/dashboard');
+                                } else if (role === 'ROLE_STAFF') {
+                                    navigate('/');
+                                } else if (role === 'ROLE_STOREKEEPER') {
+                                    navigate('/storekeeper/home');
+                                }
                             }}
                         >
-                            {user?.role === 'ROLE_DOCTOR' ? 'Công việc' : 'Dịch vụ'}
+                            {user?.role === 'ROLE_DOCTOR' ? 'Công việc' : user?.role === 'ROLE_PATIENT' ? 'Dịch vụ' : 'Trang chủ'}
                         </Nav.Link>
 
+                        {user && user?.role === 'ROLE_STAFF' && (
+                            <>
+                                <Nav.Link className="header-navlink" onClick={() => navigate('/reception')}>
+                                    Tiếp nhận
+                                </Nav.Link>
 
-
+                            </>
+                        )}
+                        {user && user?.role === 'ROLE_STOREKEEPER' && (
+                            <Nav.Link className="header-navlink" onClick={() => navigate('/storekeeper')}>
+                                Kho thuốc
+                            </Nav.Link>
+                        )}
                         {user && user?.role === 'ROLE_PATIENT' && (
                             <>
                                 <Nav.Link className="header-navlink" onClick={() => navigate('/doctors')}>
@@ -91,14 +132,7 @@ const Header = () => {
                             </Nav.Link>
                         )}
 
-                        {/* <NavDropdown title="Chuyên khoa" id="specialties-nav-dropdown" className="me-2 header-dropdown">
-                            {(Array.isArray(specialties) ? specialties : []).map(s => (
-                                <NavDropdown.Item key={s.id} onClick={() => navigate(`/specialties/${s.id}`)}>
-                                    {s.name}
-                                </NavDropdown.Item>
-                            ))}
-                        </NavDropdown>
- */}
+
 
 
 
@@ -121,7 +155,7 @@ const Header = () => {
                                     {user?.role === 'ROLE_DOCTOR' ? (
                                         <div>Chào bác sĩ {user?.doctorProfile ? user.doctorProfile.fullName : ''} !&nbsp;&nbsp;</div>
                                     ) : (
-                                        <div>Chào {user?.name || 'bạn'} !&nbsp;&nbsp;</div>
+                                        <div>Chào {user?.name || user?.username || 'bạn'} !&nbsp;&nbsp;</div>
                                     )}
                                 </Nav>
 
@@ -154,15 +188,7 @@ const Header = () => {
                                         </span>
                                     }>
 
-                                    {user?.role === 'ROLE_DOCTOR' ? (
-                                        <NavDropdown.Item onClick={() => navigate('/doctor/profile')}>{user?.doctorProfile ? user?.doctorProfile.fullName : 'Bác sĩ'}</NavDropdown.Item>
-                                    ) : (
-                                        <>
-                                            <NavDropdown.Item onClick={() => navigate('/patient/profiles')}>Hồ sơ sức khỏe</NavDropdown.Item>
-                                            <NavDropdown.Item onClick={() => navigate('/patient/account')}>Xem tài khoản</NavDropdown.Item>
-                                        </>
-                                    )}
-                                    <NavDropdown.Item onClick={() => navigate('/user/change-password')}>Đổi mật khẩu</NavDropdown.Item>
+                                    {renderDropdownItems()}
                                     <NavDropdown.Divider />
                                     <NavDropdown.Item className="text-danger" onClick={handleLogout}>
                                         Đăng xuất

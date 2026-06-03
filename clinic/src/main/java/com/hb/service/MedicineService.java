@@ -19,6 +19,7 @@ public interface MedicineService {
     Medicine addOrUpdateMedicine(MedicineForm medicineForm);
     List<Medicine> getMedicines(Map<String, String> params);
     List<MedicineResponse> getMedicinesWithStock(Map<String, String> params);
+    List<MedicineResponse> getLowStockMedicines(Map<String, String> params);
     Medicine getMedicineById(Long id);
     void deleteMedicine(Long id);
     long countMedicines(Map<String, String> params);

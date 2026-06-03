@@ -101,20 +101,16 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
         if (p == null) {
             throw new ResourceNotFoundException("Không tìm thấy bệnh nhân!");
         }
-
         User currentUser = userRepo.getUserByUsername(username);
         if (currentUser == null) {
             return false;
         }
-
         if (currentUser.getRole() == UserRole.ROLE_PATIENT) {
             return p.getUserId() != null && p.getUserId().getUsername().equals(username);
         }
-
         if (currentUser.getRole() == UserRole.ROLE_DOCTOR) {
             return appointmentRepo.existsAppointmentForPatientAndDoctorUser(patientId, currentUser.getId());
         }
-
         if (currentUser.getRole() == UserRole.ROLE_STAFF) {
             return true;
         }
@@ -124,6 +120,12 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 
     @Override
     public boolean checkAccessControll(User user, Long medicalRecordId) {
+        if (user == null) {
+            return false;
+        }
+        if (user.getRole() == UserRole.ROLE_STAFF) {
+            return true;
+        }
         return this.medicalRecordRepo.checkAccessControll(user, medicalRecordId);
     }
 

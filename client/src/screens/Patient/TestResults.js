@@ -1,12 +1,10 @@
 import { Fragment, useContext, useEffect, useState } from "react";
 import { authApis, USER_ENDPOINTS, TEST_ENDPOINTS } from "../../configs/Apis";
-import { exp } from "firebase/firestore/pipelines";
 import { MyUserContext } from "../../configs/Contexts";
 import { Card, Col, Container, Form, Row, Button, Tabs, Tab, Pagination, Badge } from "react-bootstrap";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import MySpinner from "../../components/MySpinner";
-import TestResultDetailModal from "./TestResultDetail";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 const getInitialFromDate = () => {
