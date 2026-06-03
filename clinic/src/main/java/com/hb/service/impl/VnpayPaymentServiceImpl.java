@@ -88,7 +88,7 @@ public class VnpayPaymentServiceImpl implements VnpayPaymentService {
             String fieldValue = vnp_Params.get(fieldName);
             if ((fieldValue != null) && (fieldValue.length() > 0)) {
                 try {
-                    // Encode cả Key và Value để an toàn tuyệt đối
+               
                     String encodedKey = URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString());
                     String encodedValue = URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString());
                     
@@ -134,22 +134,17 @@ public class VnpayPaymentServiceImpl implements VnpayPaymentService {
                     if ("vnp_SecureHash".equals(fieldName) || "vnp_SecureHashType".equals(fieldName)) {
                         continue;
                     }
-
-                    
                     String encodedKey = URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString());
                     String encodedValue = URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString());
                     
                     hashData.append(encodedKey).append('=').append(encodedValue).append('&');
                 }
             }
-
             if (hashData.length() > 0) {
                 hashData.setLength(hashData.length() - 1);
             }
-
             String secureHash = VNPayConfigs.hmacSHA512(vnpHashSecret, hashData.toString());
             return secureHash.equals(vnp_SecureHash);
-
         } catch (Exception e) {
             e.printStackTrace();
             return false;

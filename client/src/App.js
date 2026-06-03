@@ -130,14 +130,16 @@ function App() {
               <Route path="/doctor/consultations" element={<ConsultationPage />} />
               <Route path="/doctors" element={<ListDoctor />} />
               <Route path="/appointments/:appointmentId" element={<AppointmentDetail />} />
+              
             </Route>
 
             <Route element={<ProtectedRoute allowedRoles={["ROLE_STAFF"]} />}>
               <Route path="/reception" element={<ReceptionAppointments />} />
               <Route path="/reception/invoices" element={<ReceptionInvoices />} />
-              <Route path="/reception/payments/:appointmentId" element={<ReceptionPayment />} />
+              <Route path="/reception/payments/:paymentId" element={<ReceptionPayment />} />
               <Route path="/reception/prescriptions" element={<ReceptionPrescriptions />} />
               <Route path="/reception/prescriptions/:prescriptionId" element={<ReceptionPrescriptionDetail />} />
+              
             </Route>
 
             <Route element={<ProtectedRoute allowedRoles={["ROLE_STOREKEEPER", "ROLE_STAFF"]} />}>
@@ -146,8 +148,6 @@ function App() {
             </Route>
 
             <Route path="/doctor/detail/:doctorId" element={<DoctorDetail />} />
-
-
           </Routes>
 
         </Container>

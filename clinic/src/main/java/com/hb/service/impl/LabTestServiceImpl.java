@@ -45,7 +45,6 @@ public class LabTestServiceImpl implements LabTestService {
         if (id != null && !id.isEmpty()) {
             t.setId(Long.parseLong(id));
         }
-
         t.setTestName(params.get("test_name"));
         t.setUnit(params.get("unit"));
         t.setNormalRange(params.get("normal_range"));

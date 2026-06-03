@@ -65,15 +65,11 @@ public class PatientServiceImpl implements PatientService {
     public PatientResponse addPatient(PatientCreateRequest req, User u) {
         if (u == null) {
             throw new ResourceNotFoundException("Tài khoản không tồn tại");
-        }
-        
+        }        
         this.validatePatientData(req, u);
-        
-        Patient p = patientMapper.toEntity(req, u);
-        
+        Patient p = patientMapper.toEntity(req, u);        
         Patient patient = this.patientRepo.saveOrUpdate(p);
         return patientMapper.toResponse(patient);
-
     }
 
     @Override
@@ -97,7 +93,6 @@ public class PatientServiceImpl implements PatientService {
         } else {
             p = this.patientRepo.getPatientById(form.getId());
         }
-
         p.setCccd(form.getCccd() != null ? form.getCccd() : null);
         p.setFullName(form.getFullName() != null ? form.getFullName() : null);
         p.setDob(form.getDob() != null ? form.getDob() : null);
@@ -141,7 +136,6 @@ public class PatientServiceImpl implements PatientService {
         if (patientRepo.isExistedCCCD(req.getCccd())) {
             throw new DuplicateResourceException("Căn cước công dân này đã được đăng ký");
         }
-        
         if (req.getRelationship()==PatientRelationship.SELF) {
             if (patientRepo.isExistedForSelf(u)) {
                 throw new DuplicateResourceException("Bạn chỉ có thể đăng ký 1 hồ sơ cho bản thân");

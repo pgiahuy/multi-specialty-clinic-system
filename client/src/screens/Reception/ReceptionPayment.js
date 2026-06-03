@@ -8,7 +8,7 @@ import { authApis, PAYMENT_ENDPOINTS } from "../../configs/Apis";
 import { CheckCircleFill } from "react-bootstrap-icons";
 
 const ReceptionPayment = () => {
-    const { appointmentId } = useParams();
+    const { paymentId } = useParams();
     const navigate = useNavigate();
     const [payment, setPayment] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -19,15 +19,15 @@ const ReceptionPayment = () => {
 
     useEffect(() => {
         const loadPayment = async () => {
-            if (!appointmentId) {
-                setError("Mã lịch hẹn không hợp lệ.");
+            if (!paymentId) {
+                setError("Mã hóa đơn không hợp lệ.");
                 setLoading(false);
                 return;
             }
 
             try {
                 setLoading(true);
-                const response = await authApis().get(PAYMENT_ENDPOINTS.BY_APPOINTMENT(appointmentId));
+                const response = await authApis().get(PAYMENT_ENDPOINTS.BY_PAYMENT_ID(paymentId));
                 setPayment(response.data || null);
             } catch (err) {
                 console.error(err);
@@ -38,7 +38,7 @@ const ReceptionPayment = () => {
         };
 
         loadPayment();
-    }, [appointmentId]);
+    }, [paymentId]);
 
     const handleCashPayment = async () => {
         if (!payment || !payment.id) return;
@@ -67,6 +67,17 @@ const ReceptionPayment = () => {
         }
     };
 
+    const getPaymentType = (type) => {
+        switch (type) {
+            case "APPOINTMENT":
+                return "Phí khám bệnh";
+            case "LAB_TEST":
+                return "Phí xét nghiệm";
+            case "PRESCRIPTION":
+                return "Thanh toán đơn thuốc";
+        }
+    }
+
     return (
         <div className="d-flex flex-column min-vh-100">
             <Header />
@@ -74,7 +85,7 @@ const ReceptionPayment = () => {
                 <div className="mb-4 d-flex justify-content-between align-items-center">
                     <div>
                         <h2 className="fw-bold mb-1 text-primary">Thanh toán quầy tiếp nhận</h2>
-                        <p className="text-muted mb-0">Lịch hẹn #{appointmentId}</p>
+                        <p className="text-muted mb-0">Hóa đơn #{paymentId}</p>
                     </div>
                     <Button variant="outline-secondary" onClick={() => navigate('/reception')}>
                         Quay lại danh sách tiếp nhận
@@ -96,6 +107,7 @@ const ReceptionPayment = () => {
                                         <div className="text-secondary small mb-2">Bệnh nhân</div>
                                         <h4 className="fw-semibold">{payment.patientName || '---'}</h4>
                                         <div className="text-secondary small">Hóa đơn #{payment.id}</div>
+                                        <h4 className="text-center text-uppercase text-success fw-bold">{getPaymentType(payment.paymentItems[0]?.itemType)}</h4>
                                     </div>
 
                                     <div className="mb-4">
@@ -120,7 +132,7 @@ const ReceptionPayment = () => {
                                         {payment.status !== 'SUCCESS' ? (
                                             <Button
                                                 variant="success"
-                                                size="lg"
+                                               
                                                 onClick={handleCashPayment}
                                                 disabled={submitting}
                                             >
@@ -131,7 +143,7 @@ const ReceptionPayment = () => {
                                                 Đã thanh toán
                                             </Button>
                                         )}
-                                        <Button variant="secondary" onClick={() => navigate('/reception')}>
+                                        <Button variant="secondary" onClick={() => navigate(-1)}>
                                             Quay lại
                                         </Button>
                                     </div>

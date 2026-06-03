@@ -17,16 +17,10 @@ import java.util.Map;
  * @author DELL
  */
 public interface RoomService {
-
-    List<Room> getRooms(Map<String, String> params);
-    
+    List<Room> getRooms(Map<String, String> params);  
     List<RoomResponse> getAvailableRoomsForDoctor(Map<String, String> params, User currentUser);
-
     Room getRoomById(Long id);
-
     Room saveOrUpdate(RoomForm form);
-
     void deleteRoom(Long id);
-
     long countRooms(Map<String, String> params);
 }

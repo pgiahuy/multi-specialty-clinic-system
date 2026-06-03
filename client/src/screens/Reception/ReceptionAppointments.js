@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import Footer from "../../components/Footer";
 import Header from "../../components/Header";
-import { APPOINTMENT_ENDPOINTS, authApis, CLINIC_ENDPOINTS } from "../../configs/Apis";
+import { APPOINTMENT_ENDPOINTS, authApis, CLINIC_ENDPOINTS, PAYMENT_ENDPOINTS } from "../../configs/Apis";
 import { Button, Col, Container, Row, Table, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import MySpinner from "../../components/MySpinner";
@@ -12,12 +12,10 @@ const ReceptionAppointments = () => {
     const [filterKw, setFilterKw] = useState("");
     const [filterDate, setFilterDate] = useState("");
     const [filterStatus, setFilterStatus] = useState("");
-
     const [searchTerm, setSearchTerm] = useState("");
-
     const timeRef = useRef(null);
-
     const nav = useNavigate();
+    
 
     const getStatusLabel = (status) => {
         const statusMap = {
@@ -60,6 +58,21 @@ const ReceptionAppointments = () => {
             if (timeRef.current) clearTimeout(timeRef.current);
         };
     }, [filterKw]);
+
+    const handleReceiveCash = async (appointmentId) => {
+        try {
+            const response = await authApis().get(PAYMENT_ENDPOINTS.BY_APPOINTMENT(appointmentId));
+            const paymentData = response.data;
+            if (paymentData && paymentData.id) {
+                nav(`/reception/payments/${paymentData.id}`);
+            } else {
+                alert("Không tìm thấy thông tin thanh toán cho lịch hẹn này!");
+            }
+        } catch (error) {
+            console.error("Lỗi khi tải thông tin thanh toán:", error);
+            alert("Có lỗi xảy ra khi lấy thông tin thanh toán. Vui lòng thử lại!");
+        }
+    };
 
     useEffect(() => {
         loadAppointments();
@@ -174,7 +187,7 @@ const ReceptionAppointments = () => {
                                                     variant="success"
                                                     size="sm"
                                                     className="me-2"
-                                                    onClick={() => nav(`/reception/payments/${a.id}`)}
+                                                    onClick={() => handleReceiveCash(a.id)}
                                                 >
                                                     Nhận tiền mặt
                                                 </Button>

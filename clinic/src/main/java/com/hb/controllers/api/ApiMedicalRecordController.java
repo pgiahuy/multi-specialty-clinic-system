@@ -69,7 +69,6 @@ public class ApiMedicalRecordController {
     }
     
     
-
     @GetMapping("/medical-records")
     @PreAuthorize("hasAnyRole('DOCTOR','PATIENT','STAFF')")
     public ResponseEntity<List<MedicalRecordResponse>> list(@RequestParam Map<String, String> params, Principal principal) {

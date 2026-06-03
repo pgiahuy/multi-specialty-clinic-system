@@ -24,12 +24,9 @@ public interface UserService extends UserDetailsService {
     User saveOrUpdateUser(UserCreateRequest urq);
     List<User> getUsers(Map<String,String> params);
     List<User> getActiveUsers(String kw);
-    
     void deleteUser(Long id);
     User processSocialLoginGoogle(GoogleIdToken.Payload payload, String fcmToken);
-    User processSocialLoginFacebook(String facebookId, String email, String name);
-            
-            
+    User processSocialLoginFacebook(String facebookId, String email, String name);         
     long countUsers(Map<String, String> params);
     void updateFcmToken(String username, String fcmToken);
     String getRoleByUsername(String username);

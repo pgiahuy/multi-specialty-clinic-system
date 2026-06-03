@@ -3,16 +3,13 @@ package com.hb.controllers.api;
 import com.hb.dto.request.ChatMessageCreateRequest;
 import com.hb.dto.response.ChatMessageResponse;
 import com.hb.enums.UserRole;
-import com.hb.pojo.User;
 import com.hb.service.ChatService;
 import com.hb.service.UserService;
 import java.security.Principal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController

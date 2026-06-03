@@ -1,7 +1,6 @@
 package com.hb.controllers.api;
 
 import com.hb.dto.response.RoomResponse;
-import com.hb.exception.ResourceNotFoundException;
 import com.hb.enums.UserRole;
 import com.hb.pojo.Room;
 import com.hb.pojo.User;

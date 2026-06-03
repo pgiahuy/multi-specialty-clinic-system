@@ -15,7 +15,6 @@ import java.util.Map;
  */
 public interface SpecialtyService {
     List<Specialty> getSpecialties(Map<String,String> params);
-    
     Specialty getSpecialtieById(Long id);
     Specialty saveOrUpdate(SpecialtyForm form);
     void deleteSpecialty(Long id);
