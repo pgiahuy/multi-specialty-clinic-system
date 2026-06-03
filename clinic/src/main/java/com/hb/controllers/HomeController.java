@@ -5,7 +5,9 @@
 package com.hb.controllers;
 
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 /**
@@ -16,8 +18,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class HomeController {
       
+    @Autowired
+    private com.hb.service.AppointmentService appointmentService;
+
     @GetMapping("/") 
-    public String index() {
+    public String index(Model model,
+            @org.springframework.web.bind.annotation.RequestParam(name = "month", required = false) String month) {
+        model.addAttribute("month", month);
+        model.addAttribute("topDoctorByConversionAppointments", appointmentService.getTopDoctorsByConvertedAppointmentCount(10, month));
+        model.addAttribute("topDoctorByAppointmentCount", appointmentService.getTopDoctorsByAppointmentCount(10, month));
         return "index";
     }
     
@@ -25,5 +34,7 @@ public class HomeController {
     public String loginView() {
         return "login";
     }
+    
+   
     
 }

@@ -55,7 +55,7 @@ public class Prescription implements Serializable {
     private PrescriptionStatus status;
     @Column(name = "public_at")
     private LocalDateTime publicAt;
-    @Column(name = "dispense_at")
+    @Column(name = "dispensed_at")
     private LocalDateTime dispensedAt;
     @OneToMany(mappedBy = "prescriptionId")
     private Collection<PrescriptionItem> prescriptionItemCollection;
