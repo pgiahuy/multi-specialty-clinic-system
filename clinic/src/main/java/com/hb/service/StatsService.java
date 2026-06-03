@@ -29,4 +29,5 @@ public interface StatsService {
     List<RevenueBySpecialtyStatsResponse> statsRevenueBySpecialty(int year, int month);
     List<RevenueByTypeStatsResponse> statsRevenueByType(int year, int month);
     List<ServiceUsageStatsResponse> statsServiceUsage(LocalDate fromDate, LocalDate toDate);
+    List<com.hb.dto.response.stats.MedicineInventoryStatsResponse> getMedicineInventoryStats(LocalDate fromDate, LocalDate toDate);
 }

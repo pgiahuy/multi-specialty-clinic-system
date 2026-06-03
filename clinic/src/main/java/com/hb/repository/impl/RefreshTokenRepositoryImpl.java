@@ -4,11 +4,9 @@
  */
 package com.hb.repository.impl;
 
-import com.hb.exception.DuplicateResourceException;
 import com.hb.pojo.RefreshToken;
 import com.hb.repository.RefreshTokenRepository;
 import org.hibernate.Session;
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Repository;

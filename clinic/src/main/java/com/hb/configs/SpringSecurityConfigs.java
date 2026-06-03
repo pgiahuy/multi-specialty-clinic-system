@@ -54,15 +54,16 @@ public class SpringSecurityConfigs {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.securityMatcher("/admin/**", "/", "/login").csrf(c -> c.disable()).authorizeHttpRequests((requests) -> requests
-                .requestMatchers("/", "/admin").hasRole("ADMIN")
+        http.securityMatcher("/admin/**", "/", "/login", "/logout").csrf(c -> c.disable()).authorizeHttpRequests((requests) -> requests
+                .requestMatchers("/admin/login", "/login", "/logout").permitAll()
+                .requestMatchers("/", "/admin/**").hasRole("ADMIN")
                 .anyRequest().permitAll()
         ).formLogin(form -> form.loginPage("/admin/login")
                 .loginProcessingUrl("/login")
                 .defaultSuccessUrl("/", true)
                 .failureUrl("/admin/login?error=true")
                 .permitAll()
-        ).logout((logout) -> logout.logoutSuccessUrl("/admin/login").permitAll());
+        ).logout((logout) -> logout.logoutUrl("/logout").logoutSuccessUrl("/admin/login").permitAll());
         return http.build();
     }
 

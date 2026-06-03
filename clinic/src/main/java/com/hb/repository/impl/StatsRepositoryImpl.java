@@ -5,12 +5,14 @@
 package com.hb.repository.impl;
 
 import com.hb.enums.PaymentStatus;
+import com.hb.pojo.InventoryLog;
 import com.hb.pojo.Appointment;
 import com.hb.pojo.Patient;
 import com.hb.pojo.Payment;
 import com.hb.pojo.PaymentItem;
 import com.hb.pojo.Schedule;
 import com.hb.pojo.Specialty;
+import com.hb.pojo.Medicine;
 import com.hb.repository.StatsRepository;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -145,6 +147,43 @@ public class StatsRepositoryImpl implements StatsRepository {
 
         return session.createQuery(q).getResultList();
     }
+
+        @Override
+        public List<Object[]> medicineInventoryStats(LocalDate fromDate, LocalDate toDate) {
+        Session session = this.factory.getObject().getCurrentSession();
+        CriteriaBuilder b = session.getCriteriaBuilder();
+        CriteriaQuery<Object[]> q = b.createQuery(Object[].class);
+
+        Root<InventoryLog> rootLog = q.from(InventoryLog.class);
+        Join<InventoryLog, Medicine> joinMedicine = rootLog.join("medicineId");
+
+        java.time.LocalDateTime fromDateTime = fromDate.atStartOfDay();
+        java.time.LocalDateTime toDateTime = toDate.atTime(23, 59, 59, 999999999);
+
+        q.where(b.between(rootLog.get("createdAt"), fromDateTime, toDateTime));
+
+
+        Expression<Integer> importedCase = b.<Integer>selectCase()
+            .when(b.equal(rootLog.get("reason"), com.hb.enums.InventoryLogType.IMPORT_FROM_SUPPLIER), rootLog.get("changeAmount"))
+            .otherwise(0);
+
+        Expression<Integer> exportedCase = b.<Integer>selectCase()
+            .when(b.equal(rootLog.get("reason"), com.hb.enums.InventoryLogType.PRESCRIPTION_EXPORT), rootLog.get("changeAmount"))
+            .otherwise(0);
+
+        Expression<Integer> importedSum = b.sum(importedCase);
+        Expression<Integer> exportedSum = b.sum(exportedCase);
+
+        q.multiselect(
+            joinMedicine.get("name"),
+            exportedSum,
+            importedSum
+        );
+        q.groupBy(joinMedicine.get("name"));
+        q.orderBy(b.desc(exportedSum));
+
+        return session.createQuery(q).getResultList();
+        }
 
     @Override
     public List<Object[]> topDiseasesStats(LocalDate fromDate, LocalDate toDate, int limit) {

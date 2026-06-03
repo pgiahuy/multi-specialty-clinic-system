@@ -224,7 +224,6 @@ public class PrescriptionServiceImpl implements PrescriptionService {
         
         Prescription saved = prescriptionRepo.saveOrUpdate(p);
         
-        // Create or reuse a payment for the appointment and attach the prescription item
         if (saved.getMedicalRecordId() != null && saved.getMedicalRecordId().getAppointmentId() != null) {
             Long appointmentId = saved.getMedicalRecordId().getAppointmentId().getId();
             if (appointmentId != null) {
@@ -235,7 +234,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
                     }
                     paymentItemsService.addPrescriptionItem(payment, saved.getId());
                 } catch (Exception e) {
-                    // Log, but don't block prescription creation if payment setup fails
+
                     System.err.println("Lỗi tạo thanh toán cho đơn thuốc: " + e.getMessage());
                 }
             }
@@ -307,7 +306,6 @@ public class PrescriptionServiceImpl implements PrescriptionService {
 
         int bufferDays = 3;
 
-        // Deduct stock for each medicine in the prescription using same logic as createPrescription
         if (prescription.getPrescriptionItemCollection() != null) {
             for (PrescriptionItem item : prescription.getPrescriptionItemCollection()) {
                 Medicine m = item.getMedicineId();
@@ -316,13 +314,10 @@ public class PrescriptionServiceImpl implements PrescriptionService {
                 int requiredQty = item.getQuantity();
                 int daysToUse = (item.getDaysToUse() > 0) ? item.getDaysToUse() : 7;
                 
-                // Calculate minimum expiry date (same logic as createPrescription)
                 LocalDate minExpiryDate = LocalDate.now().plusDays(daysToUse + bufferDays);
                 
-                // Get available batches (earliest expiry first)
                 List<MedicineBatch> availableBatches = medicineRepo.getAvailableBatches(m.getId(), minExpiryDate);
 
-                // Deduct from batches (same logic as createPrescription)
                 int remainingQtyToDeduct = requiredQty;
                 for (MedicineBatch batch : availableBatches) {
                     if (remainingQtyToDeduct <= 0) {
@@ -344,7 +339,6 @@ public class PrescriptionServiceImpl implements PrescriptionService {
 
                     medicineBatchRepo.saveOrUpdate(batch);
 
-                    // Create inventory log (same as createPrescription)
                     InventoryLog log = new InventoryLog();
                     log.setMedicineId(m);
                     log.setBatchId(batch);
@@ -359,7 +353,6 @@ public class PrescriptionServiceImpl implements PrescriptionService {
             }
         }
 
-        // Mark prescription as dispensed
         prescription.setDispensedAt(LocalDateTime.now());
         this.prescriptionRepo.saveOrUpdate(prescription);
 
