@@ -58,8 +58,6 @@ const MedicalRecord = () => {
         try {
             setLoading(true);
             const response = await authApis().get(endpoint['medical-record'](appointmentId));
-
-
             setMedicalRecord(response.data);
             setEditableDiagnosis(response.data.diagnosis || '');
             setEditableNotes(response.data.note || '');
@@ -87,7 +85,7 @@ const MedicalRecord = () => {
                     resultValue: result.value,
                     unit: result.unit || '',
                     normalRange: result.normalRange || '',
-                    isNormal: result.isAbnormal === false,
+                    isNormal: result.isAbnormal,
                     isAbnormal: result.isAbnormal
                 }));
                 setLabResult(transformedResults);
@@ -419,9 +417,9 @@ const MedicalRecord = () => {
                                             <td style={tableStyles.dataCell} className="text-muted">{result.normalRange}</td>
                                             <td style={tableStyles.dataCell}>
                                                 {result.isNormal === true ? (
-                                                    <span className="badge bg-success-subtle text-success border border-success px-2 py-1 rounded-3">Bình thường</span>
+                                                    <span className="text-success px-2 py-1 rounded-3">Bình thường</span>
                                                 ) : result.isNormal === false ? (
-                                                    <span className="badge bg-danger-subtle text-danger border border-danger px-2 py-1 rounded-3 fw-bold">Bất thường (!)</span>
+                                                    <span className="text-danger px-2 py-1 rounded-3 fw-bold">Bất thường (!)</span>
                                                 ) : (
                                                     <span className="text-muted">-</span>
                                                 )}

@@ -12,7 +12,6 @@ import com.hb.pojo.Patient;
 import com.hb.pojo.Schedule;
 import com.hb.pojo.Shift;
 import com.hb.repository.AppointmentRepository;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

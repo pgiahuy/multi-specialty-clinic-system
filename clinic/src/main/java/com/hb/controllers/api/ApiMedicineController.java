@@ -41,9 +41,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class ApiMedicineController {
 
     @Autowired
-    private Environment env;
-
-    @Autowired
     private MedicineService medicineService;
 
     @Autowired

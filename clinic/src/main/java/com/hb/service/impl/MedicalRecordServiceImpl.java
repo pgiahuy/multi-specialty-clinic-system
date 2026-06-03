@@ -34,19 +34,12 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 
     @Autowired
     private MedicalRecordRepository medicalRecordRepo;
-
     @Autowired
     private UserRepository userRepo;
-
-    @Autowired
-    private DoctorRepository doctorRepo;
-
     @Autowired
     private PatientRepository patientRepo;
-
     @Autowired
     private AppointmentRepository appointmentRepo;
-
     @Override
     public MedicalRecord addOrUpdateMedicalRecord(MedicalRecordCreateRequest req) {
         MedicalRecord m;
@@ -133,7 +126,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
     public List<MedicalRecord> getMedicalRecordsByPatientId(Long patientId) {
         Patient p = patientRepo.getPatientById(patientId);
         if (p == null) {
-            throw new ResourceNotFoundException("Patient not found!");
+            throw new ResourceNotFoundException("Không tìm thấy bệnh nhân");
         }
 
         List<MedicalRecord> res = medicalRecordRepo.getMedicalRecordsByPatientId(patientId);
@@ -145,7 +138,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
         Appointment a = appointmentRepo.getAppointmentById(appointmentId);
 
         if (a == null) {
-            throw new ResourceNotFoundException("Appointment not found!");
+            throw new ResourceNotFoundException("Không tìm thấy lịch hẹn");
         }
 
         return this.medicalRecordRepo.getMedicalRecordByAppointmentId(appointmentId);

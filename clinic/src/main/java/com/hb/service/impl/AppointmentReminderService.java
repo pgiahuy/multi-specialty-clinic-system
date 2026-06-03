@@ -33,7 +33,6 @@ public class AppointmentReminderService {
     @Autowired
     private NotificationService notificationService;
 
-//    @Scheduled(fixedRateString = "1800000")
     @Scheduled(fixedRateString = "60000")
     @Transactional
     public void sendAppointmentReminders() {

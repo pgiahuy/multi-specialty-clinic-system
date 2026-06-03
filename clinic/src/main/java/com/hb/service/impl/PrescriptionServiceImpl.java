@@ -12,6 +12,7 @@ import com.hb.pojo.InventoryLog;
 import com.hb.pojo.MedicalRecord;
 import com.hb.pojo.Medicine;
 import com.hb.pojo.MedicineBatch;
+import com.hb.pojo.Payment;
 import com.hb.pojo.Prescription;
 import com.hb.pojo.PrescriptionItem;
 import com.hb.pojo.User;
@@ -228,10 +229,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
             Long appointmentId = saved.getMedicalRecordId().getAppointmentId().getId();
             if (appointmentId != null) {
                 try {
-                    com.hb.pojo.Payment payment = paymentService.getPaymentByAppoint(appointmentId);
-                    if (payment == null) {
-                        payment = paymentService.createPayment(appointmentId);
-                    }
+                    Payment payment = paymentService.createPayment(appointmentId);
                     paymentItemsService.addPrescriptionItem(payment, saved.getId());
                 } catch (Exception e) {
 
@@ -239,11 +237,10 @@ public class PrescriptionServiceImpl implements PrescriptionService {
                 }
             }
         }
-        
         this.pushPrescriptionNotify(saved);
         
         return saved;
-        
+ 
     }
     
     @Override
@@ -303,21 +300,17 @@ public class PrescriptionServiceImpl implements PrescriptionService {
         if (prescription == null) {
             throw new ResourceNotFoundException("Không tìm thấy đơn thuốc!");
         }
-
         int bufferDays = 3;
+        
 
         if (prescription.getPrescriptionItemCollection() != null) {
             for (PrescriptionItem item : prescription.getPrescriptionItemCollection()) {
                 Medicine m = item.getMedicineId();
                 if (m == null) continue;
-
                 int requiredQty = item.getQuantity();
-                int daysToUse = (item.getDaysToUse() > 0) ? item.getDaysToUse() : 7;
-                
+                int daysToUse = (item.getDaysToUse() > 0) ? item.getDaysToUse() : 7;                  
                 LocalDate minExpiryDate = LocalDate.now().plusDays(daysToUse + bufferDays);
-                
                 List<MedicineBatch> availableBatches = medicineRepo.getAvailableBatches(m.getId(), minExpiryDate);
-
                 int remainingQtyToDeduct = requiredQty;
                 for (MedicineBatch batch : availableBatches) {
                     if (remainingQtyToDeduct <= 0) {

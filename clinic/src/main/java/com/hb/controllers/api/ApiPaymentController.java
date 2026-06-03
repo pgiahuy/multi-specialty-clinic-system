@@ -7,7 +7,6 @@ package com.hb.controllers.api;
 import com.hb.enums.PaymentMethod;
 import com.hb.enums.UserRole;
 import com.hb.mapper.PaymentMapper;
-import com.hb.pojo.Patient;
 import com.hb.pojo.Payment;
 import com.hb.pojo.User;
 import com.hb.repository.PatientRepository;
@@ -17,9 +16,7 @@ import com.hb.service.UserService;
 import com.hb.service.VnpayPaymentService;
 import jakarta.servlet.http.HttpServletRequest;
 import java.security.Principal;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
@@ -64,14 +61,9 @@ public class ApiPaymentController {
     @Autowired
     private PatientRepository patientRepo;
 
-//    @Autowired
-//    private PaymentMapper payMapper;
-//    
     @Autowired
     private Environment env;
-    
-    
-    
+        
     @GetMapping("/payments")
     @PreAuthorize("hasAnyRole('PATIENT','STAFF')")
     public ResponseEntity<?> list(@RequestParam Map<String,String> params, Principal principal) {
@@ -125,7 +117,7 @@ public class ApiPaymentController {
             if ("CASH".equalsIgnoreCase(method)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Không cho phép thanh toán tiền mặt từ patient.");
             }
-            Payment payment = paymentService.getPaymentById(paymentId);
+            Payment payment = paymentService.getPaymentEntityById(paymentId);
             if (payment == null || payment.getAppointmentId() == null || payment.getAppointmentId().getPatientId() == null
                     || payment.getAppointmentId().getPatientId().getUserId() == null
                     || !payment.getAppointmentId().getPatientId().getUserId().getId().equals(u.getId())) {
@@ -144,7 +136,7 @@ public class ApiPaymentController {
                 yield ResponseEntity.ok(Map.of("payUrl", vnpayUrl));
             }
             case "CASH" -> {
-                Payment payment = paymentService.getPaymentById(paymentId);
+                Payment payment = paymentService.getPaymentEntityById(paymentId);
                 if (payment == null) {
 
                     yield ResponseEntity.badRequest().body("Không tìm thấy hóa đơn!");
@@ -180,6 +172,23 @@ public class ApiPaymentController {
 
         return ResponseEntity.ok(payMapper.toResponse(payment));
     }
+    
+    
+    @GetMapping("/payments/{id}")
+    @PreAuthorize("hasRole('STAFF'")
+    public ResponseEntity<?> getPaymentById(Principal principal, @PathVariable("id") Long id) {
+        User u = userService.getUserByUsername(principal.getName());
+        if (u == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        
+        if (u.getRole() == UserRole.ROLE_PATIENT) {
+           return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Không có quyền truy cập!");
+        }
+
+        return ResponseEntity.ok(paymentService.getPaymentById(id));
+        
+    }
 
     public ResponseEntity<?> momoReturn(@RequestParam Map<String, String> params) throws Exception {
         boolean valid = momoService.verifySignature(params);
@@ -192,6 +201,7 @@ public class ApiPaymentController {
         } else {
             paymentService.confirmPaymentFailed(paymentId, PaymentMethod.MOMO);
         }
+        
         return ResponseEntity.ok().body(null);
     }
 

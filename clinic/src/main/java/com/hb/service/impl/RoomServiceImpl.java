@@ -32,13 +32,8 @@ public class RoomServiceImpl implements RoomService {
 
     @Autowired
     private RoomRepository roomRepo;
-
-    @Autowired
-    private AreaRepository areaRepo;
-
     @Autowired
     private DoctorRepository doctorRepo;
-
     @Override
     public List<Room> getRooms(Map<String, String> params) {
         return roomRepo.getRooms(params);
