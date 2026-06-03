@@ -335,7 +335,6 @@ const BookingPage = () => {
         loadSchedules();
     }, [selectedDoctor, selectedDate, selectedSpecialty]);
 
-    // Allow booking from tomorrow onwards
     const tomorrowDate = new Date();
     tomorrowDate.setDate(tomorrowDate.getDate() + 1);
     const todayStr = tomorrowDate.toISOString().split('T')[0];
@@ -627,7 +626,6 @@ const BookingPage = () => {
                                                                             <div className="d-flex align-items-center justify-content-between gap-2">
                                                                                 <div className="fw-semibold text-dark text-truncate small">{doctorName}</div>
                                                                                 <div className="d-flex align-items-center justify-content-between gap-2 mt-1">
-
                                                                                     <Button
                                                                                         type="button"
                                                                                         variant="link"
@@ -684,11 +682,9 @@ const BookingPage = () => {
                                                         );
                                                     })
                                                 )}
-
                                                 {hasMoreDoctors && doctors.length > 0 && (
                                                     <div className="col-12" ref={doctorLoadMoreRef} style={{ height: "1px" }} />
                                                 )}
-
                                                 {loadingMoreDoctors && doctors.length > 0 && (
                                                     <div className="col-12 text-center text-muted small py-1">Đang tải thêm bác sĩ...</div>
                                                 )}
@@ -696,10 +692,6 @@ const BookingPage = () => {
                                         </div>
                                     </div>
                                 </div>
-
-
-
-
                             </Card>
                         </Col>
 
@@ -711,7 +703,6 @@ const BookingPage = () => {
                                             <Card.Title className="fw-semibold mb-0" style={{ fontSize: "1.05rem" }}>Lịch khám</Card.Title>
                                         </div>
                                     </div>
-
                                     <div>
                                         <ScheduleBooking
                                             schedules={schedules}
@@ -722,7 +713,6 @@ const BookingPage = () => {
                                             onSelectSchedule={(scheduleId) => handleFilterChange("scheduleId", scheduleId)}
                                         />
                                     </div>
-
                                 </Card.Body>
                             </Card>
                         </Col>
@@ -816,7 +806,6 @@ const BookingPage = () => {
                             </Button>
                         </Modal.Footer>
                     </Modal>
-
                     <LoginRequiredModal
                         show={loginPromptVisible}
                         onHide={() => setLoginPromptVisible(false)}

@@ -46,7 +46,6 @@ const DoctorDetail = () => {
                 name: doctor.specialtyName || doctor.specialty,
             }];
         }
-
         return [];
     })();
     const specialtyLabel = specialties.length > 0 ? specialties[0].name : "Chưa có chuyên khoa";

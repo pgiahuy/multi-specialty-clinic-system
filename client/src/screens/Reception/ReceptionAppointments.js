@@ -97,7 +97,6 @@ const ReceptionAppointments = () => {
                             />
                         </Form.Group>
                     </Col>
-
                     <Col md={2} sm={6}>
                         <Form.Group controlId="filterDate">
                             <Form.Label className="fw-semibold small text-secondary">Chọn ngày hẹn</Form.Label>

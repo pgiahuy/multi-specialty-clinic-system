@@ -161,7 +161,6 @@ const RegisterSchedule = () => {
             return false;
         }
 
-
         if (Number(formData.maxPatients) > (selectedShift?.maxPatients || 10)) {
             setErrorMessage(`Số bệnh nhân tối đa phải lớn hơn 0 và không vượt quá ${selectedShift?.maxPatients || 10}.`);
             return false;
@@ -334,8 +333,6 @@ const RegisterSchedule = () => {
                                                     <Form.Text className="text-warning text-center  d-block mt-1">
                                                         Vui lòng chọn đầy đủ thông tin để tìm phòng.
                                                     </Form.Text>)}
-
-
                                             </>
                                         ) : (
                                             <Form.Select
@@ -353,9 +350,7 @@ const RegisterSchedule = () => {
                                                 ))}
                                             </Form.Select>
                                         )}
-
                                     </Form.Group>
-
                                     <Button className="w-100" type="submit" disabled={submitting}>
                                         {submitting ? (
                                             <span className="d-inline-flex align-items-center">
@@ -370,7 +365,6 @@ const RegisterSchedule = () => {
                             </Card.Body>
                         </Card>
                     </Col>
-
                     <Col lg={7}>
                         <Card className="border-0 shadow-sm rounded-4 h-100">
                             <Card.Body>
