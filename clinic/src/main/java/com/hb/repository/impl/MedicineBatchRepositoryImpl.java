@@ -42,7 +42,7 @@ public class MedicineBatchRepositoryImpl implements MedicineBatchRepository {
     @Override
     public long count(Map<String, String> params, Class<MedicineBatch> clazz) {
         Session session = this.factory.getObject().getCurrentSession();
-        StringBuilder hql = new StringBuilder("SELECT COUNT(DISTINCT mb.id) FROM MedicineBatch mb LEFT JOIN mb.medicineId m WHERE 1=1");
+        StringBuilder hql = new StringBuilder("SELECT COUNT(DISTINCT mb.id) FROM MedicineBatch mb LEFT JOIN mb.medicineId m WHERE mb.isActive = true");
 
         if (params != null && params.get("fromImport") != null && params.get("toImport") != null) {
             hql.append(" AND mb.importDate BETWEEN :fromImport AND :toImport");
@@ -68,7 +68,7 @@ public class MedicineBatchRepositoryImpl implements MedicineBatchRepository {
     @Override
     public long countMedicineBatchs(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
-        StringBuilder hql = new StringBuilder("SELECT COUNT(DISTINCT mb.id) FROM MedicineBatch mb LEFT JOIN mb.medicineId m WHERE 1=1");
+        StringBuilder hql = new StringBuilder("SELECT COUNT(DISTINCT mb.id) FROM MedicineBatch mb LEFT JOIN mb.medicineId m WHERE mb.isActive = true");
 
         if (params != null && hasText(params.get("kw"))) {
             hql.append(" AND (mb.batchCode LIKE :kw OR m.name LIKE :kw OR m.code LIKE :kw)");
@@ -143,6 +143,8 @@ public class MedicineBatchRepositoryImpl implements MedicineBatchRepository {
             predicates.add(b.between(root.get("expiryDate"), from, to));
         }
 
+        predicates.add(b.isTrue(root.get("isActive")));
+
         q.where(predicates.toArray(new Predicate[0]));
         q.orderBy(b.desc(root.get("id")));
 
@@ -154,7 +156,32 @@ public class MedicineBatchRepositoryImpl implements MedicineBatchRepository {
                 .setMaxResults(pageSize)
                 .getResultList();
     }
-    
+
+    @Override
+    public List<MedicineBatch> getExpiringBatches(Map<String, String> params) {
+        if (params == null || !hasText(params.get("fromExpiry")) || !hasText(params.get("toExpiry"))) {
+            return List.of();
+        }
+
+        Session session = this.factory.getObject().getCurrentSession();
+        String hql = "SELECT mb FROM MedicineBatch mb LEFT JOIN FETCH mb.medicineId m "
+                + "WHERE mb.isActive = true "
+                + "AND mb.expiryDate BETWEEN :fromExpiry AND :toExpiry "
+                + "ORDER BY mb.expiryDate ASC";
+
+        Query<MedicineBatch> q = session.createQuery(hql, MedicineBatch.class);
+        q.setParameter("fromExpiry", java.time.LocalDate.parse(params.get("fromExpiry")));
+        q.setParameter("toExpiry", java.time.LocalDate.parse(params.get("toExpiry")));
+
+        if (params != null && params.containsKey("pageSize") && hasText(params.get("pageSize"))) {
+            int pageSize = Integer.parseInt(params.get("pageSize"));
+            int page = Integer.parseInt(params.getOrDefault("page", "1"));
+            q.setMaxResults(pageSize);
+            q.setFirstResult((page - 1) * pageSize);
+        }
+
+        return q.getResultList();
+    }
     
     @Override
     public MedicineBatch getMedicineBatchById(Long id) {
@@ -174,5 +201,21 @@ public class MedicineBatchRepositoryImpl implements MedicineBatchRepository {
             throw new ResourceNotFoundException("MedicineBatch not found!");
         }
     }
+
+    @Override
+    public MedicineBatch getAvailableBatchForMedicine(Long medicineId) {
+        Session session = this.factory.getObject().getCurrentSession();
+        String hql = "FROM MedicineBatch mb WHERE mb.medicineId.id = :medicineId "
+                + "AND mb.quantityAvailable > 0 "
+                + "AND mb.expiryDate > CURRENT_DATE "
+                + "AND mb.isActive = true "
+                + "ORDER BY mb.expiryDate ASC";
+        Query<MedicineBatch> query = session.createQuery(hql, MedicineBatch.class);
+        query.setParameter("medicineId", medicineId);
+        query.setMaxResults(1);
+        List<MedicineBatch> results = query.getResultList();
+        return results.isEmpty() ? null : results.get(0);
+    }
+ 
 
 }

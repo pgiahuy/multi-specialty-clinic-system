@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { authApis, endpoint, TEST_ENDPOINTS } from "../../configs/Apis";
+import { authApis, CLINIC_ENDPOINTS, endpoint, TEST_ENDPOINTS } from "../../configs/Apis";
 import Header from "../../components/Header";
 import MySpinner from "../../components/MySpinner";
 import MyAlert from "../../components/MyAlert";
@@ -19,8 +19,10 @@ import {
 } from "react-bootstrap-icons";
 import { tableStyles, emptyState } from "./DoctorStyle";
 import FloatAlert from "../../components/FloatAlert";
+import { MyUserContext } from "../../configs/Contexts";
 
 const MedicalRecord = () => {
+    const [user, dispatch] = useContext(MyUserContext);
     const { appointmentId } = useParams();
     const alertTimerRef = useRef(null);
     const [loading, setLoading] = useState(false);
@@ -31,6 +33,7 @@ const MedicalRecord = () => {
     const [editableDiagnosis, setEditableDiagnosis] = useState('');
     const [editableNotes, setEditableNotes] = useState('');
     const [isEditing, setIsEditing] = useState(false);
+    const [appointmentStatus, setAppointmentStatus] = useState(null);
 
     const [alertData, setAlertData] = useState({
         show: false,
@@ -55,6 +58,8 @@ const MedicalRecord = () => {
         try {
             setLoading(true);
             const response = await authApis().get(endpoint['medical-record'](appointmentId));
+
+
             setMedicalRecord(response.data);
             setEditableDiagnosis(response.data.diagnosis || '');
             setEditableNotes(response.data.note || '');
@@ -70,7 +75,6 @@ const MedicalRecord = () => {
 
             const response = await authApis().get(TEST_ENDPOINTS.LAB_RESULTS_BY_APPOINTMENT(appointmentId));
 
-            // Set status
             if (response.data && response.data.status) {
                 setLabResultStatus(response.data.status);
             }
@@ -145,10 +149,25 @@ const MedicalRecord = () => {
         }
     };
 
+    const loadAppointment = async () => {
+        try {
+            const response = await authApis().get(CLINIC_ENDPOINTS.APPOINTMENT_BY_ID(appointmentId));
+            if (response.data && response.data.status) {
+                setAppointmentStatus(response.data.status);
+            }
+        }
+        catch (error) {
+            console.error("Tải thông tin lịch hẹn thất bại:", error);
+        }
+    };
+
+
     useEffect(() => {
+        console.log("hawdhhaw", user?.role);
         if (appointmentId) {
             loadMedicalRecord(appointmentId);
             loadTestResults(appointmentId);
+            loadAppointment(appointmentId);
         }
     }, [appointmentId]);
 
@@ -178,7 +197,7 @@ const MedicalRecord = () => {
                                 <Button
                                     variant="primary"
                                     className="shadow-sm px-4 py-2 fw-semibold rounded-pill"
-                                    onClick={() => nav(`/doctor/create-medical-record?appointmentId=${appointmentId}`)}
+                                    onClick={() => nav(`/create-medical-record?appointmentId=${appointmentId}`)}
                                 >
                                     <PlusCircleFill className="me-2" /> Tạo bệnh án ngay
                                 </Button>
@@ -292,13 +311,17 @@ const MedicalRecord = () => {
                                             Xem kết quả ({labResult.length})
                                         </Button>
                                     ) : (
-                                        <Button
-                                            variant="outline-danger"
-                                            className="fw-semibold px-3 btn-sm rounded-pill"
-                                            onClick={() => nav(`/doctor/assign-test/${appointmentId}`)}
-                                        >
-                                            <PlusCircleFill className="me-1 mb-1" /> Chỉ định ngay
-                                        </Button>
+
+                                        user && user.role === "ROLE_DOCTOR" ? (
+                                            <Button
+                                                variant="outline-danger"
+                                                className="fw-semibold px-3 btn-sm rounded-pill"
+                                                onClick={() => nav(`/doctor/assign-test/${appointmentId}`)}
+                                            >
+                                                <PlusCircleFill className="me-1 mb-1" /> Chỉ định ngay
+                                            </Button>
+                                        ) : null
+
                                     )}
                                 </div>
 
@@ -306,21 +329,28 @@ const MedicalRecord = () => {
                                 <div className="d-flex justify-content-end gap-2 pt-3 border-top">
                                     {!isEditing ? (
                                         <>
-                                            <Button
+
+                                            {user && user.role === "ROLE_DOCTOR" && (<Button
                                                 variant="outline-primary"
                                                 className="px-4 fw-semibold rounded-pill shadow-sm"
                                                 onClick={() => nav(`/doctor/prescribe/${medicalRecord.id}`)}
                                             >
                                                 Kê đơn thuốc
-                                            </Button>
+                                            </Button>)}
 
-                                            <Button
-                                                variant="warning"
-                                                className="px-4 fw-semibold text-white rounded-pill shadow-sm"
-                                                onClick={() => setIsEditing(true)}
-                                            >
-                                                Chỉnh sửa
-                                            </Button>
+
+                                            {((user?.role === "ROLE_DOCTOR") ||
+                                                (user?.role === "ROLE_STAFF" && appointmentStatus !== "COMPLETED" && appointmentStatus !== "CANCELLED"
+                                                    && appointmentStatus !== "IN_PROGRESS"
+                                                )) && (
+                                                    <Button
+                                                        variant="warning"
+                                                        className="px-4 fw-semibold text-white rounded-pill shadow-sm"
+                                                        onClick={() => setIsEditing(true)}
+                                                    >
+                                                        Chỉnh sửa
+                                                    </Button>
+                                                )}
                                         </>
                                     ) : (
                                         <>

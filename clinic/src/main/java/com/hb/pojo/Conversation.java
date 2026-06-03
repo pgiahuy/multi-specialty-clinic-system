@@ -14,7 +14,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
@@ -22,6 +22,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.Date;
 
 /**
@@ -44,8 +45,9 @@ public class Conversation implements Serializable {
     @Column(name = "conversation_type")
     private String conversationType;
     @Column(name = "created_at")
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
+    @OneToMany(mappedBy = "conversationId")
+    private Collection<Appointment> appointmentCollection;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -55,9 +57,7 @@ public class Conversation implements Serializable {
     private Long id;
     @Column(name = "is_active")
     private Boolean isActive;
-    @JoinColumn(name = "appointment_id", referencedColumnName = "id")
-    @OneToOne
-    private Appointment appointmentId;
+    
     
     
     @JoinColumn(name = "patient_id", referencedColumnName = "id")
@@ -112,13 +112,6 @@ public class Conversation implements Serializable {
         this.createdAt = createdAt;
     }
 
-    public Appointment getAppointmentId() {
-        return appointmentId;
-    }
-
-    public void setAppointmentId(Appointment appointmentId) {
-        this.appointmentId = appointmentId;
-    }
 
     public Patient getPatientId() {
         return patientId;
@@ -159,6 +152,16 @@ public class Conversation implements Serializable {
     @Override
     public String toString() {
         return "com.hb.pojo.Conversation[ id=" + id + " ]";
+    }
+
+   
+
+    public Collection<Appointment> getAppointmentCollection() {
+        return appointmentCollection;
+    }
+
+    public void setAppointmentCollection(Collection<Appointment> appointmentCollection) {
+        this.appointmentCollection = appointmentCollection;
     }
 
     

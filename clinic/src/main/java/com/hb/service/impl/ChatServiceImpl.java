@@ -1,6 +1,8 @@
 package com.hb.service.impl;
 
+import com.hb.dto.response.ChatMessageResponse;
 import com.hb.exception.ResourceNotFoundException;
+import com.hb.mapper.ChatMessageMapper;
 import com.hb.pojo.ChatMessage;
 import com.hb.pojo.Conversation;
 import com.hb.pojo.Doctor;
@@ -17,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +42,9 @@ public class ChatServiceImpl implements ChatService {
     @Autowired
     private PatientRepository patientRepo;
 
+    @Autowired
+    private ChatMessageMapper messageMapper;
+
     @Override
     public List<Map<String, Object>> getConversationsForDoctor(Long userId) {
         List<Object[]> rawData = conversationRepo.findAllConversationsWithPatientName(userId);
@@ -58,8 +64,10 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public List<ChatMessage> getMessagesByConversation(Long conversationId) {
-        return messageRepo.findByConversationIdOrderByCreatedAtAsc(conversationId);
+    public List<ChatMessageResponse> getMessagesByConversation(Long conversationId) {
+        return messageRepo.findByConversationIdOrderByCreatedAtAsc(conversationId).stream()
+                .map(messageMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -74,7 +82,8 @@ public class ChatServiceImpl implements ChatService {
             map.put("receiver_id", String.valueOf(row[2]));
             map.put("appointment_id", row[3] != null ? String.valueOf(row[3]) : null);
             map.put("is_active", row[4]);
-            map.put("doctor_name", row[5] != null ? String.valueOf(row[5]) : null);
+            map.put("doctor_id", row.length > 5 && row[5] != null ? String.valueOf(row[5]) : null);
+            map.put("doctor_name", row.length > 6 && row[6] != null ? String.valueOf(row[6]) : null);
             result.add(map);
         }
         return result;
@@ -91,7 +100,6 @@ public class ChatServiceImpl implements ChatService {
 
         Conversation newConvo = new Conversation();
         newConvo.setConversationType("TUVAN");
-        newConvo.setAppointmentId(null);
         newConvo.setIsActive(true);
         newConvo.setCreatedAt(LocalDateTime.now());
 
@@ -106,7 +114,7 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     @Transactional
-    public ChatMessage saveAndPushMessage(Long conversationId, Long senderId, String content, String msgType, String currentSenderType) {
+    public ChatMessageResponse saveAndPushMessage(Long conversationId, Long senderId, String content, String msgType, String currentSenderType) {
 
         Conversation convo = conversationRepo.getConversationById(conversationId);
         if (convo == null) {
@@ -117,7 +125,7 @@ public class ChatServiceImpl implements ChatService {
         msg.setSenderType(currentSenderType);
         msg.setMessageType(msgType != null ? msgType : "TEXT");
         msg.setContent(content);
-        msg.setCreatedAt( LocalDateTime.now());
+        msg.setCreatedAt(LocalDateTime.now());
         msg.setConversationId(convo);
 
         User user = userRepo.getUserById(senderId);
@@ -143,7 +151,7 @@ public class ChatServiceImpl implements ChatService {
             }
 
             if (targetFcmToken != null && !targetFcmToken.isEmpty()) {
-                fcmService.sendChatMessageToUserDevice(targetFcmToken, savedMsg);
+                fcmService.sendChatMessageToUserDevice(targetFcmToken, messageMapper.toResponse(savedMsg));
             } else {
                 System.out.println("Người nhận " + targetName + " đang không online, không bắn FCM.");
             }
@@ -152,6 +160,6 @@ public class ChatServiceImpl implements ChatService {
             System.err.println("Lỗi xử lý luồng Token FCM: " + e.getMessage());
         }
 
-        return savedMsg;
+        return messageMapper.toResponse(savedMsg);
     }
 }

@@ -117,7 +117,7 @@ const AppointmentList = () => {
             return {
                 label: 'Bệnh án',
                 variant: 'primary',
-                onClick: () => nav(`/doctor/appointments/${appointment.id}/medical-record`),
+                onClick: () => nav(`/appointments/${appointment.id}/medical-record`),
             };
         }
 

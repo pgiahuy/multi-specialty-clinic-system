@@ -24,7 +24,6 @@
     <class>com.hb.pojo.Shifts</class>
     <class>com.hb.pojo.Rooms</class>
     <class>com.hb.pojo.Medicinebatch</class>
-    <class>com.hb.pojo.ChatMessage</class>
     <class>com.hb.pojo.MedicineBatch</class>
     <class>com.hb.pojo.RefreshToken</class>
     <class>com.hb.pojo.InventoryLog_1</class>
@@ -49,5 +48,6 @@
     <class>com.hb.pojo.Patient_1</class>
     <class>com.hb.pojo.Conversation_1_1</class>
     <class>com.hb.pojo.Conversation</class>
+    <class>com.hb.pojo.ChatMessage</class>
   </persistence-unit>
 </persistence>

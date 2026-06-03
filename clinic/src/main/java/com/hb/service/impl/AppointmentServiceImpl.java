@@ -61,6 +61,9 @@ public class AppointmentServiceImpl implements AppointmentService {
     private PaymentService paymentService;
     
     @Autowired
+    private com.hb.repository.ConversationRepository conversationRepo;
+    
+    @Autowired
     private NotificationService notificationService;
 
     @Override
@@ -108,6 +111,19 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         Appointment appointment = appointmentMapper.toEntity(req, patient, schedule);
         appointmentRepo.addOrUpdateAppointment(appointment);
+
+
+        try {
+            if (req.getConversationId() != null) {
+                var conv = conversationRepo.getConversationById(req.getConversationId());
+                if (conv != null) {
+                    appointment.setConversationId(conv);
+                    appointmentRepo.addOrUpdateAppointment(appointment);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Failed linking conversation to appointment: " + e.getMessage());
+        }
 
         Payment p = paymentService.createPayment(appointment.getId());
         itemService.addAppointmentItem(p, appointment.getId());

@@ -47,10 +47,13 @@ public class Appointment implements Serializable {
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private AppointmentStatus status;
-    @Column(name = "reminder_sent")
-    private Boolean reminderSent = false;
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+    @Column(name = "reminder_sent")
+    private boolean reminderSent;
+    @JoinColumn(name = "conversation_id", referencedColumnName = "id")
+    @ManyToOne
+    private Conversation conversationId;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -68,8 +71,6 @@ public class Appointment implements Serializable {
     private Collection<LabResult> labResultCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "appointmentId")
     private Collection<Payment> paymentCollection;
-    @OneToOne(mappedBy = "appointmentId")
-    private Conversation conversation;
     @OneToOne(mappedBy = "appointmentId")
     private MedicalRecord medicalRecord;
 
@@ -129,13 +130,6 @@ public class Appointment implements Serializable {
         this.paymentCollection = paymentCollection;
     }
 
-    public Conversation getConversation() {
-        return conversation;
-    }
-
-    public void setConversation(Conversation conversation) {
-        this.conversation = conversation;
-    }
 
     public MedicalRecord getMedicalRecord() {
         return medicalRecord;
@@ -170,13 +164,6 @@ public class Appointment implements Serializable {
         return "com.hb.pojo.Appointment[ id=" + id + " ]";
     }
 
-    public AppointmentStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(AppointmentStatus status) {
-        this.status = status;
-    }
 
     /**
      * @return the reminderSent
@@ -190,6 +177,25 @@ public class Appointment implements Serializable {
      */
     public void setReminderSent(Boolean reminderSent) {
         this.reminderSent = reminderSent;
+    }
+
+    public AppointmentStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(AppointmentStatus status) {
+        this.status = status;
+    }
+
+    
+   
+
+    public Conversation getConversationId() {
+        return conversationId;
+    }
+
+    public void setConversationId(Conversation conversationId) {
+        this.conversationId = conversationId;
     }
 
    

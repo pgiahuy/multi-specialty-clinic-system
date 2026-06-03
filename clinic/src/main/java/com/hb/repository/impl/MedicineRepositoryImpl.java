@@ -38,6 +38,7 @@ public class MedicineRepositoryImpl extends BaseRepositoryImpl<Medicine> impleme
         Session session = this.factory.getObject().getCurrentSession();
         String hql = "SELECT mb FROM MedicineBatch mb "
                 + "WHERE mb.medicineId.id = :medicineId "
+                + "AND mb.isActive = true "
                 + "AND mb.quantity > 0 "
                 + "AND mb.expiryDate >= :minExpiryDate "
                 + "ORDER BY mb.expiryDate ASC, mb.importDate ASC";
@@ -55,7 +56,7 @@ public class MedicineRepositoryImpl extends BaseRepositoryImpl<Medicine> impleme
         StringBuilder hql = new StringBuilder(
                 "SELECT new com.hb.dto.response.MedicineResponse(m.id, m.code, m.name, m.price, m.unit, SUM(mb.quantity)) "
                 + "FROM Medicine m "
-                + "LEFT JOIN MedicineBatch mb ON mb.medicineId = m "
+                + "LEFT JOIN MedicineBatch mb ON mb.medicineId = m AND mb.isActive = true "
                 + "WHERE 1=1"
         );
 
@@ -69,6 +70,45 @@ public class MedicineRepositoryImpl extends BaseRepositoryImpl<Medicine> impleme
         if (params != null && hasText(params.get("kw"))) {
             q.setParameter("kw", "%" + params.get("kw").trim() + "%");
         }
+        if (params != null && params.containsKey("pageSize") && hasText(params.get("pageSize"))) {
+            int pageSize = Integer.parseInt(params.get("pageSize"));
+            int page = Integer.parseInt(params.getOrDefault("page", "1"));
+            int start = (page - 1) * pageSize;
+            q.setMaxResults(pageSize);
+            q.setFirstResult(start);
+        }
+
+        return q.getResultList();
+    }
+
+    @Override
+    public List<MedicineResponse> getLowStockMedicines(Map<String, String> params) {
+        Session session = this.factory.getObject().getCurrentSession();
+        StringBuilder hql = new StringBuilder(
+                "SELECT new com.hb.dto.response.MedicineResponse(m.id, m.code, m.name, m.price, m.unit, COALESCE(SUM(mb.quantity), 0)) "
+                + "FROM Medicine m "
+                + "LEFT JOIN MedicineBatch mb ON mb.medicineId = m AND mb.isActive = true "
+                + "WHERE 1=1"
+        );
+
+        if (params != null && hasText(params.get("kw"))) {
+            hql.append(" AND (m.name LIKE :kw OR m.code LIKE :kw)");
+        }
+        hql.append(" GROUP BY m.id, m.code, m.name, m.price, m.unit");
+        hql.append(" HAVING COALESCE(SUM(mb.quantity), 0) <= :threshold");
+
+        Query<MedicineResponse> q = session.createQuery(hql.toString(), MedicineResponse.class);
+
+        if (params != null && hasText(params.get("kw"))) {
+            q.setParameter("kw", "%" + params.get("kw").trim() + "%");
+        }
+
+        int threshold = 10;
+        if (params != null && hasText(params.get("lowStockThreshold"))) {
+            threshold = Integer.parseInt(params.get("lowStockThreshold"));
+        }
+        q.setParameter("threshold", threshold);
+
         if (params != null && params.containsKey("pageSize") && hasText(params.get("pageSize"))) {
             int pageSize = Integer.parseInt(params.get("pageSize"));
             int page = Integer.parseInt(params.getOrDefault("page", "1"));

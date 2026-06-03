@@ -4,7 +4,7 @@
  */
 package com.hb.service;
 
-import com.hb.pojo.ChatMessage;
+import com.hb.dto.response.ChatMessageResponse;
 import com.hb.pojo.Conversation;
 import java.util.List;
 import java.util.Map;
@@ -18,10 +18,10 @@ public interface ChatService {
     List<Map<String, Object>> getConversationsForDoctor(Long doctorId);
     List<Map<String, Object>> getConversationsForPatient(Long patientId);
     
-    List<ChatMessage> getMessagesByConversation(Long conversationId);
+    List<ChatMessageResponse> getMessagesByConversation(Long conversationId);
     
     Conversation quickStartConversation(Long doctorId, Long patientId);
     
-    ChatMessage saveAndPushMessage(Long conversationId, Long senderId, String content, String msgType, String currentSenderType);
+    ChatMessageResponse saveAndPushMessage(Long conversationId, Long senderId, String content, String msgType, String currentSenderType);
     
 }

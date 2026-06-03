@@ -69,6 +69,11 @@ public class MedicineServiceImpl implements MedicineService {
     }
 
     @Override
+    public List<MedicineResponse> getLowStockMedicines(Map<String, String> params) {
+        return this.medicineRepo.getLowStockMedicines(params);
+    }
+
+    @Override
     public Medicine getMedicineById(Long id) {
         return this.medicineRepo.getMedicineById(id);
     }

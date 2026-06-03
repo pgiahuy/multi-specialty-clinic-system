@@ -4,6 +4,7 @@ import { Card, ListGroup, Form, InputGroup, Button, Spinner } from "react-bootst
 import { Search, Send, FileText, Person, ChatDots, CircleFill, ChevronDown } from "react-bootstrap-icons";
 import { authApis, CHAT_ENDPOINTS, CLINIC_ENDPOINTS } from "../../configs/Apis";
 import Header from "../../components/Header";
+import MySpinner from "../../components/MySpinner";
 import { db } from '../../configs/firebaseConfig';
 import { ref, query as dbQuery, orderByChild, onValue, off } from 'firebase/database';
 
@@ -22,6 +23,8 @@ const ConsultationPage = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [showRightCol, setShowRightCol] = useState(true);
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+    const [latestMedicalRecord, setLatestMedicalRecord] = useState(null);
+    const [medicalRecordLoading, setMedicalRecordLoading] = useState(false);
 
     const chatBodyRef = useRef(null);
     const unsubscribeRef = useRef(null);
@@ -127,8 +130,39 @@ const ConsultationPage = () => {
     }, [searchTerm]);
 
 
+    const loadRecentMedicalRecordByPatientId = async (patientId) => {
+        if (!patientId) return null;
+
+        try {
+            const res = await authApis().get(CLINIC_ENDPOINTS.MEDICAL_RECORD_BY_PATIENT_ID(patientId));
+            const records = Array.isArray(res.data) ? res.data : [];
+            if (records.length === 0) return null;
+
+            return records.slice().sort((a, b) => {
+                const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+                const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+                if (bTime !== aTime) return bTime - aTime;
+                return (b.id || 0) - (a.id || 0);
+            })[0] || null;
+        } catch (err) {
+            console.error("Lỗi lấy bệnh án gần nhất của bệnh nhân:", err);
+            return null;
+        }
+    };
+
+
     const handleSelectChat = async (chatItem) => {
         setSearchTerm("");
+        setLatestMedicalRecord(null);
+        setMedicalRecordLoading(true);
+        setShowRightCol(true);
+
+        try {
+            const recentRecord = await loadRecentMedicalRecordByPatientId(chatItem.patient_id || chatItem.patientId || chatItem.id);
+            setLatestMedicalRecord(recentRecord);
+        } finally {
+            setMedicalRecordLoading(false);
+        }
 
         const existingConvo = conversations.find(c => String(c.patient_id) === String(chatItem.patient_id));
         if (existingConvo && existingConvo.id) {
@@ -298,6 +332,18 @@ const ConsultationPage = () => {
         }
     };
 
+    const activePatient = activeChat ? allPatients.find(p => String(p.patient_id || p.id) === String(activeChat.patient_id)) : null;
+    const patientDob = activePatient?.dob || activePatient?.dateOfBirth || latestMedicalRecord?.dob || "";
+    const patientGender = activePatient?.gender || latestMedicalRecord?.gender || "";
+    const patientAddress = activePatient?.address || latestMedicalRecord?.address || "";
+    const patientPhone = activePatient?.phone || activePatient?.phoneNumber || "";
+
+    const formatDate = (value) => {
+        if (!value) return "";
+        const parsed = new Date(value);
+        return !isNaN(parsed.getTime()) ? parsed.toLocaleDateString() : String(value);
+    };
+
     return (
         <div className="d-flex flex-column bg-light" style={{ height: "100vh", overflow: "hidden" }}>
             <Header />
@@ -398,7 +444,7 @@ const ConsultationPage = () => {
                                 </div>
                                 {!showRightCol && (
                                     <Button size="sm" variant="outline-primary" className="fw-bold px-3 border-2 rounded-2 d-flex align-items-center gap-1" style={{ fontSize: "12px" }} onClick={() => setShowRightCol(true)}>
-                                        <FileText size={14} /> Mở Bệnh Án
+                                        Xem Bệnh Án
                                     </Button>
                                 )}
                             </div>
@@ -490,33 +536,63 @@ const ConsultationPage = () => {
                             </div>
 
                             <div className="p-3 overflow-y-auto flex-grow-1 small">
-                                <div className="mb-3 p-3 bg-light rounded-3 border-start border-3 border-primary">
+                                <div className="mb-3 p-4 bg-light rounded-3 border-primary">
                                     <div className="text-muted" style={{ fontSize: "11px" }}>Họ và tên</div>
-                                    <div className="fw-bold text-dark">{activeChat.patient_name}</div>
+                                    <div className="fw-bold text-dark">{activePatient?.patient_name || activeChat.patient_name}</div>
+
                                     <div className="text-muted mt-2" style={{ fontSize: "11px" }}>Mã định danh hệ thống</div>
                                     <div className="font-monospace text-secondary" style={{ fontSize: "12px" }}>{activeChat.patient_id}</div>
+
+                                    <div className="d-flex gap-4flex-wrap align-items-center justify-content-start">
+                                        <div>
+                                            <div className="text-muted mt-2" style={{ fontSize: "11px" }}>Ngày sinh</div>
+                                            <div className="text-dark">{patientDob ? formatDate(patientDob) : "Không có"}</div>
+                                        </div>
+
+                                        <div>
+                                            <div className="text-muted mt-2" style={{ fontSize: "11px" }}>Giới tính</div>
+                                            <div className="text-dark">{patientGender || "Không có"}</div>
+                                        </div>
+                                    </div>
+
+                                    <div className="text-muted mt-2" style={{ fontSize: "11px" }}>Địa chỉ</div>
+                                    <div className="text-dark">{patientAddress || "Không có"}</div>
+
+                                    {patientPhone && (
+                                        <>
+                                            <div className="text-muted mt-2" style={{ fontSize: "11px" }}>Số điện thoại</div>
+                                            <div className="text-dark">{patientPhone}</div>
+                                        </>
+                                    )}
                                 </div>
 
                                 <div className="mb-4">
-                                    <h6 className="fw-bold text-dark border-bottom pb-2" style={{ fontSize: "12px" }}>Chẩn đoán hiện tại</h6>
-                                    <p className="text-secondary mb-0" style={{ lineHeight: "1.6" }}>
-                                        {activeChat.appointment_id ? "Theo dõi viêm dạ dày cấp tính, trào ngược thực quan độ A. Đang sử dụng phác đồ PPI." : "Bệnh nhân tự do đăng ký tư vấn sức khỏe tổng quát từ xa."}
-                                    </p>
+                                    <h6 className="fw-bold text-dark border-bottom pb-2" style={{ fontSize: "12px" }}>Hồ sơ bệnh án gần nhất</h6>
+                                    {medicalRecordLoading ? (
+                                        <div className="d-flex align-items-center text-secondary small py-2">
+                                            <MySpinner />
+                                            <span>Đang tải hồ sơ bệnh án...</span>
+                                        </div>
+                                    ) : latestMedicalRecord ? (
+                                        <div className="text-secondary" style={{ lineHeight: "1.6" }}>
+                                            <div className="mb-2">
+                                                <strong className="text-dark">Mã bệnh án:</strong> BA#{latestMedicalRecord.id}
+                                            </div>
+                                            <div className="mb-2">
+                                                <strong className="text-dark">Ngày tạo:</strong> {latestMedicalRecord.createdAt || "Chưa cập nhật"}
+                                            </div>
+                                            <div className="mb-2">
+                                                <strong className="text-dark">Chẩn đoán:</strong> {latestMedicalRecord.diagnosis || "Không có"}
+                                            </div>
+                                            <div>
+                                                <strong className="text-dark">Ghi chú:</strong> {latestMedicalRecord.note || "Không có"}
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="text-secondary small">Không có hồ sơ bệnh án gần nhất.</div>
+                                    )}
                                 </div>
 
-                                <div className="mb-3">
-                                    <h6 className="fw-bold text-dark border-bottom pb-2" style={{ fontSize: "12px" }}>Ghi chú ca bệnh</h6>
-                                    <Form.Control
-                                        as="textarea"
-                                        rows={4}
-                                        className="bg-light border-0 small p-2"
-                                        placeholder="Nhập ghi chú chẩn đoán nhanh tại đây..."
-                                        style={{ fontSize: "12px", lineHeight: "1.5" }}
-                                    />
-                                </div>
-                                <Button size="sm" variant="success" className="w-100 fw-bold py-2 rounded-2 mt-2">
-                                    Lưu Bệnh Án
-                                </Button>
                             </div>
                         </Card>
                     </div>
