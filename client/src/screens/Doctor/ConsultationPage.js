@@ -10,22 +10,18 @@ import { ref, query as dbQuery, orderByChild, onValue, off } from 'firebase/data
 
 
 const ConsultationPage = () => {
-
     const [searchParams, setSearchParams] = useSearchParams();
-
     const [conversations, setConversations] = useState([]);
     const [allPatients, setAllPatients] = useState([]);
     const [activeChat, setActiveChat] = useState(null);
     const [messages, setMessages] = useState([]);
     const [loadingMessages, setLoadingMessages] = useState(false);
-
     const [inputText, setInputText] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
     const [showRightCol, setShowRightCol] = useState(true);
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
     const [latestMedicalRecord, setLatestMedicalRecord] = useState(null);
     const [medicalRecordLoading, setMedicalRecordLoading] = useState(false);
-
     const chatBodyRef = useRef(null);
     const unsubscribeRef = useRef(null);
     const debounceTimerRef = useRef(null);
@@ -60,9 +56,6 @@ const ConsultationPage = () => {
                     };
                 });
                 setConversations(mappedConversations);
-
-
-
             } catch (err) {
                 console.error("Lỗi lấy dữ liệu khởi tạo từ Server:", err);
             }
@@ -117,7 +110,6 @@ const ConsultationPage = () => {
         if (debounceTimerRef.current) {
             clearTimeout(debounceTimerRef.current);
         }
-
         debounceTimerRef.current = setTimeout(() => {
             setDebouncedSearchTerm(searchTerm);
         }, 300);
@@ -132,7 +124,6 @@ const ConsultationPage = () => {
 
     const loadRecentMedicalRecordByPatientId = async (patientId) => {
         if (!patientId) return null;
-
         try {
             const res = await authApis().get(CLINIC_ENDPOINTS.MEDICAL_RECORD_BY_PATIENT_ID(patientId));
             const records = Array.isArray(res.data) ? res.data : [];
@@ -347,12 +338,9 @@ const ConsultationPage = () => {
     return (
         <div className="d-flex flex-column bg-light" style={{ height: "100vh", overflow: "hidden" }}>
             <Header />
-
             <div className="flex-grow-1 d-flex p-3 gap-3" style={{ overflow: "hidden" }}>
-
                 <div style={{ width: "320px", minWidth: "320px" }} className="d-flex flex-column h-100">
                     <Card className="h-100 border-0 shadow-sm rounded-3 overflow-hidden d-flex flex-column bg-white">
-
                         <div className="p-3 border-bottom bg-white position-relative">
                             <InputGroup size="sm" className="bg-light rounded-pill border-0 overflow-hidden px-2">
                                 <InputGroup.Text className="bg-transparent border-0 text-muted">
@@ -367,7 +355,6 @@ const ConsultationPage = () => {
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
                             </InputGroup>
-
                             {debouncedSearchTerm.trim() && getFilteredResults().length > 0 && (
                                 <div className="position-absolute start-0 end-0 top-100 mt-2 bg-white border rounded-2 shadow-lg" style={{ zIndex: 1000, maxHeight: "300px", overflow: "auto", left: "12px", right: "12px" }}>
                                     <ListGroup variant="flush">
@@ -384,7 +371,6 @@ const ConsultationPage = () => {
                                                 </div>
                                                 <div className="ms-3 text-start overflow-hidden flex-grow-1">
                                                     <div className="fw-bold text-dark small text-truncate">{patient.patient_name}</div>
-
                                                 </div>
                                             </ListGroup.Item>
                                         ))}
@@ -392,7 +378,6 @@ const ConsultationPage = () => {
                                 </div>
                             )}
                         </div>
-
                         <ListGroup variant="flush" className="overflow-y-auto flex-grow-1">
                             {conversations.length > 0 ? (
                                 conversations.map((c, index) => {
@@ -429,9 +414,7 @@ const ConsultationPage = () => {
 
                 <div className="flex-grow-1 d-flex flex-column h-100">
                     {activeChat ? (
-
                         <Card className="h-100 border-0 shadow-sm rounded-3 overflow-hidden d-flex flex-column bg-white position-relative">
-
                             <div className="p-3 border-bottom bg-white d-flex align-items-center justify-content-between" style={{ height: "60px" }}>
                                 <div className="d-flex align-items-center overflow-hidden">
                                     <div className="position-relative">

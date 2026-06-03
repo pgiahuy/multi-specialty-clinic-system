@@ -8,7 +8,6 @@ import FloatAlert from "../../components/FloatAlert";
 const CreateMedicalRecord = () => {
     const navigate = useNavigate();
     const alertTimerRef = useRef(null);
-
     const [searchParams] = useSearchParams();
     const [loading, setLoading] = useState(false);
     const [appointment, setAppointment] = useState(null);

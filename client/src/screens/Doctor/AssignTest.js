@@ -43,7 +43,6 @@ const AssignTest = () => {
                 page: 1,
                 pageSize: 10000
             };
-
             const response = await authApis().get(endpoint['lab-test'], { params });
             const tests = response.data.tests || response.data;
             setAllLabTests(tests);
@@ -338,8 +337,6 @@ const AssignTest = () => {
                             {isSaving ? 'Đang chỉ định...' : 'Xác nhận'}
                         </Button>
                     </div>
-
-
                 </div>
             </Container>
 

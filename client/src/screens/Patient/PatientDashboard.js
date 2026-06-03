@@ -7,20 +7,15 @@ import Footer from "../../components/Footer";
 
 const PatientDashboard = () => {
 
-
     return (
         <>
             <div className="d-flex flex-column min-vh-100 bg-light">
                 <Header />
                 <Container>
                     <ControlCard />
-                    
                 </Container>
-                
                 <Footer />
             </div>
-
-
         </>
     );
 };

@@ -15,8 +15,6 @@ const ReceptionAppointments = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const timeRef = useRef(null);
     const nav = useNavigate();
-    
-
     const getStatusLabel = (status) => {
         const statusMap = {
             'UN_PAID': 'Chưa thanh toán',
@@ -93,7 +91,6 @@ const ReceptionAppointments = () => {
                         </Button>
                     </div>
                 </div>
-
                 <Row className="mb-4 g-3 bg-light p-3 pt-0 mt-1 rounded shadow-sm mx-auto" style={{ width: '70%' }}>
                     <Col md={5} sm={12}>
                         <Form.Group controlId="filterKw">
@@ -106,7 +103,6 @@ const ReceptionAppointments = () => {
                             />
                         </Form.Group>
                     </Col>
-
                     <Col md={2} sm={6}>
                         <Form.Group controlId="filterDate">
                             <Form.Label className="fw-semibold small text-secondary">Chọn ngày hẹn</Form.Label>
