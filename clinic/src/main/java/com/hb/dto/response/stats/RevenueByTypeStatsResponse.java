@@ -10,46 +10,31 @@ import java.math.BigDecimal;
  *
  * @author HUY
  */
-public class RevenueStatsResponse {
-    private int month;
+public class RevenueByTypeStatsResponse {
+    private String type;
     private BigDecimal amount;
 
-    public RevenueStatsResponse() {
+    public RevenueByTypeStatsResponse() {
     }
 
-    public RevenueStatsResponse(int month, BigDecimal amount) {
-        this.month = month;
+    public RevenueByTypeStatsResponse(String type, BigDecimal amount) {
+        this.type = type;
         this.amount = amount;
     }
 
-    /**
-     * @return the month
-     */
-    public int getMonth() {
-        return month;
+    public String getType() {
+        return type;
     }
 
-    /**
-     * @param month the month to set
-     */
-    public void setMonth(int month) {
-        this.month = month;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    /**
-     * @return the amount
-     */
     public BigDecimal getAmount() {
         return amount;
     }
 
-    /**
-     * @param amount the amount to set
-     */
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
-    
-    
-    
 }

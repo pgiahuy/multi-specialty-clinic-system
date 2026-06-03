@@ -1,11 +1,11 @@
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
 
-<head>
-    <title>Thống kê và Báo cáo</title>
+    <head>
+        <title>Thống kê và Báo cáo</title>
     <th:block th:replace="base :: css"></th:block>
     <th:block th:replace="base :: js"></th:block>
-    <script th:src="@{/js/admin-forms.js}"></script>
+    <!--    <script th:src="@{/js/admin-forms.js}"></script>-->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
@@ -20,102 +20,156 @@
         <div class="container bg-white p-4 rounded shadow-sm">
 
             <form th:action="@{/admin/stats/{type}(type=${#strings.toLowerCase(reportType)})}" method="get"
-                class="row g-3 mb-4 card p-3 bg-light">
-                <label class="form-label fw-bold text-secondary">Loại báo cáo:</label>
-                <div class="d-flex flex-row">
-                    <div class="col-md-3">
+                  class="row g-3 mb-4 card flex-row align-items-end p-3 bg-light shadow-sm mx-0">
 
-                        <select id="reportType" name="reportType" class="form-select bg-primary text-white fw-bold"
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Loại báo cáo:</label>
+                    <select id="reportType" name="reportType" class="form-select text-dark border-secondary"
                             onchange="changeReportUrl()">
-                            <option value="patient" th:selected="${reportType == 'PATIENT'}">Số lượng Bệnh nhân</option>
-                            <option value="service" th:selected="${reportType == 'SERVICE'}">Dịch vụ y tế sử dụng
-                            </option>
-                            <option value="disease" th:selected="${reportType == 'DISEASE'}">Tình hình bệnh phổ biến
-                            </option>
-                            <option value="revenue" th:selected="${reportType == 'REVENUE'}">Doanh thu phòng khám
+                        <option value="patient" th:selected="${reportType == 'PATIENT'}">Số lượng Bệnh nhân</option>
+                        <option value="service" th:selected="${reportType == 'SERVICE'}">Dịch vụ y tế sử dụng</option>
+                        <option value="disease" th:selected="${reportType == 'DISEASE'}">Tình hình bệnh phổ biến</option>
+                        <option value="revenue" th:selected="${reportType == 'REVENUE'}">Doanh thu phòng khám</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4 d-flex gap-2" th:if="${reportType == 'PATIENT'}">
+                    <div class="flex-fill">
+                        <label class="form-label fw-bold">Từ ngày:</label>
+                        <input type="date" name="fromDate" th:value="${fromDate}" class="form-control border-secondary">
+                    </div>
+                    <div class="flex-fill">
+                        <label class="form-label fw-bold">Đến ngày:</label>
+                        <input type="date" name="toDate" th:value="${toDate}" class="form-control border-secondary">
+                    </div>
+                </div>
+
+                <div class="col-md-3 d-flex gap-2" th:if="${reportType == 'REVENUE'}">
+                    <div class="flex-fill">
+                        <label class="form-label fw-bold">Năm:</label>
+                        <select id="year" name="yearValue" class="form-select border-secondary">
+                            <option th:each="y : ${#numbers.sequence(currentYear - 4, currentYear)}" 
+                                    th:value="${y}" th:text="${y}" 
+                                    th:selected="${y == selectedYear}">
                             </option>
                         </select>
                     </div>
-
-                    <div class="col-md-3" id="subReportGroup"
-                        th:style="${reportType == 'PATIENT' ? 'display:block' : 'display:none'}">
-                        <select id="subType" name="subType" class="form-select fw-bold border-danger">
-                            <option value="GENDER" th:selected="${subType == 'GENDER'}">Thống kê theo Giới tính</option>
-                            <option value="AGE" th:selected="${subType == 'AGE'}">Thống kê theo Nhóm tuổi</option>
-                            <option value="SPECIALTY" th:selected="${subType == 'SPECIALTY'}">Thống kê theo Chuyên khoa
+                    <div class="flex-fill">
+                        <label class="form-label fw-bold">Tháng:</label>
+                        <select id="month" name="month" class="form-select border-secondary">
+                            <option value="0" th:selected="${selectedMonth == 0}">Tất cả</option>
+                            <option th:each="m : ${#numbers.sequence(1, 12)}" 
+                                    th:value="${m}" th:text="${m}" 
+                                    th:selected="${m == selectedMonth}">
                             </option>
                         </select>
                     </div>
-
                 </div>
 
-                <div class="d-flex flex-row">
-                    <div class="col-md-2">
-                        <label class="form-label">Thời gian:</label>
-                        <select id="dateType" name="dateType" class="form-select" onchange="toggleDateInputs()">
-                            <option value="CUSTOM" th:selected="${dateType == 'CUSTOM'}">Khoảng ngày tự chọn</option>
-                            <option value="MONTH" th:selected="${dateType == 'MONTH'}">Xem theo Tháng</option>
-                            <option value="YEAR" th:selected="${dateType == 'YEAR'}">Xem theo Năm</option>
-                        </select>
-                    </div>
-
-                    <div class="col-md-2 date-group" id="fromDateGroup">
-                        <label class="form-label">Từ ngày:</label>
-                        <input type="date" name="fromDate" th:value="${fromDate}" class="form-control">
-                    </div>
-                    <div class="col-md-2 date-group" id="toDateGroup">
-                        <label class="form-label">Đến ngày:</label>
-                        <input type="date" name="toDate" th:value="${toDate}" class="form-control">
-                    </div>
-
-
+                <div class="col-md-2 ms-auto">
+                    <button type="submit" class="btn btn-success w-100 fw-bold">
+                        <i class="fas fa-filter"></i> Xem báo cáo
+                    </button>
                 </div>
-                <div class="col-md-2 d-flex align-items-end">
-                    <button type="submit" class="btn btn-success w-100 fw-bold">Xem báo cáo</button>
-                </div>
+
             </form>
             <hr class="my-4">
 
             <div class="report-content-section card p-3 bg-light">
 
                 <div th:if="${reportType == 'PATIENT'}" id="patientInPage">
-                    <h3 class="text-secondary mb-3"><i class="fas fa-users"></i> Báo cáo số lượng bệnh nhân</h3>
+                    <h3 class="text-secondary mb-3"><i class="fas fa-users text-primary text-center"></i>BÁO CÁO SỐ LƯỢNG BỆNH NHÂN</h3>
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="card p-3 mb-3">
-                                <h5 class="card-title">Phân bố giới tính</h5>
-                                <canvas id="genderPieChart"></canvas>
+                        <div class="col-md-6 mb-3">
+                            <div class="card p-3 h-100 shadow-sm">
+                                <h5 class="card-title text-center text-primary mb-4">Phân bố giới tính</h5>
+
+                                <div style="position: relative; height: 300px; width: 100%;">
+                                    <canvas id="genderPieChart"></canvas>
+                                </div>
+
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="card p-3 mb-3">
-                                <h5 class="card-title">Nhóm tuổi</h5>
-                                <canvas id="ageBarChart"></canvas>
+
+                        <div class="col-md-6 mb-3">
+                            <div class="card p-3 h-100 shadow-sm">
+                                <h5 class="card-title text-center text-primary mb-4">Nhóm tuổi</h5>
+
+                                <div style="position: relative; height: 300px; width: 100%;">
+                                    <canvas id="ageBarChart"></canvas>
+                                </div>
+
                             </div>
                         </div>
+
+                    </div>
+                </div>
+                <div th:if="${reportType == 'REVENUE'}" id="revenueInPage">
+                    <div class="row">
+                        <h4 class="text-primary text-center fw-bold">BÁO CÁO DOANH THU PHÒNG KHÁM</h4>
                         <div class="col-12">
-                            <div class="card p-3 mb-3">
-                                <h5 class="card-title">Chuyên khoa</h5>
-                                <canvas id="specialtyBarChart"></canvas>
+                            <div class="card p-4 mb-4 shadow-sm">
+                                <h5 class="card-title text-center text-primary mb-4">Biểu đồ doanh thu theo từng tháng
+                                </h5>
+                                <div style="position: relative; max-height: 400px; width: 100%;">
+                                    <canvas id="revenueChart" height="100"></canvas>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <div class="d-flex justify-content-start gap-4">
+                                <div><strong>Năm:</strong> <span th:text="${selectedYear}">2026</span></div>
+                                <div><strong>Tháng:</strong> <span
+                                        th:text="${selectedMonth == 0 ? 'Tất cả' : selectedMonth}">Tất cả</span></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card p-4 mb-4 shadow-sm">
+                                <h5 class="card-title text-center text-primary mb-4">Biểu đồ doanh thu theo khoa</h5>
+
+                                <canvas id="revenueSpecialtyChart" height="100"></canvas>
+
+
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card p-4 mb-4 shadow-sm">
+                                <h5 class="card-title text-center text-primary mb-4">Biểu đồ doanh thu hóa đơn</h5>
+                                <canvas id="revenueInvoiceChart" height="100"></canvas>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div th:if="${reportType == 'SERVICE'}" id="serviceInPage">
-                    <h3 class="text-secondary mb-3"><i class="fas fa-stethoscope"></i> Thống kê dịch vụ y tế sử dụng
+                    <h3 class="text-secondary mb-3 text-primary text-center">BÁO CÁO SỐ LƯỢNG DỊCH VỤ Y TẾ ĐƯỢC SỬ DỤNG
                     </h3>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card p-3 mb-3">
+
+                                <div style="position: relative; height: 400px; width: 100%;">
+                                    <canvas id="serviceUsageChart" height="100"></canvas>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div th:if="${reportType == 'DISEASE'}" id="diseaseInPage">
-                    <h3 class="text-secondary mb-3"><i class="fas fa-procedures"></i> Tình hình bệnh phổ biến trong cộng
-                        đồng</h3>
+                    <h3 class="text-primary text-center mb-3">BÁO CÁO TÌNH HÌNH BỆNH PHỔ BIẾN</h3>
+                    <div class="col-12">
+                        <div class="card p-3 mb-3">
+                            <div style="position: relative; width: 100%; height: 440px;">
+                                <canvas id="specialtyBarChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div th:if="${reportType == 'REVENUE'}" id="revenueInPage">
-                    <h3 class="text-secondary mb-3"><i class="fas fa-wallet"></i> Báo cáo doanh thu tổng hợp và chi tiết
-                    </h3>
-                </div>
+
 
             </div>
         </div>
@@ -133,69 +187,301 @@
     <script th:inline="javascript">
         /*<![CDATA[*/
         // Prepare data arrays from server-side model (Thymeleaf inlining)
-        var genderLabels = /*[[${genderStats.*.gender}]]*/[];
-        var genderValues = /*[[${genderStats.*.count}]]*/[];
+        var rawGenderData = /*[[${genderStats}]]*/[];
+        var rawAgeData = /*[[${ageStats}]]*/[];
+        var rawSpecialtyData = /*[[${specialtyStats}]]*/[];
+        var rawRevenueData = /*[[${revenueStats}]]*/[];
+        var rawRevenueBySpecialtyData = /*[[${revenueBySpecialty}]]*/[];
+        var rawRevenueByTypeData = /*[[${revenueByType}]]*/ [];
+        var rawServiceData = /*[[${serviceStats}]]*/[];
         /*]]>*/
+
+        console.log(rawGenderData);
+        console.log(rawAgeData);
+        console.log(rawSpecialtyData);
+        console.log(rawRevenueBySpecialtyData);
+        console.log(rawRevenueByTypeData);
 
         function changeReportUrl() {
             var report = document.getElementById("reportType").value;
-            window.location.href = "/admin/stats/" + report;
+            window.location.href = "/clinic/admin/stats/" + report;
         }
 
-        function toggleDateInputs() {
-            var dateType = document.getElementById("dateType").value;
 
-            document.getElementById("fromDateGroup").style.display = "none";
-            document.getElementById("toDateGroup").style.display = "none";
-            document.getElementById("monthGroup").style.display = "none";
-            document.getElementById("yearGroup").style.display = "none";
-
-            if (dateType === "CUSTOM") {
-                document.getElementById("fromDateGroup").style.display = "block";
-                document.getElementById("toDateGroup").style.display = "block";
-            } else if (dateType === "MONTH") {
-                document.getElementById("monthGroup").style.display = "block";
-            } else if (dateType === "YEAR") {
-                document.getElementById("yearGroup").style.display = "block";
-            }
-        }
-
-        document.addEventListener("DOMContentLoaded", toggleDateInputs);
 
         document.addEventListener("DOMContentLoaded", function () {
             if (document.getElementById('genderPieChart')) {
-                var ctx = document.getElementById('genderPieChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'pie',
-                    data: {
-                        labels: genderLabels,
-                        datasets: [{
-                            data: genderValues,
-                            backgroundColor: ['#36A2EB', '#FF6384', '#FFCE56', '#4BC0C0']
-                        }]
-                    }
-                });
+                var genderLabels = [];
+                var genderValues = [];
+                var genderColors = ['#36A2EB', '#FF6384', '#FFCE56', '#4BC0C0'];
+                if (typeof rawGenderData !== 'undefined' && rawGenderData.length > 0) {
+                    rawGenderData.forEach(function (item) {
+                        if (item) {
+                            genderLabels.push(item.gender);
+                            genderValues.push(item.count || 0);
+                        }
+                    });
+                }
+                if (genderLabels.length > 0) {
+                    var ctx = document.getElementById('genderPieChart').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: genderLabels,
+                            datasets: [{
+                                    data: genderValues,
+                                    backgroundColor: genderColors
+                                }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {position: 'bottom'}
+                            }
+                        }
+                    });
+                }
             }
 
             if (document.getElementById('ageBarChart')) {
+                var ageLabels = [];
+                var ageValues = [];
+                if (typeof rawAgeData !== 'undefined' && rawAgeData.length > 0) {
+                    rawAgeData.forEach(function (item) {
+                        if (item) {
+                            ageLabels.push(item.ageGroup);
+                            ageValues.push(item.count || 0);
+                        }
+                    });
+                }
                 var ctx2 = document.getElementById('ageBarChart').getContext('2d');
                 new Chart(ctx2, {
                     type: 'bar',
                     data: {
-                        labels: [],
-                        datasets: [{ label: 'Số lượng', data: [], backgroundColor: '#6c757d' }]
+                        labels: ageLabels,
+                        datasets: [{label: 'Số lượng', data: ageValues, backgroundColor: '#6c757d'}]
                     },
-                    options: { scales: { y: { beginAtZero: true } } }
+                    options: {scales: {y: {beginAtZero: true}}}
                 });
             }
 
             if (document.getElementById('specialtyBarChart')) {
+                var specialtyLabels = [];
+                var specialtyValues = [];
+                if (typeof rawSpecialtyData !== 'undefined' && rawSpecialtyData.length > 0) {
+                    rawSpecialtyData.forEach(function (item) {
+                        if (item) {
+                            specialtyLabels.push(item.specialtyName);
+                            specialtyValues.push(item.count || 0);
+                        }
+                    });
+                }
                 var ctx3 = document.getElementById('specialtyBarChart').getContext('2d');
                 new Chart(ctx3, {
                     type: 'bar',
-                    data: { labels: [], datasets: [{ label: 'Số lượng', data: [], backgroundColor: '#198754' }] },
-                    options: { indexAxis: 'y', scales: { x: { beginAtZero: true } } }
+                    data: {labels: specialtyLabels, datasets: [{label: 'Số lượng', data: specialtyValues, backgroundColor: '#198754'}]},
+                    options: {indexAxis: 'y', scales: {x: {beginAtZero: true}}}
                 });
+            }
+            if (document.getElementById('revenueChart')) {
+                var months = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
+                var revenueValues = new Array(12).fill(0)
+
+                if (typeof rawRevenueData !== 'undefined' && rawRevenueData.length > 0) {
+                    rawRevenueData.forEach(function (item) {
+                        var monthIndex = item.month - 1;
+                        var revenue = item.amount;
+                        revenueValues[monthIndex] = revenue;
+
+                    });
+                }
+
+                var ctx = document.getElementById('revenueChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: months,
+                        datasets: [{
+                                label: 'Doanh thu (VNĐ)',
+                                data: revenueValues,
+                                backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                borderWidth: 1,
+                                borderRadius: 4
+                            }]
+                    },
+                    options: {
+                        responsive: true,
+
+                        plugins: {
+                            legend: {display: false},
+                            tooltip: {
+                                callbacks: {
+
+                                    label: function (context) {
+                                        var value = context.raw;
+                                        return value.toLocaleString('vi-VN') + ' VNĐ';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+
+                                    callback: function (value) {
+                                        if (value >= 1000000)
+                                            return (value / 1000000) + ' triệu';
+                                        if (value >= 1000)
+                                            return (value / 1000) + ' nghìn';
+                                        return value;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            if (document.getElementById('revenueSpecialtyChart')) {
+                var specialtyLabels = [];
+                var specialtyValues = [];
+                var specialtyColors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#C9CBCF'];
+
+                if (typeof rawRevenueBySpecialtyData !== 'undefined' && rawRevenueBySpecialtyData.length > 0) {
+                    rawRevenueBySpecialtyData.forEach(function (item) {
+                        if (item) {
+                            specialtyLabels.push(item.specialty);
+                            specialtyValues.push(item.amount || 0);
+                        }
+                    });
+                }
+
+                if (specialtyLabels.length > 0) {
+                    var ctx4 = document.getElementById('revenueSpecialtyChart').getContext('2d');
+                    new Chart(ctx4, {
+                        type: 'pie',
+                        data: {
+                            labels: specialtyLabels,
+                            datasets: [{
+                                    data: specialtyValues,
+                                    backgroundColor: specialtyColors,
+                                    borderColor: '#fff',
+                                    borderWidth: 1
+                                }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {position: 'bottom'},
+                                tooltip: {
+                                    callbacks: {
+                                        label: function (context) {
+                                            var label = context.label || '';
+                                            var value = context.parsed || 0;
+                                            return label + ': ' + value.toLocaleString('vi-VN') + ' VNĐ';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+            if (document.getElementById('serviceUsageChart')) {
+                var serviceLabels = [];
+                var serviceValues = [];
+                var serviceColors = ['#36A2EB', '#FF6384', '#4BC0C0', '#FFCE56'];
+
+                if (typeof rawServiceData !== 'undefined' && rawServiceData.length > 0) {
+                    rawServiceData.forEach(function (item) {
+                        if (item) {
+                            serviceLabels.push(item.serviceName);
+                            serviceValues.push(item.usageCount || 0);
+                        }
+                    });
+                }
+
+                var ctxService = document.getElementById('serviceUsageChart').getContext('2d');
+                new Chart(ctxService, {
+                    type: 'bar',
+                    data: {
+                        labels: serviceLabels,
+                        datasets: [{
+                                label: 'Số lượt sử dụng',
+                                data: serviceValues,
+                                backgroundColor: serviceColors,
+                                borderColor: serviceColors,
+                                borderWidth: 1
+                            }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    precision: 0
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            if (document.getElementById('revenueInvoiceChart')) {
+                var typeLabels = [];
+                var typeValues = [];
+                var typeColors = ['#4BC0C0', '#FF6384', '#36A2EB', '#FFCE56', '#9966FF', '#FF9F40'];
+
+                if (typeof rawRevenueByTypeData !== 'undefined' && rawRevenueByTypeData.length > 0) {
+                    rawRevenueByTypeData.forEach(function (item) {
+                        if (item) {
+                            typeLabels.push(item.type);
+                            typeValues.push(item.amount || 0);
+                        }
+                    });
+                }
+
+                if (typeLabels.length > 0) {
+                    var ctx5 = document.getElementById('revenueInvoiceChart').getContext('2d');
+                    new Chart(ctx5, {
+                        type: 'pie',
+                        data: {
+                            labels: typeLabels,
+                            datasets: [{
+                                    data: typeValues,
+                                    backgroundColor: typeColors,
+                                    borderColor: '#fff',
+                                    borderWidth: 1
+                                }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {position: 'bottom'},
+                                tooltip: {
+                                    callbacks: {
+                                        label: function (context) {
+                                            var label = context.label || '';
+                                            var value = context.parsed || 0;
+                                            return label + ': ' + value.toLocaleString('vi-VN') + ' VNĐ';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
             }
         });
     </script>

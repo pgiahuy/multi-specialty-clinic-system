@@ -260,6 +260,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         if (appointment == null) {
             throw new ResourceNotFoundException("Không tìm thấy lịch hẹn");
         }
+        
         appointment.setStatus(status);
         appointmentRepo.addOrUpdateAppointment(appointment);
     }
