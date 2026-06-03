@@ -125,7 +125,7 @@ const ReceptionPrescriptionDetail = () => {
             <Container className="py-4" style={{ maxWidth: "900px" }}>
                 <div className="mb-4">
                     <Button variant="outline-secondary" size="sm" onClick={() => nav("/reception/prescriptions")}>
-                        ← Quay lại
+                        Quay lại
                     </Button>
                 </div>
 
@@ -235,14 +235,14 @@ const ReceptionPrescriptionDetail = () => {
                                 {isPaid && !isDispensed && (
                                     <div className="d-flex gap-2">
                                         <Button variant="success" size="lg" onClick={() => setShowDispenseModal(true)}>
-                                            📦 Xuất thuốc
+                                            Xuất thuốc
                                         </Button>
                                     </div>
                                 )}
 
                                 {isDispensed && (
                                     <div className="alert alert-success">
-                                        ✓ Đã xuất thuốc vào lúc: {moment(prescription.dispensedAt).format("DD/MM/YYYY HH:mm:ss")}
+                                        Đã xuất thuốc vào lúc: {moment(prescription.dispensedAt).format("DD/MM/YYYY HH:mm:ss")}
                                     </div>
                                 )}
                             </>
