@@ -154,9 +154,11 @@ const Prescriptions = () => {
                                                                 Bác sĩ: <span className="fw-semibold">{prescription.doctorName || 'Chưa xác định'}</span>
                                                             </div>
                                                         </div>
-                                                        <Badge bg={prescription.status === 'PUBLIC' ? 'success' : 'secondary'} className="text-uppercase p-2">
-                                                            {prescription.status === 'PUBLIC' ? 'Đã kê đơn' : ''}
-                                                        </Badge>
+                                                        <div>
+                                                            <Badge bg={prescription.status === 'DISPENSED' ? 'info' : prescription.status === 'PUBLIC' ? 'success' : 'secondary'} className="text-uppercase p-2">
+                                                                {prescription.status === 'DISPENSED' ? 'Đã xuất' : prescription.status === 'PUBLIC' ? 'Đã kê đơn' : prescription.status}
+                                                            </Badge>
+                                                        </div>
                                                     </div>
                                                     <div className="small text-muted mt-1">
                                                         Ngày kê đơn: {prescription.publicAt ? moment(prescription.publicAt).format('DD/MM/YYYY') : 'Chưa xác định'}
@@ -172,23 +174,32 @@ const Prescriptions = () => {
                     </Col>
 
                     <Col lg={9}>
-                        {payment && payment.status === "SUCCESS" ? (
-                            <Card className="h-100 shadow-sm" style={styles.detailPanel}>
-                                <Card.Body>
-                                    <PrescriptionDetail prescription={selectedPrescription} error={error} />
-                                </Card.Body>
-                            </Card>
-                        ) : (<>
+                        {prescriptions.length === 0 ? (
+                            <div className="p-4 text-center text-muted">
+                                {loading ? "Đang tải đơn thuốc..." : "Không có đơn thuốc nào."}
+                            </div>
+                        ) : selectedPrescription ? (
+                            (selectedPrescription.status === "DISPENSED" || (payment && payment.status === "SUCCESS")) ? (
+                                <Card className="h-100 shadow-sm" style={styles.detailPanel}>
+                                    <Card.Body>
+                                        <PrescriptionDetail prescription={selectedPrescription} error={error} />
+                                    </Card.Body>
+                                </Card>
+                            ) : (
                                 <div className="alert alert-info d-flex justify-content-between align-items-center">
-                                <div>Đơn thuốc chưa được thanh toán, vui lòng thanh toán để xem chi tiết</div>
-                                <Button variant="primary"
-                                    className="rounded-pill px-4 py-2"
-                                    onClick={() => navigate('/patient/payments/')}
-                                >
-                                    Thanh toán ngay
-                                </Button>
-                            </div> 
-                        </>
+                                    <div>Đơn thuốc chưa được thanh toán, vui lòng thanh toán để xem chi tiết</div>
+                                    <Button variant="primary"
+                                        className="rounded-pill px-4 py-2"
+                                        onClick={() => navigate('/patient/payments/')}
+                                    >
+                                        Thanh toán ngay
+                                    </Button>
+                                </div>
+                            )
+                        ) : (
+                            <div className="p-4 text-center text-muted">
+                                Chọn đơn thuốc để xem chi tiết
+                            </div>
                         )}
                     </Col>
                 </Row>

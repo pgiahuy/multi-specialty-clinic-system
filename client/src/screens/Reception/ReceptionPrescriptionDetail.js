@@ -79,7 +79,7 @@ const ReceptionPrescriptionDetail = () => {
     };
 
     const isPaid = payment && payment.status === "SUCCESS";
-    const isDispensed = prescription && prescription.dispensedAt;
+    const isDispensed = prescription && prescription.status === "DISPENSED";
 
     if (loading) {
         return (
@@ -134,19 +134,16 @@ const ReceptionPrescriptionDetail = () => {
                         <div className="d-flex justify-content-between align-items-center">
                             <h4 className="mb-0">Đơn thuốc #{prescription.id}</h4>
                             <div className="d-flex gap-2">
-                                <Badge bg={prescription.status === "PUBLIC" ? "success" : "secondary"}>
-                                    {prescription.status === "PUBLIC" ? "Đã kê đơn" : "Chưa kê"}
+                                <Badge bg={prescription.status === "DISPENSED" ? "info" : prescription.status === "PUBLIC" ? "success" : "secondary"}>
+                                    {prescription.status === "DISPENSED" ? "Đã xuất" : prescription.status === "PUBLIC" ? "Đã kê đơn" : prescription.status}
                                 </Badge>
-                                {isDispensed && (
-                                    <Badge bg="info">Đã xuất thuốc</Badge>
-                                )}
                             </div>
                         </div>
                     </Card.Header>
                     <Card.Body>
                         {!isPaid && !isDispensed && (
                             <div className="alert alert-warning mb-4">
-                                <strong>Chưa thanh toán:</strong> Bệnh nhân cần thanh toán hoặc nhân viên nhận tiền mặt trước khi xuất thuốc.
+                                <strong>Chưa thanh toán:</strong> Cần thanh toán để xem đơn thuốc.
                                 {payment && (
                                     <>
                                         <Button
@@ -185,7 +182,7 @@ const ReceptionPrescriptionDetail = () => {
                             </div>
                         </div>
 
-                        <div className="row g-3 mb-4">
+                        <div className="row g-3" style={{ marginBottom: "40px" }}>
                             <div className="col-md-6">
                                 <div className="text-secondary small mb-2">Chuẩn đoán</div>
                                 <div className="border rounded-3 p-3 bg-white h-100">{prescription.diagnosis || "Không có"}</div>
@@ -198,7 +195,7 @@ const ReceptionPrescriptionDetail = () => {
 
                         {isPaid || isDispensed ? (
                             <>
-                                <h5 className="mb-3">Danh sách thuốc</h5>
+                                <h5 className="mb-3 ">Danh sách thuốc</h5>
                                 <div className="table-responsive mb-6">
                                     <Table hover className="table">
                                         <thead className="table-light">
@@ -242,7 +239,7 @@ const ReceptionPrescriptionDetail = () => {
 
                                 {isDispensed && (
                                     <div className="alert alert-success">
-                                        Đã xuất thuốc vào lúc: {moment(prescription.dispensedAt).format("DD/MM/YYYY HH:mm:ss")}
+                                        <strong>Trạng thái:</strong> Đã xuất thuốc vào lúc: {moment(prescription.dispensedAt).format("DD/MM/YYYY HH:mm:ss")}
                                     </div>
                                 )}
                             </>
