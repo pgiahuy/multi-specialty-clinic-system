@@ -84,6 +84,10 @@ const Login = () => {
                         nav('/doctor/dashboard');
                     } else if (role === 'ROLE_PATIENT') {
                         nav('/patient/dashboard');
+                    } else if (role === 'ROLE_STAFF') {
+                        nav('/reception');
+                    } else if (role === 'ROLE_STOREKEEPER') {
+                        nav('/storekeeper');
                     }
                 }, 500);
 

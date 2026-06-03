@@ -1,12 +1,10 @@
 import { Fragment, useContext, useEffect, useState } from "react";
-import { APPOINTMENT_ENDPOINTS, authApis, CLINIC_ENDPOINTS, endpoint, USER_ENDPOINTS, TEST_ENDPOINTS } from "../../configs/Apis";
-import { exp } from "firebase/firestore/pipelines";
+import { authApis, USER_ENDPOINTS, TEST_ENDPOINTS } from "../../configs/Apis";
 import { MyUserContext } from "../../configs/Contexts";
-import { Card, Col, Container, Form, Row, Table, Modal, Button, Tabs, Tab, Pagination, Badge } from "react-bootstrap";
+import { Card, Col, Container, Form, Row, Button, Tabs, Tab, Pagination, Badge } from "react-bootstrap";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import MySpinner from "../../components/MySpinner";
-import TestResultDetailModal from "./TestResultDetail";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 const getInitialFromDate = () => {
@@ -255,22 +253,22 @@ const TestResults = () => {
                                                             </h5>
                                                         </div>
                                                         <Row className="mb-3 g-2 p-3 rounded-3">
-                                                            
+
                                                             <Col md={6}>
-                                                                    <small className="text-muted">Bác sĩ chỉ định</small>
-                                                                    <div className="fw-semibold text-dark">{labResult.doctorName || 'N/A'}</div>
+                                                                <small className="text-muted">Bác sĩ chỉ định</small>
+                                                                <div className="fw-semibold text-dark">{labResult.doctorName || 'N/A'}</div>
                                                             </Col>
                                                             <Col md={6} className="px-1">
-                                                                    <small className="text-muted">Ngày chỉ định</small>
-                                                                    <div className="fw-semibold text-dark">{labResult.createdAt || '-'}</div>                                                               
+                                                                <small className="text-muted">Ngày chỉ định</small>
+                                                                <div className="fw-semibold text-dark">{labResult.createdAt || '-'}</div>
                                                             </Col>
-                                                            
+
                                                             <Col md={6}>
-                                                                 <small className="text-muted">Người thực hiện</small>
+                                                                <small className="text-muted">Người thực hiện</small>
                                                                 <div className="fw-semibold text-dark">{labResult.doctorTestName || '-'}</div>
                                                             </Col>
                                                             <Col md={6}>
-                                                                 <small className="text-muted">Ngày xét nghiệm</small>
+                                                                <small className="text-muted">Ngày xét nghiệm</small>
                                                                 <div className="fw-semibold text-dark">{labResult.testAt || '-'}</div>
                                                             </Col>
                                                         </Row>

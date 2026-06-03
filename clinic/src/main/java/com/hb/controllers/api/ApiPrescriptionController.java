@@ -100,4 +100,11 @@ public class ApiPrescriptionController {
         Prescription prescription = this.prescriptionService.getPrescriptionById(id);
         return ResponseEntity.ok().body(PrescriptionMapper.INSTANCE.toResponse(prescription));
     }
+
+    @PostMapping("prescriptions/{id}/dispense")
+    @PreAuthorize("hasRole('STAFF')")
+    public ResponseEntity<PrescriptionResponse> dispense(@PathVariable("id") Long id, Principal principal){
+        Prescription prescription = this.prescriptionService.dispensePrescription(id, principal.getName());
+        return ResponseEntity.ok().body(PrescriptionMapper.INSTANCE.toResponse(prescription));
+    }
 }

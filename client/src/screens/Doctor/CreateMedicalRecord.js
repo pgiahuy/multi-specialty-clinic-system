@@ -79,7 +79,7 @@ const CreateMedicalRecord = () => {
 
                 handleShowAlert('Thành công', 'Tạo bệnh án thành công!', 'success');
                 alertTimerRef.current = setTimeout(() => {
-                    navigate(`/doctor/appointments/${appointmentId}/medical-record`);
+                    navigate(`/appointments/${appointmentId}/medical-record`);
                 }, 1800);
             } else {
                 handleShowAlert('Lỗi', 'Tạo bệnh án thất bại. Vui lòng thử lại!', 'danger');

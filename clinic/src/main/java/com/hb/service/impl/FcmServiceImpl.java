@@ -8,7 +8,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
-import com.hb.pojo.ChatMessage;
+import com.hb.dto.response.ChatMessageResponse;
 import com.hb.service.FcmService;
 import java.time.ZoneId;
 import java.util.HashMap;
@@ -56,7 +56,7 @@ public class FcmServiceImpl implements FcmService {
 
     @Async("taskExecutor")
     @Override
-    public void sendChatMessageToUserDevice(String token, ChatMessage message) {
+    public void sendChatMessageToUserDevice(String token, ChatMessageResponse message) {
         try {
 
             if (token == null || token.isEmpty()) {
@@ -64,16 +64,16 @@ public class FcmServiceImpl implements FcmService {
             }
             Map<String, String> dataPayload = new HashMap<>();
             dataPayload.put("type", "CHAT");
-            dataPayload.put("message_id", String.valueOf(message.getId()));
-            dataPayload.put("conversation_id", String.valueOf(message.getConversationId().getId()));
-            dataPayload.put("sender_id", String.valueOf(message.getSenderId().getId()));
+            dataPayload.put("message_id", message.getId() != null ? String.valueOf(message.getId()) : null);
+            dataPayload.put("conversation_id", message.getConversationId() != null ? String.valueOf(message.getConversationId()) : null);
+            dataPayload.put("sender_id", message.getSenderId() != null ? String.valueOf(message.getSenderId()) : null);
             dataPayload.put("sender_type", message.getSenderType());
             dataPayload.put("message_type", message.getMessageType());
             dataPayload.put("content", message.getContent());
-            dataPayload.put("created_at", String.valueOf(message.getCreatedAt()
+            dataPayload.put("created_at", message.getCreatedAt() != null ? String.valueOf(message.getCreatedAt()
                     .atZone(ZoneId.systemDefault())
                     .toInstant()
-                    .toEpochMilli()));
+                    .toEpochMilli()) : null);
 
             Message fcmMessage = Message.builder()
                     .setToken(token)

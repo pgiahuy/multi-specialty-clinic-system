@@ -4,7 +4,7 @@
  */
 package com.hb.service;
 
-import com.hb.pojo.ChatMessage;
+import com.hb.dto.response.ChatMessageResponse;
 
 /**
  *
@@ -12,5 +12,5 @@ import com.hb.pojo.ChatMessage;
  */
 public interface FcmService {
     void sendPushNotification(String token, String notiId, String title, String content, String path);
-    void sendChatMessageToUserDevice(String token, ChatMessage message);
+    void sendChatMessageToUserDevice(String token, ChatMessageResponse message);
 }

@@ -2,9 +2,9 @@ import { Container, Row, Col, Card, Modal, Button } from "react-bootstrap";
 import Header from "../../components/Header";
 import LoginRequiredModal from "../../components/LoginRequiredModal";
 import { useContext, useEffect, useRef, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { authApis, CLINIC_ENDPOINTS, USER_ENDPOINTS } from "../../configs/Apis";
 import MySpinner from "../../components/MySpinner";
-import { useNavigate } from "react-router-dom";
 import Footer from "../../components/Footer";
 import { MyUserContext } from "../../configs/Contexts";
 import FloatAlert from "../../components/FloatAlert";
@@ -48,6 +48,8 @@ const BookingPage = () => {
     const alertTimerRef = useRef(null);
 
     const nav = useNavigate();
+    const [searchParams] = useSearchParams();
+    const [conversationId, setConversationId] = useState(null);
 
     const loadPatientProfiles = async () => {
         try {
@@ -228,10 +230,14 @@ const BookingPage = () => {
 
         try {
             setLoading(true);
-            await authApis().post(CLINIC_ENDPOINTS.PATIENT_BOOKING_APPOINTMENT, {
+            const payload = {
                 patientId: selectedPatient,
                 scheduleId: selectedSchedule.id,
-            });
+            };
+
+            if (conversationId) payload.conversationId = conversationId;
+
+            await authApis().post(CLINIC_ENDPOINTS.PATIENT_BOOKING_APPOINTMENT, payload);
 
             setShowModal(true);
             handleShowAlert(
@@ -275,7 +281,17 @@ const BookingPage = () => {
     useEffect(() => {
         loadPatientProfiles();
         loadSpecialties();
-    }, []);
+
+        const doctorIdParam = searchParams.get("doctorId");
+        if (doctorIdParam) {
+            setSelectedDoctor(doctorIdParam);
+        }
+        const convParam = searchParams.get("conversationId");
+        if (convParam) setConversationId(convParam);
+
+        const patientIdParam = searchParams.get("patientId");
+        if (patientIdParam) setSelectedPatient(patientIdParam);
+    }, [searchParams]);
 
     useEffect(() => {
         const timerId = setTimeout(() => {
