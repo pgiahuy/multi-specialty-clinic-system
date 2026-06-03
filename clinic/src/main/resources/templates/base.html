@@ -1,8 +1,8 @@
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 
-    <head>
-        <title>Admin</title>
+<head>
+    <title>Admin</title>
 
     <th:block th:fragment="js">
 
@@ -37,9 +37,11 @@
 
                 <div class="ms-auto me-3" sec:authorize="isAuthenticated()">
                     <span class="text-white me-3">Admin</span>
-                    <a class="btn btn-sm btn-danger" th:href="@{/logout}">
-                        <i class="bi bi-box-arrow-right me-2"></i>Logout
-                    </a>
+                    <form th:action="@{/logout}" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-sm btn-danger">
+                            <i class="bi bi-box-arrow-right me-2"></i>Logout
+                        </button>
+                    </form>
                 </div>
 
             </div>
@@ -103,7 +105,7 @@
             <li class="nav-item">
                 <a class="nav-link text-white" th:href="@{/admin/medicines}">Dược phẩm</a>
             </li>
-            
+
             <li class="nav-item">
                 <a class="nav-link text-white" th:href="@{/admin/medicine-batchs}">Lô hàng</a>
             </li>

@@ -11,6 +11,7 @@ import com.hb.dto.response.stats.RevenueBySpecialtyStatsResponse;
 import com.hb.dto.response.stats.RevenueByTypeStatsResponse;
 import com.hb.dto.response.stats.RevenueStatsResponse;
 import com.hb.dto.response.stats.ServiceUsageStatsResponse;
+import com.hb.dto.response.stats.MedicineInventoryStatsResponse;
 import com.hb.repository.StatsRepository;
 import com.hb.service.StatsService;
 import java.math.BigDecimal;
@@ -137,6 +138,18 @@ public class StatsServiceImpl implements StatsService {
                     }
                     return new ServiceUsageStatsResponse(typeLabel, (Long) obj[1]);
                 })
+                .toList();
+    }
+
+    @Override
+    public List<com.hb.dto.response.stats.MedicineInventoryStatsResponse> getMedicineInventoryStats(LocalDate fromDate, LocalDate toDate) {
+        List<Object[]> res = this.statsRepo.medicineInventoryStats(fromDate, toDate);
+        return res.stream()
+                .map(obj -> new com.hb.dto.response.stats.MedicineInventoryStatsResponse(
+                        String.valueOf(obj[0]),
+                obj[1] != null ? ((Number) obj[1]).longValue() : 0L,
+                obj[2] != null ? ((Number) obj[2]).longValue() : 0L
+                ))
                 .toList();
     }
 

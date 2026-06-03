@@ -26,7 +26,6 @@ public class InventoryLogRepositoryImpl implements InventoryLogRepository{
     private LocalSessionFactoryBean factory;
 
     
-
     @Override
     public void createInventoryLog(InventoryLog log) {
         Session session = this.factory.getObject().getCurrentSession();

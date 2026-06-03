@@ -21,6 +21,8 @@ public interface AppointmentService {
     Appointment getAppointmentById(Long id);
     AppointmentResponse registerAppointment(AppointmentCreateRequest req);
     long countAppointments(Map<String,String> params);
+    java.util.List<com.hb.dto.response.DoctorRankingResponse> getTopDoctorsByAppointmentCount(int limit, String month);
+    java.util.List<com.hb.dto.response.DoctorRankingResponse> getTopDoctorsByConvertedAppointmentCount(int limit, String month);
     boolean doctorConfirmAppointment(Long appointmentId);
     boolean doctorStartAppointment(Long appointmentId);
     List<Appointment> getAppointmentsByPatientId(Long patientId, Map<String, String> params);

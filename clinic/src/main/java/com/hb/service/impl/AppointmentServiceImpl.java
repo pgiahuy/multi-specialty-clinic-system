@@ -22,12 +22,14 @@ import com.hb.repository.AppointmentRepository;
 import com.hb.repository.PatientRepository;
 import com.hb.repository.ScheduleRepository;
 import com.hb.service.AppointmentService;
+import com.hb.dto.response.DoctorRankingResponse;
 import com.hb.service.NotificationService;
 import com.hb.service.PaymentItemsService;
 import com.hb.service.PaymentService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.YearMonth;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -135,6 +137,36 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public long countAppointments(Map<String, String> params) {
         return appointmentRepo.countAppointments(params);
+    }
+
+    private java.time.LocalDate[] parseMonth(String month) {
+        if (month == null || month.isEmpty()) {
+            return null;
+        }
+        try {
+            YearMonth ym = YearMonth.parse(month);
+            return new java.time.LocalDate[]{ym.atDay(1), ym.atEndOfMonth()};
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @Override
+    public List<DoctorRankingResponse> getTopDoctorsByAppointmentCount(int limit, String month) {
+        java.time.LocalDate[] range = parseMonth(month);
+        if (range == null) {
+            return appointmentRepo.getTopDoctorsByAppointmentCount(limit, null, null);
+        }
+        return appointmentRepo.getTopDoctorsByAppointmentCount(limit, range[0], range[1]);
+    }
+
+    @Override
+    public List<DoctorRankingResponse> getTopDoctorsByConvertedAppointmentCount(int limit, String month) {
+        java.time.LocalDate[] range = parseMonth(month);
+        if (range == null) {
+            return appointmentRepo.getTopDoctorsByConvertedAppointmentCount(limit, null, null);
+        }
+        return appointmentRepo.getTopDoctorsByConvertedAppointmentCount(limit, range[0], range[1]);
     }
 
     @Override

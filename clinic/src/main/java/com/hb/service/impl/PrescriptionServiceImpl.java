@@ -225,7 +225,6 @@ public class PrescriptionServiceImpl implements PrescriptionService {
         
         Prescription saved = prescriptionRepo.saveOrUpdate(p);
         
-        
         if (saved.getMedicalRecordId() != null && saved.getMedicalRecordId().getAppointmentId() != null) {
             Long appointmentId = saved.getMedicalRecordId().getAppointmentId().getId();
             if (appointmentId != null) {
@@ -233,6 +232,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
                     Payment payment = paymentService.createPayment(appointmentId);
                     paymentItemsService.addPrescriptionItem(payment, saved.getId());
                 } catch (Exception e) {
+
                     System.err.println("Lỗi tạo thanh toán cho đơn thuốc: " + e.getMessage());
                 }
             }
@@ -302,6 +302,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
         }
         int bufferDays = 3;
         
+
         if (prescription.getPrescriptionItemCollection() != null) {
             for (PrescriptionItem item : prescription.getPrescriptionItemCollection()) {
                 Medicine m = item.getMedicineId();
@@ -344,6 +345,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
                 }
             }
         }
+
         prescription.setDispensedAt(LocalDateTime.now());
         this.prescriptionRepo.saveOrUpdate(prescription);
 

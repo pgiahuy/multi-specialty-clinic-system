@@ -4,6 +4,7 @@
  */
 package com.hb.repository.impl;
 
+import com.hb.dto.response.DoctorRankingResponse;
 import com.hb.enums.AppointmentStatus;
 import com.hb.pojo.Appointment;
 import com.hb.pojo.Doctor;
@@ -233,6 +234,46 @@ public class AppointmentRepositoryImpl extends BaseRepositoryImpl<Appointment> i
         cq.where(predicates.toArray(new Predicate[0]));
 
         Query<Appointment> query = session.createQuery(cq);
+        return query.getResultList();
+    }
+
+    @Override
+    public java.util.List<DoctorRankingResponse> getTopDoctorsByAppointmentCount(int limit, java.time.LocalDate fromDate, java.time.LocalDate toDate) {
+        Session session = this.factory.getObject().getCurrentSession();
+        String hql = "SELECT new com.hb.dto.response.DoctorRankingResponse(d.id, d.fullName, count(a)) "
+                + "FROM Appointment a JOIN a.scheduleId s JOIN s.doctorId d ";
+        if (fromDate != null && toDate != null) {
+            hql += "WHERE s.date BETWEEN :fromDate AND :toDate ";
+        }
+        hql += "GROUP BY d.id, d.fullName "
+                + "ORDER BY count(a) DESC";
+        Query<DoctorRankingResponse> query = session.createQuery(hql, DoctorRankingResponse.class);
+        if (fromDate != null && toDate != null) {
+            query.setParameter("fromDate", fromDate);
+            query.setParameter("toDate", toDate);
+        }
+        query.setMaxResults(limit);
+        return query.getResultList();
+    }
+
+    @Override
+    public java.util.List<DoctorRankingResponse> getTopDoctorsByConvertedAppointmentCount(int limit, java.time.LocalDate fromDate, java.time.LocalDate toDate) {
+        Session session = this.factory.getObject().getCurrentSession();
+        String hql = "SELECT new com.hb.dto.response.DoctorRankingResponse(d.id, d.fullName, count(a)) "
+                + "FROM Appointment a JOIN a.scheduleId s JOIN s.doctorId d ";
+        if (fromDate != null && toDate != null) {
+            hql += "WHERE a.conversationId IS NOT NULL AND s.date BETWEEN :fromDate AND :toDate ";
+        } else {
+            hql += "WHERE a.conversationId IS NOT NULL ";
+        }
+        hql += "GROUP BY d.id, d.fullName "
+                + "ORDER BY count(a) DESC";
+        Query<DoctorRankingResponse> query = session.createQuery(hql, DoctorRankingResponse.class);
+        if (fromDate != null && toDate != null) {
+            query.setParameter("fromDate", fromDate);
+            query.setParameter("toDate", toDate);
+        }
+        query.setMaxResults(limit);
         return query.getResultList();
     }
 
