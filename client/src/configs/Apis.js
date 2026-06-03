@@ -64,7 +64,7 @@ export const CLINIC_ENDPOINTS = {
     AVAILABLE_ROOMS: 'secure/available-rooms',
     SHIFTS: 'shifts',
     SCHEDULES: 'secure/schedules',
-    DOCTOR_APPOINTMENTS: (scheduleId) => `secure/appointments?scheduleId=${scheduleId}`,
+    DOCTOR_APPOINTMENTS: (scheduleId) => `secure/appointments/scheduleId=${scheduleId}`,
     DOCTOR_CONFIRM_APPOINTMENT: (appointmentId) => `secure/appointments/${appointmentId}/confirm`,
     DOCTOR_START_APPOINTMENT: (appointmentId) => `secure/appointments/${appointmentId}/start`,
     DOCTOR_GET_PATIENTS: 'secure/patients',

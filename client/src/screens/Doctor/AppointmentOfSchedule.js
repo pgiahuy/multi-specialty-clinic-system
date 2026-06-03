@@ -19,6 +19,7 @@ const AppointmentOfSchedule = () => {
     const loadScheduleDetails = async () => {
         try {
             setLoading(true);
+            console.log("Loading schedule details for scheduleId:", scheduleId);
             const response = await authApis().get(`${CLINIC_ENDPOINTS.DOCTOR_GET_SCHEDULES_BY_ID(scheduleId)}`);
             setScheduleDetails(response.data);
         } catch (error) {
