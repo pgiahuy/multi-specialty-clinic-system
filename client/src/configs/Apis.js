@@ -77,6 +77,11 @@ export const CLINIC_ENDPOINTS = {
     MEDICAL_RECORD_BY_PATIENT_ID: (id) => `secure/medical-records/patient/${id}`,
     PRESCRIPTION_BY_RECORD_ID: (recordId) => `secure/prescriptions/medical-record/${recordId}`,
     MEDICINES: 'secure/medicines',
+    MEDICINE_BATCHS: 'secure/medicine-batchs',
+    MEDICINE_BATCH_DELETE: (id) => `secure/medicine-batchs/${id}`,
+    STOREKEEPER_ALERTS: 'secure/storekeeper/alerts',
+    MEDICINES_COUNT: 'secure/medicines/count',
+    MEDICINE_BATCHS_COUNT: 'secure/medicine-batchs/count',
     CREATE_PRESCRIPTIONS: 'secure/prescriptions',
     SAVE_DRAFT_PRESCRIPTIONS: 'secure/prescriptions/draft',
     LAB_RESULTS_APPOINTMENT: (appointmentId) => `secure/lab-results/appointment/${appointmentId}`,
@@ -105,6 +110,7 @@ export const PAYMENT_ENDPOINTS = {
     MOMO_RETURN: 'secure/payments/momo/return',
     VNPAY_IPN: 'secure/payments/vnpay/ipn',
     HISTORY: 'secure/payments',
+    BY_APPOINTMENT: (appointmentId) => `secure/payments/appointment/${appointmentId}`,
     ITEMS: (paymentId) => `secure/payment-items/${paymentId}`,
 };
 
@@ -130,6 +136,11 @@ export const clinicApis = {
     getDoctorAppointments: (scheduleId) => authApis().get(CLINIC_ENDPOINTS.APPOINTMENTS(scheduleId)),
     getShifts: () => API.get(CLINIC_ENDPOINTS.SHIFTS),
     getMedicines: (params = {}) => authApis().get(CLINIC_ENDPOINTS.MEDICINES, { params }),
+    getMedicinesCount: (params = {}) => authApis().get(CLINIC_ENDPOINTS.MEDICINES_COUNT, { params }),
+    getMedicineBatchs: (params = {}) => authApis().get(CLINIC_ENDPOINTS.MEDICINE_BATCHS, { params }),
+    deleteMedicineBatch: (id) => authApis().delete(CLINIC_ENDPOINTS.MEDICINE_BATCH_DELETE(id)),
+    getMedicineBatchsCount: (params = {}) => authApis().get(CLINIC_ENDPOINTS.MEDICINE_BATCHS_COUNT, { params }),
+    getStorekeeperAlerts: (params = {}) => authApis().get(CLINIC_ENDPOINTS.STOREKEEPER_ALERTS, { params }),
 };
 
 

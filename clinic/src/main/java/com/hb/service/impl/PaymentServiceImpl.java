@@ -80,6 +80,15 @@ public class PaymentServiceImpl implements PaymentService {
     } 
 
     @Override
+    @Transactional
+    public List<PaymentResponse> getPaymentsByUserName(Map<String, String> params) {
+        List<Payment> payments = this.paymentRepo.getPaymentsByUserName(params);
+        return payments.stream()
+                .map(payMapper::toResponse)
+                .toList();
+    }
+
+    @Override
     public Payment getPaymentById(Long id) {
         return this.paymentRepo.getPaymentById(id);
     }
@@ -103,13 +112,21 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    @Transactional
     public Payment getPaymentByAppoint(Long appointmentId) {
         PaymentItem item = itemService.getPaymentItemByAppointment(appointmentId);
-        return this.paymentRepo.getPaymentById(item.getPaymentId().getId());
+        if (item == null || item.getPaymentId() == null) {
+            return null;
+        }
+
+        Payment payment = this.paymentRepo.getPaymentById(item.getPaymentId().getId());
+        if (payment != null && payment.getPaymentItemCollection() != null) {
+            payment.getPaymentItemCollection().size();
+        }
+        return payment;
     }
 
     @Override
-    
     public void updatePaymentTotalAmount(Payment payment) {
         List<PaymentItem> items = itemRepo.getItemsByPayment(payment);
 

@@ -148,7 +148,6 @@ public class MedicalRecordRepositoryImpl extends BaseRepositoryImpl<MedicalRecor
         if (user == null || medicalRecordId == null) {
             throw new ResourceNotFoundException("Thông tin xác thực không hợp lệ!");
         }
-
         CriteriaBuilder cb = session.getCriteriaBuilder();
         CriteriaQuery<Long> query = cb.createQuery(Long.class);
 

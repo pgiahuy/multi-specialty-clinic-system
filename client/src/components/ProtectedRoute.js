@@ -11,7 +11,16 @@ const ProtectedRoute = ({ allowedRoles = [], redirectTo = '/login' }) => {
   }
 
   if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
-    const fallbackPath = user.role === 'ROLE_DOCTOR' ? '/doctor/dashboard' : '/patient/dashboard';
+    let fallbackPath = '/';
+    if (user.role === 'ROLE_DOCTOR') {
+      fallbackPath = '/doctor/dashboard';
+    } else if (user.role === 'ROLE_PATIENT') {
+      fallbackPath = '/patient/dashboard';
+    } else if (user.role === 'ROLE_STAFF') {
+      fallbackPath = '/reception';
+    } else if (user.role === 'ROLE_STOREKEEPER') {
+      fallbackPath = '/storekeeper';
+    }
     return <Navigate to={fallbackPath} replace />;
   }
 
