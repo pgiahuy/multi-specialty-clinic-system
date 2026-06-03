@@ -5,53 +5,198 @@
     <title>Trang chủ</title>
     <th:block th:replace="~{base :: css}"></th:block>
     <th:block th:replace="~{base :: js}"></th:block>
+
+    <style>
+        body {
+            background-color: #fafafa;
+            color: #2c3e50;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        .content {
+            padding: 3rem 2rem;
+        }
+
+        .page-title {
+            font-size: 1.35rem;
+            font-weight: 500;
+            color: #111111;
+            letter-spacing: -0.02em;
+        }
+
+        .rank-card {
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            background-color: #ffffff;
+            overflow: hidden;
+        }
+
+        .rank-card .card-header {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e5e5e5;
+            padding: 1.2rem 1.5rem;
+        }
+
+        .rank-card .card-header strong {
+            font-size: 0.95rem;
+            color: #111111;
+            font-weight: 600;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table th {
+            background-color: #fafafa;
+            color: #777777;
+            font-size: 1rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.9rem 1.5rem;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .table td {
+            padding: 1rem 1.5rem;
+            font-size: 0.9rem;
+            color: #333333;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: #f7f7f7 !important;
+        }
+
+        .rank-number {
+            font-weight: 600;
+            color: #111111;
+            font-size: 0.9rem;
+        }
+
+        .rank-top-1 {
+            color: #d4af37;
+        }
+
+        .doctor-name {
+            font-weight: 500;
+        }
+
+        .count-value {
+            font-weight: 500;
+            color: #555555;
+            font-variant-numeric: tabular-nums;
+        }
+    </style>
 </head>
 
 <body>
 
     <div th:replace="~{base :: header('Trang chủ')}"></div>
-
     <div th:replace="~{base :: sidebar}"></div>
 
     <div class="content">
+        <div class="container-fluid">
 
-        <h2 class="mb-4">Danh sách sản phẩm</h2>
 
-        <table class="table table-bordered table-hover">
-            <thead class="table-dark">
-                <tr>
-                    <th>ID</th>
-                    <th>Tên</th>
-                    <th>Giá</th>
-                    <th>Hành động</th>
-                </tr>
-            </thead>
+            <div class="row g-4 mb-4">
+                <div class="col-12 m-0">
+                    <form class="row gx-3 gy-2 align-items-end justify-content-center" method="get" th:action="@{/}">
+                        <div class="col-md-4">
+                            <label class="form-label">Chọn tháng</label>
+                            <input type="month" name="month" class="form-control" th:value="${month}">
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-primary w-100">Xem xếp hạng</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
 
-            <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>Iphone 15</td>
-                    <td>20,000,000</td>
-                    <td>
-                        <button class="btn btn-warning btn-sm">Sửa</button>
-                        <button class="btn btn-danger btn-sm">Xóa</button>
-                    </td>
-                </tr>
+            <div class="row g-4">
 
-                <tr>
-                    <td>2</td>
-                    <td>Laptop Dell</td>
-                    <td>15,000,000</td>
-                    <td>
-                        <button class="btn btn-warning btn-sm">Sửa</button>
-                        <button class="btn btn-danger btn-sm">Xóa</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+                <div class="col-md-6">
+                    <div class="card rank-card">
+                        <div class="card-header">
+                            <h5>SỐ LỊCH ĐẶT HẸN TỪ TƯ VẤN</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 15%;">Hạng</th>
+                                        <th style="width: 55%;">Bác sĩ</th>
+                                        <th style="width: 30%;" class="text-end">Số cuộc hẹn</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="item, iterStat : ${topDoctorByConversionAppointments}">
+                                        <td>
+                                            <span class="rank-number"
+                                                th:classappend="${iterStat.index == 0} ? 'rank-top-1' : ''"
+                                                th:text="${iterStat.index + 1}">1</span>
+                                        </td>
+                                        <td>
+                                            <span class="doctor-name" th:text="${item.doctorFullName}"></span>
+                                        </td>
+                                        <td class="text-end">
+                                            <span class="count-value" th:text="${item.appointmentCount}">0</span>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(topDoctorByConversionAppointments)}">
+                                        <td colspan="3" class="text-center py-4 text-muted" style="font-size: 0.85rem;">
+                                            Chưa có dữ liệu thống kê.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
 
+                <div class="col-md-6">
+                    <div class="card rank-card">
+                        <div class="card-header">
+                            <h5>TỔNG LỊCH HẸN ĐÃ HOÀN THÀNH</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 15%;">Hạng</th>
+                                        <th style="width: 55%;">Bác sĩ</th>
+                                        <th style="width: 30%;" class="text-end">Tổng số</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="item, iterStat : ${topDoctorByAppointmentCount}">
+                                        <td>
+                                            <span class="rank-number"
+                                                th:classappend="${iterStat.index == 0} ? 'rank-top-1' : ''"
+                                                th:text="${iterStat.index + 1}">1</span>
+                                        </td>
+                                        <td>
+                                            <span class="doctor-name" th:text="${item.doctorFullName}">Bác sĩ B</span>
+                                        </td>
+                                        <td class="text-end">
+                                            <span class="count-value" th:text="${item.appointmentCount}">0</span>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(topDoctorByAppointmentCount)}">
+                                        <td colspan="3" class="text-center py-4 text-muted" style="font-size: 0.85rem;">
+                                            Chưa có dữ liệu thống kê.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
     </div>
-
 
     <div th:replace="~{base :: footer}"></div>
 

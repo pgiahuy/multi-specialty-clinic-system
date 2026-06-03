@@ -81,13 +81,17 @@ public class UserServiceImpl implements UserService {
     public User saveOrUpdateUser(UserCreateRequest urq) {
 
         validateUsername(urq.getUsername());
-        validatePassword(urq.getPassword());
+
         validateEmail(urq.getEmail());
 
         User u;
 
         if (urq.getId() != null) {
             u = userRepo.getUserById(urq.getId());
+
+            if (urq.getPassword() != null && !urq.getPassword().isEmpty() && !this.passwordEncoder.matches(urq.getPassword(), u.getPassword())) {
+                validatePassword(urq.getPassword());
+            }
 
             if (u == null) {
                 throw new ResourceNotFoundException("Không tìm thấy người dùng!");
@@ -121,6 +125,8 @@ public class UserServiceImpl implements UserService {
             if (checkEmail != null) {
                 throw new DuplicateResourceException("Email này đã được sử dụng!");
             }
+
+            validatePassword(urq.getPassword());
 
             u = new User();
             u.setUsername(urq.getUsername());
