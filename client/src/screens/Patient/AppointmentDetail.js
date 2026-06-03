@@ -95,7 +95,6 @@ const AppointmentDetail = () => {
                                     <div> Khoa {appointment.specialtyName} </div>
                                     <div> {appointment.roomName} - {appointment.areaName} </div>
                                 </Card.Header>
-
                                 <Card.Body className="p-4">
                                     <div className="d-flex justify-content-between align-items-center mb-3">
                                         <div className="small text-muted">Bệnh nhân</div>
@@ -128,7 +127,6 @@ const AppointmentDetail = () => {
                                         </div>
                                     </div>
                                 </Card.Body>
-
                                 <Card.Footer className="bg-white border-0 p-4 pt-0">
                                     {appointment?.status === 'UN_PAID' && (
                                         <div className="d-flex align-items-center p-3 mb-4 bg-warning bg-opacity-10 border border-warning border-opacity-50 rounded-3">
@@ -162,8 +160,6 @@ const AppointmentDetail = () => {
                                                 Thanh toán
                                             </Button>
                                         )}
-
-
                                     </div>
                                 </Card.Footer>
                             </Card>
@@ -181,7 +177,6 @@ const AppointmentDetail = () => {
             >
                 <div>Bạn có chắc chắn muốn hủy lịch hẹn này không? Hành động này có thể không hoàn tác được.</div>
             </MyModal>
-
             <MyModal
                 show={showCancelErrorModal}
                 onHide={() => setShowCancelErrorModal(false)}

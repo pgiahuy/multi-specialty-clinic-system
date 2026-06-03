@@ -13,7 +13,6 @@ import MyModal from "../../components/MyModal";
 const PatientProfile = () => {
     const [patientProfiles, setPatientProfiles] = useState([]);
     const navigate = useNavigate();
-
     const [showEditModal, setShowEditModal] = useState(false);
     const [editData, setEditData] = useState({});
     const [loading, setLoading] = useState(false);
@@ -35,9 +34,7 @@ const PatientProfile = () => {
             }
         }
 
-
         setEditData(dataToEdit);
-
         setShowEditModal(true);
     };
 
@@ -287,9 +284,7 @@ const PatientProfile = () => {
                         <h4 className="mt-3 text-success">Hồ sơ đã được xóa thành công!</h4>
                     </div>
                 </MyModal>
-
             </div >
-
         </>
     );
 };

@@ -244,8 +244,6 @@ const MedicalRecord = () => {
                                         </Row>
                                     </div>
                                 </div>
-
-
                                 <div className="mb-4">
                                     <Form>
                                         <Form.Group className="mb-3">
@@ -285,7 +283,6 @@ const MedicalRecord = () => {
                                         </Form.Group>
                                     </Form>
                                 </div>
-
                                 <div className="mb-4 bg-light p-3 rounded-3 border d-flex justify-content-between align-items-center">
                                     <div>
                                         <div className="fw-bold text-dark">Kết quả xét nghiệm cận lâm sàng</div>
@@ -322,12 +319,9 @@ const MedicalRecord = () => {
 
                                     )}
                                 </div>
-
-
                                 <div className="d-flex justify-content-end gap-2 pt-3 border-top">
                                     {!isEditing ? (
                                         <>
-
                                             {user && user.role === "ROLE_DOCTOR" && (<Button
                                                 variant="outline-primary"
                                                 className="px-4 fw-semibold rounded-pill shadow-sm"
@@ -335,8 +329,6 @@ const MedicalRecord = () => {
                                             >
                                                 Kê đơn thuốc
                                             </Button>)}
-
-
                                             {((user?.role === "ROLE_DOCTOR") ||
                                                 (user?.role === "ROLE_STAFF" && appointmentStatus !== "COMPLETED" && appointmentStatus !== "CANCELLED"
                                                     && appointmentStatus !== "IN_PROGRESS"
@@ -380,8 +372,6 @@ const MedicalRecord = () => {
                     )
                 }
             </Container >
-
-
             <Modal show={showTestResultsModal} onHide={() => setShowTestResultsModal(false)} size="lg" centered>
                 <Modal.Header closeButton className="bg-light">
                     <Modal.Title className="fw-bold text-primary fs-5">

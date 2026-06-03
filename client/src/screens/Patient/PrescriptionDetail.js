@@ -6,7 +6,6 @@ const PrescriptionDetail = ({ prescription, error }) => {
     if (error) {
         return <div className="text-danger">{error}</div>;
     }
-
     if (!prescription) {
         return (
             <div className="text-center text-muted py-5">
@@ -58,7 +57,6 @@ const PrescriptionDetail = ({ prescription, error }) => {
                     <div className="border rounded-3 p-3 bg-white h-100">{prescription.note || 'Không có ghi chú'}</div>
                 </div>
             </div>
-
             <div className="rounded-4 shadow-sm border overflow-hidden">
                 <Table hover responsive className="mb-0 align-middle">
                     <thead className="table-light text-secondary small">

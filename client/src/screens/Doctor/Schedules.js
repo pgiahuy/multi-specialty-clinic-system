@@ -38,7 +38,6 @@ const Schedules = () => {
         boxShadow: "0 10px 30px rgba(15, 23, 42, 0.06)"
     };
 
-
     const uniqueDates = useMemo(() => {
         return [
             moment().format('DD-MM-YYYY'),
@@ -49,12 +48,9 @@ const Schedules = () => {
 
     const loadSchedules = useCallback(async () => {
         if (!selectedDate) return;
-
         try {
             setLoading(true);
-
             const formattedDate = moment(selectedDate, ['YYYY-MM-DD', 'DD-MM-YYYY']).format('YYYY-MM-DD');
-
             const response = await authApis().get(CLINIC_ENDPOINTS.SCHEDULES, {
                 params: { fromDate: formattedDate }
             });
@@ -70,9 +66,7 @@ const Schedules = () => {
         loadSchedules();
     }, [loadSchedules]);
 
-
     useEffect(() => {
-
         setSelectedDate(moment().format('YYYY-MM-DD'));
     }, []);
 
@@ -88,8 +82,6 @@ const Schedules = () => {
     const morningShifts = schedules.filter((schedule) => schedule.session === "Sáng");
     const afternoonShifts = schedules.filter((schedule) => schedule.session === "Chiều");
 
-
-
     return (
         <div className="d-flex flex-column min-vh-100" style={pageStyle}>
             <Header />
@@ -101,7 +93,6 @@ const Schedules = () => {
                                 <h6 className="fw-bold text-uppercase text-muted mb-0" style={{ letterSpacing: 0.8 }}>
                                     Chọn ngày làm việc
                                 </h6>
-
                             </div>
                             <input
                                 ref={dateInputRef}
@@ -130,12 +121,7 @@ const Schedules = () => {
                             </div>
                         </div>
                     </Col>
-
-
                     <Col md={9} >
-
-
-
                         <div className="bg-white p-4 rounded-5 border" style={{ minHeight: "80vh" }}>
                             <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-4">
                                 <h4 className="fw-bold mb-0 text-primary">Lịch trình ngày: {selectedDate || "--"}</h4>
@@ -170,7 +156,6 @@ const Schedules = () => {
                                             )}
                                         </div>
                                     </Row>
-
                                     <Row>
                                         <div className="p-3 bg-light h-100 w-100" style={{ borderRadius: 18 }}>
                                             <h5 className="fw-bold text-primary mb-3">Buổi Chiều</h5>
@@ -189,14 +174,9 @@ const Schedules = () => {
                                     </Row>
                                 </Col>
                             )}
-
                         </div>
-
                     </Col >
-
                 </Row >
-
-
             </Container >
             <Footer />
         </div >

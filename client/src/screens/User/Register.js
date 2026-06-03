@@ -1,8 +1,10 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect, useContext } from "react";
 import { Button, Card, Container, Form, Alert } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import MySpinner from "../../components/MySpinner";
-import API, { AUTH_ENDPOINTS, endpoint, USER_ENDPOINTS } from "../../configs/Apis";
+import API, { AUTH_ENDPOINTS, endpoint, USER_ENDPOINTS, authApis } from "../../configs/Apis";
+import cookies from "react-cookies";
+import { MyUserContext } from "../../configs/Contexts";
 import { formCardStyle } from "./UserStyle";
 
 const Register = () => {
@@ -34,8 +36,43 @@ const Register = () => {
     const [err, setErr] = useState();
     const nav = useNavigate();
     const [loading, setLoading] = useState(false);
+    const [, dispatch] = useContext(MyUserContext);
 
+    useEffect(() => {
+        const token = cookies.load("accessToken");
+        if (!token) return;
 
+        const restoreAndRedirect = async () => {
+            const stored = localStorage.getItem("user");
+            try {
+                if (stored) {
+                    const u = JSON.parse(stored);
+                    dispatch({ type: "LOGIN", payload: u });
+                    const role = u.role;
+                    if (role === 'ROLE_DOCTOR') nav('/doctor/dashboard');
+                    else if (role === 'ROLE_PATIENT') nav('/patient/dashboard');
+                    else if (role === 'ROLE_STAFF') nav('/reception');
+                    else if (role === 'ROLE_STOREKEEPER') nav('/storekeeper');
+                    else nav('/');
+                    return;
+                }
+
+                const res = await authApis().get(USER_ENDPOINTS.CURRENT_USER);
+                localStorage.setItem("user", JSON.stringify(res.data));
+                dispatch({ type: "LOGIN", payload: res.data });
+                const role = res.data.role;
+                if (role === 'ROLE_DOCTOR') nav('/doctor/dashboard');
+                else if (role === 'ROLE_PATIENT') nav('/patient/dashboard');
+                else if (role === 'ROLE_STAFF') nav('/reception');
+                else if (role === 'ROLE_STOREKEEPER') nav('/storekeeper');
+                else nav('/');
+            } catch (e) {
+                console.debug('Failed to restore user on register page:', e);
+            }
+        }
+
+        restoreAndRedirect();
+    }, [dispatch, nav]);
 
     const validateUsername = (username) => {
         if (!username || !username.trim()) return "Tên tài khoản không được để trống!";
@@ -126,15 +163,11 @@ const Register = () => {
                         'Content-Type': 'multipart/form-data'
                     }
                 });
-
                 if (res.status === 201) {
                     nav("/login");
                 }
-
-
                 else
                     alert("Hệ thống bị lỗi!");
-
             } catch (error) {
                 if (error.response) {
                     const serverMessage = error.response.data?.message || error.response.data || error.message;
@@ -153,9 +186,7 @@ const Register = () => {
             <Card style={formCardStyle.card}>
                 <Card.Body>
                     <h3 className="text-center mt-1">Đăng ký</h3>
-
                     {err && <Alert variant="danger">{err}</Alert>}
-
                     <Form onSubmit={register}>
                         {userInfo.map(u => {
                             const controlId = `userInfo-${u.field}`;

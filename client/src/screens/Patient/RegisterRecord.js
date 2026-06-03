@@ -102,8 +102,6 @@ const RegisterRecord = () => {
                 if (key !== 'dob') {
                     form.append(key, patient[key]);
                 }
-
-
                 if (patient.dob) {
                     const date = new Date(patient.dob);
                     const formattedDate = `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
@@ -132,7 +130,6 @@ const RegisterRecord = () => {
                 setLoading(false);
             }
         }
-
     }
 
     return (
@@ -170,8 +167,6 @@ const RegisterRecord = () => {
                                                         </option>
                                                     );
                                                 })}
-
-
                                             </Form.Select>
                                         ) : (
                                             <Form.Control
@@ -184,13 +179,8 @@ const RegisterRecord = () => {
                                         )}
                                         <Form.Label>{u.title}</Form.Label>
                                     </Form.Floating>)}
-
-
                                 <Form.Group className="mb-3" controlId="button">
-
                                     <div className="d-flex gap-3">
-
-
                                         <Button
                                             variant="outline-danger"
                                             type="button"
@@ -199,10 +189,7 @@ const RegisterRecord = () => {
                                         >
                                             Quay lại
                                         </Button>
-
-
                                         {loading === true ? (
-
                                             <div className="w-100 d-flex justify-content-center align-items-center">
                                                 <MySpinner />
                                             </div>
@@ -216,19 +203,15 @@ const RegisterRecord = () => {
                                                 Thêm hồ sơ
                                             </Button>
                                         )}
-
                                     </div>
                                 </Form.Group>
                             </Form>
                         </Card.Body>
                     </Card>
-
                 </Container>
                 <Footer />
             </div>
-
         </>
-
     );
 };
 

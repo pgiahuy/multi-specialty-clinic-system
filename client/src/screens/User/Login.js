@@ -1,6 +1,6 @@
 import { Button, Card, Form, Alert, Container } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { jwtDecode } from "jwt-decode";
 import cookies from "react-cookies";
 import API, { AUTH_ENDPOINTS, authApis, USER_ENDPOINTS } from "../../configs/Apis";
@@ -14,17 +14,47 @@ import FacebookLoginButton from "./FacebookLoginButton";
 import { requestForToken } from "../../configs/firebaseConfig";
 
 const Login = () => {
-
-
-
     const [user, setUser] = useState({});
     const [err, setErr] = useState("");
-
     const [loading, setLoading] = useState(false);
-
     const nav = useNavigate();
     const [, dispatch] = useContext(MyUserContext);
+    
+    useEffect(() => {
+        const token = cookies.load("accessToken");
+        if (!token) return;
 
+        const restoreAndRedirect = async () => {
+            const stored = localStorage.getItem("user");
+            try {
+                if (stored) {
+                    const u = JSON.parse(stored);
+                    dispatch({ type: "LOGIN", payload: u });
+                    const role = u.role;
+                    if (role === 'ROLE_DOCTOR') nav('/doctor/dashboard');
+                    else if (role === 'ROLE_PATIENT') nav('/patient/dashboard');
+                    else if (role === 'ROLE_STAFF') nav('/reception');
+                    else if (role === 'ROLE_STOREKEEPER') nav('/storekeeper');
+                    else nav('/');
+                    return;
+                }
+
+                const res = await authApis().get(USER_ENDPOINTS.CURRENT_USER);
+                localStorage.setItem("user", JSON.stringify(res.data));
+                dispatch({ type: "LOGIN", payload: res.data });
+                const role = res.data.role;
+                if (role === 'ROLE_DOCTOR') nav('/doctor/dashboard');
+                else if (role === 'ROLE_PATIENT') nav('/patient/dashboard');
+                else if (role === 'ROLE_STAFF') nav('/reception');
+                else if (role === 'ROLE_STOREKEEPER') nav('/storekeeper');
+                else nav('/');
+            } catch (e) {
+                console.debug('Failed to restore user on login page:', e);
+            }
+        }
+
+        restoreAndRedirect();
+    }, [dispatch, nav]);
     const validate = () => {
         if (!user.username || !user.password) {
             setErr("Vui lòng điền đầy đủ tên đăng nhập và mật khẩu!");
@@ -63,15 +93,10 @@ const Login = () => {
                     deviceId: deviceId,
                     deviceInfo: deviceInfo
                 });
-
-
-
                 const decoded = jwtDecode(res.data.accessToken);
                 const role = decoded.role;
                 cookies.save("accessToken", res.data.accessToken, { path: '/' });
                 cookies.save("refreshToken", res.data.refreshToken, { path: '/' });
-
-
 
                 let u = await authApis().get(USER_ENDPOINTS.CURRENT_USER);
                 localStorage.setItem("user", JSON.stringify(u.data));
@@ -162,8 +187,6 @@ const Login = () => {
                 </Card.Body>
             </Card>
         </Container>
-
-
     );
 }
 

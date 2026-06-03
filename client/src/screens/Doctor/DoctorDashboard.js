@@ -5,15 +5,12 @@ import Header from "../../components/Header";
 import ControlCard from "./component/ControlCard";
 
 const DoctorDashboard = () => {
-
-
 	return (
 		<>
 			<Header />
 			<Container>
 				<ControlCard />
 			</Container>
-
 		</>
 	);
 };

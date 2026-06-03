@@ -90,8 +90,6 @@ const Schedules = () => {
     const morningShifts = schedules.filter((schedule) => schedule.session === "Sáng");
     const afternoonShifts = schedules.filter((schedule) => schedule.session === "Chiều");
 
-
-
     return (
         <div className="d-flex flex-column min-vh-100" style={pageStyle}>
             <Header />
@@ -103,7 +101,6 @@ const Schedules = () => {
                                 <h6 className="fw-bold text-uppercase text-muted mb-0" style={{ letterSpacing: 0.8 }}>
                                     Chọn ngày làm việc
                                 </h6>
-
                             </div>
                             <input
                                 ref={dateInputRef}
@@ -139,12 +136,7 @@ const Schedules = () => {
                             </Button>
                         </div>
                     </Col>
-
-
                     <Col md={9} >
-
-
-
                         <div className="bg-white p-4 rounded-5 border" style={{ minHeight: "80vh" }}>
                             <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-4">
                                 <h4 className="fw-bold mb-0 text-primary">Lịch trình ngày: {selectedDate || "--"}</h4>
@@ -179,7 +171,6 @@ const Schedules = () => {
                                             )}
                                         </div>
                                     </Row>
-
                                     <Row>
                                         <div className="p-3 bg-light h-100 w-100" style={{ borderRadius: 18 }}>
                                             <h5 className="fw-bold text-primary mb-3">Buổi Chiều</h5>
@@ -198,14 +189,9 @@ const Schedules = () => {
                                     </Row>
                                 </Col>
                             )}
-
                         </div>
-
                     </Col >
-
                 </Row >
-
-
             </Container >
             <Footer />
         </div >
