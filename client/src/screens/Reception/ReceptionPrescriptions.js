@@ -6,6 +6,7 @@ import Footer from "../../components/Footer";
 import { authApis } from "../../configs/Apis";
 import MySpinner from "../../components/MySpinner";
 import moment from "moment";
+import ReceptionNavBar from "./StaffNavBar";
 
 const ReceptionPrescriptions = () => {
     const [prescriptions, setPrescriptions] = useState([]);
@@ -73,17 +74,7 @@ const ReceptionPrescriptions = () => {
         <div className="d-flex flex-column min-vh-100">
             <Header />
             <Container fluid className="py-4" style={{ width: "97%" }}>
-                <div className="d-flex justify-content-between align-items-center mb-4">
-                    <h3 className="mb-0 text-center flex-grow-1">Quầy Tiếp Nhận - DANH SÁCH ĐƠN THUỐC</h3>
-                    <div className="d-flex gap-2">
-                        <Button variant="outline-primary" size="sm" onClick={() => nav("/reception")}>
-                            Xem lịch hẹn
-                        </Button>
-                        <Button variant="outline-primary" size="sm" onClick={() => nav("/reception/invoices")}>
-                            Xem hóa đơn
-                        </Button>
-                    </div>
-                </div>
+                <ReceptionNavBar />
 
                 <Row className="mb-4 g-3 bg-light p-3 rounded shadow-sm">
                     <Col md={4} sm={12}>
@@ -201,7 +192,6 @@ const ReceptionPrescriptions = () => {
                     </Table>
                 </div>
             </Container>
-            <Footer />
         </div>
     );
 };
