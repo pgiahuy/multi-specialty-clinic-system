@@ -8,6 +8,11 @@ on:
 jobs:
   backend-pipeline:
     runs-on: ubuntu-latest
+
+    environment:
+      name: production
+      url: https://triplehstorage.site
+
     steps:
       - name: Checkout source code
         uses: actions/checkout@v3
@@ -106,6 +111,11 @@ jobs:
 
   frontend-pipeline:
     runs-on: ubuntu-latest
+
+    environment:
+      name: production
+      url: https://triplehstorage.site
+
     steps:
       - name: Checkout source code
         uses: actions/checkout@v3
