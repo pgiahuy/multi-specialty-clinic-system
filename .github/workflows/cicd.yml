@@ -66,41 +66,42 @@ jobs:
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" scp -o StrictHostKeyChecking=no clinic/db/init.sql myserver:/home/giahuy/mysql_init/init.sql
 
           SSHPASS="${{ secrets.SERVER_PASSWORD }}" sshpass -e ssh -o StrictHostKeyChecking=no myserver << 'EOF'
-            docker rm -f clinic-mysql || true
-            
-            echo "$SSHPASS" | sudo -S rm -rf /home/giahuy/mysql_data
-            mkdir -p /home/giahuy/mysql_data
-            
-            docker run -d \
-              --network="host" \
-              --name=clinic-mysql \
-              --restart=always \
-              -v /home/giahuy/mysql_data:/var/lib/mysql \
-              -e MYSQL_ROOT_PASSWORD="root" \
-              mysql:8.0
+          docker rm -f clinic-mysql || true
 
-            for i in {1..15}; do
-              if docker exec clinic-mysql mysqladmin ping -u root -proot --silent; then
-                break
-              fi
-              sleep 2
-            done
+          echo "$SSHPASS" | sudo -S rm -rf /home/giahuy/mysql_data
+          mkdir -p /home/giahuy/mysql_data
 
-            docker exec -i clinic-mysql mysql -u root -proot --host=127.0.0.1 -e "DROP DATABASE IF EXISTS clinicdb; CREATE DATABASE clinicdb;"
-            docker exec -i clinic-mysql mysql -u root -proot --host=127.0.0.1 clinicdb < /home/giahuy/mysql_init/init.sql
+          docker run -d \
+            --network="host" \
+            --name=clinic-mysql \
+            --restart=always \
+            -v /home/giahuy/mysql_data:/var/lib/mysql \
+            -e MYSQL_ROOT_PASSWORD="root" \
+            mysql:8.0
 
-            docker pull ${{ secrets.DOCKER_USERNAME }}/clinic-backend:latest
-            docker rm -f my-clinic-tomcat || true
-            
-            docker run -d \
-              --network="host" \
-              --name=my-clinic-tomcat \
-              -e DB_PASSWORD="root" \
-              --restart=always \
-              ${{ secrets.DOCKER_USERNAME }}/clinic-backend:latest
-            
-            docker image prune -f
-EOF
+          for i in {1..15}; do
+            if docker exec clinic-mysql mysqladmin ping -u root -proot --silent; then
+              break
+            fi
+            sleep 2
+          done
+
+          docker exec -i clinic-mysql mysql -u root -proot --host=127.0.0.1 -e "DROP DATABASE IF EXISTS clinicdb; CREATE DATABASE clinicdb;"
+          docker exec -i clinic-mysql mysql -u root -proot --host=127.0.0.1 clinicdb < /home/giahuy/mysql_init/init.sql
+
+          docker pull ${{ secrets.DOCKER_USERNAME }}/clinic-backend:latest
+          docker rm -f my-clinic-tomcat || true
+
+          docker run -d \
+            --network="host" \
+            --name=my-clinic-tomcat \
+            -e DB_PASSWORD="root" \
+            --restart=always \
+            ${{ secrets.DOCKER_USERNAME }}/clinic-backend:latest
+
+          docker image prune -f
+          echo "BACKEND DONE"
+          EOF
 
   frontend-pipeline:
     runs-on: ubuntu-latest
@@ -155,8 +156,9 @@ EOF
         run: |
           sudo apt-get update && sudo apt-get install -y sshpass
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no myserver << 'EOF'
-            docker pull ${{ secrets.DOCKER_USERNAME }}/clinic-frontend:latest
-            docker rm -f my-clinic-frontend || true
-            docker run -d --network="host" --name=my-clinic-frontend --restart=always ${{ secrets.DOCKER_USERNAME }}/clinic-frontend:latest
-            docker image prune -f
-EOF
+          docker pull ${{ secrets.DOCKER_USERNAME }}/clinic-frontend:latest
+          docker rm -f my-clinic-frontend || true
+          docker run -d --network="host" --name=my-clinic-frontend --restart=always ${{ secrets.DOCKER_USERNAME }}/clinic-frontend:latest
+          docker image prune -f
+          echo "FRONTEND DONE"
+          EOF
