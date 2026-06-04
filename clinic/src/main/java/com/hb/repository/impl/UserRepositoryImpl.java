@@ -34,8 +34,7 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<User> implements User
     @Autowired
     private SocialAccountRepository socialAccountRepo;
     @Autowired
-    @Lazy
-    private PasswordEncoder passwordEncoder;
+    private org.springframework.beans.factory.ObjectProvider<PasswordEncoder> passwordEncoderProvider;
 
     @Override
     public List<User> getUsers(Map<String, String> params) {
@@ -137,7 +136,7 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<User> implements User
     public boolean authenticate(String username, String password) {
         User u = this.getUserByUsername(username);
 
-        return this.passwordEncoder.matches(password, u.getPassword());
+        return this.passwordEncoderProvider.getObject().matches(password, u.getPassword());
     }
 
     @Override
