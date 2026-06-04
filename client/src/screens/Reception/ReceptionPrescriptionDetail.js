@@ -69,10 +69,8 @@ const ReceptionPrescriptionDetail = () => {
             const response = await authApis().get(`secure/prescriptions/${prescriptionId}`);
             setPrescription(response.data);
             setShowDispenseModal(false);
-            alert("Xuất thuốc thành công!");
         } catch (err) {
             console.error("Lỗi khi xuất thuốc:", err);
-            alert("Lỗi khi xuất thuốc. Vui lòng thử lại sau.");
         } finally {
             setDispensing(false);
         }

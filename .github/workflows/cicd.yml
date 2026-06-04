@@ -62,20 +62,15 @@ jobs:
         run: |
           sudo apt-get update && sudo apt-get install -y sshpass
 
-          echo "Tạo các thư mục chứa dữ liệu trên server..."
-          sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no myserver "mkdir -p /home/giahuy/mysql_data /home/giahuy/mysql_init"
-
-          echo "Chép file SQL tổng từ Repo lên Server..."
+          sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no myserver "mkdir -p /home/giahuy/mysql_init"
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" scp -o StrictHostKeyChecking=no clinic/db/init.sql myserver:/home/giahuy/mysql_init/init.sql
 
-          sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no myserver << EOF
-            echo "1. Dọn dẹp tận gốc container và vùng dữ liệu cũ lỗi quyền..."
+          SSHPASS="${{ secrets.SERVER_PASSWORD }}" sshpass -e ssh -o StrictHostKeyChecking=no myserver << 'EOF'
             docker rm -f clinic-mysql || true
             
-            echo "${{ secrets.SERVER_PASSWORD }}" | sudo -S rm -rf /home/giahuy/mysql_data
-            mkdir -p /home/giahuy/mysql_data /home/giahuy/mysql_init
-
-            echo "2. Khởi chạy Container MySQL với mật khẩu root mới tinh..."
+            echo "$SSHPASS" | sudo -S rm -rf /home/giahuy/mysql_data
+            mkdir -p /home/giahuy/mysql_data
+            
             docker run -d \
               --network="host" \
               --name=clinic-mysql \
@@ -84,23 +79,16 @@ jobs:
               -e MYSQL_ROOT_PASSWORD="root" \
               mysql:8.0
 
-            echo "3. Kiểm tra trạng thái sẵn sàng của MySQL (Vòng lặp thông minh)..."
             for i in {1..15}; do
               if docker exec clinic-mysql mysqladmin ping -u root -proot --silent; then
-                echo "MySQL đã sẵn sàng mở socket!"
                 break
               fi
-              echo "MySQL đang khởi tạo, đợi 2 giây... (\$i/15)"
               sleep 2
             done
 
-            echo "4. Thực hiện chiến thuật Database First: Đập đi xây lại Database sạch..."
-            docker exec -i clinic-mysql mysql -u root -proot -e "DROP DATABASE IF EXISTS clinicdb; CREATE DATABASE clinicdb;"
+            docker exec -i clinic-mysql mysql -u root -proot --host=127.0.0.1 -e "DROP DATABASE IF EXISTS clinicdb; CREATE DATABASE clinicdb;"
+            docker exec -i clinic-mysql mysql -u root -proot --host=127.0.0.1 clinicdb < /home/giahuy/mysql_init/init.sql
 
-            echo "5. Nạp (Import) file SQL mới tinh từ Repo vào DB..."
-            docker exec -i clinic-mysql mysql -u root -proot clinicdb < /home/giahuy/mysql_init/init.sql
-
-            echo "6. Làm mới Container Backend Spring Boot (Tomcat 11)..."
             docker pull ${{ secrets.DOCKER_USERNAME }}/clinic-backend:latest
             docker rm -f my-clinic-tomcat || true
             
@@ -112,8 +100,7 @@ jobs:
               ${{ secrets.DOCKER_USERNAME }}/clinic-backend:latest
             
             docker image prune -f
-            echo "BACKEND & DATABASE ĐÃ ONLINE MƯỢT MÀ!"
-          EOF
+EOF
 
   frontend-pipeline:
     runs-on: ubuntu-latest
@@ -168,12 +155,8 @@ jobs:
         run: |
           sudo apt-get update && sudo apt-get install -y sshpass
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no myserver << 'EOF'
-            echo "1. Kéo Docker Image Frontend mới về..."
             docker pull ${{ secrets.DOCKER_USERNAME }}/clinic-frontend:latest
-            echo "2. Xóa Container Frontend cũ nếu đang chạy..."
             docker rm -f my-clinic-frontend || true
-            echo "3. Khởi chạy Container Frontend mới trên Host Network (Cổng 80)..."
             docker run -d --network="host" --name=my-clinic-frontend --restart=always ${{ secrets.DOCKER_USERNAME }}/clinic-frontend:latest
             docker image prune -f
-            echo "FRONTEND REACT ĐÃ CẬP NHẬT THÀNH CÔNG!"
-          EOF
+EOF
