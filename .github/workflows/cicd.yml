@@ -68,11 +68,10 @@ jobs:
           echo "Chép file SQL tổng từ Repo lên Server..."
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" scp -o StrictHostKeyChecking=no clinic/db/init.sql myserver:/home/giahuy/mysql_init/init.sql
 
-          sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no myserver << 'EOF'
+          sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no myserver << EOF
             echo "1. Dọn dẹp tận gốc container và vùng dữ liệu cũ lỗi quyền..."
             docker rm -f clinic-mysql || true
             
-            # Sử dụng mật khẩu server để ép xóa thư mục data thuộc quyền root của Docker
             echo "${{ secrets.SERVER_PASSWORD }}" | sudo -S rm -rf /home/giahuy/mysql_data
             mkdir -p /home/giahuy/mysql_data /home/giahuy/mysql_init
 
@@ -85,16 +84,23 @@ jobs:
               -e MYSQL_ROOT_PASSWORD="root" \
               mysql:8.0
 
-            echo "Chờ 20 giây cho MySQL khởi tạo hoàn toàn cấu trúc..."
-            sleep 20
+            echo "3. Kiểm tra trạng thái sẵn sàng của MySQL (Vòng lặp thông minh)..."
+            for i in {1..15}; do
+              if docker exec clinic-mysql mysqladmin ping -u root -proot --silent; then
+                echo "MySQL đã sẵn sàng mở socket!"
+                break
+              fi
+              echo "MySQL đang khởi tạo, đợi 2 giây... (\$i/15)"
+              sleep 2
+            done
 
-            echo "3. Thực hiện chiến thuật Database First: Đập đi xây lại Database sạch..."
+            echo "4. Thực hiện chiến thuật Database First: Đập đi xây lại Database sạch..."
             docker exec -i clinic-mysql mysql -u root -proot -e "DROP DATABASE IF EXISTS clinicdb; CREATE DATABASE clinicdb;"
 
-            echo "4. Nạp (Import) file SQL mới tinh từ Repo vào DB..."
+            echo "5. Nạp (Import) file SQL mới tinh từ Repo vào DB..."
             docker exec -i clinic-mysql mysql -u root -proot clinicdb < /home/giahuy/mysql_init/init.sql
 
-            echo "5. Làm mới Container Backend Spring Boot (Tomcat 11)..."
+            echo "6. Làm mới Container Backend Spring Boot (Tomcat 11)..."
             docker pull ${{ secrets.DOCKER_USERNAME }}/clinic-backend:latest
             docker rm -f my-clinic-tomcat || true
             
@@ -106,7 +112,7 @@ jobs:
               ${{ secrets.DOCKER_USERNAME }}/clinic-backend:latest
             
             docker image prune -f
-            echo "BACKEND & DATABASE ĐÃ ONLINE"
+            echo "BACKEND & DATABASE ĐÃ ONLINE MƯỢT MÀ!"
           EOF
 
   frontend-pipeline:
