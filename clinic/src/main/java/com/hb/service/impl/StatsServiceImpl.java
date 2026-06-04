@@ -43,24 +43,18 @@ public class StatsServiceImpl implements StatsService {
     public List<PatientAgeGroupStatsResponse> getPatientAgeGroupStats(LocalDate fromDate, LocalDate toDate) {
         List<Object[]> res = this.statsRepo.countPatientsByAgeGroup(fromDate, toDate);
         
-        // Dùng TreeMap<Integer, Long> để tự động sắp xếp tuổi tăng dần (1, 2, 3... 10, 20...)
         java.util.Map<Integer, Long> exactAgeMap = new java.util.TreeMap<>();
         
         res.forEach(obj -> {
-            // Lấy ngày sinh và số lượng
             LocalDate dob = (LocalDate) obj[0];
             Long count = (Long) obj[1];
             
-            // Tính tuổi chính xác
             int age = java.time.Period.between(dob, LocalDate.now()).getYears();
             
-            // Gộp dữ liệu theo từng tuổi cụ thể (thay vì nhóm tuổi)
             exactAgeMap.merge(age, count, Long::sum);
         });
         
-        // Chuyển đổi sang List DTO trả về cho Controller
         return exactAgeMap.entrySet().stream()
-                // Gắn thêm chữ "tuổi" luôn vào DTO để JS không cần xử lý nữa
                 .map(entry -> new PatientAgeGroupStatsResponse(entry.getKey() + " tuổi", entry.getValue()))
                 .toList();
     }
