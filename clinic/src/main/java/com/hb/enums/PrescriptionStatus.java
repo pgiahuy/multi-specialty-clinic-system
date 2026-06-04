@@ -11,6 +11,7 @@ package com.hb.enums;
 public enum PrescriptionStatus {
     DRAFT("Bản nháp"),
     PUBLIC("Chính thức"),
+    DISPENSED("Đã xuất"),
     CANCELLED("Đã huỷ");
     
     private final String label;

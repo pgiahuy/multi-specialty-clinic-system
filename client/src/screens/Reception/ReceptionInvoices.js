@@ -5,6 +5,7 @@ import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { authApis, PAYMENT_ENDPOINTS } from "../../configs/Apis";
 import MySpinner from "../../components/MySpinner";
+import ReceptionNavBar from "./StaffNavBar";
 
 const ReceptionInvoices = () => {
     const [invoices, setInvoices] = useState([]);
@@ -41,7 +42,7 @@ const ReceptionInvoices = () => {
         }
     };
 
-    
+
 
     const loadInvoices = useCallback(async () => {
         try {
@@ -90,17 +91,7 @@ const ReceptionInvoices = () => {
         <div className="d-flex flex-column min-vh-100">
             <Header />
             <Container fluid className="py-4" style={{ width: "97%" }}>
-                <div className="d-flex justify-content-between align-items-center mb-4">
-                    <h3 className="mb-0 text-center flex-grow-1">Quầy Tiếp Nhận - DANH SÁCH HÓA ĐƠN</h3>
-                    <div className="d-flex gap-2">
-                        <Button variant="outline-primary" size="sm" onClick={() => nav('/reception')}>
-                            Xem lịch hẹn
-                        </Button>
-                        <Button variant="outline-primary" size="sm" onClick={() => nav('/reception/prescriptions')}>
-                            Xem đơn thuốc
-                        </Button>
-                    </div>
-                </div>
+                <ReceptionNavBar />
 
                 <Row className="mb-4 g-3 bg-light p-3 rounded shadow-sm">
                     <Col md={4} sm={12}>
@@ -220,7 +211,7 @@ const ReceptionInvoices = () => {
                                         </td>
                                         <td>{inv.method || "---"}</td>
                                         <td>
-                                            {inv.status === "PENDING"  ? (
+                                            {inv.status === "PENDING" ? (
                                                 <Button
                                                     variant="success"
                                                     size="sm"
@@ -239,7 +230,6 @@ const ReceptionInvoices = () => {
                     </Table>
                 </div>
             </Container>
-            <Footer />
         </div>
     );
 };

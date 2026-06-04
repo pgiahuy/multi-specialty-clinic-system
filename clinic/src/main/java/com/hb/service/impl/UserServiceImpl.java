@@ -32,6 +32,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,8 +58,7 @@ public class UserServiceImpl implements UserService {
     private CloudinaryService cloudinaryService;
 
     @Autowired
-    @Lazy
-    private BCryptPasswordEncoder passwordEncoder;
+    private org.springframework.beans.factory.ObjectProvider<PasswordEncoder> passwordEncoderProvider;
 
     @Autowired
     private PatientService patientService;
@@ -89,7 +89,7 @@ public class UserServiceImpl implements UserService {
         if (urq.getId() != null) {
             u = userRepo.getUserById(urq.getId());
 
-            if (urq.getPassword() != null && !urq.getPassword().isEmpty() && !this.passwordEncoder.matches(urq.getPassword(), u.getPassword())) {
+            if (urq.getPassword() != null && !urq.getPassword().isEmpty() && !this.passwordEncoderProvider.getObject().matches(urq.getPassword(), u.getPassword())) {
                 validatePassword(urq.getPassword());
             }
 
@@ -109,7 +109,7 @@ public class UserServiceImpl implements UserService {
             }
 
             if (urq.getPassword() != null && !urq.getPassword().trim().isEmpty()) {
-                u.setPassword(passwordEncoder.encode(urq.getPassword()));
+                u.setPassword(passwordEncoderProvider.getObject().encode(urq.getPassword()));
             }
 
             if (urq.getName() != null && !urq.getName().trim().isEmpty()) {
@@ -131,7 +131,7 @@ public class UserServiceImpl implements UserService {
             u = new User();
             u.setUsername(urq.getUsername());
             u.setEmail(urq.getEmail());
-            u.setPassword(passwordEncoder.encode(urq.getPassword()));
+            u.setPassword(passwordEncoderProvider.getObject().encode(urq.getPassword()));
             u.setRole(UserRole.ROLE_PATIENT);
             u.setIsActive(true);
             u.setName(urq.getName());
@@ -203,7 +203,7 @@ public class UserServiceImpl implements UserService {
             user.setRole(UserRole.ROLE_PATIENT);
             user.setCreatedAt(LocalDateTime.now());
             String randomPassword = UUID.randomUUID().toString();
-            user.setPassword(passwordEncoder.encode(randomPassword));
+            user.setPassword(passwordEncoderProvider.getObject().encode(randomPassword));
 
             userRepo.saveOrUpdate(user);
         }
@@ -235,7 +235,7 @@ public class UserServiceImpl implements UserService {
             user.setEmail(email);
             user.setName(name);
             user.setUsername(email);
-            user.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+            user.setPassword(passwordEncoderProvider.getObject().encode(UUID.randomUUID().toString()));
             userRepo.saveOrUpdate(user);
         }
 

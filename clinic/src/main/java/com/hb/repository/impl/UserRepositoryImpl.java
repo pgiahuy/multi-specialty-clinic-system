@@ -13,9 +13,10 @@ import java.util.Map;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,12 +33,8 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<User> implements User
 
     @Autowired
     private SocialAccountRepository socialAccountRepo;
-
     @Autowired
-    private UserRepository userRepo;
-
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
+    private org.springframework.beans.factory.ObjectProvider<PasswordEncoder> passwordEncoderProvider;
 
     @Override
     public List<User> getUsers(Map<String, String> params) {
@@ -139,7 +136,7 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<User> implements User
     public boolean authenticate(String username, String password) {
         User u = this.getUserByUsername(username);
 
-        return this.passwordEncoder.matches(password, u.getPassword());
+        return this.passwordEncoderProvider.getObject().matches(password, u.getPassword());
     }
 
     @Override

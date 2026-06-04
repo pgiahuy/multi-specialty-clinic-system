@@ -21,8 +21,8 @@ const PrescriptionDetail = ({ prescription, error }) => {
                 <div>
                     <div className="fw-semibold">Đơn #{prescription.id}</div>
                 </div>
-                <Badge bg={prescription.status === 'PUBLIC' ? 'success' : 'secondary'} className="text-uppercase p-2">
-                    {prescription.status === 'PUBLIC' ? 'Đã kê đơn' : ''}
+                <Badge bg={prescription.status === 'DISPENSED' ? 'info' : prescription.status === 'PUBLIC' ? 'success' : 'secondary'} className="text-uppercase p-2">
+                    {prescription.status === 'DISPENSED' ? 'Đã xuất' : prescription.status === 'PUBLIC' ? 'Đã kê đơn' : prescription.status}
                 </Badge>
             </div>
 

@@ -83,7 +83,8 @@
             <div class="report-content-section card p-3 bg-light">
 
                 <div th:if="${reportType == 'PATIENT'}" id="patientInPage">
-                    <h3 class="text-primary text-center mb-3"><i class="fas fa-users"></i>BÁO CÁO SỐ LƯỢNG BỆNH NHÂN</h3>
+                    <h3 class="text-primary text-center mb-3"><i class="fas fa-users"></i>BÁO CÁO SỐ LƯỢNG BỆNH NHÂN
+                    </h3>
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <div class="card p-3 h-100 shadow-sm">
@@ -282,7 +283,7 @@
                 var ageLabels = [];
                 var ageValues = [];
 
-               
+
                 if (typeof rawAgeData !== 'undefined' && rawAgeData.length > 0) {
                     rawAgeData.forEach(function (item) {
                         if (item) {
@@ -294,39 +295,39 @@
 
                 var ctx2 = document.getElementById('ageBarChart').getContext('2d');
                 new Chart(ctx2, {
-                    type: 'line', 
+                    type: 'line',
                     data: {
                         labels: ageLabels,
                         datasets: [{
-                                label: 'Số lượng bệnh nhân',
-                                data: ageValues,
-                                borderColor: '#0d6efd', 
-                                backgroundColor: 'rgba(13, 110, 253, 0.2)', )
-                                borderWidth: 2,
-                                fill: true, 
-                                tension: 0.4, 
-                                pointBackgroundColor: '#fff', 
-                                pointBorderColor: '#0d6efd',
-                                pointRadius: 4, 
-                                pointHoverRadius: 6 
-                            }]
+                            label: 'Số lượng bệnh nhân',
+                            data: ageValues,
+                            borderColor: '#0d6efd',
+                            backgroundColor: 'rgba(13, 110, 253, 0.2)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#fff',
+                            pointBorderColor: '#0d6efd',
+                            pointRadius: 4,
+                            pointHoverRadius: 6
+                        }]
                     },
                     options: {
                         responsive: true,
-                        maintainAspectRatio: false, 
+                        maintainAspectRatio: false,
                         plugins: {
-                            legend: {display: false} 
+                            legend: { display: false }
                         },
                         scales: {
                             x: {
                                 grid: {
-                                    display: false 
+                                    display: false
                                 }
                             },
                             y: {
                                 beginAtZero: true,
                                 grid: {
-                                    color: 'rgba(0, 0, 0, 0.05)' 
+                                    color: 'rgba(0, 0, 0, 0.05)'
                                 }
                             }
                         }
@@ -395,6 +396,56 @@
                                             return (value / 1000) + ' nghìn';
                                         return value;
                                     }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            if (document.getElementById('specialtyBarChart')) {
+                var diseaseLabels = [];
+                var diseaseValues = [];
+                if (typeof rawSpecialtyData !== 'undefined' && rawSpecialtyData.length > 0) {
+                    rawSpecialtyData.forEach(function (item) {
+                        if (item) {
+                            diseaseLabels.push(item.specialtyName || item.specialty || item.diagnosis || 'Không rõ');
+                            diseaseValues.push(item.count || 0);
+                        }
+                    });
+                }
+
+                var ctxDisease = document.getElementById('specialtyBarChart').getContext('2d');
+                new Chart(ctxDisease, {
+                    type: 'bar',
+                    data: {
+                        labels: diseaseLabels,
+                        datasets: [{
+                            label: 'Số lượng bệnh nhân',
+                            data: diseaseValues,
+                            backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            x: {
+                                ticks: {
+                                    autoSkip: false,
+                                    maxRotation: 45,
+                                    minRotation: 0
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    precision: 0
                                 }
                             }
                         }
