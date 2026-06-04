@@ -43,12 +43,6 @@ import java.util.Date;
     @NamedQuery(name = "InventoryLog.findByCreatedBy", query = "SELECT i FROM InventoryLog i WHERE i.createdBy = :createdBy")})
 public class InventoryLog implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "id")
-    private Long id;
     @Basic(optional = false)
     @NotNull
     @Column(name = "change_amount")
@@ -66,6 +60,15 @@ public class InventoryLog implements Serializable {
     @Size(max = 255)
     @Column(name = "created_by")
     private String createdBy;
+    @Column(name = "is_confirm")
+    private boolean isConfirm;
+
+    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id")
+    private Long id;
     @JoinColumn(name = "medicine_id", referencedColumnName = "id")
     @ManyToOne
     private Medicine medicineId;
@@ -102,13 +105,6 @@ public class InventoryLog implements Serializable {
         this.changeAmount = changeAmount;
     }
 
-    public InventoryLogType getReason() {
-        return reason;
-    }
-
-    public void setReason(InventoryLogType reason) {
-        this.reason = reason;
-    }
 
     public Long getReferenceId() {
         return referenceId;
@@ -173,6 +169,25 @@ public class InventoryLog implements Serializable {
     @Override
     public String toString() {
         return "com.hb.pojo.InventoryLog[ id=" + id + " ]";
+    }
+
+
+    public InventoryLogType getReason() {
+        return reason;
+    }
+
+    public void setReason(InventoryLogType reason) {
+        this.reason = reason;
+    }
+
+
+
+    public boolean getIsConfirm() {
+        return isConfirm;
+    }
+
+    public void setIsConfirm(boolean isConfirm) {
+        this.isConfirm = isConfirm;
     }
     
 }

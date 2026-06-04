@@ -5,6 +5,7 @@ import { APPOINTMENT_ENDPOINTS, authApis, CLINIC_ENDPOINTS, PAYMENT_ENDPOINTS } 
 import { Button, Col, Container, Row, Table, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import MySpinner from "../../components/MySpinner";
+import ReceptionNavBar from "./StaffNavBar";
 
 const ReceptionAppointments = () => {
     const [appointments, setAppointments] = useState([]);
@@ -15,6 +16,8 @@ const ReceptionAppointments = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const timeRef = useRef(null);
     const nav = useNavigate();
+
+
     const getStatusLabel = (status) => {
         const statusMap = {
             'UN_PAID': 'Chưa thanh toán',
@@ -80,17 +83,8 @@ const ReceptionAppointments = () => {
         <div className="d-flex flex-column min-vh-100">
             <Header />
             <Container fluid className="py-4" style={{ width: '97%' }}>
-                <div className="d-flex justify-content-between align-items-center mb-4">
-                    <h3 className="mb-0 text-center flex-grow-1">Quầy Tiếp Nhận - DANH SÁCH LỊCH HẸN</h3>
-                    <div className="d-flex gap-2">
-                        <Button variant="outline-primary" size="sm" onClick={() => nav('/reception/prescriptions')}>
-                            Xem đơn thuốc
-                        </Button>
-                        <Button variant="outline-primary" size="sm" onClick={() => nav('/reception/invoices')}>
-                            Xem hóa đơn
-                        </Button>
-                    </div>
-                </div>
+                <ReceptionNavBar />
+
                 <Row className="mb-4 g-3 bg-light p-3 pt-0 mt-1 rounded shadow-sm mx-auto" style={{ width: '70%' }}>
                     <Col md={5} sm={12}>
                         <Form.Group controlId="filterKw">
