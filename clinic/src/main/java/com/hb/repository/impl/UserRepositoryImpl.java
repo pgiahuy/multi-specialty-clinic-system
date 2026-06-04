@@ -33,10 +33,6 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<User> implements User
 
     @Autowired
     private SocialAccountRepository socialAccountRepo;
-
-    @Autowired
-    private UserRepository userRepo;
-
     @Autowired
     @Lazy
     private PasswordEncoder passwordEncoder;
