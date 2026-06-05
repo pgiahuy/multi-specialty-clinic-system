@@ -34,3 +34,6 @@ client/dist/
 
 **/configs.properties
 !/clinic/src/main/resources/configs.properties
+
+# IntelliJ IDEA
+.idea/
