@@ -1,205 +1,144 @@
-# Hệ thống Quản lý Phòng khám Đa Khoa Trực tuyến
+# Hệ thống Quản lý Phòng khám Đa khoa
 
-Một hệ thống quản lý phòng khám toàn diện được thiết kế nhằm tối ưu hóa quy trình vận hành y tế, chăm sóc bệnh nhân và các tác vụ hành chính cho các cơ sở y tế đa chuyên khoa.
+Một website quản lý phòng khám đa chuyên khoa. Phần backend viết bằng Spring MVC, frontend bằng React, dữ liệu lưu trên MySQL. Hệ thống phục vụ cả phía bệnh nhân (đặt lịch, khám, thanh toán online) lẫn phía phòng khám (quản lý bác sĩ, hồ sơ bệnh án, kho thuốc, thống kê).
 
----
+## Tính năng
 
-## Tổng quan Dự án
+**Bệnh nhân** đăng ký tài khoản bằng email hoặc đăng nhập qua Google, đặt và huỷ lịch khám theo chuyên khoa, xem lại hồ sơ khám, đơn thuốc và kết quả xét nghiệm. Thanh toán hỗ trợ MoMo, VNPay hoặc tiền mặt tại quầy. Trong lúc chờ, bệnh nhân có thể chat trực tiếp với bác sĩ và nhận thông báo khi có lịch hẹn hoặc đơn thuốc/ thanh toán mới.
 
-Dự án này là một ứng dụng web full-stack hỗ trợ các tính năng:
-- **Quản lý Bệnh nhân**: Đăng ký, quản lý hồ sơ và theo dõi lịch sử y tế.
-- **Đặt lịch Hẹn**: Đặt lịch khám trực tuyến với các bác sĩ chuyên khoa.
-- **Hồ sơ Bệnh án Điện tử (EMR)**: Số hóa hồ sơ sức khỏe và kết quả xét nghiệm của bệnh nhân.
-- **Quản lý Dược & Kho dược**: Danh mục thuốc, theo dõi tồn kho và cảnh báo hạn sử dụng.
-- **Xử lý Thanh toán**: Thanh toán trực tuyến cho các dịch vụ y tế.
-- **Thông báo**: Nhắc lịch hẹn và cập nhật đơn thuốc theo thời gian thực.
-- **Phân tích & Báo cáo**: Số liệu thống kê toàn diện và thông tin chuyên sâu về sức khỏe cộng đồng.
+**Bác sĩ** đăng ký lịch làm việc theo ca, xem danh sách bệnh nhân trong ngày, lập hồ sơ bệnh án, chỉ định xét nghiệm và kê đơn thuốc.
 
----
+**Nhân viên tiếp nhận và thủ kho** phụ trách phần quầy: tiếp nhận lịch hẹn, xuất hoá đơn, thu tiền mặt, quản lý kho thuốc - nhập lô, theo dõi hạn dùng, cảnh báo khi sắp hết, và tự trừ kho theo đơn đã kê.
 
-## Tính năng Cốt lõi
+**Quản trị viên** quản lý các danh mục (chuyên khoa, phòng, khu vực, ca làm việc, bác sĩ, bệnh nhân, thuốc) và xem báo cáo thống kê: doanh thu, cơ cấu bệnh nhân theo độ tuổi/giới tính/chuyên khoa, xếp hạng bác sĩ và tồn kho.
 
-### Dành cho Bệnh nhân
-- Đăng ký tài khoản và quản lý thông tin cá nhân.
-- Đặt lịch hẹn khám trực tuyến theo chuyên khoa.
-- Theo dõi lịch sử khám bệnh và kết quả xét nghiệm.
-- Thanh toán trực tuyến chi phí khám bệnh.
-- Nhận nhắc lịch hẹn và thông tin đơn thuốc theo thời gian thực.
-- Tư vấn y tế từ xa (Video call/Chat).
+## Công nghệ
 
-### Dành cho Bác sĩ & Nhân viên Y tế
-- Quản lý lịch làm việc và danh sách lịch hẹn.
-- Quản lý hồ sơ bệnh án điện tử của bệnh nhân.
-- Quản lý và kê đơn thuốc trực tuyến.
-- Hỗ trợ tư vấn, khám bệnh từ xa.
+Backend đóng gói thành file WAR chạy trên Tomcat; frontend là ứng dụng React tạo bằng Create React App.
 
-### Quản lý Dược & Kho dược
-- Quản lý danh mục thuốc và theo dõi lượng tồn kho.
-- Tự động cảnh báo thuốc sắp hết hạn sử dụng.
-- Thông báo khi lượng hàng trong kho xuống mức thấp.
-- Tự động trừ kho dựa trên đơn thuốc được kê.
+Backend
 
-### Thống kê & Báo cáo
-- Báo cáo biểu đồ nhân khẩu học của bệnh nhân (độ tuổi, giới tính, chuyên khoa).
-- Thống kê tần suất sử dụng các dịch vụ y tế.
-- Theo dõi các mô hình bệnh tật phổ biến trong cộng đồng.
-- Báo cáo doanh thu (tổng quan và chi tiết).
+| Thành phần | Công nghệ |
+|---|---|
+| Ngôn ngữ | Java 17 |
+| Framework | Spring MVC, Spring Security |
+| ORM | Hibernate |
+| CSDL | MySQL |
+| Build | Maven |
+| Khác | JWT (có refresh token), Firebase Admin, Cloudinary, Thymeleaf |
 
----
+Frontend
 
-## Kiến trúc & Công nghệ Sử dụng
+| Thành phần | Công nghệ |
+|---|---|
+| Framework | React (Create React App) |
+| Gọi API | Axios |
+| Giao diện | Bootstrap, PrimeReact |
+| Biểu đồ | Chart.js |
+| Realtime | Firebase (FCM) |
 
-### Backend
-- **Framework**: Spring MVC 6.2.16 + Spring Security 6.3.4
-- **ORM**: Hibernate 6.6.1 với Jakarta Persistence
-- **Cơ sở dữ liệu**: MySQL 8.4.0
-- **API**: RESTful API với Jackson databind
-- **Công cụ đóng gói (Build Tool)**: Maven
-- **Phiên bản Java**: 17
-- **Các thư viện bổ sung**:
-  - Firebase Admin SDK
-  - Cloudinary
-  - JWT
-  - Thymeleaf
-  - Google API Client
 
-### Frontend
-- **Framework**: React 19.2.4
-- **Điều hướng (Routing)**: React Router DOM 7.14.1
-- **Thư viện UI**: Bootstrap 5.3.8 + PrimeReact 10.9.8
-- **Quản lý trạng thái & Gọi API**: Axios
-- **Biểu đồ (Charting)**: Chart.js 4.5.1
-- **Thời gian thực (Real-time)**: Firebase 12.13.0
-- **Xử lý Ngày/Tháng**: Moment.js 2.30.1
-- **Xác thực mã hóa**: JWT Decode 4.0.0
-- **Trình soạn thảo văn bản**: Quill 2.0.3
-- **Công cụ đóng gói**: Create React App
-
----
-
-## Cấu trúc Thư mục
+## Cấu trúc thư mục
 
 ```text
 multi-specialty-clinic-system/
-├── clinic/                      # Backend (Ứng dụng Spring Boot/MVC)
-│   ├── src/main/java/com/hb//
-│   │   ├── controllers/         # Các endpoint REST API
-│   │   ├── service/             # Tầng xử lý logic nghiệp vụ (Business logic)
-│   │   ├── repository/          # Tầng truy cập dữ liệu (Data access)
-│   │   ├── pojo/                # Các thực thể dữ liệu (Entity models)
-│   │   ├── dto/                 # Đối tượng chuyển đổi dữ liệu (Data transfer objects)
-│   │   ├── mapper/              # Bộ ánh xạ DTO (MapStruct)
-│   │   ├── enums/               # Các kiểu dữ liệu Enum
-│   │   └── exception/           # Xử lý ngoại lệ tùy chỉnh (Custom exceptions)
-│   ├── src/main/resources/
-│   │   ├── application.properties # Cấu hình hệ thống
-│   │   └── templates/           # Giao diện Thymeleaf
-│   └── pom.xml                  # Quản lý dependency của Maven
+├── clinic/                      # Backend Spring MVC (đóng gói WAR)
+│   ├── src/main/java/com/hb/
+│   │   ├── configs/             # Cấu hình Spring, Security, Firebase, MoMo, VNPay
+│   │   ├── controllers/         # Controller MVC và REST API (thư mục api/)
+│   │   ├── service/             # Logic nghiệp vụ
+│   │   ├── repository/          # Truy cập dữ liệu qua Hibernate
+│   │   ├── pojo/                # Entity ánh xạ CSDL
+│   │   ├── dto/  mapper/        # DTO và bộ ánh xạ Entity-DTO
+│   │   ├── enums/  filters/     # Enum dùng chung, JWT filter
+│   │   └── exception/
+│   ├── src/main/resources/      # databases.properties, configs.properties, templates
+│   ├── db/init.sql              # Script khởi tạo cơ sở dữ liệu
+│   └── pom.xml
 │
-├── client/                      # Frontend (Ứng dụng React)
-│   ├── src/
-│   │   ├── components/          # Các component React dùng chung
-│   │   ├── pages/               # Các trang giao diện chính
-│   │   ├── services/            # Các hàm gọi API service
-│   │   ├── utils/               # Các hàm tiện ích bổ trợ
-│   │   ├── App.js               # Component chính của ứng dụng
-│   │   └── index.js             # Điểm khởi chạy hệ thống (Entry point)
-│   ├── public/                  # Các tài nguyên tĩnh (Static assets)
-│   └── package.json             # Quản lý dependency của NPM
-│
-└── README.md                    # File hướng dẫn này
+└── client/                      # Frontend React
+    ├── src/
+    │   ├── components/          # Component dùng chung
+    │   ├── configs/             # Apis.js, Contexts.js, firebaseConfig.js
+    │   ├── reducers/            # Quản lý trạng thái người dùng
+    │   └── screens/             # Màn hình theo vai trò: Doctor, Patient,
+    │                            #   Reception, StoreKeeper, Home, User
+    └── package.json
 ```
 
-## Các Phân hệ Chính
+## Cài đặt & Chạy
 
-### Quản lý Người dùng
-- Đăng ký, đăng nhập và xác thực người dùng (JWT + Đăng nhập mạng xã hội).
-- Phân quyền truy cập dựa trên vai trò (Bệnh nhân, Bác sĩ, Quản trị viên).
-- Quản lý FCM token để phục vụ gửi thông báo đẩy.
+Cần Java 17, Maven, Node.js 18+, npm và MySQL 8.
 
-### Hệ thống Đặt lịch khám
-- Tạo và quản lý lịch làm việc của bác sĩ.
-- Đặt lịch hẹn và xác nhận lịch khám.
-- Theo dõi trạng thái lịch hẹn (đang chờ, đã xác nhận, đã hoàn thành, đã hủy).
-- Xếp hạng bác sĩ dựa trên tỷ lệ chuyển đổi lịch hẹn thành công.
+**Cơ sở dữ liệu** - tạo database và import script khởi tạo:
 
-### Hồ sơ Bệnh án
-- Quản lý toàn diện lịch sử y tế của bệnh nhân.
-- Quản lý kết quả xét nghiệm lâm sàng.
-- Thống kê nhân khẩu học bệnh nhân và các mối quan hệ gia đình liên quan.
+```bash
+mysql -u root -p -e "CREATE DATABASE clinicdb CHARACTER SET utf8mb4;"
+mysql -u root -p clinicdb < clinic/db/init.sql
+```
 
-### Quản lý Dược phẩm & Kho hàng
-- Quản lý các lô thuốc nhập kho kèm theo theo dõi ngày hết hạn.
-- Nhật ký lưu trữ mọi biến động, thay đổi của kho hàng.
-- Tự động gửi cảnh báo khi hàng sắp hết hoặc thuốc sắp quá hạn.
+Sửa thông tin kết nối trong `clinic/src/main/resources/databases.properties`, và điền các khoá dịch vụ (Firebase, Cloudinary, MoMo, VNPay, Google/Facebook) trong `configs.properties`.
 
-### Hệ thống Thanh toán
-- Hỗ trợ nhiều phương thức thanh toán linh hoạt.
-- Theo dõi và cập nhật trạng thái giao dịch theo thời gian thực.
-- Xuất báo cáo doanh thu tổng hợp.
+**Backend** - build ra file WAR rồi triển khai lên Tomcat 10 trở lên:
 
-### Hệ thống Thông báo
-- Tích hợp dịch vụ Firebase Cloud Messaging (FCM).
-- Gửi thông báo nhắc lịch khám định kỳ.
-- Thông báo đơn thuốc mới cho bệnh nhân.
-- Lưu nhật ký lịch sử thông báo vào cơ sở dữ liệu.
+```bash
+cd clinic
+mvn clean package
+```
 
+**Frontend**:
 
-## Tính năng Bảo mật
-- Sử dụng Spring Security để phân quyền dựa trên vai trò.
-- Xác thực người dùng thông qua mã token mã hóa JWT.
-- Tích hợp cơ chế đăng nhập bằng tài khoản MXH bên thứ ba (Google, Facebook).
+```bash
+cd client
+npm install
+npm start
+```
 
----
+Frontend chạy ở `http://localhost:3000`. Nếu muốn dùng Docker, mỗi thư mục `clinic/` và `client/` đã có sẵn Dockerfile để build image.
 
-## Sơ đồ Cơ sở Dữ liệu
+Pipeline CI/CD trong `.github/workflows/cicd.yml` hiện đã tắt vì dự án đã hoàn thành.
 
-<img width="1962" height="1277" alt="a" src="https://github.com/user-attachments/assets/59de2c27-47ec-46e7-9f9c-b85a11d3b180" />
+## Cơ sở dữ liệu
 
+<img width="1962" height="1277" alt="ERD" src="https://github.com/user-attachments/assets/59de2c27-47ec-46e7-9f9c-b85a11d3b180" />
 
-Các thực thể cốt lõi bao gồm:
-- **User**: Tài khoản người dùng phục vụ đăng nhập và phân quyền.
-- **Patient**: Thông tin nhân khẩu học và hồ sơ y tế bệnh nhân.
-- **Appointment**: Dữ liệu điều phối và quản lý lịch hẹn khám.
-- **Medicine**: Danh mục thuốc trong kho dược.
-- **MedicineBatch**: Theo dõi chi tiết từng lô thuốc nhập và hạn sử dụng.
-- **Payment**: Lưu trữ nhật ký các giao dịch thanh toán hóa đơn.
-- **Notification**: Quản lý thông báo gửi tới người dùng.
-- **LabTest**: Hồ sơ lưu trữ kết quả xét nghiệm và cận lâm sàng.
-- **InventoryLog**: Nhật ký ghi nhận mọi biến động xuất-nhập kho.
+| Bảng | Mô tả |
+|---|---|
+| User, Patient | Tài khoản và hồ sơ bệnh nhân |
+| Doctor, Specialty | Bác sĩ và chuyên khoa (quan hệ nhiều-nhiều) |
+| Schedule, Shift | Lịch làm việc và ca của bác sĩ |
+| Appointment | Lịch hẹn khám |
+| MedicalRecord | Hồ sơ bệnh án |
+| Prescription, PrescriptionItem | Đơn thuốc và chi tiết |
+| Medicine, MedicineBatch | Thuốc và lô nhập kho |
+| InventoryLog | Nhật ký xuất-nhập kho |
+| LabResult, LabResultDetail | Kết quả xét nghiệm |
+| Payment, PaymentItem | Giao dịch thanh toán |
+| Conversation, ChatMessage | Chat bác sĩ-bệnh nhân |
+| Notification | Thông báo đẩy |
 
----
+## Một số Endpoint API
 
-## Các Endpoint API mẫu
+```
+POST   /api/auth/register        Đăng ký
+POST   /api/auth/login           Đăng nhập
+POST   /api/auth/refresh         Làm mới token
 
-### Xác thực & Tài khoản
-- `POST /auth/register` - Đăng ký tài khoản mới
-- `POST /auth/login` - Đăng nhập vào hệ thống
-- `POST /auth/logout` - Đăng xuất khỏi hệ thống
+GET    /api/appointments         Danh sách lịch hẹn
+POST   /api/appointments         Đặt lịch hẹn
+GET    /api/appointments/{id}    Chi tiết lịch hẹn
 
-### Lịch hẹn khám
-- `GET /api/appointments` - Lấy danh sách các lịch hẹn
-- `POST /api/appointments` - Tạo lịch hẹn mới
-- `GET /api/appointments/{id}` - Xem chi tiết một lịch hẹn cụ thể
-- `PUT /api/appointments/{id}` - Cập nhật thông tin lịch hẹn
+POST   /api/payments             Tạo giao dịch (MoMo/VNPay/tiền mặt)
+GET    /api/stats/revenue        Báo cáo doanh thu
+```
 
-### Quản lý Thuốc (Admin)
-- `GET /admin/medicines` - Lấy danh sách các loại thuốc
-- `POST /admin/medicines` - Thêm mới một loại thuốc vào danh mục
-- `DELETE /admin/medicines/{id}` - Xóa thuốc khỏi hệ thống
+Danh sách đầy đủ nằm trong `clinic/src/main/java/com/hb/controllers/`.
 
-### Thanh toán
-- `GET /api/payments` - Xem danh sách hóa đơn giao dịch
-- `POST /api/payments` - Tạo hóa đơn thanh toán mới
-- `GET /api/payments/{id}` - Xem chi tiết giao dịch cụ thể
+## Nhóm phát triển
 
-### Báo cáo Thống kê
-- `GET /api/stats/patients` - Thống kê nhân khẩu học bệnh nhân
-- `GET /api/stats/revenue` - Báo cáo doanh thu tài chính
-- `GET /api/stats/services` - Thống kê tần suất dùng các dịch vụ y tế
+- Gia Huy - [@pgiahuy](https://github.com/pgiahuy)
+- Bao Nguyen - baondq205
 
 ---
 
-Trạng thái: Đang trong quá trình phát triển.
-
-Cập nhật lần cuối: Tháng 6 năm 2026
+Dự án đã hoàn thành. Cập nhật lần cuối tháng 7 năm 2026.
